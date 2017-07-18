@@ -42,7 +42,7 @@ class SingleResponseGrader(AbstractGrader):
         {'ok':..., 'msg':..., 'decimal_grade':...}
     
     """
-    
+
     @staticmethod
     def standardize_expect(expect):
         """Standard form of expect is a list of dictionaries with structure:
@@ -63,59 +63,29 @@ class SingleResponseGrader(AbstractGrader):
             containing key 'expect'.
             Result: Raise Exception.
         """
-        try: # Case 1
-            assert isinstance(expect, list)
+        try:
+            case_1 = all([ isinstance(item, dict) and 'expect' in item for item in expect ])
+        except:
+            case_1 = False
+        try:
+            case_2a = not isinstance(expect, list)
+            case_2b = isinstance(expect, list) and all( [ not isinstance(item, dict) or 'expect' not in item for item in expect ] )
+            case_2 = case_2a or case_2b
+        except:
+            case_2 = False
+            
+        if case_1:
             standardized_expect = []
             for item in expect:
-                assert isinstance(item, dict)
-                assert 'expect' in item
                 item.setdefault('msg','')
                 item.setdefault('grade_decimal', 1)
                 item.setdefault('ok', SingleResponseGrader.grade_decimal_to_ok(item['grade_decimal']) )
                 standardized_expect.append(item)
             return standardized_expect
-        except AssertionError:
-            pass
-        
-        try: # Case 2 and expect is not a list
-            assert not isinstance(expect, list)
+        elif case_2:
             return [{'expect':expect, 'msg':'', 'grade_decimal':1, 'ok':True}]
-        except AssertionError: 
-            pass
-        
-        try: # Case 2 and expect is a list
-            for item in expect:
-                if isinstance(item, dict):
-                    assert 'expect' not in item
-            return {'expect':expect, 'msg':'', 'grade_decimal':1, 'ok':True}
-        except AssertionError:
-            pass
-        
-        # Case 3
-        raise Exception("expect is improperly formatted.")
-    
-    @staticmethod
-    def assert_result_valid(result):
-        assert result['ok'] in [True, False, 'partial']
-        assert 0 <= result['grade_decimal'] <= 1
-        assert 'msg' in result
-
-    @staticmethod
-    def assert_cfn_result_valid(cfn):
-        """Asserts SingleResponseGrader.cfn returns a dict with
-        key 'ok' and standardizes result to form:
-            {'ok': ... , 'msg': ... , 'grade_decimal': ...}
-        """
-
-        def decorated_cfn(expect, answer):
-            """cfn where output is guaranteed to have form
-            {'ok': ... , 'msg': ... , 'grade_decimal': ...}
-            """
-            result = cfn(expect, answer)
-            SingleResponseGrader.assert_result_valid(result)
-            return result
-           
-        return decorated_cfn
+        else:
+            raise Exception("expect is improperly formatted.")
 
     def iterate_cfn(self, cfn):
         def iterated_cfn(expect, answer):
@@ -155,7 +125,6 @@ class SingleResponseGrader(AbstractGrader):
     
     def __init__(self, config):
         super(SingleResponseGrader, self).__init__(config)
-        self.cfn = self.assert_cfn_result_valid(self.cfn)
         self.cfn = self.iterate_cfn(self.cfn)
 
 class MultiResponseGrader(AbstractGrader):
@@ -166,40 +135,7 @@ class MultiResponseGrader(AbstractGrader):
     where input_list is a list SingleResponseGrader.cfn results
     
     """
-    
-    @staticmethod
-    def assert_result_valid(overall_result):
-        """Standardizes cfn return value.
-        Required keys are:
-            input_list (list): a list of SingleResponseGrader.cfn return values
-        Optional keys are:
-            overall_message (str): defaults to empty string
-        
-        The individual results in input_list are standardized with SingleResponseGrader.standardize_result
-        """
-        assert isinstance(overall_result['overall_message'], str)
-        assert isinstance(overall_result['input_list'], list)
-        for result in overall_result['input_list']:
-            SingleResponseGrader.assert_result_valid(result)
-            
-        return overall_result
-
-    @staticmethod
-    def assert_cfn_result_valid(cfn):
-        """Asserts MultiResponseGrader.cfn returns a dict with key-values:
-            overall_message: str
-            input_list: a list of SingleResponseGrader.cfn valid results
-        """
-
-        def decorated_cfn(expect, answer):
-            """cfn where output is guaranteed to have form
-            {'ok': ... , 'msg': ... , 'grade_decimal': ...}
-            """
-            result = cfn(expect, answer)
-            MultiResponseGrader.assert_result_valid(result)
-            return result
-           
-        return decorated_cfn
+    pass
 
 class ListGrader(AbstractGrader):
     """A generic grader for grading lists of input according to the same check function.
@@ -278,11 +214,9 @@ class ListMultiGrader(ListGrader):
     
     def __init__(self, config):
         super(ListMultiGrader, self).__init__(config)
-        self.cfn = MultiResponseGrader.assert_cfn_result_valid(self.cfn)
     
     def cfn(self, expect, answers):
         self.config['expect'] if expect==None else expect
-        assert len(expect) == len(answers)
         
         if self.config['ordered']:
             input_list = [ self.item_cfn(e, a) for e, a in zip(expect, answers) ]
@@ -344,7 +278,6 @@ class ListSingleGrader(ListGrader):
     
     def __init__(self, config):
         super(ListSingleGrader, self).__init__(config)
-        self.cfn = SingleResponseGrader.assert_cfn_result_valid(self.cfn)
     
     def cfn(self, expect, answer):
         self.config['expect'] if expect==None else expect
