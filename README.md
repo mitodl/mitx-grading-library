@@ -42,12 +42,15 @@ Above, `item_grader` is the grader responsible for grading individual list items
 Comments:
 
  1. `ListGrader` is fully(?) implemented, but the only currently implemeneted ItemGrader is a `StringGrader`, which Chris has been using as a toy grader.
+ 
  2. The `ListGrader`'s `cfn` can accept two forms of input:
    - A list of strings with same length as `expect` (for when `<customresponse>` has multiple input fields)
    - A comma-separated list of items with varying length (for when customresponse has one input field)
+   
  3. By default, `ListGrader` does not care about the list order. In this case, assigning student asnwers to expected answers amounts to solving an [Assignment Problem](https://en.wikipedia.org/wiki/Assignment_problem). 
      - To find the optimal assignment of student answers to expected answers, we use [munkres.py](https://github.com/bmc/munkres)
      - Partial credit is given in proportion to the number of correct answers minus the number of incorrect answers.
+     
   4. `expect` can be either a simple list of expected answers, or a nested list of dictionaries containing feedback messages and partial credit. For an example, see `[test_list_grader](graders/tests/test_list_grader.py)`
  
 
