@@ -2,7 +2,7 @@
 
 A library of graders for EdX Custom Response problems.
 
-**TODO: This readme is out of date since voluptuous refactoring**
+**WARNING / TODO: This readme is out of date since voluptuous refactoring**
 
 # Installation
   
