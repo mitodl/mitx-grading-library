@@ -3,7 +3,7 @@ from .. import graders
 
 def test_single_expect_value_in_config():
     grader = graders.StringGrader({
-        'expect':'cat'
+        'answers':['cat']
     })
     submission = 'dog'
     expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
@@ -11,7 +11,7 @@ def test_single_expect_value_in_config():
 
 def test_list_of_expect_values():
     grader = graders.StringGrader({
-        'expect':[
+        'answers':[
             {'expect':'zebra', 'grade_decimal':1},
             {'expect':'horse', 'grade_decimal':0.45},
             {'expect':'unicorn', 'grade_decimal':0, 'msg': "unicorn_msg"}
@@ -23,14 +23,14 @@ def test_list_of_expect_values():
     
 def test_longer_message_wins_grade_ties():
     grader1 = graders.StringGrader({
-        'expect':[
+        'answers':[
             {'expect':'zebra', 'grade_decimal':1},
             {'expect':'horse', 'grade_decimal':0, 'msg':'short'},
             {'expect':'unicorn', 'grade_decimal':0, 'msg': "longer_msg"}
         ]
     })
     grader2 = graders.StringGrader({
-        'expect':[
+        'answers':[
             {'expect':'zebra', 'grade_decimal':1},
             {'expect':'unicorn', 'grade_decimal':0, 'msg': "longer_msg"},
             {'expect':'horse', 'grade_decimal':0, 'msg':'short'}
