@@ -34,6 +34,7 @@ class AbstractGrader(object):
     
     def __init__(self, config={}):
         self.config = self.validate_config(config)
+    
     def __repr__(self):
         return "{classname}({config})".format(classname=self.__class__.__name__, config = self.config)
         
@@ -92,7 +93,7 @@ class ListGrader(AbstractGrader):
             raise Exception("Expected answer to have type <type list> or <type unicode>, but had {t}".format(t = type(student_input)))
 
 class ListMultiGrader(ListGrader):
-    """Delegated to by ListGrader.cfn when answer is a list of answers.
+    """Delegated to by ListGrader.cfn when student_input is a list.
     I.e., when customresponse contains multiple inputs.
     """
     
@@ -107,7 +108,7 @@ class ListMultiGrader(ListGrader):
         return {'input_list':input_list, 'overall_message':''}
 
 class ListSingleGrader(ListGrader):
-    """Delegated to by ListGrader.cfn when answer is a string.
+    """Delegated to by ListGrader.cfn when student_input is a string.
     I.e., when customresponse contains a single input.
     """
     
@@ -177,6 +178,8 @@ class ListSingleGrader(ListGrader):
 
 class ItemGrader(AbstractGrader):
     
+    __meta__ = abc.ABCMeta
+    
     @staticmethod
     def grade_decimal_to_ok(gd):
         if gd == 0 :
@@ -185,6 +188,10 @@ class ItemGrader(AbstractGrader):
             return True
         else:
             return 'partial'
+    
+    @abc.abstractmethod
+    def validate_input(self, value):
+        pass
     
     @property
     def schema_answer(self):
