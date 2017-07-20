@@ -29,6 +29,9 @@ class AbstractGrader(object):
         """
         pass
     
+    def validate_config(self, config):
+        return vh.validate_with_humanized_errors(config, self.schema_config)
+    
     def __init__(self, config={}):
         self.config = self.validate_config(config)
     def __repr__(self):
@@ -36,7 +39,8 @@ class AbstractGrader(object):
         
 class ListGrader(AbstractGrader):
     
-    def validate_config(self, config):
+    def make_schema_config(self, config):
+        # ListGrader's schema_config depends on the config object...differe for different ItemGraders. Hence we need a function to dynamically create the schema.
         item_grader = vh.validate_with_humanized_errors( config['item_grader'], Schema(ItemGrader) )        
         schema = Schema({
             Required('ordered', default=False):bool,
@@ -44,8 +48,13 @@ class ListGrader(AbstractGrader):
             Required('item_grader'):ItemGrader,
             Required('answers_list'): [ item_grader.schema_answers ], 
         })
-        return vh.validate_with_humanized_errors(config, schema)
-
+        return schema
+    
+    def __init__(self, config={}):
+        self.schema_config = self.make_schema_config(config)
+        super(ListGrader, self).__init__(config)
+        self.item_cfn = self.config['item_grader'].cfn
+    
     @staticmethod
     def find_optimal_order(cfn, answers_list, student_input_list):
         """ Finds optimal assignment of student_inputs --> answers according to cfn
@@ -70,11 +79,7 @@ class ListGrader(AbstractGrader):
         
         input_list = [ result_matrix[i][j] for i, j in indexes]
         return input_list
-    
-    def __init__(self, config={}):
-        super(ListGrader, self).__init__(config)
-        self.item_cfn = self.config['item_grader'].cfn
-        
+
     def cfn(self, answers_list, student_input):
         answers_list = self.config['answers_list']
         multi_input = isinstance(student_input, list)
@@ -217,9 +222,6 @@ class ItemGrader(AbstractGrader):
         return Schema({
             Required('answers', default=[]): self.schema_answers
         })
-
-    def validate_config(self, config):
-        return vh.validate_with_humanized_errors(config, self.schema_config)
 
     def iterate_cfn(self, cfn):
         def iterated_cfn(answers, student_input):
