@@ -86,13 +86,13 @@ class ListGrader(AbstractGrader):
         multi_input = isinstance(student_input, list)
         single_input = isinstance(student_input, str) or isinstance(student_input, unicode)
         if multi_input:
-            return ListMultiGrader(self.config).cfn(answers_list, student_input)
+            return ListGraderListInput(self.config).cfn(answers_list, student_input)
         elif single_input:
-            return ListSingleGrader(self.config).cfn(answers_list, student_input)
+            return ListGraderStringInput(self.config).cfn(answers_list, student_input)
         else:
             raise Exception("Expected answer to have type <type list> or <type unicode>, but had {t}".format(t = type(student_input)))
 
-class ListMultiGrader(ListGrader):
+class ListGraderListInput(ListGrader):
     """Delegated to by ListGrader.cfn when student_input is a list.
     I.e., when customresponse contains multiple inputs.
     """
@@ -107,7 +107,7 @@ class ListMultiGrader(ListGrader):
         
         return {'input_list':input_list, 'overall_message':''}
 
-class ListSingleGrader(ListGrader):
+class ListGraderStringInput(ListGrader):
     """Delegated to by ListGrader.cfn when student_input is a string.
     I.e., when customresponse contains a single input.
     """
