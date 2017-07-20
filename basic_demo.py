@@ -4,7 +4,7 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 list_grader = ListGrader({
-    'expect': ['cat', 'dog', 'unicorn'],
+    'answers_list': [['cat'], ['dog'], ['unicorn']],
     'item_grader': StringGrader() 
 })
  

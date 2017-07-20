@@ -2,6 +2,8 @@
 
 A library of graders for EdX Custom Response problems.
 
+**WARNING / TODO: This readme is out of date since voluptuous refactoring**
+
 # Installation
   
   **Requirements:** An installation of Python 2.7 (since this is what EdX uses). 
