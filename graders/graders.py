@@ -1,6 +1,6 @@
 from __future__ import division
 import munkres
-from numbers import Number
+import numbers
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid, Invalid, humanize
 import voluptuous.humanize as vh
 from pprint import pprint
@@ -165,7 +165,7 @@ class ItemGrader(AbstractGrader):
     def schema_answer(self):
         return Schema({
             Required('expect', default=None): self.validate_input,
-            Required('grade_decimal', default=1): All(Number, Range(0,1)),
+            Required('grade_decimal', default=1): All(numbers.Number, Range(0,1)),
             Required('msg', default=''): str,
             Required('ok',  default='computed'):Any('computed', True, False, 'partial')
         })
@@ -230,20 +230,19 @@ class ItemGrader(AbstractGrader):
         self.cfn = self.iterate_cfn( self.cfn)
 
 class NumberGrader(ItemGrader):
-    schema_expect = Number
     
     @property
     def schema_config(self):
         schema = super(NumberGrader, self).schema_config
         return schema.extend({
             Required('tolerance', default=0.1) : Any(
-                All(Number, Range(0,float('inf'))),
+                All(numbers.Number, Range(0,float('inf'))),
                 PercentageString
             )
         })
 
     def validate_input(self, value):
-        if isinstance(value, Number):
+        if isinstance(value, numbers.Number):
             return value
         raise ValueError
 
