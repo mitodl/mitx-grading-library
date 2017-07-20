@@ -172,15 +172,6 @@ class ListSingleGrader(ListGrader):
 
 class ItemGrader(AbstractGrader):
     
-    @property
-    def schema_answer(self):
-        return Schema({
-            Required('expect', default=None): self.validate_input,
-            Required('grade_decimal', default=1): All(numbers.Number, Range(0,1)),
-            Required('msg', default=''): str,
-            Required('ok',  default='computed'):Any('computed', True, False, 'partial')
-        })
-    
     @staticmethod
     def grade_decimal_to_ok(gd):
         if gd == 0 :
@@ -189,6 +180,15 @@ class ItemGrader(AbstractGrader):
             return True
         else:
             return 'partial'
+    
+    @property
+    def schema_answer(self):
+        return Schema({
+            Required('expect', default=None): self.validate_input,
+            Required('grade_decimal', default=1): All(numbers.Number, Range(0,1)),
+            Required('msg', default=''): str,
+            Required('ok',  default='computed'):Any('computed', True, False, 'partial')
+        })
     
     @property
     def schema_answers(self):
