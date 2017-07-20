@@ -20,7 +20,7 @@ class AbstractGrader(object):
     
     __meta__ = abc.ABCMeta
     
-    @abstractmethod
+    @abc.abstractmethod
     def cfn(self, answer, student_input):
         """Arguments:
             answer: a dictionary of form
