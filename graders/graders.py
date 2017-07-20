@@ -1,6 +1,7 @@
 from __future__ import division
 import munkres
 import numbers
+import abc
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid, Invalid, humanize
 import voluptuous.humanize as vh
 from pprint import pprint
@@ -16,6 +17,17 @@ def PercentageString(value):
     raise ValueError("Not a percentage string.")
 
 class AbstractGrader(object):
+    
+    __meta__ = abc.ABCMeta
+    
+    @abstractmethod
+    def cfn(self, answer, student_input):
+        """Arguments:
+            answer: a dictionary of form
+                {'expect':..., 'ok':..., 'msg':..., 'grade_decimal':...}
+            student_input: a string passed to grader by EdX
+        """
+        pass
     
     def __init__(self, config={}):
         self.config = self.validate_config(config)
@@ -73,7 +85,6 @@ class ListGrader(AbstractGrader):
             return ListSingleGrader(self.config).cfn(answers_list, student_input)
         else:
             raise Exception("Expected answer to have type <type list> or <type unicode>, but had {t}".format(t = type(student_input)))
-    
 
 class ListMultiGrader(ListGrader):
     """Delegated to by ListGrader.cfn when answer is a list of answers.
@@ -262,11 +273,6 @@ class StringGrader(ItemGrader):
         raise ValueError
     
     def cfn(self, answer, student_input):
-        """Arguments:
-            answer: a dictionary of form
-                {'expect':..., 'ok':..., 'msg':..., 'grade_decimal':...}
-            student_input: a string passed to grader by EdX
-        """
         if self.config['strip']:
             answer['expect'] = answer['expect'].strip()
             student_input = student_input.strip()
