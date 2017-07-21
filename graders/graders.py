@@ -4,7 +4,6 @@ import numbers
 import abc
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid, Invalid, humanize
 import voluptuous.humanize as vh
-from pprint import pprint
 
 def PercentageString(value):
     if isinstance(value, str) and value.endswith("%"):
