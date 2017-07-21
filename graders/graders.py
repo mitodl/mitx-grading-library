@@ -40,7 +40,7 @@ class AbstractGrader(object):
 class ListGrader(AbstractGrader):
     
     def make_schema_config(self, config):
-        # ListGrader's schema_config depends on the config object...differe for different ItemGraders. Hence we need a function to dynamically create the schema.
+        # ListGrader's schema_config depends on the config object...different for different ItemGraders. Hence we need a function to dynamically create the schema.
         item_grader = vh.validate_with_humanized_errors( config['item_grader'], Schema(ItemGrader) )        
         schema = Schema({
             Required('ordered', default=False):bool,
