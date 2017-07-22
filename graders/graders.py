@@ -128,6 +128,18 @@ class ListGrader(AbstractGrader):
         >>> result == expected
         True
     
+    Optionally, change the separator for single-input:
+        >>> semicolon_grader = ListGrader({
+        ...     'separator': ';',
+        ...     'answers_list':[['cat'], ['dog'], ['fish']],
+        ...     'item_grader': StringGrader()
+        ... })
+        >>> result = semicolon_grader.cfn(None, "cat; fish; moose")
+        >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }
+        >>> result == expected
+        True
+    
+    
     """
     
     def make_schema_config(self, config):
