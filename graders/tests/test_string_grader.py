@@ -9,6 +9,14 @@ def test_single_expect_value_in_config():
     expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
     assert grader.cfn(None, submission) == expected_result
 
+def test_single_expect_value_in_config_and_passed_explicitly():
+    grader = graders.StringGrader({
+        'answers':['cat']
+    })
+    submission = 'dog'
+    expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
+    assert grader.cfn('cat', submission) == expected_result
+
 def test_list_of_expect_values():
     grader = graders.StringGrader({
         'answers':[
