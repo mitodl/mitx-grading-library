@@ -54,8 +54,93 @@ class AbstractGrader(object):
         return "{classname}({config})".format(classname=self.__class__.__name__, config = self.config)
         
 class ListGrader(AbstractGrader):
-    """Grades Lists"""
+    """Grades Lists of items according to ItemGrader, unordered by default.
     
+    ListGrader can be used to grade a list of answers according to the 
+    supplied ItemGrader. Works with either multi-input customresponse
+    or single-input customresponse.
+    
+    How learners enter lists in customresponse
+    ==========================================
+    
+    Multi-input customresponse:
+        <customresmse cfn="grader.cfn">
+            <textline/> <!-- learner enters cat -->
+            <textline/> <!-- learner enters dog -->
+            <textline/> <!-- learner leaves blank -->
+        </customresmse>
+        Notes:
+            grader.cfn receives a list: ['cat', 'dog', None]
+            list will always contain exactly as many items as input tags
+    
+    Single-input customresponse:
+        <customresmse cfn="grader.cfn">
+            <textline/> <!-- learner enters 'cat, dog, fish, rabbit' -->
+        </customresmse>
+        Notes:
+            learner is responsible for entering item separator (here: ',')
+            grader.cfn receives a string: 'cat, dog, fish, rabbit'
+            learner might enter fewer or more items than author expects
+    
+    Basic Usage
+    ===========
+    
+    Grade a list of strings (multi-input)
+        >>> grader = ListGrader({
+        ...     'answers_list':[['cat'], ['dog'], ['fish']],
+        ...     'item_grader': StringGrader()
+        ... })
+        >>> result = grader.cfn(None, ['fish', 'cat', 'moose'])
+        >>> expected = {'input_list':[
+        ...     {'ok': True, 'grade_decimal':1, 'msg':''},
+        ...     {'ok': True, 'grade_decimal':1, 'msg':''},
+        ...     {'ok': False, 'grade_decimal':0, 'msg':''}
+        ... ], 'overall_message':''}
+        >>> result == expected
+        True
+    
+    Grade a string of comma-separated items through the same API:
+        >>> result = grader.cfn(None, "cat, fish, moose")
+        >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }
+        >>> result == expected
+        True
+
+    Extra items reduce score:
+        >>> result = grader.cfn(None, "cat, fish, moose, rabbit")
+        >>> expected = {'ok':'partial', 'grade_decimal':1/3, 'msg': '' }
+        >>> result == expected
+        True
+
+    but not below zero:
+        >>> result = grader.cfn(None, "cat, fish, moose, rabbit, bear, lion")
+        >>> expected = {'ok':False, 'grade_decimal':0, 'msg': '' }
+        >>> result == expected
+        True
+    
+    Optionally, make order matter:
+        >>> ordered_grader = ListGrader({
+        ...     'ordered': True,
+        ...     'answers_list':[['cat'], ['dog'], ['fish']],
+        ...     'item_grader': StringGrader()
+        ... })
+        >>> result = ordered_grader.cfn(None, "cat, fish, moose")
+        >>> expected = {'ok':'partial', 'grade_decimal':1/3, 'msg': '' }
+        >>> result == expected
+        True
+    
+    Optionally, change the separator for single-input:
+        >>> semicolon_grader = ListGrader({
+        ...     'separator': ';',
+        ...     'answers_list':[['cat'], ['dog'], ['fish']],
+        ...     'item_grader': StringGrader()
+        ... })
+        >>> result = semicolon_grader.cfn(None, "cat; fish; moose")
+        >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }
+        >>> result == expected
+        True
+    
+    
+    """
     
     def make_schema_config(self, config):
         """Returns a voluptuous Schema object to validate config
@@ -135,22 +220,36 @@ class ListGraderStringInput(ListGrader):
     """
     
     @staticmethod
-    def assign_partial_credit(graded_input_list, n_expect):
-        """Given input list and expected number of inputs, assigns partial credit.
-        Inputs:
-            input_list, a list of SingleResponseGrader.check results
-            n_expect: expected number of answers
+    def calculate_grade(grade_decimals, n_expect):
+        """Consolidate several grade_decimals into one.
         
-        Assigns score linearly:
-            +1 for each correct answer,
-            -1 part for each extra answer.
-        with a minimum score of zero.
+        Arguments:
+            grade_decimals (list): A list of floats between 0 and 1
+            n_expect (int): expected number of answers
+        Returns:
+            float, either:
+                average of grade_decimals padded to length n_extra if
+                    necessary, and subtracting 1/n_extra for each extra, or
+                zero
+            whichever is larger.
+        
+        Usage:
+            >>> ListGraderStringInput.calculate_grade([1, 0, 0.5], 4)
+            0.375
+            >>> ListGraderStringInput.calculate_grade([1,0.5,0], 2)
+            0.25
+            >>> ListGraderStringInput.calculate_grade([1,0.5,0,0,0],2)
+            0
         """
-        points = sum([ result['grade_decimal'] for result in graded_input_list ])
-        n_extra = len(graded_input_list) - n_expect
-        grade_decimal = max(0, (points-n_extra)/n_expect )
+        n_extra = len(grade_decimals) - n_expect
+        if n_extra > 0:
+            grade_decimals += [-1] * n_extra
+        elif n_extra < 0:
+            grade_decimals += [0] * abs(n_extra)
         
-        return grade_decimal
+        avg = sum(grade_decimals)/n_expect
+        
+        return max(0, avg)
 
     @staticmethod
     def find_optimal_order(check, answers_list, student_input_list):
@@ -187,7 +286,8 @@ class ListGraderStringInput(ListGrader):
         else:
             input_list = self.find_optimal_order( self.item_check, answers_list, student_input_list)
         
-        grade_decimal = self.assign_partial_credit(input_list, len(answers_list))
+        grade_decimals = [g['grade_decimal'] for g in input_list]
+        grade_decimal = self.calculate_grade(grade_decimals, len(answers_list))
         ok = ItemGrader.grade_decimal_to_ok(grade_decimal)
         
         result = {
