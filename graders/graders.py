@@ -10,7 +10,7 @@ from validatorfuncs import PercentageString
 class ObjectWithSchema(object):
     "Represents a user-facing object whose configuration needs validation."
     
-    __meta__ = abc.ABCMeta
+    __metaclass__ = abc.ABCMeta
     
     @abc.abstractproperty
     def schema_config(self):
@@ -28,7 +28,7 @@ class ObjectWithSchema(object):
 
 class AbstractGrader(ObjectWithSchema):
     
-    __meta__ = abc.ABCMeta
+    __metaclass__ = abc.ABCMeta
     
     @abc.abstractmethod
     def check(self, answer, student_input):
@@ -311,7 +311,7 @@ class ListGraderStringInput(ListGrader):
 
 class ItemGrader(AbstractGrader):
     
-    __meta__ = abc.ABCMeta
+    __metaclass__ = abc.ABCMeta
     
     @staticmethod
     def grade_decimal_to_ok(gd):
