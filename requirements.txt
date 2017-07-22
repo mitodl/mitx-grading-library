@@ -1,1 +1,4 @@
 pytest
+pyparsing==2.0.7
+numpy==1.6.2
+scipy==0.14.0
