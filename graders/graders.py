@@ -54,8 +54,81 @@ class AbstractGrader(object):
         return "{classname}({config})".format(classname=self.__class__.__name__, config = self.config)
         
 class ListGrader(AbstractGrader):
-    """Grades Lists"""
+    """Grades Lists of items according to ItemGrader, unordered by default.
     
+    ListGrader can be used to grade a list of answers according to the 
+    supplied ItemGrader. Works with either multi-input customresponse
+    or single-input customresponse.
+    
+    How learners enter lists in customresponse
+    ==========================================
+    
+    Multi-input customresponse:
+        <customresmse cfn="grader.cfn">
+            <textline/> <!-- learner enters cat -->
+            <textline/> <!-- learner enters dog -->
+            <textline/> <!-- learner leaves blank -->
+        </customresmse>
+        Notes:
+            grader.cfn receives a list: ['cat', 'dog', None]
+            list will always contain exactly as many items as input tags
+    
+    Single-input customresponse:
+        <customresmse cfn="grader.cfn">
+            <textline/> <!-- learner enters 'cat, dog, fish, rabbit' -->
+        </customresmse>
+        Notes:
+            learner is responsible for entering item separator (here: ',')
+            grader.cfn receives a string: 'cat, dog, fish, rabbit'
+            learner might enter fewer or more items than author expects
+    
+    Basic Usage
+    ===========
+    
+    Grade a list of strings (multi-input)
+        >>> grader = ListGrader({
+        ...     'answers_list':[['cat'], ['dog'], ['fish']],
+        ...     'item_grader': StringGrader()
+        ... })
+        >>> result = grader.cfn(None, ['fish', 'cat', 'moose'])
+        >>> expected = {'input_list':[
+        ...     {'ok': True, 'grade_decimal':1, 'msg':''},
+        ...     {'ok': True, 'grade_decimal':1, 'msg':''},
+        ...     {'ok': False, 'grade_decimal':0, 'msg':''}
+        ... ], 'overall_message':''}
+        >>> result == expected
+        True
+    
+    Grade a string of comma-separated items through the same API:
+        >>> result = grader.cfn(None, "cat, fish, moose")
+        >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }
+        >>> result == expected
+        True
+
+    Extra items reduce score:
+        >>> result = grader.cfn(None, "cat, fish, moose, rabbit")
+        >>> expected = {'ok':'partial', 'grade_decimal':1/3, 'msg': '' }
+        >>> result == expected
+        True
+
+    but not below zero:
+        >>> result = grader.cfn(None, "cat, fish, moose, rabbit, bear, lion")
+        >>> expected = {'ok':False, 'grade_decimal':0, 'msg': '' }
+        >>> result == expected
+        True
+    
+    Optionally, make order matter:
+        >>> ordered_grader = ListGrader({
+        ...     'ordered': True,
+        ...     'answers_list':[['cat'], ['dog'], ['fish']],
+        ...     'item_grader': StringGrader()
+        ... })
+        >>> result = ordered_grader.cfn(None, "cat, fish, moose")
+        >>> expected = {'ok':'partial', 'grade_decimal':1/3, 'msg': '' }
+        >>> result == expected
+        True
+    
+    """
     
     def make_schema_config(self, config):
         """Returns a voluptuous Schema object to validate config
