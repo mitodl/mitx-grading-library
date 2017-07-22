@@ -135,22 +135,36 @@ class ListGraderStringInput(ListGrader):
     """
     
     @staticmethod
-    def assign_partial_credit(graded_input_list, n_expect):
-        """Given input list and expected number of inputs, assigns partial credit.
-        Inputs:
-            input_list, a list of SingleResponseGrader.check results
-            n_expect: expected number of answers
+    def calculate_grade(grade_decimals, n_expect):
+        """Consolidate several grade_decimals into one.
         
-        Assigns score linearly:
-            +1 for each correct answer,
-            -1 part for each extra answer.
-        with a minimum score of zero.
+        Arguments:
+            grade_decimals (list): A list of floats between 0 and 1
+            n_expect (int): expected number of answers
+        Returns:
+            float, either:
+                average of grade_decimals padded to length n_extra if
+                    necessary, and subtracting 1/n_extra for each extra, or
+                zero
+            whichever is larger.
+        
+        Usage:
+            >>> ListGraderStringInput.calculate_grade([1, 0, 0.5], 4)
+            0.375
+            >>> ListGraderStringInput.calculate_grade([1,0.5,0], 2)
+            0.25
+            >>> ListGraderStringInput.calculate_grade([1,0.5,0,0,0],2)
+            0
         """
-        points = sum([ result['grade_decimal'] for result in graded_input_list ])
-        n_extra = len(graded_input_list) - n_expect
-        grade_decimal = max(0, (points-n_extra)/n_expect )
+        n_extra = len(grade_decimals) - n_expect
+        if n_extra > 0:
+            grade_decimals += [-1] * n_extra
+        elif n_extra < 0:
+            grade_decimals += [0] * abs(n_extra)
         
-        return grade_decimal
+        avg = sum(grade_decimals)/n_expect
+        
+        return max(0, avg)
 
     @staticmethod
     def find_optimal_order(check, answers_list, student_input_list):
@@ -187,7 +201,8 @@ class ListGraderStringInput(ListGrader):
         else:
             input_list = self.find_optimal_order( self.item_check, answers_list, student_input_list)
         
-        grade_decimal = self.assign_partial_credit(input_list, len(answers_list))
+        grade_decimals = [g['grade_decimal'] for g in input_list]
+        grade_decimal = self.calculate_grade(grade_decimals, len(answers_list))
         ok = ItemGrader.grade_decimal_to_ok(grade_decimal)
         
         result = {
