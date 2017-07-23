@@ -1,8 +1,11 @@
 from ..graders import ObjectWithSchema, ItemGrader
 from ..voluptuous import Schema, Required, All, Any, Range, MultipleInvalid, Invalid, humanize, Length
+from ..validatorfuncs import Positive, NonNegative, PercentageString
+from ..calc import evaluator
 import abc
 import numpy
-import numbers
+from numbers import Number
+
 
 class AbstractSamplingSet(ObjectWithSchema):
     """Represents a set from which random samples are taken."""
@@ -40,7 +43,7 @@ class RealInterval(VariableSamplingSet):
     
     def standardize_alternate_config(config_as_list):
         alternate_form = Schema(All(
-            [numbers.Number, numbers.Number],
+            [Number, Number],
             Length(min=2,max=2)
         ))
         config_as_list = alternate_form(config_as_list)
@@ -48,8 +51,8 @@ class RealInterval(VariableSamplingSet):
         
     schema_config = Schema(Any(
         {
-            Required('start', default=1): numbers.Number,
-            Required('stop', default=3): numbers.Number
+            Required('start', default=1): Number,
+            Required('stop', default=3): Number
         },
         standardize_alternate_config
     ))
@@ -85,7 +88,8 @@ class NiceFunctions(FunctionSamplingSet):
     [-1.88769 -1.32087]
     
     NOTE:
-        Currently implemented as a sum of trigonometric functions
+        1. Sadly, calc.evaluator can only handle unary functions
+        2. Currently implemented as a sum of trigonometric functions
         with random phases and periods.
     """
     
@@ -134,9 +138,60 @@ class NiceFunctions(FunctionSamplingSet):
             return value if len(value)>1 else value[0]
         
         return f
+
+class NumericalGrader(ItemGrader):
+    
+    @staticmethod
+    def within_tolerance(x, y, tolerance, hard_tolerance=10e-6):
+        """Check that ||x-y||<tolerance or hard_tolerance with appropriate norm.
         
-class FormulaGrader(ItemGrader):
-    """ Grades mathematical expressions, like EdX formularesponse but flexible.    
+        Args:
+            x: number or array (numpy array_like)
+            y: number or array (numpy array_like)
+            tolerance: Number or PercentageString
+            hard_tolerance: Number, default to 10e-6
+        
+        Note:
+            The purpose of hard_tolerance is that if tolerance is specified as
+            a percentage and x is nearly zero, the calculated tolerance could 
+            potential be smaller than Python's precision.
+        
+        Usage
+        =====
+        
+        The tolerance can be a number:
+        >>> NumericalGrader.within_tolerance(10, 9.01, 1)
+        True
+        >>> NumericalGrader.within_tolerance(10, 9.01, 0.5)
+        False
+        
+        If tolerance is a percentage, it is a percent of (the norm of) x:
+        >>> NumericalGrader.within_tolerance(10, 9.01, '10%')
+        True
+        >>> NumericalGrader.within_tolerance(9.01, 10, '10%')
+        False
+        
+        Works for vectors and matrices:
+        >>> A = numpy.matrix([[1,2],[-3,1]])
+        >>> B = numpy.matrix([[1.1, 2], [-2.8, 1]])
+        >>> diff = round(numpy.linalg.norm(A-B), 6)
+        >>> diff
+        0.223607
+        >>> NumericalGrader.within_tolerance(A, B, 0.25)
+        True
+        """
+        # When used within graders, tolerance has already been validated as a Number or PercentageString
+        if isinstance(tolerance, str):
+            tolerance = x * float(tolerance[:-1]) * 0.01 
+            
+        return numpy.linalg.norm(x-y) < max(tolerance, hard_tolerance) 
+     
+class FormulaGrader(NumericalGrader):
+    """ Grades mathematical expressions.
+    
+    Similar to EdX formularesponse but more flexible. Allows author
+    to specify functions in addition to variables.
+    
     FormulaGrader({
         'answers':['a+b^2'],
         'variables': ['a', 'b', 'c'],
@@ -151,6 +206,39 @@ class FormulaGrader(ItemGrader):
         },
         'samples':5
     })
+    
+    Usage
+    =====
+    
+    Grade a formula containing variables and functions:
+    >>> grader = FormulaGrader({
+    ...     'answers':['a*b + f(c-b) + f(g(a))'],
+    ...     'variables':['a', 'b'],
+    ...     'functions':['f', 'g']
+    ... })
+    >>> input0 = 'f(g(a)) + a*b + f(-b+c)'
+    >>> grader.cfn(None, input0)['ok']
+    True
+    >>> input1 = 'f(g(b)) + 2*a*b + f(b-c)'
+    >>> grader.cfn(None, input1)['ok']
+    False
+    
+    The learner's input is compared to expected answer using numerical
+    numerical evaluations. By default, 5 evaluations are used with variables
+    sampled on the interval [1,3]. The defaults can be overidden:
+    >>> grader = FormulaGrader({
+    ...     'answers': ['b^2 - f(g(a))/4'],
+    ...     'variables': ['a', 'b'],
+    ...     'functions': ['f', 'g'],
+    ...     'samples': 3,
+    ...     'sample_from': {
+    ...         'a': [-4,1]    
+    ...     },
+    ...     'tolerance': 0.1
+    ... })
+    >>> input0 = "b*b - 0.25*f(g(a))"
+    >>> grader.cfn(None, input0)['ok']
+    True
     """
     
     def validate_input(self, value):
@@ -165,7 +253,10 @@ class FormulaGrader(ItemGrader):
         # We need to dynamically create the samples_from Schema based on number variable and function names
         
         default_variables_sample_from = {
-            Required(varname, default=RealInterval() ) : VariableSamplingSet
+            Required(varname, default=RealInterval() ) : Any(
+                VariableSamplingSet,
+                lambda pair : RealInterval(pair)
+            )
             for varname in self.config['variables']
         }
         
@@ -179,9 +270,11 @@ class FormulaGrader(ItemGrader):
         return schema.extend({
             Required('variables', default=[]): [str],
             Required('functions', default=[]): [str],
-            Required('samples', default=5):All(int, Range(1, float('inf'))),
+            Required('samples', default=5):Positive(int),
             Required('sample_from', default=schema_samples_from({})): schema_samples_from,
-            Required('case_sensitive', default=True):bool
+            Required('tolerance', default='0.1%'): Any(Positive(Number), PercentageString),
+            Required('case_sensitive', default=True):bool,
+            Required('failable_evals', default=0):NonNegative(int)
         })
     
     @staticmethod
@@ -215,6 +308,47 @@ class FormulaGrader(ItemGrader):
             for j in range(samples)
         ]
     
-    
     def check(self, answer, student_input):
-        pass
+        
+        var_samples = self.gen_symbols_samples(
+                            self.config['variables'],
+                            self.config['samples'],
+                            self.config['sample_from'])
+        
+        func_samples = self.gen_symbols_samples(
+                            self.config['functions'],
+                            self.config['samples'],
+                            self.config['sample_from'])
+        
+        expected_evals = [ evaluator(
+                                variables,
+                                functions,
+                                answer['expect'],
+                                case_sensitive=self.config['case_sensitive'])
+                            for variables, functions in 
+                            zip(var_samples, func_samples)]
+        
+        learner_evals = [ evaluator(
+                                variables,
+                                functions,
+                                student_input,
+                                case_sensitive=self.config['case_sensitive'])
+                            for variables, functions in 
+                            zip(var_samples, func_samples)]
+
+        failures = [ not self.within_tolerance(
+                            e1, 
+                            e2, 
+                            self.config['tolerance'])
+                        for e1, e2 in zip(expected_evals, learner_evals)]
+        num_failures = sum(failures)
+        
+        if num_failures <= self.config['failable_evals']:
+            return {
+                'ok':answer['ok'],
+                'grade_decimal':answer['grade_decimal'],
+                'msg':answer['msg']
+            }
+        else:
+            return {'ok':False, 'grade_decimal':0, 'msg':''}
+    
