@@ -382,22 +382,6 @@ class ItemGrader(AbstractGrader):
         super(ItemGrader, self).__init__(config)
         self.check = self.iterate_check( self.check)
 
-class NumberGrader(ItemGrader):
-    
-    @property
-    def schema_config(self):
-        schema = super(NumberGrader, self).schema_config
-        return schema.extend({
-            Required('tolerance', default=0.1) : Any(
-                All(numbers.Number, Range(0,float('inf'))),
-                PercentageString
-            )
-        })
-
-    def validate_input(self, value):
-        if isinstance(value, numbers.Number):
-            return value
-        raise ValueError
 
 class StringGrader(ItemGrader):
     
