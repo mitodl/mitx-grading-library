@@ -1,7 +1,7 @@
 from ..graders import ObjectWithSchema, ItemGrader
 from ..voluptuous import Schema, Required, All, Any, Range, MultipleInvalid, Invalid, humanize, Length
 from ..validatorfuncs import Positive, NonNegative, PercentageString
-from ..calc import evaluator
+from ..calc import evaluator, UndefinedVariable
 import abc
 import numpy
 import random
@@ -307,10 +307,7 @@ class FormulaGrader(NumericalGrader):
     
     """
     
-    def validate_input(self, value):
-        if isinstance(value, str):
-            return value
-        raise ValueError
+    schema_expect = Schema(str)
     
     @property
     def schema_config(self):
@@ -374,8 +371,8 @@ class FormulaGrader(NumericalGrader):
             for j in range(samples)
         ]
     
-    def check(self, answer, student_input):
-        
+    def raw_check(self, answer, student_input):
+        """Check student_input against answer but do not format exceptions."""
         var_samples = self.gen_symbols_samples(
                             self.config['variables'],
                             self.config['samples'],
@@ -417,4 +414,11 @@ class FormulaGrader(NumericalGrader):
             }
         else:
             return {'ok':False, 'grade_decimal':0, 'msg':''}
+    
+    def check(self, answer, student_input):
+        try:
+            return self.raw_check(answer, student_input)
+        except UndefinedVariable as e:
+            message = "Invalid Input: {varname} not permitted in answer".format(varname=str(e))
+            raise UndefinedVariable(message)
     

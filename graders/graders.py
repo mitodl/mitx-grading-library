@@ -322,14 +322,10 @@ class ItemGrader(AbstractGrader):
         else:
             return 'partial'
     
-    @abc.abstractmethod
-    def validate_input(self, value):
-        pass
-    
     @property
     def schema_answer(self):
         return Schema({
-            Required('expect', default=None): self.validate_input,
+            Required('expect', default=None): self.schema_expect,
             Required('grade_decimal', default=1): All(numbers.Number, Range(0,1)),
             Required('msg', default=''): str,
             Required('ok',  default='computed'):Any('computed', True, False, 'partial')
@@ -382,24 +378,9 @@ class ItemGrader(AbstractGrader):
         super(ItemGrader, self).__init__(config)
         self.check = self.iterate_check( self.check)
 
-class NumberGrader(ItemGrader):
-    
-    @property
-    def schema_config(self):
-        schema = super(NumberGrader, self).schema_config
-        return schema.extend({
-            Required('tolerance', default=0.1) : Any(
-                All(numbers.Number, Range(0,float('inf'))),
-                PercentageString
-            )
-        })
-
-    def validate_input(self, value):
-        if isinstance(value, numbers.Number):
-            return value
-        raise ValueError
-
 class StringGrader(ItemGrader):
+    
+    schema_expect = Schema(str)
     
     @property
     def schema_config(self):
@@ -408,11 +389,6 @@ class StringGrader(ItemGrader):
             Required('strip', default=True): bool,
             Required('case_sensitive', default=True) : bool
         })
-    
-    def validate_input(self, value):
-        if isinstance(value, str):
-            return value
-        raise ValueError
     
     def check(self, answer, student_input):
         if self.config['strip']:
