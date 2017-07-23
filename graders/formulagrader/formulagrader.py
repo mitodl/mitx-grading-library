@@ -307,10 +307,7 @@ class FormulaGrader(NumericalGrader):
     
     """
     
-    def validate_input(self, value):
-        if isinstance(value, str):
-            return value
-        raise ValueError
+    schema_expect = Schema(str)
     
     @property
     def schema_config(self):
@@ -375,7 +372,6 @@ class FormulaGrader(NumericalGrader):
         ]
     
     def check(self, answer, student_input):
-        
         var_samples = self.gen_symbols_samples(
                             self.config['variables'],
                             self.config['samples'],
