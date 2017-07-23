@@ -423,6 +423,3 @@ class StringGrader(ItemGrader):
             return {'ok':answer['ok'], 'grade_decimal':answer['grade_decimal'], 'msg':answer['msg']}
         else:
             return {'ok':False, 'grade_decimal':0, 'msg':''}
-
-class FormulaGrader(ItemGrader):
-    pass
