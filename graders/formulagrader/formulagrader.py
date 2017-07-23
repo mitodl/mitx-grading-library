@@ -135,8 +135,8 @@ class NiceFunctions(FunctionSamplingSet):
         components = [self.gen_sample_component() for j in range(dim_output)]
         
         def f(*args):
-            value = [comp(*args) for comp in components]
-            return value if len(value)>1 else value[0]
+            value = numpy.matrix([comp(*args) for comp in components])
+            return value if dim_output>1 else float(value)
         
         return f
 
