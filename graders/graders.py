@@ -21,6 +21,7 @@ class ObjectWithSchema(object):
         return vh.validate_with_humanized_errors(config, self.schema_config)
     
     def __init__(self, config={}):
+        self.config = config
         self.config = self.validate_config(config)
     
     def __repr__(self):
@@ -157,7 +158,7 @@ class ListGrader(AbstractGrader):
         """Returns a voluptuous Schema object to validate config
         """
         # ListGrader's schema_config depends on the config object...different for different ItemGraders. Hence we need a function to dynamically create the schema. I would have prefered schema_config as a class attribute.
-        item_grader = vh.validate_with_humanized_errors( self._item_grader, Schema(ItemGrader) )        
+        item_grader = vh.validate_with_humanized_errors( self.config['item_grader'], Schema(ItemGrader) )        
         schema = Schema({
             Required('ordered', default=False):bool,
             Required('separator', default=','): str,
@@ -167,7 +168,6 @@ class ListGrader(AbstractGrader):
         return schema
     
     def __init__(self, config={}):
-        self._item_grader = config['item_grader']
         super(ListGrader, self).__init__(config)
         self.item_check = self.config['item_grader'].check
     
