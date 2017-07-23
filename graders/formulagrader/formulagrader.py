@@ -4,6 +4,7 @@ from ..validatorfuncs import Positive, NonNegative, PercentageString
 from ..calc import evaluator
 import abc
 import numpy
+import random
 from numbers import Number
 
 
@@ -139,6 +140,53 @@ class NiceFunctions(FunctionSamplingSet):
         
         return f
 
+class DiscreteValues(VariableSamplingSet, FunctionSamplingSet):
+    """Represents a discrete set of values from which to sample.
+    
+    Note:
+        This class is provided just so that FormulaGrader has a consistent
+        gen_sample() method to call when sampling.
+    
+    Usage
+    =====
+    
+    >>> values = DiscreteValues([1,2,3,4])
+    >>> values.gen_sample() in [1,2,3,4]
+    True
+    >>> values = DiscreteValues([numpy.sin, numpy.cos, numpy.tan])
+    >>> values.gen_sample() in [numpy.sin, numpy.cos, numpy.tan]
+    True
+    """
+    
+    schema_config = Schema(list)
+    
+    def gen_sample(self):
+        return random.choice(self.config)
+
+class UniqueValue(VariableSamplingSet, FunctionSamplingSet):
+    """Represents a unique value to sample.
+    
+    Note:
+        This class is provided just so that FormulaGrader has a consistent
+        gen_sample() method to call when sampling.
+    
+    Usage
+    =====
+    
+    >>> values = UniqueValue(5)
+    >>> values.gen_sample() == 5
+    True
+    >>> step_func = lambda x : 0 if x<0 else 1
+    >>> values = UniqueValue(step_func)
+    >>> values.gen_sample() == step_func
+    True
+    """
+    
+    schema_config = Schema(object)
+    
+    def gen_sample(self):
+        return self.config
+
 class NumericalGrader(ItemGrader):
     
     @staticmethod
@@ -222,6 +270,21 @@ class FormulaGrader(NumericalGrader):
     ...     'tolerance': 0.1
     ... })
     >>> input0 = "b*b - 0.25*f(g(a))"
+    >>> grader.cfn(None, input0)['ok']
+    True
+    
+    You can also provide specific values to use for any variable or function:
+    >>> def square(x):
+    ...     return x**2
+    >>> grader = FormulaGrader({
+    ...     'answers': ['4*f(a)+b'],
+    ...     'variables': ['a','b'],
+    ...     'functions': ['f'],
+    ...     'sample_from': {
+    ...         'f': UniqueValue(square)
+    ...     }
+    ... })
+    >>> input0 = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = sq uare
     >>> grader.cfn(None, input0)['ok']
     True
     
