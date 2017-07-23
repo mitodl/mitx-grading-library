@@ -8,7 +8,15 @@ class AbstractSamplingSet(ObjectWithSchema):
     """Represents a set from which random samples are taken."""
     pass
 
-class RealInterval(AbstractSamplingSet):
+class VariableSamplingSet(AbstractSamplingSet):
+    """Represents a set from which variable random samples are taken."""
+    pass
+
+class FunctionSamplingSet(AbstractSamplingSet):
+    """Represents a set from which function random samples are taken."""
+    pass
+
+class RealInterval(VariableSamplingSet):
     """Represents an interval of real numbers from which to sample.
     
     Usage
@@ -16,17 +24,17 @@ class RealInterval(AbstractSamplingSet):
     
     Generate 5 random floats betweens -2 and 4
     >>> ri = RealInterval({'start':-2, 'stop':4})
-    >>> ri.gen_samples(5) # doctest: +SKIP
+    >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
     [ 2.44247 -0.67699 -1.36759 -0.11255  1.39864]
     
     You can initialize with a pair instead of a dict:
     >>> ri = RealInterval([-2,4])
-    >>> ri.gen_samples(5) # doctest: +SKIP
+    >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
     [ 2.9973   2.95767  0.069    0.23813 -1.49541]
     
     The default is {'start':1, 'stop':3}:
     >>> ri = RealInterval()
-    >>> ri.gen_samples(5) # doctest: +SKIP
+    >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
     [ 2.61484  1.38107  2.61687  1.00507  1.87933]    
     """
     
@@ -46,16 +54,16 @@ class RealInterval(AbstractSamplingSet):
         standardize_alternate_config
     ))
 
-    def gen_samples(self,n):
+    def gen_sample(self):
         "Returns a list of n random reals in range [self.start, self.stop]"
         start, stop = self.config['start'], self.config['stop']
         
         width = stop - start
-        uniform_iid = start + width*numpy.random.rand(n)
+        uniform_iid = start + width*numpy.random.rand(1)
         
-        return list(uniform_iid)
+        return uniform_iid[0]
 
-class NiceFunctions(AbstractSamplingSet):
+class NiceFunctions(FunctionSamplingSet):
     """Represents space of 'nice' functions from which to sample.
     
     Usage
@@ -129,4 +137,84 @@ class NiceFunctions(AbstractSamplingSet):
         
 class FormulaGrader(ItemGrader):
     """ Grades mathematical expressions, like EdX formularesponse but flexible.    
+    FormulaGrader({
+        'answers':['a+b^2'],
+        'variables': ['a', 'b', 'c'],
+        'functions': ['f', 'g', 'h'],
+        'sample_from': {
+            'a': [1,3],
+            'b': [1,3],
+            'c': RealInterval(1, 3),
+            'd': IntegerInterval(-5,5),
+            'd': MatrixGroupSO(2),
+            'h': PolynomialFunction
+        },
+        'samples':5
+    })
     """
+    
+    def validate_input(self, value):
+        if isinstance(value, str):
+            return value
+        raise ValueError
+    
+    @property
+    def schema_config(self):
+        schema = super(FormulaGrader, self).schema_config
+        
+        # We need to dynamically create the samples_from Schema based on number variable and function names
+        
+        default_variables_sample_from = {
+            Required(varname, default=RealInterval() ) : VariableSamplingSet
+            for varname in self.config['variables']
+        }
+        
+        default_functions_sample_from = {
+            Required(funcname, default=NiceFunctions() ) : FunctionSamplingSet
+            for funcname in self.config['functions']
+        }
+        
+        schema_samples_from = Schema(default_variables_sample_from).extend(default_functions_sample_from)
+        
+        return schema.extend({
+            Required('variables', default=[]): [str],
+            Required('functions', default=[]): [str],
+            Required('samples', default=5):All(int, Range(1, float('inf'))),
+            Required('sample_from', default=schema_samples_from({})): schema_samples_from,
+            Required('case_sensitive', default=True):bool
+        })
+    
+    @staticmethod
+    def gen_symbols_samples(symbols, samples, sample_from):
+        """Generates a list of dictionaries mapping variable names to values.
+        
+        The symbols argument will usually be self.config['variables']
+        or self.config['functions'].
+        
+        Usage
+        =====
+        
+        >>> variable_samples = FormulaGrader.gen_symbols_samples(
+        ...     ['a', 'b'],
+        ...     3,
+        ...     {
+        ...         'a': RealInterval([1,3]),
+        ...         'b': RealInterval([-4,-2])
+        ...     }
+        ... )
+        >>> variable_samples # doctest: +SKIP
+        [
+            {'a': 1.4765130193614819, 'b': -2.5596368656227217},
+            {'a': 2.3141937628942406, 'b': -2.8190938526155582},
+            {'a': 2.8169225565573566, 'b': -2.6547771579673363}
+        ]
+        """
+        
+        return [ 
+            { symbol: sample_from[symbol].gen_sample() for symbol in symbols }
+            for j in range(samples)
+        ]
+    
+    
+    def check(self, answer, student_input):
+        pass
