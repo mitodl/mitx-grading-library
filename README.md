@@ -133,7 +133,7 @@ Notes:
  - grader.cfn receives a string: 'cat, dog, fish, rabbit'
  - learner might enter fewer or more items than author expects
     
-## Basic Usage
+### Basic Usage
 For more advanced usage, see exmaples in `graders/tests/test_list_grader.py`.
 
 Grade a list of strings (multi-input)
