@@ -3,12 +3,33 @@ import munkres
 import numbers
 import abc
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid, Invalid, humanize
+import voluptuous as v
 import voluptuous.humanize as vh
 from validatorfuncs import PercentageString
 
-class AbstractGrader(object):
+class ObjectWithSchema(object):
+    "Represents a user-facing object whose configuration needs validation."
     
-    __meta__ = abc.ABCMeta
+    __metaclass__ = abc.ABCMeta
+    
+    @abc.abstractproperty
+    def schema_config(self):
+        pass
+    
+    def validate_config(self, config):
+        """Validates config and prints human-readable error messages."""
+        return vh.validate_with_humanized_errors(config, self.schema_config)
+    
+    def __init__(self, config={}):
+        self.config = config
+        self.config = self.validate_config(config)
+    
+    def __repr__(self):
+        return "{classname}({config})".format(classname=self.__class__.__name__, config = self.config)    
+
+class AbstractGrader(ObjectWithSchema):
+    
+    __metaclass__ = abc.ABCMeta
     
     @abc.abstractmethod
     def check(self, answer, student_input):
@@ -42,16 +63,6 @@ class AbstractGrader(object):
             expect attribute because it's value is diaplyed to students.
         """
         return self.check(None, student_input)
-    
-    def validate_config(self, config):
-        """Validates config and prints human-readable error messages."""
-        return vh.validate_with_humanized_errors(config, self.schema_config)
-    
-    def __init__(self, config={}):
-        self.config = self.validate_config(config)
-    
-    def __repr__(self):
-        return "{classname}({config})".format(classname=self.__class__.__name__, config = self.config)
         
 class ListGrader(AbstractGrader):
     """Grades Lists of items according to ItemGrader, unordered by default.
@@ -142,11 +153,12 @@ class ListGrader(AbstractGrader):
     
     """
     
-    def make_schema_config(self, config):
+    @property
+    def schema_config(self):
         """Returns a voluptuous Schema object to validate config
         """
         # ListGrader's schema_config depends on the config object...different for different ItemGraders. Hence we need a function to dynamically create the schema. I would have prefered schema_config as a class attribute.
-        item_grader = vh.validate_with_humanized_errors( config['item_grader'], Schema(ItemGrader) )        
+        item_grader = vh.validate_with_humanized_errors( self.config['item_grader'], Schema(ItemGrader) )        
         schema = Schema({
             Required('ordered', default=False):bool,
             Required('separator', default=','): str,
@@ -156,7 +168,6 @@ class ListGrader(AbstractGrader):
         return schema
     
     def __init__(self, config={}):
-        self.schema_config = self.make_schema_config(config)
         super(ListGrader, self).__init__(config)
         self.item_check = self.config['item_grader'].check
     
@@ -300,7 +311,7 @@ class ListGraderStringInput(ListGrader):
 
 class ItemGrader(AbstractGrader):
     
-    __meta__ = abc.ABCMeta
+    __metaclass__ = abc.ABCMeta
     
     @staticmethod
     def grade_decimal_to_ok(gd):
@@ -412,6 +423,3 @@ class StringGrader(ItemGrader):
             return {'ok':answer['ok'], 'grade_decimal':answer['grade_decimal'], 'msg':answer['msg']}
         else:
             return {'ok':False, 'grade_decimal':0, 'msg':''}
-
-class FormulaGrader(ItemGrader):
-    pass
