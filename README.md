@@ -68,8 +68,8 @@ The learner's input is compared to expected answer using numerical evaluations. 
 ...     },
 ...     'tolerance': 0.1
 ... })
->>> input0 = "b*b - 0.25*f(g(a))"
->>> grader.cfn(None, input0)['ok']
+>>> input = "b*b - 0.25*f(g(a))"
+>>> grader.cfn(None, input)['ok']
 True
 ```
 You can also provide specific values to use for any variable or function:
@@ -84,8 +84,8 @@ You can also provide specific values to use for any variable or function:
 ...         'f': UniqueValue(square)
 ...     }
 ... })
->>> input0 = 'f(2*a)+b'               # f(2*a) = 4*f(a) for f = sq uare
->>> grader.cfn(None, input0)['ok']
+>>> input = 'f(2*a)+b'               # f(2*a) = 4*f(a) for f = sq uare
+>>> grader.cfn(None, input)['ok']
 True
 ```
 
