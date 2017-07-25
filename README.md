@@ -55,7 +55,7 @@ True
 False
 ```
 
-The learner's input is compared to expected answer using numerical numerical evaluations. By default, 5 evaluations are used with variables sampled on the interval [1,3]. The defaults can be overidden:
+The learner's input is compared to expected answer using numerical evaluations. By default, 5 evaluations are used with variables sampled on the interval [1,3]. The defaults can be overidden:
 
 ```python
 >>> grader = FormulaGrader({
