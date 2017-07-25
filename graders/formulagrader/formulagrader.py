@@ -246,7 +246,7 @@ class FormulaGrader(NumericalGrader):
     Grade a formula containing variables and functions:
     >>> grader = FormulaGrader({
     ...     'answers':['a*b + f(c-b) + f(g(a))'],
-    ...     'variables':['a', 'b'],
+    ...     'variables':['a', 'b','c'],
     ...     'functions':['f', 'g']
     ... })
     >>> input0 = 'f(g(a)) + a*b + f(-b+c)'
