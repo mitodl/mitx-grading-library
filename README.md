@@ -44,14 +44,14 @@ Grade a formula containing variables and functions:
 ```python
 >>> grader = FormulaGrader({
 ...     'answers':['a*b + f(c-b) + f(g(a))'],
-...     'variables':['a', 'b'],
+...     'variables':['a', 'b','c'],
 ...     'functions':['f', 'g']
 ... })
->>> input0 = 'f(g(a)) + a*b + f(-b+c)'
->>> grader.cfn(None, input0)['ok']
+>>> theinput0 = 'f(g(a)) + a*b + f(-b+c)'
+>>> grader.cfn(None, theinput0)['ok']
 True
->>> input1 = 'f(g(b)) + 2*a*b + f(b-c)'
->>> grader.cfn(None, input1)['ok']
+>>> theinput1 = 'f(g(b)) + 2*a*b + f(b-c)'
+>>> grader.cfn(None, theinput1)['ok']
 False
 ```
 
@@ -64,12 +64,12 @@ The learner's input is compared to expected answer using numerical evaluations. 
 ...     'functions': ['f', 'g'],
 ...     'samples': 3,
 ...     'sample_from': {
-...         'a': [-4,1]    
+...         'a': [-4,1]
 ...     },
 ...     'tolerance': 0.1
 ... })
->>> input = "b*b - 0.25*f(g(a))"
->>> grader.cfn(None, input)['ok']
+>>> theinput = "b*b - 0.25*f(g(a))"
+>>> grader.cfn(None, theinput)['ok']
 True
 ```
 You can also provide specific values to use for any variable or function:
@@ -84,10 +84,21 @@ You can also provide specific values to use for any variable or function:
 ...         'f': UniqueValue(square)
 ...     }
 ... })
->>> input = 'f(2*a)+b'               # f(2*a) = 4*f(a) for f = sq uare
->>> grader.cfn(None, input)['ok']
+>>> theinput = 'f(2*a)+b'               # f(2*a) = 4*f(a) for f = sq uare
+>>> grader.cfn(None, theinput)['ok']
 True
 ```
+Grade complex-valued expressions:
+>>> grader = FormulaGrader({
+...     'answers': ['abs(z)^2'],
+...     'variables': ['z'],
+...     'sample_from': {
+...         'z': ComplexRectangle()
+...     }
+... })
+>>> theinput = 're(z)^2+im(z)^2'
+>>> grader.cfn(None, theinput)['ok']
+True
 
 ### Configuration Dictionary Keys
 
