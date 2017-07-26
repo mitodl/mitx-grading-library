@@ -66,6 +66,29 @@ class RealInterval(VariableSamplingSet):
         
         return uniform_iid[0]
 
+class ComplexRectangle(VariableSamplingSet):
+    """Represents a rectangle in the complex plane from which to sample.
+    
+    Usage
+    =====
+    >>> rect = ComplexRectangle({'re':[1,4], 'im':[-5,0]})
+    >>> rect.gen_sample() # doctest: +SKIP
+    (1.90313791936 - 2.94195943775j)
+    """
+    
+    schema_config = Schema({
+        Required('re', default=[1,3]) : RealInterval.schema_config,
+        Required('im', default=[1,3]) : RealInterval.schema_config
+    })
+    
+    def __init__(self, config={}):
+        super(ComplexRectangle, self).__init__(config)
+        self.re = RealInterval(self.config['re'])
+        self.im = RealInterval(self.config['im'])
+    
+    def gen_sample(self):
+        return self.re.gen_sample() + self.im.gen_sample()*1j
+
 class NiceFunctions(FunctionSamplingSet):
     """Represents space of 'nice' functions from which to sample.
     
@@ -135,7 +158,7 @@ class NiceFunctions(FunctionSamplingSet):
         
         def f(*args):
             value = numpy.matrix([comp(*args) for comp in components])
-            return value if dim_output>1 else float(value)
+            return value if dim_output>1 else value.item(0)
         
         return f
 
@@ -224,7 +247,11 @@ class NumericalGrader(ItemGrader):
         'arctanh': numpy.lib.scimath.arctanh,
         'arcsech': calc.functions.arcsech,
         'arccsch': calc.functions.arccsch,
-        'arccoth': calc.functions.arccoth
+        'arccoth': calc.functions.arccoth,
+        # lambdas because sometimes numpy.real returns an array,
+        're':lambda x: float(numpy.real(x)), 
+        'im': lambda x: float(numpy.imag(x)),
+        'conj': lambda x: numpy.conj,
     }
     DEFAULT_VARIABLES = {
         'i': numpy.complex(0, 1),
@@ -479,5 +506,5 @@ class FormulaGrader(NumericalGrader):
             return self.raw_check(answer, student_input)
         except calc.UndefinedVariable as e:
             message = "Invalid Input: {varname} not permitted in answer".format(varname=str(e))
-            raise UndefinedVariable(message)
+            raise calc.UndefinedVariable(message)
     
