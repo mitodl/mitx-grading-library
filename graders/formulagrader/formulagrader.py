@@ -359,7 +359,7 @@ class FormulaGrader(NumericalGrader):
     ...         'f': UniqueValue(square)
     ...     }
     ... })
-    >>> theinput = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = sq uare
+    >>> theinput = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = square
     >>> grader.cfn(None, theinput)['ok']
     True
     
