@@ -89,6 +89,7 @@ You can also provide specific values to use for any variable or function:
 True
 ```
 Grade complex-valued expressions:
+```python
 >>> grader = FormulaGrader({
 ...     'answers': ['abs(z)^2'],
 ...     'variables': ['z'],
@@ -99,6 +100,7 @@ Grade complex-valued expressions:
 >>> theinput = 're(z)^2+im(z)^2'
 >>> grader.cfn(None, theinput)['ok']
 True
+```
 
 ### Configuration Dictionary Keys
 
