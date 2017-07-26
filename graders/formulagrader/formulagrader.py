@@ -359,8 +359,20 @@ class FormulaGrader(NumericalGrader):
     ...         'f': UniqueValue(square)
     ...     }
     ... })
-    >>> input0 = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = sq uare
-    >>> grader.cfn(None, input0)['ok']
+    >>> input = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = sq uare
+    >>> grader.cfn(None, input)['ok']
+    True
+    
+    Grade complex-valued expressions:
+    >>> grader = FormulaGrader({
+    ...     'answers': ['abs(z)^2'],
+    ...     'variables': ['z'],
+    ...     'sample_from': {
+    ...         'z': ComplexRectangle()
+    ...     }
+    ... })
+    >>> input = 're(z)^2+im(z)^2'
+    >>> grader.cfn(None, input)['ok']
     True
     
     Configuration Dictionary Keys
