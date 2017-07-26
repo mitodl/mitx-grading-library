@@ -10,7 +10,7 @@
     - [Configuration Dictionary Keys](#configuration-dictionary-keys)
   - [ListGrader](#listgrader)
     - [How learners enter lists in customresponse](#how-learners-enter-lists-in-customresponse)
-  - [Basic Usage](#basic-usage)
+    - [Basic Usage](#basic-usage)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
