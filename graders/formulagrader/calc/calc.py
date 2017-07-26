@@ -1,4 +1,5 @@
 # Downloaded from https://github.com/edx/edx-platform/tree/4697aab44346e8573cae4e934f338300b8a5fded/common/lib/calc/calc
+# MODIDFIED to handle matrices
 """
 Parser and evaluator for FormulaResponse and NumericalResponse
 
@@ -63,7 +64,7 @@ DEFAULT_FUNCTIONS = {
     'arctanh': numpy.arctanh,
     'arcsech': functions.arcsech,
     'arccsch': functions.arccsch,
-    'arccoth': functions.arccoth
+    'arccoth': functions.arccoth,
 }
 DEFAULT_VARIABLES = {
     'i': numpy.complex(0, 1),
@@ -110,6 +111,8 @@ def lower_dict(input_dict):
 # of results from each parse component. They convert the strings and (previously
 # calculated) numbers into the number that component represents.
 
+algebraic = (numbers.Number, numpy.matrix)
+
 def super_float(text):
     """
     Like float, but with SI extensions. 1k goes to 1000.
@@ -137,7 +140,7 @@ def eval_atom(parse_result):
     In the case of parenthesis, ignore them.
     """
     # Find first number in the list
-    result = next(k for k in parse_result if isinstance(k, numbers.Number))
+    result = next(k for k in parse_result if isinstance(k, algebraic))
     return result
 
 
@@ -151,10 +154,18 @@ def eval_power(parse_result):
     # `reduce` will go from left to right; reverse the list.
     parse_result = reversed(
         [k for k in parse_result
-         if isinstance(k, numbers.Number)]  # Ignore the '^' marks.
+         if isinstance(k, algebraic)]  # Ignore the '^' marks.
     )
     # Having reversed it, raise `b` to the power of `a`.
-    power = reduce(lambda a, b: b ** a, parse_result)
+    def robust_pow(b, a):
+        try:
+            # builtin fails for (-4)**0.5, but works better for matrices
+            return b**a
+        except ValueError:
+            # scimath.power is componentwise power on matrices, hence above try
+            return numpy.lib.scimath.power(b,a)    
+    power = reduce(lambda a, b: robust_pow(b, a), parse_result)
+    
     return power
 
 
@@ -173,7 +184,7 @@ def eval_parallel(parse_result):
     if 0 in parse_result:
         return float('nan')
     reciprocals = [1. / e for e in parse_result
-                   if isinstance(e, numbers.Number)]
+                   if isinstance(e, algebraic)]
     return 1. / sum(reciprocals)
 
 
@@ -215,12 +226,16 @@ def eval_product(parse_result):
     return prod
 
 
-def add_defaults(variables, functions, case_sensitive):
+def add_defaults(variables,
+                functions,
+                case_sensitive,
+                default_variables={},
+                default_functions={}):
     """
     Create dictionaries with both the default and user-defined variables.
     """
-    all_variables = dict(DEFAULT_VARIABLES)
-    all_functions = dict(DEFAULT_FUNCTIONS)
+    all_variables = dict(default_variables)
+    all_functions = dict(default_functions)
     all_variables.update(variables)
     all_functions.update(functions)
 
@@ -231,7 +246,12 @@ def add_defaults(variables, functions, case_sensitive):
     return (all_variables, all_functions)
 
 
-def evaluator(variables, functions, math_expr, case_sensitive=False):
+def evaluator(variables,
+    functions,
+    math_expr,
+    case_sensitive=False,
+    default_variables={},
+    default_functions={}):
     """
     Evaluate an expression; that is, take a string of math and return a float.
 
@@ -248,7 +268,11 @@ def evaluator(variables, functions, math_expr, case_sensitive=False):
     math_interpreter.parse_algebra()
 
     # Get our variables together.
-    all_variables, all_functions = add_defaults(variables, functions, case_sensitive)
+    all_variables, all_functions = add_defaults(variables,
+                                                 functions,
+                                                 case_sensitive,
+                                                 default_variables,
+                                                 default_functions)
 
     # ...and check them
     math_interpreter.check_variables(all_variables, all_functions)
