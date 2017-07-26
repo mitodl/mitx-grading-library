@@ -1,9 +1,8 @@
 from ..graders import ObjectWithSchema, ItemGrader
 from ..voluptuous import Schema, Required, All, Any, Range, MultipleInvalid, Invalid, humanize, Length
 from ..validatorfuncs import Positive, NonNegative, PercentageString
-from ..calc import evaluator, UndefinedVariable
 import abc
-import numpy
+import numpy, math, calc, scipy
 import random
 from numbers import Number
 
@@ -66,6 +65,29 @@ class RealInterval(VariableSamplingSet):
         uniform_iid = start + width*numpy.random.rand(1)
         
         return uniform_iid[0]
+
+class ComplexRectangle(VariableSamplingSet):
+    """Represents a rectangle in the complex plane from which to sample.
+    
+    Usage
+    =====
+    >>> rect = ComplexRectangle({'re':[1,4], 'im':[-5,0]})
+    >>> rect.gen_sample() # doctest: +SKIP
+    (1.90313791936 - 2.94195943775j)
+    """
+    
+    schema_config = Schema({
+        Required('re', default=[1,3]) : RealInterval.schema_config,
+        Required('im', default=[1,3]) : RealInterval.schema_config
+    })
+    
+    def __init__(self, config={}):
+        super(ComplexRectangle, self).__init__(config)
+        self.re = RealInterval(self.config['re'])
+        self.im = RealInterval(self.config['im'])
+    
+    def gen_sample(self):
+        return self.re.gen_sample() + self.im.gen_sample()*1j
 
 class NiceFunctions(FunctionSamplingSet):
     """Represents space of 'nice' functions from which to sample.
@@ -136,7 +158,7 @@ class NiceFunctions(FunctionSamplingSet):
         
         def f(*args):
             value = numpy.matrix([comp(*args) for comp in components])
-            return value if dim_output>1 else float(value)
+            return value if dim_output>1 else value.item(0)
         
         return f
 
@@ -189,6 +211,59 @@ class UniqueValue(VariableSamplingSet, FunctionSamplingSet):
 
 class NumericalGrader(ItemGrader):
     
+    # The scimath variants have flexible domain. For example:
+    #   numpy.sqrt(-4+0j) = 2j
+    #   numpy.sqrt(-4) = nan, but
+    #   numpy.lib.scimath.sqrt(-4) = 2j
+    DEFAULT_FUNCTIONS = {
+        'sin': numpy.sin,
+        'cos': numpy.cos,
+        'tan': numpy.tan,
+        'sec': calc.functions.sec,
+        'csc': calc.functions.csc,
+        'cot': calc.functions.cot,
+        'sqrt': numpy.lib.scimath.sqrt,
+        'log10': numpy.lib.scimath.log10,
+        'log2': numpy.lib.scimath.log2,
+        'ln': numpy.lib.scimath.log,
+        'exp': numpy.exp,
+        'arccos': numpy.lib.scimath.arccos,
+        'arcsin': numpy.lib.scimath.arcsin,
+        'arctan': numpy.arctan,
+        'arcsec': calc.functions.arcsec,
+        'arccsc': calc.functions.arccsc,
+        'arccot': calc.functions.arccot,
+        'abs': numpy.abs,
+        'fact': math.factorial,
+        'factorial': math.factorial,
+        'sinh': numpy.sinh,
+        'cosh': numpy.cosh,
+        'tanh': numpy.tanh,
+        'sech': calc.functions.sech,
+        'csch': calc.functions.csch,
+        'coth': calc.functions.coth,
+        'arcsinh': numpy.arcsinh,
+        'arccosh': numpy.arccosh,
+        'arctanh': numpy.lib.scimath.arctanh,
+        'arcsech': calc.functions.arcsech,
+        'arccsch': calc.functions.arccsch,
+        'arccoth': calc.functions.arccoth,
+        # lambdas because sometimes numpy.real returns an array,
+        're':lambda x: float(numpy.real(x)), 
+        'im': lambda x: float(numpy.imag(x)),
+        'conj': lambda x: numpy.conj,
+    }
+    DEFAULT_VARIABLES = {
+        'i': numpy.complex(0, 1),
+        'j': numpy.complex(0, 1),
+        'e': numpy.e,
+        'pi': numpy.pi,
+        'k': scipy.constants.k,  # Boltzmann: 1.3806488e-23 (Joules/Kelvin)
+        'c': scipy.constants.c,  # Light Speed: 2.998e8 (m/s)
+        'T': 298.15,  # Typical room temperature: 298.15 (Kelvin), same as 25C/77F
+        'q': scipy.constants.e  # Fund. Charge: 1.602176565e-19 (Coulombs)
+    }
+    
     @staticmethod
     def within_tolerance(x, y, tolerance, hard_tolerance=10e-6):
         """Check that ||x-y||<tolerance or hard_tolerance with appropriate norm.
@@ -230,7 +305,7 @@ class NumericalGrader(ItemGrader):
         """
         # When used within graders, tolerance has already been validated as a Number or PercentageString
         if isinstance(tolerance, str):
-            tolerance = x * float(tolerance[:-1]) * 0.01 
+            tolerance = numpy.linalg.norm(x) * float(tolerance[:-1]) * 0.01 
             
         return numpy.linalg.norm(x-y) < max(tolerance, hard_tolerance) 
      
@@ -284,8 +359,20 @@ class FormulaGrader(NumericalGrader):
     ...         'f': UniqueValue(square)
     ...     }
     ... })
-    >>> input0 = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = sq uare
-    >>> grader.cfn(None, input0)['ok']
+    >>> input = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = sq uare
+    >>> grader.cfn(None, input)['ok']
+    True
+    
+    Grade complex-valued expressions:
+    >>> grader = FormulaGrader({
+    ...     'answers': ['abs(z)^2'],
+    ...     'variables': ['z'],
+    ...     'sample_from': {
+    ...         'z': ComplexRectangle()
+    ...     }
+    ... })
+    >>> input = 're(z)^2+im(z)^2'
+    >>> grader.cfn(None, input)['ok']
     True
     
     Configuration Dictionary Keys
@@ -307,6 +394,13 @@ class FormulaGrader(NumericalGrader):
     
     """
     
+    DEFAULT_VARIABLES = {
+        'i': numpy.complex(0, 1),
+        'j': numpy.complex(0, 1),
+        'e': numpy.e,
+        'pi': numpy.pi,
+    }
+    
     schema_expect = Schema(str)
     
     @property
@@ -320,12 +414,12 @@ class FormulaGrader(NumericalGrader):
                 VariableSamplingSet,
                 lambda pair : RealInterval(pair)
             )
-            for varname in self.config['variables']
+            for varname in self.config.get('variables',[])
         }
         
         default_functions_sample_from = {
             Required(funcname, default=NiceFunctions() ) : FunctionSamplingSet
-            for funcname in self.config['functions']
+            for funcname in self.config.get('functions',[])
         }
         
         schema_samples_from = Schema(default_variables_sample_from).extend(default_functions_sample_from)
@@ -383,19 +477,23 @@ class FormulaGrader(NumericalGrader):
                             self.config['samples'],
                             self.config['sample_from'])
         
-        expected_evals = [ evaluator(
+        expected_evals = [ calc.evaluator(
                                 variables,
                                 functions,
                                 answer['expect'],
-                                case_sensitive=self.config['case_sensitive'])
+                                case_sensitive=self.config['case_sensitive'],
+                                default_variables = self.DEFAULT_VARIABLES,
+                                default_functions = self.DEFAULT_FUNCTIONS)
                             for variables, functions in 
                             zip(var_samples, func_samples)]
         
-        learner_evals = [ evaluator(
+        learner_evals = [ calc.evaluator(
                                 variables,
                                 functions,
                                 student_input,
-                                case_sensitive=self.config['case_sensitive'])
+                                case_sensitive=self.config['case_sensitive'],
+                                default_variables = self.DEFAULT_VARIABLES,
+                                default_functions = self.DEFAULT_FUNCTIONS)
                             for variables, functions in 
                             zip(var_samples, func_samples)]
 
@@ -418,7 +516,7 @@ class FormulaGrader(NumericalGrader):
     def check(self, answer, student_input):
         try:
             return self.raw_check(answer, student_input)
-        except UndefinedVariable as e:
+        except calc.UndefinedVariable as e:
             message = "Invalid Input: {varname} not permitted in answer".format(varname=str(e))
-            raise UndefinedVariable(message)
+            raise calc.UndefinedVariable(message)
     
