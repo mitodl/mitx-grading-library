@@ -19,5 +19,5 @@ def PercentageString(value):
             return "{percent}%".format(percent=percent)
         except:
             pass
-    
+
     raise ValueError("Not a percentage string.")
