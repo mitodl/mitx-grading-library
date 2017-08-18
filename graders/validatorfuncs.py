@@ -1,6 +1,6 @@
 """Standalone validator functions for use in voluptuous Schema."""
 
-from voluptuous import All, Range, NotIn
+from voluptuous import All, Range, NotIn, Invalid
 
 def Positive(thetype):
     if thetype==int:
@@ -12,12 +12,14 @@ def NonNegative(thetype):
     return All(thetype, Range(0, float('inf')))
 
 def PercentageString(value):
-    """Validate that a string can be interpretted as a percentage."""
-    if isinstance(value, str) and value.endswith("%"):
-        try:
-            percent = float(value[:-1])
-            return "{percent}%".format(percent=percent)
-        except:
-            pass
-    
-    raise ValueError("Not a percentage string.")
+    """Validate that a string can be interpreted as a percentage."""
+    if isinstance(value, str):
+        work = value.strip()
+        if work.endswith("%"):
+            try:
+                percent = float(work[:-1])
+                return "{percent}%".format(percent=percent)
+            except:
+                pass
+
+    raise Invalid("Not a percentage string.")
