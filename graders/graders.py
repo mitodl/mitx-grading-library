@@ -3,7 +3,7 @@ import munkres
 import numbers
 import abc
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
-import voluptuous.humanize.validate_with_humanized_errors as voluptuous_validate
+from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 
 class ObjectWithSchema(object):
     "Represents a user-facing object whose configuration needs validation."
