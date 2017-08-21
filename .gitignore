@@ -3,3 +3,5 @@
 *.cache
 *.sublime-project
 *.sublime-workspace
+.env
+venv
