@@ -2,10 +2,8 @@ from __future__ import division
 import munkres
 import numbers
 import abc
-from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid, Invalid, humanize
-import voluptuous as v
-import voluptuous.humanize as vh
-from validatorfuncs import PercentageString
+from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
+from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 
 class ObjectWithSchema(object):
     "Represents a user-facing object whose configuration needs validation."
@@ -18,11 +16,14 @@ class ObjectWithSchema(object):
 
     def validate_config(self, config):
         """Validates config and prints human-readable error messages."""
-        return vh.validate_with_humanized_errors(config, self.schema_config)
+        return voluptuous_validate(config, self.schema_config)
 
-    def __init__(self, config={}):
-        self.config = config
-        self.config = self.validate_config(config)
+    def __init__(self, config=None):
+        # Set the config first before validating, so that schema_config has access to it
+        # I don't like this; it makes for a tangled mess
+        # (schema_config may access the config before it's been validated/manipulated into valid form)
+        self.config = {} if config is None else config
+        self.config = self.validate_config(self.config)
 
     def __repr__(self):
         return "{classname}({config})".format(classname=self.__class__.__name__, config = self.config)
@@ -37,22 +38,22 @@ class AbstractGrader(ObjectWithSchema):
 
         Args:
             answer (dict): The expected result and grading information; has form
-                {'expect':..., 'ok':..., 'msg':..., 'grade_decimal':...}
-            student_input (str): The student's input passed by EdX
+                {'expect':..., 'ok':..., 'msg':..., 'grade_decimal':...}  #J: I don't think this is the form you've used later...
+            student_input (str): The student's input passed by edX  #J: Is this always a string?
         """
         pass
 
     def cfn(self, expect, student_input):
-        """Ignores expect and grades student_input. Used by EdX.
+        """Ignores expect and grades student_input. Used by edX.
 
         Arguments:
-            expect (str): The value of EdX customresponse expect attribute.
-            student_input (str): The student's input passed by EdX
+            expect (str): The value of edX customresponse expect attribute.  #J: Is this always a string?
+            student_input (str): The student's input passed by edX  #J: Is this always a string?
 
         NOTES:
             This function ignores the value of expect. Reason:
 
-            EdX requires a two-parameter check function cfn with
+            edX requires a two-parameter check function cfn with
             the signature above. In the graders module, we NEVER use
             the <customresponse /> tag's expect attribute for grading.
 
@@ -63,6 +64,10 @@ class AbstractGrader(ObjectWithSchema):
             expect attribute because it's value is diaplyed to students.
         """
         return self.check(None, student_input)
+
+    def __call__(self, expect, student_input):
+        """Shortcut to cfn, allowing the class object to be called as a function"""
+        return self.cfn(expect, student_input)
 
 class ListGrader(AbstractGrader):
     """Grades Lists of items according to ItemGrader, unordered by default.
@@ -157,13 +162,16 @@ class ListGrader(AbstractGrader):
     def schema_config(self):
         """Returns a voluptuous Schema object to validate config
         """
-        # ListGrader's schema_config depends on the config object...different for different ItemGraders. Hence we need a function to dynamically create the schema. I would have prefered schema_config as a class attribute.
-        item_grader = vh.validate_with_humanized_errors( self.config['item_grader'], Schema(ItemGrader) )
+        # ListGrader's schema_config depends on the config object, which is
+        # different for different ItemGraders.
+        # Hence we need a function to dynamically create the schema.
+        # I would have prefered schema_config as a class attribute.
+        item_grader = voluptuous_validate(self.config['item_grader'], Schema(ItemGrader))
         schema = Schema({
-            Required('ordered', default=False):bool,
+            Required('ordered', default=False): bool,
             Required('separator', default=','): str,
-            Required('item_grader'):ItemGrader,
-            Required('answers_list'): [ item_grader.schema_answers ],
+            Required('item_grader'): ItemGrader,
+            Required('answers_list'): [ item_grader.schema_answers ]
         })
         return schema
 
@@ -208,7 +216,7 @@ class ListGrader(AbstractGrader):
         elif single_input:
             return ListGraderStringInput(self.config).check(answers_list, student_input)
         else:
-            raise Exception("Expected answer to have type <type list> or <type unicode>, but had {t}".format(t = type(student_input)))
+            raise Exception("Expected answer to have type <type list>, <type string> or <type unicode>, but received {t}".format(t = type(student_input)))
 
 class ListGraderListInput(ListGrader):
     """Delegated to by ListGrader.check when student_input is a list.
@@ -216,7 +224,9 @@ class ListGraderListInput(ListGrader):
     """
 
     def check(self, answers_list, student_input_list):
-        answers_list = self.config['answers_list'] if answers_list==None else answers_list
+        answers_list = self.config['answers_list'] if answers_list is None else answers_list
+
+        # TODO: Needs error checking here!!!
 
         if self.config['ordered']:
             input_list = [ self.item_check(a, i) for a, i in zip(answers_list, student_input_list) ]
@@ -364,6 +374,11 @@ class ItemGrader(AbstractGrader):
             """Iterates check over each answer in answers
             """
             answers = self.config['answers'] if answers == None else answers
+
+            #J: At this stage, can we check if answers is a list, and promote it to one if not?
+            # This would avoid needing a list of lists in places
+            # Alternatively, we may be able to use schema_answers to do it for us
+
             results = [ check(answer, student_input) for answer in answers]
 
             best_score = max([ r['grade_decimal'] for r in results ])
@@ -376,7 +391,10 @@ class ItemGrader(AbstractGrader):
 
     def __init__(self, config={}):
         super(ItemGrader, self).__init__(config)
-        self.check = self.iterate_check( self.check)
+        # Note that self.check MUST be shadowed by a subclass, so on the RHS
+        # here, self.check refers to the subclassed function
+        # However, we do overwrite it :-)
+        self.check = self.iterate_check(self.check)
 
 class StringGrader(ItemGrader):
 
