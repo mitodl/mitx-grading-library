@@ -1,6 +1,6 @@
 """Standalone validator functions for use in voluptuous Schema."""
 
-from voluptuous import All, Range, NotIn, Invalid
+from ..voluptuous import All, Range, NotIn, Invalid
 
 def Positive(thetype):
     if thetype==int:
