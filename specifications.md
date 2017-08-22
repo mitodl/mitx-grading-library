@@ -170,4 +170,4 @@ grader = ListGrader({
 })
 ```
 
-This example needs either 6 input boxes (one for each eigenvalue, three for each eigenvector), or 4 input boxes (one for each eigenvalue, and then a single input box for the eigenvector). If you want a challenge exercise, modify this to allow the eigenvectors to be either the ones presented here, or their negative!
+Because the pairing has exactly 4 items in it, this example requires 4 input boxes: eigenvalue1, eigenvector1 (single input box list), eigenvalue2, eigenvector2 (single input box list). If you want a challenge exercise, modify this to allow the eigenvectors to be either the ones presented here, or their negative!
