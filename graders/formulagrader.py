@@ -325,10 +325,10 @@ class FormulaGrader(NumericalGrader):
     ...     'functions':['f', 'g']
     ... })
     >>> theinput0 = 'f(g(a)) + a*b + f(-b+c)'
-    >>> grader.cfn(None, theinput0)['ok']
+    >>> grader(None, theinput0)['ok']
     True
     >>> theinput1 = 'f(g(b)) + 2*a*b + f(b-c)'
-    >>> grader.cfn(None, theinput1)['ok']
+    >>> grader(None, theinput1)['ok']
     False
 
     The learner's input is compared to expected answer using numerical
@@ -345,7 +345,7 @@ class FormulaGrader(NumericalGrader):
     ...     'tolerance': 0.1
     ... })
     >>> theinput = "b*b - 0.25*f(g(a))"
-    >>> grader.cfn(None, theinput)['ok']
+    >>> grader(None, theinput)['ok']
     True
 
     You can also provide specific values to use for any variable or function:
@@ -360,7 +360,7 @@ class FormulaGrader(NumericalGrader):
     ...     }
     ... })
     >>> theinput = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = square
-    >>> grader.cfn(None, theinput)['ok']
+    >>> grader(None, theinput)['ok']
     True
 
     Grade complex-valued expressions:
@@ -372,7 +372,7 @@ class FormulaGrader(NumericalGrader):
     ...     }
     ... })
     >>> theinput = 're(z)^2+im(z)^2'
-    >>> grader.cfn(None, theinput)['ok']
+    >>> grader(None, theinput)['ok']
     True
 
     Configuration Dictionary Keys
