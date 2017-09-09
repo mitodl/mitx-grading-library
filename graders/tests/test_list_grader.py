@@ -1,12 +1,12 @@
 from __future__ import division
-from .. import graders
+from .. import *
 
 from pytest import approx
 
 def test_order_not_matter_with_list_submission():
-    grader = graders.ListGrader({
+    grader = ListGrader({
         'answers_list': [['cat'], ['dog'], ['unicorn']],
-        'item_grader': graders.StringGrader()
+        'item_grader': StringGrader()
     })
     submission = ['cat','fish','dog']
     expected_result = {
@@ -17,12 +17,12 @@ def test_order_not_matter_with_list_submission():
             {'ok':True , 'grade_decimal':1, 'msg':''}
         ]
     }
-    assert grader.cfn(None, submission) == expected_result
+    assert grader(None, submission) == expected_result
 
 def test_order_not_matter_with_string_submission():
-    grader = graders.ListGrader({
+    grader = ListGrader({
         'answers_list': [['cat'], ['dog'], ['unicorn']],
-        'item_grader': graders.StringGrader()
+        'item_grader': StringGrader()
     })
     submission = "cat, fish, dog"
     expected_result = {
@@ -30,12 +30,12 @@ def test_order_not_matter_with_string_submission():
         'msg':'',
         'grade_decimal':2/3
     }
-    assert grader.cfn(None, submission) == expected_result
+    assert grader(None, submission) == expected_result
 
 def test_duplicate_items_with_list_submission():
-    grader = graders.ListGrader({
+    grader = ListGrader({
         'answers_list': [['cat'], ['dog'], ['unicorn'], ['cat'],['cat']],
-        'item_grader': graders.StringGrader()
+        'item_grader': StringGrader()
     })
     submission = ['cat','dog', 'dragon','dog','cat']
     expected_result = {
@@ -48,10 +48,10 @@ def test_duplicate_items_with_list_submission():
             {'ok':True , 'grade_decimal':1, 'msg':''}
         ]
     }
-    assert grader.cfn(None, submission) == expected_result
+    assert grader(None, submission) == expected_result
 
 def test_partial_credit_assigment_with_list_submission():
-    grader = graders.ListGrader({
+    grader = ListGrader({
         'answers_list': [
             [
                 {'expect':'tiger', 'grade_decimal':1},
@@ -64,7 +64,7 @@ def test_partial_credit_assigment_with_list_submission():
                 {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
             ]
         ],
-        'item_grader': graders.StringGrader()
+        'item_grader': StringGrader()
     })
     submission = ["skunk", "lion", "unicorn"]
     expected_result = {
@@ -75,10 +75,10 @@ def test_partial_credit_assigment_with_list_submission():
             {'ok':'partial','grade_decimal':0.75, 'msg':'unicorn_msg'}
         ]
     }
-    assert grader.cfn(None, submission) == expected_result
+    assert grader(None, submission) == expected_result
 
 def test_partial_credit_assigment_with_string_submission():
-    grader = graders.ListGrader({
+    grader = ListGrader({
         'answers_list': [
             [
                 {'expect':'tiger', 'grade_decimal':1},
@@ -91,7 +91,7 @@ def test_partial_credit_assigment_with_string_submission():
                 {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
             ]
         ],
-        'item_grader': graders.StringGrader()
+        'item_grader': StringGrader()
     })
     submission = "skunk, lion, unicorn"
     expected_result = {
@@ -99,10 +99,10 @@ def test_partial_credit_assigment_with_string_submission():
         'msg': "lion_msg\nunicorn_msg",
         'grade_decimal':approx( (1+0.5+0.75)/3 )
     }
-    assert grader.cfn(None, submission) == expected_result
-    
+    assert grader(None, submission) == expected_result
+
 def test_too_many_items_with_string_submission():
-    grader = graders.ListGrader({
+    grader = ListGrader({
         'answers_list': [
             [
                 {'expect':'tiger', 'grade_decimal':1},
@@ -115,7 +115,7 @@ def test_too_many_items_with_string_submission():
                 {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
             ],
         ],
-        'item_grader': graders.StringGrader()
+        'item_grader': StringGrader()
     })
     submission = "skunk, fish, lion, unicorn, bear"
     expected_result = {
@@ -123,10 +123,10 @@ def test_too_many_items_with_string_submission():
         'msg': "lion_msg\nunicorn_msg",
         'grade_decimal': approx( (1+0.5+0.75)/3 - 2*1/3 )
     }
-    assert grader.cfn(None, submission) == expected_result
-    
+    assert grader(None, submission) == expected_result
+
 def test_way_too_many_items_reduces_score_to_zero_with_string_submission():
-    grader = graders.ListGrader({
+    grader = ListGrader({
         'answers_list': [
             [
                 {'expect':'tiger', 'grade_decimal':1},
@@ -139,7 +139,7 @@ def test_way_too_many_items_reduces_score_to_zero_with_string_submission():
                 {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
             ],
         ],
-        'item_grader': graders.StringGrader()
+        'item_grader': StringGrader()
     })
     submission = "skunk, fish, dragon, dog, lion, unicorn, bear"
     expected_result = {
@@ -147,10 +147,10 @@ def test_way_too_many_items_reduces_score_to_zero_with_string_submission():
         'msg': "lion_msg\nunicorn_msg",
         'grade_decimal': 0
     }
-    assert grader.cfn(None, submission) == expected_result
-    
+    assert grader(None, submission) == expected_result
+
 def test_too_few_items_with_string_submission():
-    grader = graders.ListGrader({
+    grader = ListGrader({
         'answers_list': [
             [
                 {'expect':'tiger', 'grade_decimal':1},
@@ -163,7 +163,7 @@ def test_too_few_items_with_string_submission():
                 {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
             ]
         ],
-        'item_grader': graders.StringGrader()
+        'item_grader': StringGrader()
     })
     submission = "skunk, unicorn"
     expected_result = {
@@ -171,10 +171,9 @@ def test_too_few_items_with_string_submission():
         'msg': "unicorn_msg",
         'grade_decimal':approx( (1+0.75)/3 )
     }
-    assert grader.cfn(None, submission) == expected_result
-    
-    
-    
-    
-    
-    
+    assert grader(None, submission) == expected_result
+
+
+
+
+
