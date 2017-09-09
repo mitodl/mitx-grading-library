@@ -36,7 +36,7 @@ When there are multiple items to be graded, a list grader handles the grading. L
 
 ```python
 grader = ListGrader({
-    'answers_list': answerslist,
+    'answers': answerslist,
     'item_grader': graders,
     'ordered': True/False,
     'pairing': pairinglist
@@ -52,12 +52,12 @@ Each input is checked against the corresponding answer, using the item grader My
 
 ```python
 grader = ListGrader({
-    'answers_list': ['cat', 'dog'],
+    'answers': ['cat', 'dog'],
     'item_grader': MyGrader()
 })
 ```
 
-Each element of answers_list is set as an answer that is passed as the answers key into the item grader. In this case, the item grader just sees a single string as an input. You can do more complicated things though, like the following.
+Each element of answers is set as an answer that is passed as the answers key into the item grader. In this case, the item grader just sees a single string as an input. You can do more complicated things though, like the following.
 
 ```python
 answer1 = [
@@ -70,7 +70,7 @@ answer2 = [
         {'expect':'feline', 'grade_decimal':0.5}
     ]
 grader = ListGrader({
-    'answers_list': [answer1, answer2],
+    'answers': [answer1, answer2],
     'item_grader': MyGrader()
 })
 ```
@@ -82,7 +82,7 @@ By setting ordered to false, students can enter "cat", "dog" or "dog", "cat" for
 
 ```python
 grader = ListGrader({
-    'answers_list': ['cat', 'dog'],
+    'answers': ['cat', 'dog'],
     'item_grader': MyGrader(),
     'ordered': False
 })
@@ -91,11 +91,11 @@ grader = ListGrader({
 
 ### Multiple graders
 
-If you have inhomogeneous inputs, you can grade them using different graders. Simply give a list of item graders, and the data will be passed into the graders in that order. Note that the length of answers_list must be the same as the number of graders in this case. Further note that you cannot set ordered to False when using a list of graders.
+If you have inhomogeneous inputs, you can grade them using different graders. Simply give a list of item graders, and the data will be passed into the graders in that order. Note that the length of answers must be the same as the number of graders in this case. Further note that you cannot set ordered to False when using a list of graders.
 
 ```python
 grader = ListGrader({
-    'answers_list': ['cat', 'x^2+1'],
+    'answers': ['cat', 'x^2+1'],
     'item_grader': [MyGrader1(), MyGrader2()]
 })
 ```
@@ -109,7 +109,7 @@ Sometimes you will have inputs that needed to be graded together. A simple examp
 
 ```python
 grader = ListGrader({
-    'answers_list': [
+    'answers': [
         ['cat', 1],
         ['dog', 2],
         ['tiger', 3]
@@ -122,19 +122,19 @@ grader = ListGrader({
 })
 ```
 
-The pairing key specifies which group each entry belongs to. In this case, answers 1 and 2 will be combined into a list, as will 3 and 4, and 5 and 6. The item grader (itself a list grader) will then receive a list of two answers, and each of the items in the answers_list. Because this is an unordered list, the list grader will try every possible combination and choose the optimal one.
+The pairing key specifies which group each entry belongs to. In this case, answers 1 and 2 will be combined into a list, as will 3 and 4, and 5 and 6. The item grader (itself a list grader) will then receive a list of two answers, and each of the items in the answers. Because this is an unordered list, the list grader will try every possible combination and choose the optimal one.
 
-In this case, the next level of grader is receiving multiple inputs, and so itself needs to be a ListGrader. As ordered is false, this same grader will be used to grade everything. We'll see an example below where this is not the case. When initializing this ListGrader, the answers_list does not need to be specified, as the answers will be passed in automatically. Only the item_grader key needs to be specified.
+In this case, the next level of grader is receiving multiple inputs, and so itself needs to be a ListGrader. As ordered is false, this same grader will be used to grade everything. We'll see an example below where this is not the case. When initializing this ListGrader, the answers key does not need to be specified, as the answers will be passed in automatically. Only the item_grader key needs to be specified.
 
 You cannot use a paired grading scheme with a single inputbox problem.
 
 With ordered equal to false, the pairings must each have the same number of elements.
 
-Here is another example. In this case, we have ordered entry, so we can specify a list of item graders. We have three items in the first pairing and one item in the second, so we use a ListGrader for the first pairing, and a MyGrader for the second. Note that the first entry in answers_list is a list that is passed directly into the ListGrader, while the second entry is just a string. This second-level ListGrader is now unordered.
+Here is another example. In this case, we have ordered entry, so we can specify a list of item graders. We have three items in the first pairing and one item in the second, so we use a ListGrader for the first pairing, and a MyGrader for the second. Note that the first entry in answers is a list that is passed directly into the ListGrader, while the second entry is just a string. This second-level ListGrader is now unordered.
 
 ```python
 grader = ListGrader({
-    'answers_list': [
+    'answers': [
         ['bat', 'ghost', 'pumpkin'],
         'Halloween'
     ],
@@ -153,7 +153,7 @@ Our last example is for a math class, where we have a matrix that has two eigenv
 
 ```python
 grader = ListGrader({
-    'answers_list': [
+    'answers': [
         [1, [1, 0]],
         [-1, [0, 1]],
     ],
@@ -161,7 +161,7 @@ grader = ListGrader({
         'item_grader': [
             NumericalGrader(),
             ListGrader({
-                NumericalGrader()
+                'item_grader': NumericalGrader()
             })
         ]
     })
@@ -169,3 +169,5 @@ grader = ListGrader({
     'pairing': [1, 1, 2, 2]
 })
 ```
+
+Because the pairing has exactly 4 items in it, this example requires 4 input boxes: eigenvalue1, eigenvector1 (single input box list), eigenvalue2, eigenvector2 (single input box list). If you want a challenge exercise, modify this to allow the eigenvectors to be either the ones presented here, or their negative!
