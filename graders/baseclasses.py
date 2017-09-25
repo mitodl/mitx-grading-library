@@ -91,25 +91,38 @@ class ItemGrader(AbstractGrader):
 
     @property
     def schema_answers(self):
-        def validate_and_transform_answer(answer_or_expect):
-            """ XXX = answer_or_expect
-            If XXX is a valid schema_answer, compute  the 'ok' value if needed.
-            If XXX is not a valid schema, try validating {'expect':XXX}
+        """Validates config['answers'], transforming if needed.
 
+        Three forms for config['answers'] are acceptable:
+
+        1. A list of dictionaries, each a valid schema_answer
+        2. A list of schema_answer['expect'] values
+        3. A single schema_answer['expect'] value
+
+        """
+        def validate_or_transform_answer(answer):
+            """ Validates or transforms answer to conform with schema_answer
+
+            If answer is a valid schema_answer, compute  the 'ok' 'value'.
+            Otherwise, try validating {'expect': answer}
             """
-
             try:
-                answer = self.schema_answer(answer_or_expect)
-                if answer['ok'] == 'computed':
-                    answer['ok'] = self.grade_decimal_to_ok( answer['grade_decimal'] )
-                return answer
+                validated_answer = self.schema_answer(answer)
+                if validated_answer['ok'] == 'computed':
+                    validated_answer['ok'] = self.grade_decimal_to_ok( validated_answer['grade_decimal'] )
+                return validated_answer
             except MultipleInvalid:
                 try:
-                    return self.schema_answer({'expect':answer_or_expect,'ok':True})
+                    return self.schema_answer({'expect':answer,'ok':True})
                 except MultipleInvalid:
                     raise ValueError
 
-        return Schema( [validate_and_transform_answer] )
+        def validate_or_transform_answers(answers):
+            if not isinstance(answers, list):
+                answers = [answers]
+            return Schema( [validate_or_transform_answer] )(answers)
+
+        return validate_or_transform_answers
 
     @property
     def schema_config(self):
