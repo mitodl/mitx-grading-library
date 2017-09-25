@@ -3,7 +3,7 @@ from .. import *
 
 def test_single_expect_value_in_config():
     grader = StringGrader({
-        'answers':['cat']
+        'answers': 'cat'
     })
     submission = 'dog'
     expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
@@ -11,11 +11,19 @@ def test_single_expect_value_in_config():
 
 def test_single_expect_value_in_config_and_passed_explicitly():
     grader = StringGrader({
-        'answers':['cat']
+        'answers': 'cat'
     })
     submission = 'dog'
     expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
     assert grader('cat', submission) == expected_result
+
+def test_two_expect_values_in_config():
+    grader = StringGrader({
+        'answers': ['cat', 'horse']
+    })
+    submission = 'horse'
+    expected_result = {'msg': '', 'grade_decimal': 1, 'ok': True}
+    assert grader(None, submission) == expected_result
 
 def test_list_of_expect_values():
     grader = StringGrader({
