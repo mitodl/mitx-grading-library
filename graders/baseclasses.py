@@ -136,10 +136,6 @@ class ItemGrader(AbstractGrader):
             """
             answers = self.config['answers'] if answers == None else answers
 
-            #J: At this stage, can we check if answers is a list, and promote it to one if not?
-            # This would avoid needing a list of lists in places
-            # Alternatively, we may be able to use schema_answers to do it for us
-
             results = [ check(answer, student_input) for answer in answers]
 
             best_score = max([ r['grade_decimal'] for r in results ])
