@@ -211,8 +211,6 @@ class UniqueValue(VariableSamplingSet, FunctionSamplingSet):
 
 class NumericalGrader(ItemGrader):
     """Class that grades numerical input and expressions"""
-    # Input must come in the form of strings
-    schema_expect = Schema(str)
 
     # The scimath variants have flexible domain. For example:
     #   numpy.sqrt(-4+0j) = 2j
@@ -514,7 +512,7 @@ class FormulaGrader(NumericalGrader):
         else:
             return {'ok':False, 'grade_decimal':0, 'msg':''}
 
-    def check(self, answer, student_input):
+    def check_response(self, answer, student_input):
         try:
             return self.raw_check(answer, student_input)
         except calc.UndefinedVariable as e:

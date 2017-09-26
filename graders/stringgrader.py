@@ -3,8 +3,6 @@ from voluptuous import Schema, Required
 
 class StringGrader(ItemGrader):
 
-    schema_expect = Schema(str)
-
     @property
     def schema_config(self):
         schema = super(StringGrader, self).schema_config
@@ -13,7 +11,7 @@ class StringGrader(ItemGrader):
             Required('case_sensitive', default=True) : bool
         })
 
-    def check(self, answer, student_input):
+    def check_response(self, answer, student_input):
         if self.config['strip']:
             answer['expect'] = answer['expect'].strip()
             student_input = student_input.strip()
