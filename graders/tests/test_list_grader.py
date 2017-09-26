@@ -32,6 +32,22 @@ def test_order_not_matter_with_string_submission():
     }
     assert grader(None, submission) == expected_result
 
+def test_shorthand_answers_specification():
+    grader = ListGrader({
+        'answers_list': ['cat', 'dog', 'unicorn'],
+        'item_grader': StringGrader()
+    })
+    submission = ['cat','fish','dog']
+    expected_result = {
+        'overall_message':'',
+        'input_list':[
+            {'ok':True , 'grade_decimal':1, 'msg':''},
+            {'ok':False, 'grade_decimal':0, 'msg':''},
+            {'ok':True , 'grade_decimal':1, 'msg':''}
+        ]
+    }
+    assert grader(None, submission) == expected_result
+
 def test_duplicate_items_with_list_submission():
     grader = ListGrader({
         'answers_list': [['cat'], ['dog'], ['unicorn'], ['cat'],['cat']],
@@ -172,8 +188,3 @@ def test_too_few_items_with_string_submission():
         'grade_decimal':approx( (1+0.75)/3 )
     }
     assert grader(None, submission) == expected_result
-
-
-
-
-

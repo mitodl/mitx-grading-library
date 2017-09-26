@@ -116,27 +116,50 @@ class ItemGrader(AbstractGrader):
             Required('ok',  default='computed'):Any('computed', True, False, 'partial')
         })
 
+    def validate_single_answer(self, answer):
+        """
+        Validates a single answer.
+        Transforms the answer to conform with schema_answer and returns it.
+        If invalid, raises ValueError.
+
+        Two forms are acceptable:
+        1. A schema_answer dictionary (we compute the 'ok' value if needed)
+        2. A schema_answer['expect'] value (validated as {'expect': answer})
+        """
+        try:
+            validated_answer = self.schema_answer(answer)
+            if validated_answer['ok'] == 'computed':
+                validated_answer['ok'] = self.grade_decimal_to_ok( validated_answer['grade_decimal'] )
+            return validated_answer
+        except MultipleInvalid:
+            try:
+                return self.schema_answer({'expect':answer, 'ok':True})
+            except MultipleInvalid:
+                raise ValueError
+
     @property
     def schema_answers(self):
-        def validate_and_transform_answer(answer_or_expect):
-            """ XXX = answer_or_expect
-            If XXX is a valid schema_answer, compute  the 'ok' value if needed.
-            If XXX is not a valid schema, try validating {'expect':XXX}
+        """
+        Returns the schema to validate an answer list against.
 
-            """
+        This will transform the input to a list as necessary, and then call
+        validate_single_answer to validate individual answers.
 
-            try:
-                answer = self.schema_answer(answer_or_expect)
-                if answer['ok'] == 'computed':
-                    answer['ok'] = self.grade_decimal_to_ok( answer['grade_decimal'] )
-                return answer
-            except MultipleInvalid:
-                try:
-                    return self.schema_answer({'expect':answer_or_expect,'ok':True})
-                except MultipleInvalid:
-                    raise ValueError
+        Usually used to validate config['answers'].
 
-        return Schema( [validate_and_transform_answer] )
+        Three forms for the answer list are acceptable:
+
+        1. A list of dictionaries, each a valid schema_answer
+        2. A list of schema_answer['expect'] values
+        3. A single schema_answer['expect'] value
+        """
+        def validate_answers(answer_list):
+            if not isinstance(answer_list, list):
+                answer_list = [answer_list]
+            schema = Schema([self.validate_single_answer])
+            return schema(answer_list)
+
+        return validate_answers
 
     @property
     def schema_config(self):
