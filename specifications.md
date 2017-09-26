@@ -14,9 +14,9 @@ grader = MyGrader({
 ```
 
 The answers entry may be:
-* A string/number: 'cat'
+* A string: 'cat'
 * A dictionary: {'expect':'zebra', 'grade_decimal':1, 'msg':'Yay!'}
-* A list of strings/numbers: ['cat', 'lion', 'tiger']
+* A list of strings: ['cat', 'lion', 'tiger']
 * A list of dictionaries:
 ```python
 [
@@ -25,6 +25,7 @@ The answers entry may be:
     {'expect':'unicorn', 'grade_decimal':0, 'msg':'Really?'},
 ]
 ```
+Note that even for numerical input, the answers must be input as strings.
 
 Internally, the ItemGrader base class converts the answers entry into a list of dictionaries, and then asks the specific grading class to grade the response against each possible answer.
 
