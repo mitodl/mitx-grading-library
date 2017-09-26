@@ -63,13 +63,17 @@ class AbstractGrader(ObjectWithSchema):
             in the documentation for check.)
 
             But we do want to allow authors to use the edX <customresponse />
-            expect attribute because it's value is diaplyed to students.
+            expect attribute because it's value is displayed to students.
         """
         return self.check(None, student_input)
 
 class ItemGrader(AbstractGrader):
 
     __metaclass__ = abc.ABCMeta
+
+    @abc.abstractproperty
+    def schema_expect(self):
+        pass
 
     @staticmethod
     def grade_decimal_to_ok(gd):
@@ -89,40 +93,50 @@ class ItemGrader(AbstractGrader):
             Required('ok',  default='computed'):Any('computed', True, False, 'partial')
         })
 
+    def validate_single_answer(self, answer):
+        """
+        Validates a single answer.
+        Transforms the answer to conform with schema_answer and returns it.
+        If invalid, raises ValueError.
+
+        Two forms are acceptable:
+        1. A schema_answer dictionary (we compute the 'ok' value if needed)
+        2. A schema_answer['expect'] value (validated as {'expect': answer})
+        """
+        try:
+            validated_answer = self.schema_answer(answer)
+            if validated_answer['ok'] == 'computed':
+                validated_answer['ok'] = self.grade_decimal_to_ok( validated_answer['grade_decimal'] )
+            return validated_answer
+        except MultipleInvalid:
+            try:
+                return self.schema_answer({'expect':answer, 'ok':True})
+            except MultipleInvalid:
+                raise ValueError
+
     @property
     def schema_answers(self):
-        """Validates config['answers'], transforming if needed.
+        """
+        Returns the schema to validate an answer list against.
 
-        Three forms for config['answers'] are acceptable:
+        This will transform the input to a list as necessary, and then call
+        validate_single_answer to validate individual answers.
+
+        Usually used to validate config['answers'].
+
+        Three forms for the answer list are acceptable:
 
         1. A list of dictionaries, each a valid schema_answer
         2. A list of schema_answer['expect'] values
         3. A single schema_answer['expect'] value
-
         """
-        def validate_or_transform_answer(answer):
-            """ Validates or transforms answer to conform with schema_answer
+        def validate_answers(answer_list):
+            if not isinstance(answer_list, list):
+                answer_list = [answer_list]
+            schema = Schema([self.validate_single_answer])
+            return schema(answer_list)
 
-            If answer is a valid schema_answer, compute  the 'ok' 'value'.
-            Otherwise, try validating {'expect': answer}
-            """
-            try:
-                validated_answer = self.schema_answer(answer)
-                if validated_answer['ok'] == 'computed':
-                    validated_answer['ok'] = self.grade_decimal_to_ok( validated_answer['grade_decimal'] )
-                return validated_answer
-            except MultipleInvalid:
-                try:
-                    return self.schema_answer({'expect':answer,'ok':True})
-                except MultipleInvalid:
-                    raise ValueError
-
-        def validate_or_transform_answers(answers):
-            if not isinstance(answers, list):
-                answers = [answers]
-            return Schema( [validate_or_transform_answer] )(answers)
-
-        return validate_or_transform_answers
+        return validate_answers
 
     @property
     def schema_config(self):
@@ -132,7 +146,8 @@ class ItemGrader(AbstractGrader):
 
     def iterate_check(self, check):
         def iterated_check(answers, student_input):
-            """Iterates check over each answer in answers
+            """
+            Iterates check over each answer in answers
             """
             answers = self.config['answers'] if answers == None else answers
 
@@ -151,4 +166,5 @@ class ItemGrader(AbstractGrader):
         # Note that self.check MUST be shadowed by a subclass, so on the RHS
         # here, self.check refers to the subclassed function
         # However, we do overwrite it :-)
+        # TODO this is pretty bad! We should figure out how to NOT do this!
         self.check = self.iterate_check(self.check)
