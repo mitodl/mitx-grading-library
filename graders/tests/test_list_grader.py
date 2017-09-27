@@ -5,7 +5,7 @@ from pytest import approx
 
 def test_order_not_matter_with_list_submission():
     grader = ListGrader({
-        'answers_list': [['cat'], ['dog'], ['unicorn']],
+        'answers': [['cat'], ['dog'], ['unicorn']],
         'item_grader': StringGrader()
     })
     submission = ['cat','fish','dog']
@@ -21,7 +21,7 @@ def test_order_not_matter_with_list_submission():
 
 def test_order_not_matter_with_string_submission():
     grader = ListGrader({
-        'answers_list': [['cat'], ['dog'], ['unicorn']],
+        'answers': [['cat'], ['dog'], ['unicorn']],
         'item_grader': StringGrader()
     })
     submission = "cat, fish, dog"
@@ -34,7 +34,7 @@ def test_order_not_matter_with_string_submission():
 
 def test_shorthand_answers_specification():
     grader = ListGrader({
-        'answers_list': ['cat', 'dog', 'unicorn'],
+        'answers': ['cat', 'dog', 'unicorn'],
         'item_grader': StringGrader()
     })
     submission = ['cat','fish','dog']
@@ -50,7 +50,7 @@ def test_shorthand_answers_specification():
 
 def test_duplicate_items_with_list_submission():
     grader = ListGrader({
-        'answers_list': [['cat'], ['dog'], ['unicorn'], ['cat'],['cat']],
+        'answers': [['cat'], ['dog'], ['unicorn'], ['cat'],['cat']],
         'item_grader': StringGrader()
     })
     submission = ['cat','dog', 'dragon','dog','cat']
@@ -68,7 +68,7 @@ def test_duplicate_items_with_list_submission():
 
 def test_partial_credit_assigment_with_list_submission():
     grader = ListGrader({
-        'answers_list': [
+        'answers': [
             [
                 {'expect':'tiger', 'grade_decimal':1},
                 {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
@@ -95,7 +95,7 @@ def test_partial_credit_assigment_with_list_submission():
 
 def test_partial_credit_assigment_with_string_submission():
     grader = ListGrader({
-        'answers_list': [
+        'answers': [
             [
                 {'expect':'tiger', 'grade_decimal':1},
                 {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
@@ -119,7 +119,7 @@ def test_partial_credit_assigment_with_string_submission():
 
 def test_too_many_items_with_string_submission():
     grader = ListGrader({
-        'answers_list': [
+        'answers': [
             [
                 {'expect':'tiger', 'grade_decimal':1},
                 {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
@@ -143,7 +143,7 @@ def test_too_many_items_with_string_submission():
 
 def test_way_too_many_items_reduces_score_to_zero_with_string_submission():
     grader = ListGrader({
-        'answers_list': [
+        'answers': [
             [
                 {'expect':'tiger', 'grade_decimal':1},
                 {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
@@ -167,7 +167,7 @@ def test_way_too_many_items_reduces_score_to_zero_with_string_submission():
 
 def test_too_few_items_with_string_submission():
     grader = ListGrader({
-        'answers_list': [
+        'answers': [
             [
                 {'expect':'tiger', 'grade_decimal':1},
                 {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
