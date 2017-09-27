@@ -1,25 +1,58 @@
-from baseclasses import ItemGrader
-from voluptuous import Schema, Required
+"""
+StringGrader class
+
+Grades answers that correspond to a text string, such as 'cat' and 'dog'.
+"""
+from graders.baseclasses import ItemGrader
+from graders.voluptuous import Required
+
+# Set the objects to be imported from this grader
+__all__ = ["StringGrader"]
 
 class StringGrader(ItemGrader):
+    """
+    Grader based on exact comparison of strings
+
+    Configuration options:
+
+    grader = StringGrader({
+        'answers': 'cat',
+        'strip': True,
+        'case_sensitive' True
+    })
+
+    answers: List of answers in the typical form
+    strip: Whether or not to strip leading and trailing whitespace
+           from answers/student responses before comparing to answers (default True)
+    case_sensitive: Whether to be case sensitive in comparisons (default True)
+    """
 
     @property
     def schema_config(self):
+        """Define the configuration options for StringGrader"""
+        # Construct the default ItemGrader schema
         schema = super(StringGrader, self).schema_config
+        # Append options
         return schema.extend({
             Required('strip', default=True): bool,
             Required('case_sensitive', default=True) : bool
         })
 
     def check_response(self, answer, student_input):
+        """Grades a student response against a given answer"""
+        expect = answer['expect']
+        student = student_input
+
+        # Apply options
         if self.config['strip']:
-            answer['expect'] = answer['expect'].strip()
-            student_input = student_input.strip()
+            expect = expect.strip()
+            student = student.strip()
+        if not self.config['case_sensitive']:
+            expect = expect.lower()
+            student = student.lower()
 
-        if student_input.strip() == answer['expect'].strip():
+        # Perform comparison
+        if expect == student:
             return {'ok':answer['ok'], 'grade_decimal':answer['grade_decimal'], 'msg':answer['msg']}
-        else:
-            return {'ok':False, 'grade_decimal':0, 'msg':''}
 
-# Set the objects to be imported from this grader
-__all__ = ["StringGrader"]
+        return {'ok':False, 'grade_decimal':0, 'msg':''}
