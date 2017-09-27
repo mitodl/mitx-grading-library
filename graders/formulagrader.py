@@ -210,6 +210,7 @@ class UniqueValue(VariableSamplingSet, FunctionSamplingSet):
         return self.config
 
 class NumericalGrader(ItemGrader):
+    """Class that grades numerical input and expressions"""
 
     # The scimath variants have flexible domain. For example:
     #   numpy.sqrt(-4+0j) = 2j
@@ -401,8 +402,6 @@ class FormulaGrader(NumericalGrader):
         'pi': numpy.pi,
     }
 
-    schema_expect = Schema(str)
-
     @property
     def schema_config(self):
         schema = super(FormulaGrader, self).schema_config
@@ -513,7 +512,7 @@ class FormulaGrader(NumericalGrader):
         else:
             return {'ok':False, 'grade_decimal':0, 'msg':''}
 
-    def check(self, answer, student_input):
+    def check_response(self, answer, student_input):
         try:
             return self.raw_check(answer, student_input)
         except calc.UndefinedVariable as e:
