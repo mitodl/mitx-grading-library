@@ -162,9 +162,14 @@ class ItemGrader(AbstractGrader):
 
         # If the 'ok' value is 'computed', then compute what it should be
         if validated_answer['ok'] == 'computed':
-            validated_answer['ok'] = {0: False, 1: True}.get(validated_answer['grade_decimal'], 'partial')
+            validated_answer['ok'] = self.grade_decimal_to_ok(validated_answer['grade_decimal'])
 
         return validated_answer
+
+    @staticmethod
+    def grade_decimal_to_ok(gd):
+        """Converts a grade decimal into an 'ok' value: True, False or 'partial'"""
+        return {0: False, 1: True}.get(gd, 'partial')
 
     @property
     def schema_answer(self):
