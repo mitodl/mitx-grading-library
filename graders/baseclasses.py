@@ -86,61 +86,37 @@ class AbstractGrader(ObjectWithSchema):
         return self.check(None, student_input)
 
 class ItemGrader(AbstractGrader):
+    """
+    Abstract base class that represents a grader that grades a single input.
+    Almost all grading classes should inherit from this class. The only exception
+    should be ListGrader.
 
+    This class looks after the basic schema required to describe answers to a problem,
+    allowing for multiple ways of providing those answers. It also looks after checking
+    student input against all possible answers.
+
+    Inheriting classes must implement check_response. If any extra parameters are added
+    to the config, then schema_config should be shadowed. The only other thing you may
+    want to shadow is schema_expect, to add parsing to answers.
+    """
+
+    # This is an abstract base class
     __metaclass__ = abc.ABCMeta
 
     @property
-    def schema_expect(self):
+    def schema_config(self):
         """
-        The default schema for ItemGraders is to have the answer supplied in a string.
-        This is because it is the expect value, which a student would have to supply in
-        a text box.
+        Defines the default config schema for item graders.
+        Classes that inherit from ItemGrader should extend this schema.
         """
-        return Schema(str)
-
-    @staticmethod
-    def grade_decimal_to_ok(gd):
-        if gd == 0 :
-            return False
-        elif gd == 1:
-            return True
-        else:
-            return 'partial'
-
-    @property
-    def schema_answer(self):
         return Schema({
-            Required('expect', default=None): self.schema_expect,
-            Required('grade_decimal', default=1): All(numbers.Number, Range(0,1)),
-            Required('msg', default=''): str,
-            Required('ok',  default='computed'):Any('computed', True, False, 'partial')
+            Required('answers', default=[]): self.schema_answers
         })
-
-    def validate_single_answer(self, answer):
-        """
-        Validates a single answer.
-        Transforms the answer to conform with schema_answer and returns it.
-        If invalid, raises ValueError.
-
-        Two forms are acceptable:
-        1. A schema_answer dictionary (we compute the 'ok' value if needed)
-        2. A schema_answer['expect'] value (validated as {'expect': answer})
-        """
-        try:
-            validated_answer = self.schema_answer(answer)
-            if validated_answer['ok'] == 'computed':
-                validated_answer['ok'] = self.grade_decimal_to_ok( validated_answer['grade_decimal'] )
-            return validated_answer
-        except MultipleInvalid:
-            try:
-                return self.schema_answer({'expect':answer, 'ok':True})
-            except MultipleInvalid:
-                raise ValueError
 
     @property
     def schema_answers(self):
         """
-        Returns the schema to validate an answer list against.
+        Defines the schema to validate an answer list against.
 
         This will transform the input to a list as necessary, and then call
         validate_single_answer to validate individual answers.
@@ -153,7 +129,9 @@ class ItemGrader(AbstractGrader):
         2. A list of schema_answer['expect'] values
         3. A single schema_answer['expect'] value
         """
+        # Define the validation function
         def validate_answers(answer_list):
+            # Turn answer_list into a list if it isn't already
             if not isinstance(answer_list, list):
                 answer_list = [answer_list]
             schema = Schema([self.validate_single_answer])
@@ -161,11 +139,56 @@ class ItemGrader(AbstractGrader):
 
         return validate_answers
 
+    def validate_single_answer(self, answer):
+        """
+        Validates a single answer.
+        Transforms the answer to conform with schema_answer and returns it.
+        If invalid, raises ValueError.
+
+        Two forms are acceptable:
+        1. A schema_answer dictionary (we compute the 'ok' value if needed)
+        2. A schema_answer['expect'] value (validated as {'expect': answer})
+        """
+        try:
+            # Try to validate against the answer schema
+            validated_answer = self.schema_answer(answer)
+        except MultipleInvalid:
+            try:
+                # Ok, assume that answer is a single 'expect' value
+                validated_answer = self.schema_answer({'expect':answer, 'ok':True})
+            except MultipleInvalid:
+                # Unable to interpret your answer!
+                raise ValueError
+
+        # If the 'ok' value is 'computed', then compute what it should be
+        if validated_answer['ok'] == 'computed':
+            validated_answer['ok'] = self.grade_decimal_to_ok(validated_answer['grade_decimal'])
+
+        return validated_answer
+
+    @staticmethod
+    def grade_decimal_to_ok(gd):
+        """Converts a grade decimal into an 'ok' value: True, False or 'partial'"""
+        return {0: False, 1: True}.get(gd, 'partial')
+
     @property
-    def schema_config(self):
+    def schema_answer(self):
+        """Defines the schema that a fully-specified answer should satisfy."""
         return Schema({
-            Required('answers', default=[]): self.schema_answers
+            Required('expect', default=None): self.schema_expect,
+            Required('grade_decimal', default=1): All(numbers.Number, Range(0,1)),
+            Required('msg', default=''): str,
+            Required('ok',  default='computed'):Any('computed', True, False, 'partial')
         })
+
+    @property
+    def schema_expect(self):
+        """
+        Defines the schema that a supplied answer should satisfy.
+        This is simply a string, because students enter answers as a string.
+        If this is shadowed, it should only be to parse the string.
+        """
+        return Schema(str)
 
     def check(self, answers, student_input):
         """
