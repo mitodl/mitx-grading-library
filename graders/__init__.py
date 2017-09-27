@@ -1,5 +1,7 @@
 """
 Graders package
+Version 0.2.0
+
 An edX python grading library
 
 Copyright 2017 Jolyon Bloomfield and Chris Chudzicki
