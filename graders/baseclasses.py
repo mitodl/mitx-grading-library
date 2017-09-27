@@ -5,11 +5,10 @@ Contains base classes for the library:
 * ItemGrader
 """
 from __future__ import division
-from helpers import munkres
 import numbers
 import abc
-from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
-from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
+from graders.voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
+from graders.voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 
 class ObjectWithSchema(object):
     """Represents a user-facing object whose configuration needs validation."""
@@ -33,7 +32,7 @@ class ObjectWithSchema(object):
         """Validate the supplied config for the object"""
         # Set the config first before validating, so that schema_config has access to it
         # I don't like this; it makes for a tangled mess
-        # (schema_config may access the config before it's been validated/manipulated into valid form)
+        # (schema_config may access the config before it's been mutated into a valid form)
         self.config = {} if config is None else config
         self.config = self.validate_config(self.config)
 
@@ -48,12 +47,12 @@ class AbstractGrader(ObjectWithSchema):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def check(self, answer, student_input):
+    def check(self, answers, student_input):
         """
         Check student_input for correctness and provide feedback.
 
         Arguments:
-            answer: The expected result and grading information
+            answers: The expected result and grading information
             student_input: The student's input passed by edX
         """
         pass
@@ -129,8 +128,8 @@ class ItemGrader(AbstractGrader):
         2. A list of schema_answer['expect'] values
         3. A single schema_answer['expect'] value
         """
-        # Define the validation function
         def validate_answers(answer_list):
+            """Define the validation function"""
             # Turn answer_list into a list if it isn't already
             if not isinstance(answer_list, list):
                 answer_list = [answer_list]
@@ -167,18 +166,18 @@ class ItemGrader(AbstractGrader):
         return validated_answer
 
     @staticmethod
-    def grade_decimal_to_ok(gd):
+    def grade_decimal_to_ok(grade):
         """Converts a grade decimal into an 'ok' value: True, False or 'partial'"""
-        return {0: False, 1: True}.get(gd, 'partial')
+        return {0: False, 1: True}.get(grade, 'partial')
 
     @property
     def schema_answer(self):
         """Defines the schema that a fully-specified answer should satisfy."""
         return Schema({
             Required('expect', default=None): self.schema_expect,
-            Required('grade_decimal', default=1): All(numbers.Number, Range(0,1)),
+            Required('grade_decimal', default=1): All(numbers.Number, Range(0, 1)),
             Required('msg', default=''): str,
-            Required('ok',  default='computed'):Any('computed', True, False, 'partial')
+            Required('ok', default='computed'): Any('computed', True, False, 'partial')
         })
 
     @property
@@ -196,15 +195,15 @@ class ItemGrader(AbstractGrader):
         Computes the best outcome for the student.
         """
         # If no answers provided, use the internal configuration
-        answers = self.config['answers'] if answers == None else answers
+        answers = self.config['answers'] if answers is None else answers
 
         # Compute the results for each answer
-        results = [ self.check_response(answer, student_input) for answer in answers]
+        results = [self.check_response(answer, student_input) for answer in answers]
 
         # Compute the best result for the student
-        best_score = max([ r['grade_decimal'] for r in results ])
-        best_results = [ r for r in results if r['grade_decimal'] == best_score]
-        best_result_with_longest_msg = max(best_results, key = lambda r: len(r['msg']))
+        best_score = max([r['grade_decimal'] for r in results])
+        best_results = [r for r in results if r['grade_decimal'] == best_score]
+        best_result_with_longest_msg = max(best_results, key=lambda r: len(r['msg']))
 
         return best_result_with_longest_msg
 
