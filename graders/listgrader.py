@@ -247,11 +247,11 @@ class ListGrader(AbstractGrader):
             whichever is larger.
 
         Usage:
-            >>> ListGraderStringInput.calculate_grade([1, 0, 0.5], 4)
+            >>> ListGrader.calculate_single_grade([1, 0, 0.5], 4)
             0.375
-            >>> ListGraderStringInput.calculate_grade([1,0.5,0], 2)
+            >>> ListGrader.calculate_single_grade([1, 0.5, 0], 2)
             0.25
-            >>> ListGraderStringInput.calculate_grade([1,0.5,0,0,0],2)
+            >>> ListGrader.calculate_single_grade([1, 0.5, 0, 0, 0], 2)
             0
         """
         n_extra = len(grade_decimals) - n_expect
