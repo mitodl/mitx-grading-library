@@ -1,12 +1,30 @@
+"""
+ListGrader class
+
+This class is responsible for grading anything that contains multiple inputs.
+Also deals with delimiter-separated inputs within a single input box.
+
+Works by farming out the individual objects to other graders.
+"""
 from __future__ import division
-from helpers import munkres
-import numbers
-from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
-from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
-from baseclasses import AbstractGrader, ItemGrader
+from graders.helpers import munkres
+from graders.voluptuous import Schema, Required
+from graders.voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
+from graders.baseclasses import AbstractGrader, ItemGrader
+
+# Set the objects to be imported from this grader
+__all__ = ["ListGrader"]
+
+class _AutomaticFailure(object): # pylint: disable=too-few-public-methods
+    """Used as padding when grading unknown number of inputs on a single input line"""
+    pass
 
 class ListGrader(AbstractGrader):
-    """Grades Lists of items according to ItemGrader, unordered by default.
+    """
+    TODO This docstring is outdated and should be updated once ListGrader conforms
+    to the specifications.
+
+    Grades Lists of items according to ItemGrader, unordered by default.
 
     ListGrader can be used to grade a list of answers according to the
     supplied ItemGrader. Works with either multi-input customresponse
@@ -40,7 +58,7 @@ class ListGrader(AbstractGrader):
     Grade a list of strings (multi-input)
         >>> from stringgrader import StringGrader
         >>> grader = ListGrader({
-        ...     'answers_list':[['cat'], ['dog'], ['fish']],
+        ...     'answers':[['cat'], ['dog'], ['fish']],
         ...     'item_grader': StringGrader()
         ... })
         >>> result = grader(None, ['fish', 'cat', 'moose'])
@@ -73,7 +91,7 @@ class ListGrader(AbstractGrader):
     Optionally, make order matter:
         >>> ordered_grader = ListGrader({
         ...     'ordered': True,
-        ...     'answers_list':[['cat'], ['dog'], ['fish']],
+        ...     'answers':[['cat'], ['dog'], ['fish']],
         ...     'item_grader': StringGrader()
         ... })
         >>> result = ordered_grader(None, "cat, fish, moose")
@@ -84,16 +102,18 @@ class ListGrader(AbstractGrader):
     Optionally, change the separator for single-input:
         >>> semicolon_grader = ListGrader({
         ...     'separator': ';',
-        ...     'answers_list':[['cat'], ['dog'], ['fish']],
+        ...     'answers':[['cat'], ['dog'], ['fish']],
         ...     'item_grader': StringGrader()
         ... })
         >>> result = semicolon_grader(None, "cat; fish; moose")
         >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }
         >>> result == expected
         True
-
-
     """
+
+    def __init__(self, config=None):
+        super(ListGrader, self).__init__(config)
+        self.item_check = self.config['item_grader'].check
 
     @property
     def schema_config(self):
@@ -108,32 +128,27 @@ class ListGrader(AbstractGrader):
             Required('ordered', default=False): bool,
             Required('separator', default=','): str,
             Required('item_grader'): ItemGrader,
-            Required('answers_list'): [ item_grader.schema_answers ]
+            Required('answers'): [ item_grader.schema_answers ]
         })
         return schema
 
-    def __init__(self, config={}):
-        super(ListGrader, self).__init__(config)
-        self.item_check = self.config['item_grader'].check
-
     @staticmethod
-    def find_optimal_order(check, answers_list, student_input_list):
+    def find_optimal_order(check, answers, student_input_list):
         """ Finds optimal assignment (according to check) of inputs to answers.
 
         Inputs:
-            answers_list (list): A list [answers_0, answers_1, ...]
+            answers (list): A list [answers_0, answers_1, ...]
                 wherein each answers_i is a valid ItemGrader.config['answers']
             student_input_list (list): a list of student inputs
 
         Returns:
-            A re-ordered input_list to optimally match answers_list.
+            A re-ordered input_list to optimally match answers.
 
         NOTE:
             uses https://github.com/bmc/munkres
             to solve https://en.wikipedia.org/wiki/Assignment_problem
         """
-
-        result_matrix = [ [ check(a, i) for a in answers_list] for i in student_input_list ]
+        result_matrix = [ [ check(a, i) for a in answers] for i in student_input_list ]
         cost_matrix  = munkres.make_cost_matrix(
             result_matrix,
             lambda r: 1 - r['grade_decimal']
@@ -143,42 +158,82 @@ class ListGrader(AbstractGrader):
         input_list = [ result_matrix[i][j] for i, j in indexes]
         return input_list
 
-    def check(self, answers_list, student_input):
-        """Checks student_input against answers_list."""
-        answers_list = self.config['answers_list']
+    def check(self, answers, student_input):
+        """Checks student_input against answers."""
+        answers = self.config['answers']
         multi_input = isinstance(student_input, list)
-        single_input = isinstance(student_input, str) or isinstance(student_input, unicode)
+        single_input = isinstance(student_input, basestring)
         if multi_input:
-            return ListGraderListInput(self.config).check(answers_list, student_input)
+            return self.multi_check(answers, student_input)
         elif single_input:
-            return ListGraderStringInput(self.config).check(answers_list, student_input)
+            return self.single_check(answers, student_input)
         else:
-            raise Exception("Expected answer to have type <type list>, <type string> or <type unicode>, but received {t}".format(t = type(student_input)))
+            raise ValueError("Expected answer to have type <type list>, <type string> " + \
+                "or <type unicode>, but received {t}".format(t = type(student_input)))
 
-class ListGraderListInput(ListGrader):
-    """Delegated to by ListGrader.check when student_input is a list.
-    I.e., when customresponse contains multiple inputs.
-    """
+    def multi_check(self, answers, student_list):
+        """Delegated to by ListGrader.check when student_input is a list.
+        I.e., when customresponse contains multiple inputs.
+        """
+        answers = self.config['answers'] if answers is None else answers
 
-    def check(self, answers_list, student_input_list):
-        answers_list = self.config['answers_list'] if answers_list is None else answers_list
-
-        # TODO: Needs error checking here!!!
+        # TODO Possibly need error checking if check routines run into an issue
 
         if self.config['ordered']:
-            input_list = [ self.item_check(a, i) for a, i in zip(answers_list, student_input_list) ]
+            input_list = [ self.item_check(a, i) for a, i in zip(answers, student_list) ]
         else:
-            input_list = self.find_optimal_order(self.item_check, answers_list, student_input_list)
+            input_list = self.find_optimal_order(self.item_check, answers, student_list)
 
         return {'input_list':input_list, 'overall_message':''}
 
-class ListGraderStringInput(ListGrader):
-    """Delegated to by ListGrader.check when student_input is a string.
-    I.e., when customresponse contains a single input.
-    """
+    def single_check(self, answers, student_input):
+        """Delegated to by ListGrader.check when student_input is a string.
+        I.e., when customresponse contains a single input.
+        """
+        answers = self.config['answers'] if answers is None else answers
+        student_list = student_input.split( self.config['separator'] )
+
+        if self.config['ordered']:
+            input_list = [self.item_check(ans, inp) for ans, inp in zip(answers, student_list)]
+        else:
+            input_list = self.new_find_optimal_order(self.item_check, answers, student_list)
+
+        grade_decimals = [g['grade_decimal'] for g in input_list]
+        grade_decimal = self.calculate_single_grade(grade_decimals, len(answers))
+        ok = ItemGrader.grade_decimal_to_ok(grade_decimal)
+
+        result = {
+            'grade_decimal': grade_decimal,
+            'ok': ok,
+            'msg': '\n'.join([result['msg'] for result in input_list if result['msg'] != ''])
+        }
+
+        return result
+
+    def new_find_optimal_order(self, check, answers, student_list):
+        """Same as ListGrader.find_optimal_order, but keeps track
+        of missing and extra answers.
+
+        Idea is:
+            use _AutomaticFailure to pad expect and answers to equal length
+            modify check to reject _AutomaticFailure
+        """
+
+        L = max(len(answers), len(student_list))
+
+        padded_answers = answers + [_AutomaticFailure()]*(L-len(answers))
+        padded_student_list = student_list + [_AutomaticFailure()]*(L-len(student_list))
+
+        def _check(ans, inp):
+            if isinstance(ans, _AutomaticFailure) or isinstance(inp, _AutomaticFailure):
+                return {'ok':False, 'msg':'', 'grade_decimal':0}
+
+            return check(ans,inp)
+
+        return self.find_optimal_order(_check, padded_answers, padded_student_list)
 
     @staticmethod
-    def calculate_grade(grade_decimals, n_expect):
+    def calculate_single_grade(grade_decimals, n_expect):
         """Consolidate several grade_decimals into one.
 
         Arguments:
@@ -192,11 +247,11 @@ class ListGraderStringInput(ListGrader):
             whichever is larger.
 
         Usage:
-            >>> ListGraderStringInput.calculate_grade([1, 0, 0.5], 4)
+            >>> ListGrader.calculate_single_grade([1, 0, 0.5], 4)
             0.375
-            >>> ListGraderStringInput.calculate_grade([1,0.5,0], 2)
+            >>> ListGrader.calculate_single_grade([1, 0.5, 0], 2)
             0.25
-            >>> ListGraderStringInput.calculate_grade([1,0.5,0,0,0],2)
+            >>> ListGrader.calculate_single_grade([1, 0.5, 0, 0, 0], 2)
             0
         """
         n_extra = len(grade_decimals) - n_expect
@@ -208,53 +263,3 @@ class ListGraderStringInput(ListGrader):
         avg = sum(grade_decimals)/n_expect
 
         return max(0, avg)
-
-    @staticmethod
-    def find_optimal_order(check, answers_list, student_input_list):
-        """Same as ListGrader.find_optimal_order, but keeps track
-        of missing and extra answers.
-
-        Idea is:
-            create local class AutomaticFailure
-            use AutomaticFailure to pad expect and answers to equal length
-            modify check to reject AutomaticFailure
-        """
-
-        class AutomaticFailure(object):
-            pass
-        L = max(len(answers_list), len(student_input_list))
-
-        padded_answers_list       = answers_list       + [AutomaticFailure()]*(L-len(answers_list))
-        padded_student_input_list = student_input_list + [AutomaticFailure()]*(L-len(student_input_list))
-
-        def _check(ans, inp):
-            if isinstance(ans, AutomaticFailure) or isinstance(inp, AutomaticFailure):
-                return {'ok':False, 'msg':'', 'grade_decimal':0}
-            else:
-                return check(ans,inp)
-
-        return ListGrader.find_optimal_order(_check, padded_answers_list, padded_student_input_list)
-
-    def check(self, answers_list, student_input):
-        answers_list = self.config['answers_list'] if answers_list==None else answers_list
-        student_input_list = student_input.split( self.config['separator'] )
-
-        if self.config['ordered']:
-            input_list = [ self.item_check(ans, inp) for ans, inp in zip(answers_list, student_input_list) ]
-        else:
-            input_list = self.find_optimal_order( self.item_check, answers_list, student_input_list)
-
-        grade_decimals = [g['grade_decimal'] for g in input_list]
-        grade_decimal = self.calculate_grade(grade_decimals, len(answers_list))
-        ok = ItemGrader.grade_decimal_to_ok(grade_decimal)
-
-        result = {
-            'grade_decimal': grade_decimal,
-            'ok': ok,
-            'msg': '\n'.join([result['msg'] for result in input_list if result['msg'] != ''])
-        }
-
-        return result
-
-# Set the objects to be imported from this grader
-__all__ = ["ListGrader"]
