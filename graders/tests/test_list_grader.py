@@ -303,3 +303,106 @@ def test_zero_answers():
         'answers': [],
         'subgrader': StringGrader()
     })
+
+def test_multiple_list_answers():
+    """Check that a listgrader with multiple possible answers is graded correctly"""
+    grader = ListGrader({
+        'answers': (['cat', 'meow'], ['dog', 'woof']),
+        'subgrader': StringGrader()
+    })
+
+    result = grader(None, ['cat','meow'])
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1.0, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1.0, 'msg': ''}
+        ]
+    }
+    assert result == expected_result
+
+    result = grader(None, ['cat','woof'])
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1.0, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''}
+        ]
+    }
+    assert result == expected_result
+
+    result = grader(None, ['dog','woof'])
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1.0, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1.0, 'msg': ''}
+        ]
+    }
+    assert result == expected_result
+
+    result = grader(None, ['dog','meow'])
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1.0, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''}
+        ]
+    }
+    assert result == expected_result
+
+    result = grader(None, ['badger','grumble'])
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''}
+        ]
+    }
+    assert result == expected_result
+
+def test_multiple_list_answers_same_grade():
+    grader = ListGrader({
+        'answers': (
+            [{'expect': 'dog', 'msg': 'dog1'}, 'woof'],
+            [{'expect': 'dog', 'msg': 'dog2'}, 'woof'],
+        ),
+        'subgrader': StringGrader()
+    })
+
+    result = grader(None, ['dog','woof'])
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1.0, 'msg': 'dog1'},
+            {'ok': True, 'grade_decimal': 1.0, 'msg': ''}
+        ]
+    }
+    assert result == expected_result
+
+def test_multiple_list_answers_single_input():
+    """Check that a listgrader with multiple possible answers submitted via single input is graded correctly"""
+    grader = ListGrader({
+        'answers': (['cat', 'meow'], ['dog', 'woof']),
+        'subgrader': StringGrader()
+    })
+
+    expected_result = {'ok': True, 'msg': '', 'grade_decimal': 1}
+    result = grader(None, 'cat,meow')
+    assert result == expected_result
+
+    expected_result = {'ok': 'partial', 'msg': '', 'grade_decimal': 0.5}
+    result = grader(None, 'cat,woof')
+    assert result == expected_result
+
+    expected_result = {'ok': True, 'msg': '', 'grade_decimal': 1}
+    result = grader(None, 'dog,woof')
+    assert result == expected_result
+
+    expected_result = {'ok': 'partial', 'msg': '', 'grade_decimal': 0.5}
+    result = grader(None, 'dog,meow')
+    assert result == expected_result
+
+    expected_result = {'ok': False, 'msg': '', 'grade_decimal': 0}
+    result = grader(None, 'badger,grumble')
+    assert result == expected_result
