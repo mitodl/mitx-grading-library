@@ -428,17 +428,17 @@ class FormulaGrader(NumericalGrader):
         # We need to dynamically create the samples_from Schema based on
         # number variable and function names
 
-        default_variables_sampler = {
+        schema_variables_sample_from = {
             Required(varname, default=RealInterval()): Any(VariableSamplingSet, RealInterval)
             for varname in self.config.get('variables', [])
         }
 
-        default_functions_sampler = {
+        schema_functions_sample_from = {
             Required(funcname, default=NiceFunctions()): FunctionSamplingSet
             for funcname in self.config.get('functions', [])
         }
 
-        schema_samples_from = Schema(default_variables_sampler).extend(default_functions_sampler)
+        schema_samples_from = Schema(schema_variables_sample_from).extend(schema_functions_sample_from)
 
         return schema.extend({
             Required('variables', default=[]): [str],
