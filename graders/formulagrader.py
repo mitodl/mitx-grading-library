@@ -429,7 +429,7 @@ class FormulaGrader(NumericalGrader):
         # number variable and function names
 
         schema_variables_sample_from = {
-            Required(varname, default=RealInterval()): Any(VariableSamplingSet, RealInterval)
+            Required(varname, default=RealInterval()): Any(VariableSamplingSet, lambda pair: RealInterval(pair))
             for varname in self.config.get('variables', [])
         }
 
