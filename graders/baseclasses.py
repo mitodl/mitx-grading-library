@@ -109,29 +109,29 @@ class ItemGrader(AbstractGrader):
         Classes that inherit from ItemGrader should extend this schema.
         """
         return Schema({
-            Required('answers', default=[]): self.schema_answers
+            Required('answers', default=tuple()): self.schema_answers
         })
 
-    def schema_answers(self, answer_list):
+    def schema_answers(self, answer_tuple):
         """
-        Defines the schema to validate an answer list against.
+        Defines the schema to validate an answer tuple against.
 
-        This will transform the input to a list as necessary, and then call
+        This will transform the input to a tuple as necessary, and then call
         validate_single_answer to validate individual answers.
 
         Usually used to validate config['answers'].
 
-        Three forms for the answer list are acceptable:
+        Three forms for the answer tuple are acceptable:
 
-        1. A list of dictionaries, each a valid schema_answer
-        2. A list of schema_answer['expect'] values
+        1. A tuple of dictionaries, each a valid schema_answer
+        2. A tuple of schema_answer['expect'] values
         3. A single schema_answer['expect'] value
         """
-        # Turn answer_list into a list if it isn't already
-        if not isinstance(answer_list, list):
-            answer_list = [answer_list]
-        schema = Schema([self.validate_single_answer])
-        return schema(answer_list)
+        # Turn answer_tuple into a tuple if it isn't already
+        if not isinstance(answer_tuple, tuple):
+            answer_tuple = (answer_tuple,)
+        schema = Schema((self.validate_single_answer,))
+        return schema(answer_tuple)
 
     def validate_single_answer(self, answer):
         """
@@ -187,6 +187,13 @@ class ItemGrader(AbstractGrader):
         """
         # If no answers provided, use the internal configuration
         answers = self.config['answers'] if answers is None else answers
+
+        # answers should now be a tuple of answers
+        # Check that there is at least one answer to compare to
+        if not answers:
+            raise ValueError("Expected at least one answer in answers")
+        if not isinstance(answers, tuple):
+            raise ValueError("Expected answers to be a tuple of answers, instead received {0}".format(type(answers)))
 
         # Compute the results for each answer
         results = [self.check_response(answer, student_input) for answer in answers]

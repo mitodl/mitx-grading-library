@@ -58,7 +58,7 @@ class ListGrader(AbstractGrader):
     Grade a list of strings (multi-input)
         >>> from stringgrader import StringGrader
         >>> grader = ListGrader({
-        ...     'answers':[['cat'], ['dog'], ['fish']],
+        ...     'answers':['cat', 'dog', 'fish'],
         ...     'item_grader': StringGrader()
         ... })
         >>> result = grader(None, ['fish', 'cat', 'moose'])
@@ -91,7 +91,7 @@ class ListGrader(AbstractGrader):
     Optionally, make order matter:
         >>> ordered_grader = ListGrader({
         ...     'ordered': True,
-        ...     'answers':[['cat'], ['dog'], ['fish']],
+        ...     'answers':['cat', 'dog', 'fish'],
         ...     'item_grader': StringGrader()
         ... })
         >>> result = ordered_grader(None, "cat, fish, moose")
@@ -102,7 +102,7 @@ class ListGrader(AbstractGrader):
     Optionally, change the separator for single-input:
         >>> semicolon_grader = ListGrader({
         ...     'separator': ';',
-        ...     'answers':[['cat'], ['dog'], ['fish']],
+        ...     'answers':['cat', 'dog', 'fish'],
         ...     'item_grader': StringGrader()
         ... })
         >>> result = semicolon_grader(None, "cat; fish; moose")
