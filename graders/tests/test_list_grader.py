@@ -6,7 +6,11 @@ from pytest import approx
 def test_order_not_matter_with_list_submission():
     grader = ListGrader({
         'answers': ['cat', 'dog', 'unicorn'],
+<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
         'item_grader': StringGrader()
+=======
+        'subgrader': StringGrader()
+>>>>>>> Changing item_grader to subgrader in ListGrader
     })
     submission = ['cat','fish','dog']
     expected_result = {
@@ -22,7 +26,11 @@ def test_order_not_matter_with_list_submission():
 def test_order_not_matter_with_string_submission():
     grader = ListGrader({
         'answers': ['cat', 'dog', 'unicorn'],
+<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
         'item_grader': StringGrader()
+=======
+        'subgrader': StringGrader()
+>>>>>>> Changing item_grader to subgrader in ListGrader
     })
     submission = "cat, fish, dog"
     expected_result = {
@@ -35,7 +43,7 @@ def test_order_not_matter_with_string_submission():
 def test_shorthand_answers_specification():
     grader = ListGrader({
         'answers': ['cat', 'dog', 'unicorn'],
-        'item_grader': StringGrader()
+        'subgrader': StringGrader()
     })
     submission = ['cat', 'fish', 'dog']
     expected_result = {
@@ -51,7 +59,11 @@ def test_shorthand_answers_specification():
 def test_duplicate_items_with_list_submission():
     grader = ListGrader({
         'answers': ['cat', 'dog', 'unicorn', 'cat', 'cat'],
+<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
         'item_grader': StringGrader()
+=======
+        'subgrader': StringGrader()
+>>>>>>> Changing item_grader to subgrader in ListGrader
     })
     submission = ['cat', 'dog', 'dragon', 'dog', 'cat']
     expected_result = {
@@ -80,7 +92,7 @@ def test_partial_credit_assigment_with_list_submission():
                 {'expect': 'unicorn', 'grade_decimal': 0.75, 'msg': "unicorn_msg"}
             )
         ],
-        'item_grader': StringGrader()
+        'subgrader': StringGrader()
     })
     submission = ["skunk", "lion", "unicorn"]
     expected_result = {
@@ -107,7 +119,7 @@ def test_partial_credit_assigment_with_string_submission():
                 {'expect': 'unicorn', 'grade_decimal': 0.75, 'msg': "unicorn_msg"}
             )
         ],
-        'item_grader': StringGrader()
+        'subgrader': StringGrader()
     })
     submission = "skunk, lion, unicorn"
     expected_result = {
@@ -131,7 +143,7 @@ def test_too_many_items_with_string_submission():
                 {'expect': 'unicorn', 'grade_decimal': 0.75, 'msg': "unicorn_msg"}
             ),
         ],
-        'item_grader': StringGrader()
+        'subgrader': StringGrader()
     })
     submission = "skunk, fish, lion, unicorn, bear"
     expected_result = {
@@ -155,7 +167,7 @@ def test_way_too_many_items_reduces_score_to_zero_with_string_submission():
                 {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
             ),
         ],
-        'item_grader': StringGrader()
+        'subgrader': StringGrader()
     })
     submission = "skunk, fish, dragon, dog, lion, unicorn, bear"
     expected_result = {
@@ -179,7 +191,7 @@ def test_too_few_items_with_string_submission():
                 {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
             )
         ],
-        'item_grader': StringGrader()
+        'subgrader': StringGrader()
     })
     submission = "skunk, unicorn"
     expected_result = {

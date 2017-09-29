@@ -59,7 +59,11 @@ class ListGrader(AbstractGrader):
         >>> from stringgrader import StringGrader
         >>> grader = ListGrader({
         ...     'answers':['cat', 'dog', 'fish'],
+<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
         ...     'item_grader': StringGrader()
+=======
+        ...     'subgrader': StringGrader()
+>>>>>>> Changing item_grader to subgrader in ListGrader
         ... })
         >>> result = grader(None, ['fish', 'cat', 'moose'])
         >>> expected = {'input_list':[
@@ -92,7 +96,11 @@ class ListGrader(AbstractGrader):
         >>> ordered_grader = ListGrader({
         ...     'ordered': True,
         ...     'answers':['cat', 'dog', 'fish'],
+<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
         ...     'item_grader': StringGrader()
+=======
+        ...     'subgrader': StringGrader()
+>>>>>>> Changing item_grader to subgrader in ListGrader
         ... })
         >>> result = ordered_grader(None, "cat, fish, moose")
         >>> expected = {'ok':'partial', 'grade_decimal':1/3, 'msg': '' }
@@ -103,7 +111,11 @@ class ListGrader(AbstractGrader):
         >>> semicolon_grader = ListGrader({
         ...     'separator': ';',
         ...     'answers':['cat', 'dog', 'fish'],
+<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
         ...     'item_grader': StringGrader()
+=======
+        ...     'subgrader': StringGrader()
+>>>>>>> Changing item_grader to subgrader in ListGrader
         ... })
         >>> result = semicolon_grader(None, "cat; fish; moose")
         >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }
@@ -113,7 +125,7 @@ class ListGrader(AbstractGrader):
 
     def __init__(self, config=None):
         super(ListGrader, self).__init__(config)
-        self.item_check = self.config['item_grader'].check
+        self.item_check = self.config['subgrader'].check
 
     @property
     def schema_config(self):
@@ -123,12 +135,12 @@ class ListGrader(AbstractGrader):
         # different for different ItemGraders.
         # Hence we need a function to dynamically create the schema.
         # I would have prefered schema_config as a class attribute.
-        item_grader = voluptuous_validate(self.config['item_grader'], Schema(ItemGrader))
+        subgrader = voluptuous_validate(self.config['subgrader'], Schema(ItemGrader))
         schema = Schema({
             Required('ordered', default=False): bool,
             Required('separator', default=','): str,
-            Required('item_grader'): ItemGrader,
-            Required('answers'): [item_grader.schema_answers]
+            Required('subgrader'): ItemGrader,
+            Required('answers'): [subgrader.schema_answers]
         })
         return schema
 
