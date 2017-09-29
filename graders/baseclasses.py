@@ -112,8 +112,7 @@ class ItemGrader(AbstractGrader):
             Required('answers', default=[]): self.schema_answers
         })
 
-    @property
-    def schema_answers(self):
+    def schema_answers(self, answer_list):
         """
         Defines the schema to validate an answer list against.
 
@@ -128,15 +127,11 @@ class ItemGrader(AbstractGrader):
         2. A list of schema_answer['expect'] values
         3. A single schema_answer['expect'] value
         """
-        def validate_answers(answer_list):
-            """Define the validation function"""
-            # Turn answer_list into a list if it isn't already
-            if not isinstance(answer_list, list):
-                answer_list = [answer_list]
-            schema = Schema([self.validate_single_answer])
-            return schema(answer_list)
-
-        return validate_answers
+        # Turn answer_list into a list if it isn't already
+        if not isinstance(answer_list, list):
+            answer_list = [answer_list]
+        schema = Schema([self.validate_single_answer])
+        return schema(answer_list)
 
     def validate_single_answer(self, answer):
         """
@@ -154,7 +149,7 @@ class ItemGrader(AbstractGrader):
         except MultipleInvalid:
             try:
                 # Ok, assume that answer is a single 'expect' value
-                validated_answer = self.schema_answer({'expect':answer, 'ok':True})
+                validated_answer = self.schema_answer({'expect': answer, 'ok': True})
             except MultipleInvalid:
                 # Unable to interpret your answer!
                 raise ValueError
@@ -180,14 +175,10 @@ class ItemGrader(AbstractGrader):
             Required('ok', default='computed'): Any('computed', True, False, 'partial')
         })
 
-    @property
-    def schema_expect(self):
-        """
-        Defines the schema that a supplied answer should satisfy.
-        This is simply a string, because students enter answers as a string.
-        If this is shadowed, it should only be to parse the string.
-        """
-        return Schema(str)
+    # Defines the schema that a supplied answer should satisfy.
+    # This is simply a string, because students enter answers as a string.
+    # If this is shadowed, it should only be to parse the string.
+    schema_expect = Schema(str)
 
     def check(self, answers, student_input):
         """
