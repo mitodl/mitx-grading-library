@@ -59,11 +59,7 @@ class ListGrader(AbstractGrader):
         >>> from stringgrader import StringGrader
         >>> grader = ListGrader({
         ...     'answers':['cat', 'dog', 'fish'],
-<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
-        ...     'item_grader': StringGrader()
-=======
         ...     'subgrader': StringGrader()
->>>>>>> Changing item_grader to subgrader in ListGrader
         ... })
         >>> result = grader(None, ['fish', 'cat', 'moose'])
         >>> expected = {'input_list':[
@@ -96,11 +92,7 @@ class ListGrader(AbstractGrader):
         >>> ordered_grader = ListGrader({
         ...     'ordered': True,
         ...     'answers':['cat', 'dog', 'fish'],
-<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
-        ...     'item_grader': StringGrader()
-=======
         ...     'subgrader': StringGrader()
->>>>>>> Changing item_grader to subgrader in ListGrader
         ... })
         >>> result = ordered_grader(None, "cat, fish, moose")
         >>> expected = {'ok':'partial', 'grade_decimal':1/3, 'msg': '' }
@@ -111,11 +103,7 @@ class ListGrader(AbstractGrader):
         >>> semicolon_grader = ListGrader({
         ...     'separator': ';',
         ...     'answers':['cat', 'dog', 'fish'],
-<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
-        ...     'item_grader': StringGrader()
-=======
         ...     'subgrader': StringGrader()
->>>>>>> Changing item_grader to subgrader in ListGrader
         ... })
         >>> result = semicolon_grader(None, "cat; fish; moose")
         >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }

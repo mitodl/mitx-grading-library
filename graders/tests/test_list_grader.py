@@ -6,11 +6,7 @@ from pytest import approx
 def test_order_not_matter_with_list_submission():
     grader = ListGrader({
         'answers': ['cat', 'dog', 'unicorn'],
-<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
-        'item_grader': StringGrader()
-=======
         'subgrader': StringGrader()
->>>>>>> Changing item_grader to subgrader in ListGrader
     })
     submission = ['cat','fish','dog']
     expected_result = {
@@ -26,11 +22,7 @@ def test_order_not_matter_with_list_submission():
 def test_order_not_matter_with_string_submission():
     grader = ListGrader({
         'answers': ['cat', 'dog', 'unicorn'],
-<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
-        'item_grader': StringGrader()
-=======
         'subgrader': StringGrader()
->>>>>>> Changing item_grader to subgrader in ListGrader
     })
     submission = "cat, fish, dog"
     expected_result = {
@@ -59,11 +51,7 @@ def test_shorthand_answers_specification():
 def test_duplicate_items_with_list_submission():
     grader = ListGrader({
         'answers': ['cat', 'dog', 'unicorn', 'cat', 'cat'],
-<<<<<<< 5da9d9f08bcb8520478fef6defe9e9b048c91dde
-        'item_grader': StringGrader()
-=======
         'subgrader': StringGrader()
->>>>>>> Changing item_grader to subgrader in ListGrader
     })
     submission = ['cat', 'dog', 'dragon', 'dog', 'cat']
     expected_result = {
