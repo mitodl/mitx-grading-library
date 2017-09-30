@@ -67,7 +67,6 @@ class ListGrader(AbstractGrader):
         >>> grader = ListGrader({
         ...     'answers':['cat', 'dog', 'fish'],
         ...     'subgrader': StringGrader(),
-        ...     'ordered': False,
         ...     'length_error': False
         ... })
         >>> result = grader(None, ['fish', 'cat', 'moose'])
@@ -100,7 +99,8 @@ class ListGrader(AbstractGrader):
     Optionally, make order matter:
         >>> ordered_grader = ListGrader({
         ...     'answers':['cat', 'dog', 'fish'],
-        ...     'subgrader': StringGrader()
+        ...     'subgrader': StringGrader(),
+        ...     'ordered': True
         ... })
         >>> result = ordered_grader(None, "cat, fish, moose")
         >>> expected = {'ok':'partial', 'grade_decimal':1/3, 'msg': '' }
@@ -111,8 +111,7 @@ class ListGrader(AbstractGrader):
         >>> semicolon_grader = ListGrader({
         ...     'delimiter': ';',
         ...     'answers':['cat', 'dog', 'fish'],
-        ...     'subgrader': StringGrader(),
-        ...     'ordered': False
+        ...     'subgrader': StringGrader()
         ... })
         >>> result = semicolon_grader(None, "cat; fish; moose")
         >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }
@@ -122,7 +121,7 @@ class ListGrader(AbstractGrader):
 
     # The voluptuous Schema object to validate ListGrader configurations
     schema_config = Schema({
-            Required('ordered', default=True): bool,
+            Required('ordered', default=False): bool,
             Required('length_error', default=True): bool,
             Required('delimiter', default=','): str,
             Required('subgrader'): Any(ItemGrader, [ItemGrader]),

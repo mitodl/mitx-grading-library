@@ -19,7 +19,8 @@ pp.pprint(demo2)
 
 list_grader = ListGrader({
     'answers': ['cat', 'dog'],
-    'subgrader': [StringGrader(), StringGrader()]
+    'subgrader': [StringGrader(), StringGrader()],
+    'ordered': True
 })
 
 answers = ['cat', 'fish']

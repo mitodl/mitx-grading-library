@@ -39,7 +39,7 @@ When there are multiple items to be graded, a list grader handles the grading. L
 grader = ListGrader({
     'answers': answerslist,
     'subgrader': grader,
-    'ordered': True/False (default True),
+    'ordered': True/False (default False),
     'grouping': groupinglist,
     'delimiter': delimiter (default ','),
     'length_error': True/False (default True)
