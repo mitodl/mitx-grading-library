@@ -19,7 +19,7 @@ def test_single_expect_value_in_config_and_passed_explicitly():
 
 def test_two_expect_values_in_config():
     grader = StringGrader({
-        'answers': ['cat', 'horse']
+        'answers': ('cat', 'horse')
     })
     submission = 'horse'
     expected_result = {'msg': '', 'grade_decimal': 1, 'ok': True}
@@ -27,11 +27,11 @@ def test_two_expect_values_in_config():
 
 def test_list_of_expect_values():
     grader = StringGrader({
-        'answers':[
+        'answers':(
             {'expect':'zebra', 'grade_decimal':1},
             {'expect':'horse', 'grade_decimal':0.45},
             {'expect':'unicorn', 'grade_decimal':0, 'msg': "unicorn_msg"}
-        ]
+        )
     })
     submission = 'horse'
     expected_result = {'msg': '', 'grade_decimal': 0.45, 'ok': 'partial'}
@@ -39,18 +39,18 @@ def test_list_of_expect_values():
 
 def test_longer_message_wins_grade_ties():
     grader1 = StringGrader({
-        'answers':[
+        'answers':(
             {'expect':'zebra', 'grade_decimal':1},
             {'expect':'horse', 'grade_decimal':0, 'msg':'short'},
             {'expect':'unicorn', 'grade_decimal':0, 'msg': "longer_msg"}
-        ]
+        )
     })
     grader2 = StringGrader({
-        'answers':[
+        'answers':(
             {'expect':'zebra', 'grade_decimal':1},
             {'expect':'unicorn', 'grade_decimal':0, 'msg': "longer_msg"},
             {'expect':'horse', 'grade_decimal':0, 'msg':'short'}
-        ]
+        )
     })
     submission = 'unicorn'
     expected_result = {'msg': 'longer_msg', 'grade_decimal': 0, 'ok': False}

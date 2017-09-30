@@ -340,7 +340,7 @@ class FormulaGrader(NumericalGrader):
 
     Grade a formula containing variables and functions:
     >>> grader = FormulaGrader({
-    ...     'answers':['a*b + f(c-b) + f(g(a))'],
+    ...     'answers':'a*b + f(c-b) + f(g(a))',
     ...     'variables':['a', 'b','c'],
     ...     'functions':['f', 'g']
     ... })
@@ -355,7 +355,7 @@ class FormulaGrader(NumericalGrader):
     numerical evaluations. By default, 5 evaluations are used with variables
     sampled on the interval [1,3]. The defaults can be overidden:
     >>> grader = FormulaGrader({
-    ...     'answers': ['b^2 - f(g(a))/4'],
+    ...     'answers': 'b^2 - f(g(a))/4',
     ...     'variables': ['a', 'b'],
     ...     'functions': ['f', 'g'],
     ...     'samples': 3,
@@ -372,7 +372,7 @@ class FormulaGrader(NumericalGrader):
     >>> def square(x):
     ...     return x**2
     >>> grader = FormulaGrader({
-    ...     'answers': ['4*f(a)+b'],
+    ...     'answers': '4*f(a)+b',
     ...     'variables': ['a','b'],
     ...     'functions': ['f'],
     ...     'sample_from': {
@@ -385,7 +385,7 @@ class FormulaGrader(NumericalGrader):
 
     Grade complex-valued expressions:
     >>> grader = FormulaGrader({
-    ...     'answers': ['abs(z)^2'],
+    ...     'answers': 'abs(z)^2',
     ...     'variables': ['z'],
     ...     'sample_from': {
     ...         'z': ComplexRectangle()

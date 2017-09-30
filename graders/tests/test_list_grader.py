@@ -5,7 +5,7 @@ from pytest import approx
 
 def test_order_not_matter_with_list_submission():
     grader = ListGrader({
-        'answers': [['cat'], ['dog'], ['unicorn']],
+        'answers': ['cat', 'dog', 'unicorn'],
         'item_grader': StringGrader()
     })
     submission = ['cat','fish','dog']
@@ -21,7 +21,7 @@ def test_order_not_matter_with_list_submission():
 
 def test_order_not_matter_with_string_submission():
     grader = ListGrader({
-        'answers': [['cat'], ['dog'], ['unicorn']],
+        'answers': ['cat', 'dog', 'unicorn'],
         'item_grader': StringGrader()
     })
     submission = "cat, fish, dog"
@@ -37,31 +37,31 @@ def test_shorthand_answers_specification():
         'answers': ['cat', 'dog', 'unicorn'],
         'item_grader': StringGrader()
     })
-    submission = ['cat','fish','dog']
+    submission = ['cat', 'fish', 'dog']
     expected_result = {
-        'overall_message':'',
-        'input_list':[
-            {'ok':True , 'grade_decimal':1, 'msg':''},
-            {'ok':False, 'grade_decimal':0, 'msg':''},
-            {'ok':True , 'grade_decimal':1, 'msg':''}
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''}
         ]
     }
     assert grader(None, submission) == expected_result
 
 def test_duplicate_items_with_list_submission():
     grader = ListGrader({
-        'answers': [['cat'], ['dog'], ['unicorn'], ['cat'],['cat']],
+        'answers': ['cat', 'dog', 'unicorn', 'cat', 'cat'],
         'item_grader': StringGrader()
     })
-    submission = ['cat','dog', 'dragon','dog','cat']
+    submission = ['cat', 'dog', 'dragon', 'dog', 'cat']
     expected_result = {
-        'overall_message':'',
-        'input_list':[
-            {'ok':True , 'grade_decimal':1, 'msg':''},
-            {'ok':True , 'grade_decimal':1, 'msg':''},
-            {'ok':False, 'grade_decimal':0, 'msg':''},
-            {'ok':False, 'grade_decimal':0, 'msg':''},
-            {'ok':True , 'grade_decimal':1, 'msg':''}
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''}
         ]
     }
     assert grader(None, submission) == expected_result
@@ -69,26 +69,26 @@ def test_duplicate_items_with_list_submission():
 def test_partial_credit_assigment_with_list_submission():
     grader = ListGrader({
         'answers': [
-            [
-                {'expect':'tiger', 'grade_decimal':1},
-                {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
-            ],
-            ['skunk'],
-            [
-                {'expect':'zebra', 'grade_decimal':1},
-                {'expect':'horse', 'grade_decimal':0},
-                {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
-            ]
+            (
+                {'expect': 'tiger', 'grade_decimal': 1},
+                {'expect': 'lion', 'grade_decimal': 0.5, 'msg': "lion_msg"}
+            ),
+            'skunk',
+            (
+                {'expect': 'zebra', 'grade_decimal': 1},
+                {'expect': 'horse', 'grade_decimal': 0},
+                {'expect': 'unicorn', 'grade_decimal': 0.75, 'msg': "unicorn_msg"}
+            )
         ],
         'item_grader': StringGrader()
     })
     submission = ["skunk", "lion", "unicorn"]
     expected_result = {
-        'overall_message':'',
+        'overall_message': '',
         'input_list': [
-            {'ok':True, 'grade_decimal':1, 'msg':''},
-            {'ok':'partial','grade_decimal':0.5, 'msg':'lion_msg'},
-            {'ok':'partial','grade_decimal':0.75, 'msg':'unicorn_msg'}
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': 'partial', 'grade_decimal': 0.5, 'msg': 'lion_msg'},
+            {'ok': 'partial', 'grade_decimal': 0.75, 'msg': 'unicorn_msg'}
         ]
     }
     assert grader(None, submission) == expected_result
@@ -96,40 +96,40 @@ def test_partial_credit_assigment_with_list_submission():
 def test_partial_credit_assigment_with_string_submission():
     grader = ListGrader({
         'answers': [
-            [
-                {'expect':'tiger', 'grade_decimal':1},
-                {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
-            ],
-            ['skunk'],
-            [
-                {'expect':'zebra', 'grade_decimal':1},
-                {'expect':'horse', 'grade_decimal':0},
-                {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
-            ]
+            (
+                {'expect': 'tiger', 'grade_decimal': 1},
+                {'expect': 'lion', 'grade_decimal': 0.5, 'msg': "lion_msg"}
+            ),
+            'skunk',
+            (
+                {'expect': 'zebra', 'grade_decimal': 1},
+                {'expect': 'horse', 'grade_decimal': 0},
+                {'expect': 'unicorn', 'grade_decimal': 0.75, 'msg': "unicorn_msg"}
+            )
         ],
         'item_grader': StringGrader()
     })
     submission = "skunk, lion, unicorn"
     expected_result = {
-        'ok':'partial',
+        'ok': 'partial',
         'msg': "lion_msg\nunicorn_msg",
-        'grade_decimal':approx( (1+0.5+0.75)/3 )
+        'grade_decimal': approx( (1+0.5+0.75)/3 )
     }
     assert grader(None, submission) == expected_result
 
 def test_too_many_items_with_string_submission():
     grader = ListGrader({
         'answers': [
-            [
-                {'expect':'tiger', 'grade_decimal':1},
-                {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
-            ],
-            ['skunk'],
-            [
-                {'expect':'zebra', 'grade_decimal':1},
-                {'expect':'horse', 'grade_decimal':0},
-                {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
-            ],
+            (
+                {'expect': 'tiger', 'grade_decimal': 1},
+                {'expect': 'lion', 'grade_decimal': 0.5, 'msg': "lion_msg"}
+            ),
+            'skunk',
+            (
+                {'expect': 'zebra', 'grade_decimal': 1},
+                {'expect': 'horse', 'grade_decimal': 0},
+                {'expect': 'unicorn', 'grade_decimal': 0.75, 'msg': "unicorn_msg"}
+            ),
         ],
         'item_grader': StringGrader()
     })
@@ -144,22 +144,22 @@ def test_too_many_items_with_string_submission():
 def test_way_too_many_items_reduces_score_to_zero_with_string_submission():
     grader = ListGrader({
         'answers': [
-            [
+            (
                 {'expect':'tiger', 'grade_decimal':1},
                 {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
-            ],
-            ['skunk'],
-            [
+            ),
+            'skunk',
+            (
                 {'expect':'zebra', 'grade_decimal':1},
                 {'expect':'horse', 'grade_decimal':0},
                 {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
-            ],
+            ),
         ],
         'item_grader': StringGrader()
     })
     submission = "skunk, fish, dragon, dog, lion, unicorn, bear"
     expected_result = {
-        'ok':False,
+        'ok': False,
         'msg': "lion_msg\nunicorn_msg",
         'grade_decimal': 0
     }
@@ -168,16 +168,16 @@ def test_way_too_many_items_reduces_score_to_zero_with_string_submission():
 def test_too_few_items_with_string_submission():
     grader = ListGrader({
         'answers': [
-            [
+            (
                 {'expect':'tiger', 'grade_decimal':1},
                 {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
-            ],
-            ['skunk'],
-            [
+            ),
+            ('skunk'),
+            (
                 {'expect':'zebra', 'grade_decimal':1},
                 {'expect':'horse', 'grade_decimal':0},
                 {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
-            ]
+            )
         ],
         'item_grader': StringGrader()
     })
