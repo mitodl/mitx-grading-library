@@ -33,15 +33,16 @@ Internally, the ItemGrader base class converts the answers entry into a tuple of
 List Graders
 ------------
 
-When there are multiple items to be graded, a list grader handles the grading. List graders work by farming out individual items to subgraders, and then collecting the results and working out the optimal farming scheme. There are five possible keys for a list grader's grading scheme.
+When there are multiple items to be graded, a list grader handles the grading. List graders work by farming out individual items to subgraders, and then collecting the results and working out the optimal farming scheme. Here are the possible keys for a list grader's grading scheme:
 
 ```python
 grader = ListGrader({
     'answers': answerslist,
     'subgrader': grader,
-    'ordered': True/False, (default True)
+    'ordered': True/False (default False),
     'grouping': groupinglist,
-    'delimiter': delimiter (default ',')
+    'delimiter': delimiter (default ','),
+    'length_error': True/False (default True)
 })
 ```
 
@@ -71,7 +72,17 @@ grader = ListGrader({
 
 In this case, the student should enter 'cat; dog' as the answer if presented with a single input box. The delimiter key is ignored when multiple input boxes are used.
 
-In the above cases, the item grader just sees a single string as the answer. You can do more complicated things though, like the following.
+If students enter their answer in a single input box, then if they provide the wrong number of entries, the grader can either return an error, or prorate the grade. If you ask for a 3D vector in a box, then it makes sense to return an error. If you want the prime numbers beneath 10, then it makes sense to just give partial credit. The following will give partial credit for answers of "cat" and "cat,dog,fish".
+
+```python
+grader = ListGrader({
+    'answers': ['cat', 'dog'],
+    'subgrader': MyGrader(),
+    'length_error': False
+})
+```
+
+In the above cases, the item grader just sees single strings as the answer. You can do more complicated things though, like the following.
 
 ```python
 answer1 = (

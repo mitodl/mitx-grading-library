@@ -18,7 +18,12 @@ class ObjectWithSchema(object):
 
     @abc.abstractproperty
     def schema_config(self):
-        """The schema that defines the configuration of this object"""
+        """
+        The schema that defines the configuration of this object.
+        The schema MUST be independent of the config itself. If you need to further validate
+        parts of the config based on the config, do so in the __init__ method. See ListGrader
+        for an example.
+        """
         pass
 
     def validate_config(self, config):
@@ -30,11 +35,8 @@ class ObjectWithSchema(object):
 
     def __init__(self, config=None):
         """Validate the supplied config for the object"""
-        # Set the config first before validating, so that schema_config has access to it
-        # I don't like this; it makes for a tangled mess
-        # (schema_config may access the config before it's been mutated into a valid form)
-        self.config = {} if config is None else config
-        self.config = self.validate_config(self.config)
+        config = {} if config is None else config
+        self.config = self.validate_config(config)
 
     def __repr__(self):
         """Printable representation of the object"""

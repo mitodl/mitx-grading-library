@@ -13,6 +13,7 @@ import random
 import numpy
 from graders.baseclasses import ObjectWithSchema, ItemGrader
 from graders.helpers import calc
+from graders.helpers.calc import UndefinedVariable
 from graders.helpers.validatorfuncs import Positive, NonNegative, PercentageString
 from graders.voluptuous import Schema, Required, All, Any, Range, Length
 
@@ -21,7 +22,8 @@ __all__ = [
     "NumericalGrader",
     "FormulaGrader",
     "ComplexRectangle",
-    "RealInterval"
+    "RealInterval",
+    "UndefinedVariable"
 ]
 
 class AbstractSamplingSet(ObjectWithSchema):  # pylint: disable=abstract-method
@@ -421,30 +423,42 @@ class FormulaGrader(NumericalGrader):
         'pi': numpy.pi,
     }
 
-    @property
-    def schema_config(self):
-        schema = super(FormulaGrader, self).schema_config
+    def __init__(self, config=None):
+        """
+        Validate the Formulagrader's configuration.
+        First, validate the config in broad strokes, then refine the sample_from entry.
+        """
+        super(FormulaGrader, self).__init__(config)
 
-        # We need to dynamically create the samples_from Schema based on
-        # number variable and function names
-
-        schema_variables_sample_from = {
+        # Construct the schema for sample_from
+        # Allow anything that RealInterval can make sense of to be valid
+        variables_sample_from = {
             Required(varname, default=RealInterval()): Any(VariableSamplingSet, lambda pair: RealInterval(pair))
             for varname in self.config.get('variables', [])
         }
-
-        schema_functions_sample_from = {
+        functions_sample_from = {
             Required(funcname, default=NiceFunctions()): FunctionSamplingSet
             for funcname in self.config.get('functions', [])
         }
+        sample_from = variables_sample_from
+        sample_from.update(functions_sample_from)
+        schema_sample_from = Schema(sample_from)
 
-        schema_samples_from = Schema(schema_variables_sample_from).extend(schema_functions_sample_from)
+        # Apply the schema to sample_from
+        self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
 
+
+    @property
+    def schema_config(self):
+        """Define the configuration options for FormulaGrader"""
+        # Construct the default ItemGrader schema
+        schema = super(FormulaGrader, self).schema_config
+        # Append options
         return schema.extend({
             Required('variables', default=[]): [str],
             Required('functions', default=[]): [str],
             Required('samples', default=5): Positive(int),
-            Required('sample_from', default=schema_samples_from({})): schema_samples_from,
+            Required('sample_from', default={}): dict,
             Required('tolerance', default='0.1%'): Any(Positive(Number), PercentageString),
             Required('case_sensitive', default=True): bool,
             Required('failable_evals', default=0): NonNegative(int)
@@ -529,6 +543,6 @@ class FormulaGrader(NumericalGrader):
     def check_response(self, answer, student_input):
         try:
             return self.raw_check(answer, student_input)
-        except calc.UndefinedVariable as e:
+        except UndefinedVariable as e:
             message = "Invalid Input: {varname} not permitted in answer".format(varname=str(e))
-            raise calc.UndefinedVariable(message)
+            raise UndefinedVariable(message)
