@@ -21,18 +21,20 @@ __all__ = [
     "NumericalGrader",
     "FormulaGrader",
     "ComplexRectangle",
-    "RealInterval",
+    "RealInterval"
 ]
 
-class AbstractSamplingSet(ObjectWithSchema): #pylint: disable=abstract-method
+class AbstractSamplingSet(ObjectWithSchema):  # pylint: disable=abstract-method
     """Represents a set from which random samples are taken."""
+
+    # Should have a gen_sample abstract method?
     pass
 
-class VariableSamplingSet(AbstractSamplingSet): #pylint: disable=abstract-method
+class VariableSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-method
     """Represents a set from which variable random samples are taken."""
     pass
 
-class FunctionSamplingSet(AbstractSamplingSet): #pylint: disable=abstract-method
+class FunctionSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-method
     """Represents a set from which function random samples are taken."""
     pass
 
@@ -44,7 +46,7 @@ def standardize_alternate_config(config_as_list):
         Length(min=2, max=2)
     ))
     config_as_list = alternate_form(config_as_list)
-    return {'start':config_as_list[0], 'stop':config_as_list[1]}
+    return {'start': config_as_list[0], 'stop': config_as_list[1]}
 
 class RealInterval(VariableSamplingSet):
     """Represents an interval of real numbers from which to sample.
@@ -96,8 +98,8 @@ class ComplexRectangle(VariableSamplingSet):
     """
 
     schema_config = Schema({
-        Required('re', default=[1, 3]) : RealInterval.schema_config,
-        Required('im', default=[1, 3]) : RealInterval.schema_config
+        Required('re', default=[1, 3]): RealInterval.schema_config,
+        Required('im', default=[1, 3]): RealInterval.schema_config
     })
 
     def __init__(self, config=None):
@@ -158,13 +160,14 @@ class NiceFunctions(FunctionSamplingSet):
         where
         C_ij = A_ij*x_i + B_ij
         """
-        num_terms = 3 # the k-value in docstring
+        num_terms = 3  # the k-value in docstring
         dim_input = self.config['dims'][0]
 
         A = 1 + numpy.random.rand(dim_input, num_terms)
         B = numpy.pi*numpy.random.rand(dim_input, num_terms)
+
         def component(*args):
-            X = numpy.array([args,]*num_terms).transpose()
+            X = numpy.array([args]*num_terms).transpose()
             return numpy.sum(numpy.sin(A*X + B))
 
         return component
@@ -425,27 +428,26 @@ class FormulaGrader(NumericalGrader):
         # We need to dynamically create the samples_from Schema based on
         # number variable and function names
 
-        default_variables_sample_from = {
-            Required(varname, default=RealInterval()): Any(VariableSamplingSet,
-                                                           lambda pair: RealInterval(pair))
-            for varname in self.config.get('variables',[])
+        schema_variables_sample_from = {
+            Required(varname, default=RealInterval()): Any(VariableSamplingSet, lambda pair: RealInterval(pair))
+            for varname in self.config.get('variables', [])
         }
 
-        default_functions_sample_from = {
+        schema_functions_sample_from = {
             Required(funcname, default=NiceFunctions()): FunctionSamplingSet
-                for funcname in self.config.get('functions',[])
+            for funcname in self.config.get('functions', [])
         }
 
-        schema_samples_from = Schema(default_variables_sample_from).extend(default_functions_sample_from)
+        schema_samples_from = Schema(schema_variables_sample_from).extend(schema_functions_sample_from)
 
         return schema.extend({
             Required('variables', default=[]): [str],
             Required('functions', default=[]): [str],
-            Required('samples', default=5):Positive(int),
+            Required('samples', default=5): Positive(int),
             Required('sample_from', default=schema_samples_from({})): schema_samples_from,
             Required('tolerance', default='0.1%'): Any(Positive(Number), PercentageString),
-            Required('case_sensitive', default=True):bool,
-            Required('failable_evals', default=0):NonNegative(int)
+            Required('case_sensitive', default=True): bool,
+            Required('failable_evals', default=0): NonNegative(int)
         })
 
     @staticmethod
@@ -489,41 +491,40 @@ class FormulaGrader(NumericalGrader):
                                                 self.config['samples'],
                                                 self.config['sample_from'])
 
-        expected_evals = [calc.evaluator(
-                                variables,
-                                functions,
-                                answer['expect'],
-                                case_sensitive=self.config['case_sensitive'],
-                                default_variables = self.DEFAULT_VARIABLES,
-                                default_functions = self.DEFAULT_FUNCTIONS)
-                            for variables, functions in
-                            zip(var_samples, func_samples)]
+        expected_evals = [
+            calc.evaluator(variables,
+                           functions,
+                           answer['expect'],
+                           case_sensitive=self.config['case_sensitive'],
+                           default_variables=self.DEFAULT_VARIABLES,
+                           default_functions=self.DEFAULT_FUNCTIONS)
+            for variables, functions in zip(var_samples, func_samples)
+        ]
 
-        learner_evals = [calc.evaluator(
-                                variables,
-                                functions,
-                                student_input,
-                                case_sensitive=self.config['case_sensitive'],
-                                default_variables = self.DEFAULT_VARIABLES,
-                                default_functions = self.DEFAULT_FUNCTIONS)
-                            for variables, functions in
-                            zip(var_samples, func_samples)]
+        learner_evals = [
+            calc.evaluator(variables,
+                           functions,
+                           student_input,
+                           case_sensitive=self.config['case_sensitive'],
+                           default_variables=self.DEFAULT_VARIABLES,
+                           default_functions=self.DEFAULT_FUNCTIONS)
+            for variables, functions in zip(var_samples, func_samples)
+        ]
 
-        failures = [not self.within_tolerance(
-                            e1,
-                            e2,
-                            self.config['tolerance'])
-                        for e1, e2 in zip(expected_evals, learner_evals)]
+        failures = [
+            not self.within_tolerance(e1, e2, self.config['tolerance'])
+            for e1, e2 in zip(expected_evals, learner_evals)
+        ]
         num_failures = sum(failures)
 
         if num_failures <= self.config['failable_evals']:
             return {
-                'ok':answer['ok'],
-                'grade_decimal':answer['grade_decimal'],
-                'msg':answer['msg']
+                'ok': answer['ok'],
+                'grade_decimal': answer['grade_decimal'],
+                'msg': answer['msg']
             }
 
-        return {'ok':False, 'grade_decimal':0, 'msg':''}
+        return {'ok': False, 'grade_decimal': 0, 'msg': ''}
 
     def check_response(self, answer, student_input):
         try:

@@ -35,7 +35,7 @@ class StringGrader(ItemGrader):
         # Append options
         return schema.extend({
             Required('strip', default=True): bool,
-            Required('case_sensitive', default=True) : bool
+            Required('case_sensitive', default=True): bool
         })
 
     def check_response(self, answer, student_input):
@@ -53,6 +53,10 @@ class StringGrader(ItemGrader):
 
         # Perform comparison
         if expect == student:
-            return {'ok':answer['ok'], 'grade_decimal':answer['grade_decimal'], 'msg':answer['msg']}
+            return {
+                'ok': answer['ok'],
+                'grade_decimal': answer['grade_decimal'],
+                'msg': answer['msg']
+            }
 
-        return {'ok':False, 'grade_decimal':0, 'msg':''}
+        return {'ok': False, 'grade_decimal': 0, 'msg': ''}

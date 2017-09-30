@@ -15,7 +15,7 @@ from graders.baseclasses import AbstractGrader, ItemGrader
 # Set the objects to be imported from this grader
 __all__ = ["ListGrader"]
 
-class _AutomaticFailure(object): # pylint: disable=too-few-public-methods
+class _AutomaticFailure(object):  # pylint: disable=too-few-public-methods
     """Used as padding when grading unknown number of inputs on a single input line"""
     pass
 
@@ -128,7 +128,7 @@ class ListGrader(AbstractGrader):
             Required('ordered', default=False): bool,
             Required('separator', default=','): str,
             Required('item_grader'): ItemGrader,
-            Required('answers'): [ item_grader.schema_answers ]
+            Required('answers'): [item_grader.schema_answers]
         })
         return schema
 
@@ -148,14 +148,11 @@ class ListGrader(AbstractGrader):
             uses https://github.com/bmc/munkres
             to solve https://en.wikipedia.org/wiki/Assignment_problem
         """
-        result_matrix = [ [ check(a, i) for a in answers] for i in student_input_list ]
-        cost_matrix  = munkres.make_cost_matrix(
-            result_matrix,
-            lambda r: 1 - r['grade_decimal']
-            )
+        result_matrix = [[check(a, i) for a in answers] for i in student_input_list]
+        cost_matrix = munkres.make_cost_matrix(result_matrix, lambda r: 1 - r['grade_decimal'])
         indexes = munkres.Munkres().compute(cost_matrix)
 
-        input_list = [ result_matrix[i][j] for i, j in indexes]
+        input_list = [result_matrix[i][j] for i, j in indexes]
         return input_list
 
     def check(self, answers, student_input):
@@ -168,8 +165,9 @@ class ListGrader(AbstractGrader):
         elif single_input:
             return self.single_check(answers, student_input)
         else:
-            raise ValueError("Expected answer to have type <type list>, <type string> " + \
-                "or <type unicode>, but received {t}".format(t = type(student_input)))
+            msg = "Expected answer to have type <type list>, <type string> " + \
+                  "or <type unicode>, but received {t}"
+            raise ValueError(msg.format(t=type(student_input)))
 
     def multi_check(self, answers, student_list):
         """Delegated to by ListGrader.check when student_input is a list.
@@ -180,18 +178,18 @@ class ListGrader(AbstractGrader):
         # TODO Possibly need error checking if check routines run into an issue
 
         if self.config['ordered']:
-            input_list = [ self.item_check(a, i) for a, i in zip(answers, student_list) ]
+            input_list = [self.item_check(a, i) for a, i in zip(answers, student_list)]
         else:
             input_list = self.find_optimal_order(self.item_check, answers, student_list)
 
-        return {'input_list':input_list, 'overall_message':''}
+        return {'input_list': input_list, 'overall_message': ''}
 
     def single_check(self, answers, student_input):
         """Delegated to by ListGrader.check when student_input is a string.
         I.e., when customresponse contains a single input.
         """
         answers = self.config['answers'] if answers is None else answers
-        student_list = student_input.split( self.config['separator'] )
+        student_list = student_input.split(self.config['separator'])
 
         if self.config['ordered']:
             input_list = [self.item_check(ans, inp) for ans, inp in zip(answers, student_list)]
@@ -200,11 +198,11 @@ class ListGrader(AbstractGrader):
 
         grade_decimals = [g['grade_decimal'] for g in input_list]
         grade_decimal = self.calculate_single_grade(grade_decimals, len(answers))
-        ok = ItemGrader.grade_decimal_to_ok(grade_decimal)
+        ok_status = ItemGrader.grade_decimal_to_ok(grade_decimal)
 
         result = {
             'grade_decimal': grade_decimal,
-            'ok': ok,
+            'ok': ok_status,
             'msg': '\n'.join([result['msg'] for result in input_list if result['msg'] != ''])
         }
 
@@ -219,16 +217,16 @@ class ListGrader(AbstractGrader):
             modify check to reject _AutomaticFailure
         """
 
-        L = max(len(answers), len(student_list))
+        maxlen = max(len(answers), len(student_list))
 
-        padded_answers = answers + [_AutomaticFailure()]*(L-len(answers))
-        padded_student_list = student_list + [_AutomaticFailure()]*(L-len(student_list))
+        padded_answers = answers + [_AutomaticFailure()]*(maxlen-len(answers))
+        padded_student_list = student_list + [_AutomaticFailure()]*(maxlen-len(student_list))
 
         def _check(ans, inp):
             if isinstance(ans, _AutomaticFailure) or isinstance(inp, _AutomaticFailure):
-                return {'ok':False, 'msg':'', 'grade_decimal':0}
+                return {'ok': False, 'msg': '', 'grade_decimal': 0}
 
-            return check(ans,inp)
+            return check(ans, inp)
 
         return self.find_optimal_order(_check, padded_answers, padded_student_list)
 
