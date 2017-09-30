@@ -5,7 +5,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 list_grader = ListGrader({
     'answers': ['cat', 'dog', 'unicorn'],
-    'item_grader': StringGrader()
+    'subgrader': StringGrader()
 })
 
 answers1 = ['cat', 'fish', 'dog']
