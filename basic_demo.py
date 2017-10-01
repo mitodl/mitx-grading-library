@@ -1,5 +1,10 @@
-from graders import *
+"""
+basic_demo.py
+
+A simple demo of using the grading library
+"""
 import pprint
+from graders import ListGrader, StringGrader
 
 pp = pprint.PrettyPrinter(indent=4)
 

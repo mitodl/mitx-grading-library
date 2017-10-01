@@ -1,8 +1,11 @@
+"""
+ListGrader tests
+"""
 from __future__ import division
-from .. import *
-
-from pytest import approx, raises
 import pprint
+from pytest import approx, raises
+from graders import ListGrader, StringGrader, FormulaGrader, UndefinedVariable, ConfigError
+
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint
@@ -12,13 +15,13 @@ def test_order_not_matter_with_list_submission():
         'answers': ['cat', 'dog', 'unicorn'],
         'subgrader': StringGrader()
     })
-    submission = ['cat','fish','dog']
+    submission = ['cat', 'fish', 'dog']
     expected_result = {
-        'overall_message':'',
-        'input_list':[
-            {'ok':True , 'grade_decimal':1, 'msg':''},
-            {'ok':False, 'grade_decimal':0, 'msg':''},
-            {'ok':True , 'grade_decimal':1, 'msg':''}
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''}
         ]
     }
     assert grader(None, submission) == expected_result
@@ -30,9 +33,9 @@ def test_order_not_matter_with_string_submission():
     })
     submission = "cat, fish, dog"
     expected_result = {
-        'ok':'partial',
-        'msg':'',
-        'grade_decimal':2/3
+        'ok': 'partial',
+        'msg': '',
+        'grade_decimal': 2/3
     }
     assert grader(None, submission) == expected_result
 
@@ -117,7 +120,7 @@ def test_partial_credit_assigment_with_string_submission():
     expected_result = {
         'ok': 'partial',
         'msg': "lion_msg\nunicorn_msg",
-        'grade_decimal': approx( (1+0.5+0.75)/3 )
+        'grade_decimal': approx((1+0.5+0.75)/3)
     }
     assert grader(None, submission) == expected_result
 
@@ -140,9 +143,9 @@ def test_too_many_items_with_string_submission():
     })
     submission = "skunk, fish, lion, unicorn, bear"
     expected_result = {
-        'ok':'partial',
+        'ok': 'partial',
         'msg': "lion_msg\nunicorn_msg",
-        'grade_decimal': approx( (1+0.5+0.75)/3 - 2*1/3 )
+        'grade_decimal': approx((1+0.5+0.75)/3 - 2*1/3)
     }
     assert grader(None, submission) == expected_result
 
@@ -150,14 +153,14 @@ def test_way_too_many_items_reduces_score_to_zero_with_string_submission():
     grader = ListGrader({
         'answers': [
             (
-                {'expect':'tiger', 'grade_decimal':1},
-                {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
+                {'expect': 'tiger', 'grade_decimal': 1},
+                {'expect': 'lion', 'grade_decimal': 0.5, 'msg': "lion_msg"}
             ),
             'skunk',
             (
-                {'expect':'zebra', 'grade_decimal':1},
-                {'expect':'horse', 'grade_decimal':0},
-                {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
+                {'expect': 'zebra', 'grade_decimal': 1},
+                {'expect': 'horse', 'grade_decimal': 0},
+                {'expect': 'unicorn', 'grade_decimal': 0.75, 'msg': "unicorn_msg"}
             ),
         ],
         'subgrader': StringGrader(),
@@ -175,14 +178,14 @@ def test_too_few_items_with_string_submission():
     grader = ListGrader({
         'answers': [
             (
-                {'expect':'tiger', 'grade_decimal':1},
-                {'expect':'lion', 'grade_decimal':0.5, 'msg': "lion_msg"}
+                {'expect': 'tiger', 'grade_decimal': 1},
+                {'expect': 'lion', 'grade_decimal': 0.5, 'msg': "lion_msg"}
             ),
             ('skunk'),
             (
-                {'expect':'zebra', 'grade_decimal':1},
-                {'expect':'horse', 'grade_decimal':0},
-                {'expect':'unicorn', 'grade_decimal':0.75, 'msg': "unicorn_msg"}
+                {'expect': 'zebra', 'grade_decimal': 1},
+                {'expect': 'horse', 'grade_decimal': 0},
+                {'expect': 'unicorn', 'grade_decimal': 0.75, 'msg': "unicorn_msg"}
             )
         ],
         'subgrader': StringGrader(),
@@ -190,9 +193,9 @@ def test_too_few_items_with_string_submission():
     })
     submission = "skunk, unicorn"
     expected_result = {
-        'ok':'partial',
+        'ok': 'partial',
         'msg': "unicorn_msg",
-        'grade_decimal':approx( (1+0.75)/3 )
+        'grade_decimal': approx((1+0.75)/3)
     }
     assert grader(None, submission) == expected_result
 
@@ -202,13 +205,13 @@ def test_wrong_length_string_submission():
         'subgrader': StringGrader(),
         'length_error': True
     })
-    with raises(ValueError) as excinfo:
-        result = grader(None, 'cat,dog,dragon')
-    assert excinfo.value.args[0] == 'List length error: Expected 2 terms in the list, but received 3'
+    with raises(ValueError) as err:
+        grader(None, 'cat,dog,dragon')
+    assert err.value.args[0] == 'List length error: Expected 2 terms in the list, but received 3'
 
-    with raises(ValueError) as excinfo:
-        result = grader(None, 'cat')
-    assert excinfo.value.args[0] == 'List length error: Expected 2 terms in the list, but received 1'
+    with raises(ValueError) as err:
+        grader(None, 'cat')
+    assert err.value.args[0] == 'List length error: Expected 2 terms in the list, but received 1'
 
 def test_multiple_graders():
     """Test multiple graders"""
@@ -232,9 +235,9 @@ def test_multiple_graders():
 
     # Test incorrect ordering
     submission = ['1', 'cat']
-    with raises(UndefinedVariable) as excinfo:
+    with raises(UndefinedVariable) as err:
         result = grader(None, submission)
-    assert excinfo.value.args[0] == 'Invalid Input: cat not permitted in answer'
+    assert err.value.args[0] == 'Invalid Input: cat not permitted in answer'
 
     # Test failure
     submission = ['dog', '2']
@@ -251,55 +254,56 @@ def test_multiple_graders():
 def test_multiple_graders_errors():
     """Test that exceptions are raised on bad config"""
     # Wrong number of graders
-    with raises(ConfigError) as excinfo:
+    with raises(ConfigError) as err:
         grader = ListGrader({
             'answers': ['cat', '1'],
             'subgrader': [StringGrader()],
             'ordered': True
         })
-    assert excinfo.value.args[0] == 'The number of subgraders and answers are different'
+    assert err.value.args[0] == 'The number of subgraders and answers are different'
 
     # Unordered entry
-    with raises(ConfigError) as excinfo:
+    with raises(ConfigError) as err:
         grader = ListGrader({
             'answers': ['cat', '1'],
             'subgrader': [StringGrader(), StringGrader()],
             'ordered': False
         })
-    assert excinfo.value.args[0] == 'Cannot use unordered lists with multiple graders'
+    assert err.value.args[0] == 'Cannot use unordered lists with multiple graders'
 
     # Multiple graders on single input
-    with raises(ConfigError) as excinfo:
+    with raises(ConfigError) as err:
         grader = ListGrader({
             'answers': ['cat', '1'],
             'subgrader': [StringGrader(), StringGrader()],
             'ordered': True
         })
-        result = grader(None, 'cat,1')
-    assert excinfo.value.args[0] == 'Multiple subgraders cannot be used for single input lists'
+        grader(None, 'cat,1')
+    assert err.value.args[0] == 'Multiple subgraders cannot be used for single input lists'
 
 def test_wrong_number_of_answers():
     """Check that an error is raised if number of answers != number of inputs"""
-    with raises(ConfigError) as excinfo:
+    with raises(ConfigError) as err:
         grader = ListGrader({
             'answers': ['cat', 'dog'],
             'subgrader': StringGrader()
         })
-        result = grader(None, ['cat'])
-    assert excinfo.value.args[0] == 'The number of answers (2) and the number of inputs (1) are different'
+        grader(None, ['cat'])
+    expect = 'The number of answers (2) and the number of inputs (1) are different'
+    assert err.value.args[0] == expect
 
 def test_insufficient_answers():
     """Check that an error is raised if ListGrader is fed only one answer"""
-    with raises(ConfigError) as excinfo:
-        grader = ListGrader({
+    with raises(ConfigError) as err:
+        ListGrader({
             'answers': ['cat'],
             'subgrader': StringGrader()
         })
-    assert excinfo.value.args[0] == 'ListGrader does not work with a single answer'
+    assert err.value.args[0] == 'ListGrader does not work with a single answer'
 
 def test_zero_answers():
     """Check that ListGrader instantiates without any answers supplied (used in nesting)"""
-    grader = ListGrader({
+    ListGrader({
         'answers': [],
         'subgrader': StringGrader()
     })
@@ -311,7 +315,7 @@ def test_multiple_list_answers():
         'subgrader': StringGrader()
     })
 
-    result = grader(None, ['cat','meow'])
+    result = grader(None, ['cat', 'meow'])
     expected_result = {
         'overall_message': '',
         'input_list': [
@@ -321,7 +325,7 @@ def test_multiple_list_answers():
     }
     assert result == expected_result
 
-    result = grader(None, ['cat','woof'])
+    result = grader(None, ['cat', 'woof'])
     expected_result = {
         'overall_message': '',
         'input_list': [
@@ -331,7 +335,7 @@ def test_multiple_list_answers():
     }
     assert result == expected_result
 
-    result = grader(None, ['dog','woof'])
+    result = grader(None, ['dog', 'woof'])
     expected_result = {
         'overall_message': '',
         'input_list': [
@@ -341,7 +345,7 @@ def test_multiple_list_answers():
     }
     assert result == expected_result
 
-    result = grader(None, ['dog','meow'])
+    result = grader(None, ['dog', 'meow'])
     expected_result = {
         'overall_message': '',
         'input_list': [
@@ -351,7 +355,7 @@ def test_multiple_list_answers():
     }
     assert result == expected_result
 
-    result = grader(None, ['badger','grumble'])
+    result = grader(None, ['badger', 'grumble'])
     expected_result = {
         'overall_message': '',
         'input_list': [
@@ -370,7 +374,7 @@ def test_multiple_list_answers_same_grade():
         'subgrader': StringGrader()
     })
 
-    result = grader(None, ['dog','woof'])
+    result = grader(None, ['dog', 'woof'])
     expected_result = {
         'overall_message': '',
         'input_list': [
@@ -381,7 +385,10 @@ def test_multiple_list_answers_same_grade():
     assert result == expected_result
 
 def test_multiple_list_answers_single_input():
-    """Check that a listgrader with multiple possible answers submitted via single input is graded correctly"""
+    """
+    Check that a listgrader with multiple possible answers submitted via single input
+    is graded correctly
+    """
     grader = ListGrader({
         'answers': (['cat', 'meow'], ['dog', 'woof']),
         'subgrader': StringGrader()

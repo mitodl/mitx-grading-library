@@ -10,7 +10,6 @@ from __future__ import division
 import numpy as np
 from graders.helpers import munkres
 from graders.voluptuous import Schema, Required, Any
-from graders.voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from graders.baseclasses import AbstractGrader, ItemGrader
 
 # Set the objects to be imported from this grader
@@ -122,12 +121,12 @@ class ListGrader(AbstractGrader):
 
     # The voluptuous Schema object to validate ListGrader configurations
     schema_config = Schema({
-            Required('ordered', default=False): bool,
-            Required('length_error', default=True): bool,
-            Required('delimiter', default=','): str,
-            Required('subgrader'): Any(ItemGrader, [ItemGrader]),
-            Required('answers', default=[]): Any(list, (list,)) #  Allow for a tuple of lists
-        })
+        Required('ordered', default=False): bool,
+        Required('length_error', default=True): bool,
+        Required('delimiter', default=','): str,
+        Required('subgrader'): Any(ItemGrader, [ItemGrader]),
+        Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
+    })
 
     def __init__(self, config=None):
         """
@@ -160,7 +159,7 @@ class ListGrader(AbstractGrader):
         if isinstance(answer_tuple, list):
             if len(answer_tuple) == 1:
                 raise ConfigError('ListGrader does not work with a single answer')
-            elif len(answer_tuple) == 0:
+            elif not answer_tuple:  # empty list
                 # Nothing further to check here. This must be a nested grader, which will
                 # be called upon to check answers again a bit later.
                 return tuple()
@@ -185,17 +184,19 @@ class ListGrader(AbstractGrader):
                 raise ConfigError('The number of subgraders and answers are different')
             if not self.config['ordered']:
                 raise ConfigError('Cannot use unordered lists with multiple graders')
+
+            # Validate answer_list using the subgraders
+            for answer_list in answer_tuple:
+                for index, answer in enumerate(answer_list):
+                    answer_list[index] = subgraders[index].schema_answers(answer)
         else:
             # We have a single subgrader
             self.subgrader_list = False
             subgrader = self.config['subgrader']
 
-        # Validate answer_list using the subgraders
-        for answer_list in answer_tuple:
-            for index, answer in enumerate(answer_list):
-                if self.subgrader_list:
-                    answer_list[index] = subgraders[index].schema_answers(answer)
-                else:
+            # Validate answer_list using the subgraders
+            for answer_list in answer_tuple:
+                for index, answer in enumerate(answer_list):
                     answer_list[index] = subgrader.schema_answers(answer)
 
         return answer_tuple
@@ -266,7 +267,6 @@ class ListGrader(AbstractGrader):
         for index, result in enumerate(best_results):
             for qnum, grade in enumerate(result['input_list']):
                 full_grades[qnum, index] = grade['grade_decimal']
-        full_grades
 
         # Now we have all of the grades stored
         max_vals = np.amax(full_grades, axis=1)

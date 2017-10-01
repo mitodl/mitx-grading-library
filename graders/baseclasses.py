@@ -195,7 +195,8 @@ class ItemGrader(AbstractGrader):
         if not answers:
             raise ValueError("Expected at least one answer in answers")
         if not isinstance(answers, tuple):
-            raise ValueError("Expected answers to be a tuple of answers, instead received {0}".format(type(answers)))
+            msg = "Expected answers to be a tuple of answers, instead received {0}"
+            raise ValueError(msg.format(type(answers)))
 
         # Compute the results for each answer
         results = [self.check_response(answer, student_input) for answer in answers]
