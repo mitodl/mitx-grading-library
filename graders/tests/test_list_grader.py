@@ -415,8 +415,8 @@ def test_multiple_list_answers_single_input():
     assert result == expected_result
 
 def test_nested_listgrader():
-    """Check that we can instantiate nested listgraders"""
-    ListGrader({
+    """Check that we can use nested listgraders on multiple single-input lists"""
+    grader = ListGrader({
         'answers': [
             ['1', '2'],
             ['3', '4']
@@ -425,3 +425,12 @@ def test_nested_listgrader():
             'subgrader': StringGrader()
         })
     })
+    result = grader(None, ['1,2', '4,3'])
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''}
+        ]
+    }
+    assert result == expected_result
