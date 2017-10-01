@@ -124,7 +124,7 @@ class ListGrader(AbstractGrader):
         Required('ordered', default=False): bool,
         Required('length_error', default=True): bool,
         Required('delimiter', default=','): str,
-        Required('subgrader'): Any(ItemGrader, [ItemGrader]),
+        Required('subgrader'): Any(AbstractGrader, [AbstractGrader]),
         Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
     })
 
