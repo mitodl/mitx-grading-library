@@ -1,5 +1,10 @@
-from graders import *
+"""
+basic_demo.py
+
+A simple demo of using the grading library
+"""
 import pprint
+from graders import ListGrader, StringGrader
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -16,13 +21,3 @@ pp.pprint(demo1)
 answers2 = "cat, fish, dog, zebra"
 demo2 = list_grader(None, answers2)
 pp.pprint(demo2)
-
-list_grader = ListGrader({
-    'answers': ['cat', 'dog'],
-    'subgrader': [StringGrader(), StringGrader()],
-    'ordered': True
-})
-
-answers = ['cat', 'fish']
-result = list_grader(None, answers)
-pp.pprint(result)

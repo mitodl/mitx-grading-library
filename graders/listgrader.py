@@ -7,9 +7,9 @@ Also deals with delimiter-separated inputs within a single input box.
 Works by farming out the individual objects to other graders.
 """
 from __future__ import division
+import numpy as np
 from graders.helpers import munkres
 from graders.voluptuous import Schema, Required, Any
-from graders.voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from graders.baseclasses import AbstractGrader, ItemGrader
 
 # Set the objects to be imported from this grader
@@ -121,62 +121,178 @@ class ListGrader(AbstractGrader):
 
     # The voluptuous Schema object to validate ListGrader configurations
     schema_config = Schema({
-            Required('ordered', default=False): bool,
-            Required('length_error', default=True): bool,
-            Required('delimiter', default=','): str,
-            Required('subgrader'): Any(ItemGrader, [ItemGrader]),
-            Required('answers', default=[]): list
-        })
+        Required('ordered', default=False): bool,
+        Required('length_error', default=True): bool,
+        Required('delimiter', default=','): str,
+        Required('subgrader'): Any(AbstractGrader, [AbstractGrader]),
+        Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
+    })
 
     def __init__(self, config=None):
         """
         Validate the ListGrader's configuration.
         This is a bit different from other graders, because the validation of the answers
         depends on the subgrader items in the config. Hence, we validate in three steps:
-        0. subgrader classes are initialized and checked before this class is initialized.
-           No answers are checked in this part.
+        0. Subgrader classes are initialized and checked before this class is initialized
         1. Validate the config for this class, checking that answers is a list
-        2. Validate the answers by passing them into the subgrader classes.
+        2. Validate the answers by using the subgrader classes
         """
         # Step 1: Validate the configuration of this list using the usual routines
         super(ListGrader, self).__init__(config)
 
-        # Step 2: Validate the answers using the subgrader items
-        answers = self.config['answers']  # reference to the list of answers
-        if len(answers) == 1:
-            raise ConfigError('ListGrader does not work with a single answer')
+        # Step 2: Validate the answers
+        self.config['answers'] = self.schema_answers(self.config['answers'])
 
+    def schema_answers(self, answers_tuple):
+        """
+        Defines the schema to validate an answer tuple against.
+
+        This will transform the input to a tuple as necessary, and then attempt to
+        validate the answers_tuple using the defined subgraders.
+
+        Two forms for the answer tuple are acceptable:
+
+        1. A list of answers
+        2. A tuple of lists of answers
+        """
+        # Turn answers_tuple into a tuple if it isn't already
+        if isinstance(answers_tuple, list):
+            if len(answers_tuple) == 1:
+                raise ConfigError('ListGrader does not work with a single answer')
+            elif not answers_tuple:  # empty list
+                # Nothing further to check here. This must be a nested grader, which will
+                # be called upon to check answers again a bit later.
+                return tuple()
+            answers_tuple = (answers_tuple,)
+        elif not isinstance(answers_tuple, tuple):
+            # Should not get here; voluptuous should catch this beforehand
+            raise ConfigError("Answer list must be a list or a tuple of lists")
+
+        # Check that all lists in the tuple have the same length
+        for answer_list in answers_tuple:
+            if len(answer_list) != len(answers_tuple[0]):
+                raise ConfigError("All possible list answers must have the same length")
+
+        # Check that the subgraders are commensurate with the answers
         if isinstance(self.config['subgrader'], list):
             # We have a list of subgraders
             self.subgrader_list = True
-            # First, ensure that multiple subgraders are valid
             subgraders = self.config['subgrader']
-            if len(subgraders) != len(self.config['answers']):
+
+            # Ensure that multiple subgraders are valid
+            if len(subgraders) != len(answers_tuple[0]):
                 raise ConfigError('The number of subgraders and answers are different')
             if not self.config['ordered']:
                 raise ConfigError('Cannot use unordered lists with multiple graders')
-            # Next, validate the answers using the subgraders
-            for index, answer in enumerate(answers):
-                answers[index] = subgraders[index].schema_answers(answer)
+
+            # Validate answer_list using the subgraders
+            for answer_list in answers_tuple:
+                for index, answer in enumerate(answer_list):
+                    answer_list[index] = subgraders[index].schema_answers(answer)
         else:
             # We have a single subgrader
             self.subgrader_list = False
-            # Use it to validate all of the answers
             subgrader = self.config['subgrader']
-            for index, answer in enumerate(answers):
-                answers[index] = subgrader.schema_answers(answer)
+
+            # Validate answer_list using the subgraders
+            for answer_list in answers_tuple:
+                for index, answer in enumerate(answer_list):
+                    answer_list[index] = subgrader.schema_answers(answer)
+
+        return answers_tuple
 
     def check(self, answers, student_input):
-        """Checks student_input against answers."""
-        answers = self.config['answers']
+        """Checks student_input against answers, which may be provided"""
+        # If no answers provided, use the internal configuration
+        answers = self.config['answers'] if answers is None else answers
+
+        # answers should now be a tuple of answers
+        # Check that there is at least one answer to compare to
+        if not answers:
+            raise ConfigError("Expected at least one answer in answers")
+        if not isinstance(answers, tuple):
+            msg = "Expected answers to be a tuple of answers, instead received {0}"
+            raise ConfigError(msg.format(type(answers)))
+
+        # Go and grade the responses
         if isinstance(student_input, list):
-            return self.multi_check(answers, student_input)
+            # Compute the results for each answer
+            results = [self.multi_check(answer_list, student_input) for answer_list in answers]
+            return self.get_best_multi_result(results)
         elif isinstance(student_input, basestring):
-            return self.single_check(answers, student_input)
+            # Compute the results for each answer
+            results = [self.single_check(answer_list, student_input) for answer_list in answers]
+            return self.get_best_single_result(results)
         else:
             msg = "Expected answer to have type <type list>, <type string> " + \
                   "or <type unicode>, but received {t}"
-            raise ValueError(msg.format(t=type(student_input)))
+            raise ConfigError(msg.format(t=type(student_input)))
+
+    @staticmethod
+    def get_best_multi_result(results):
+        """Compute the best result from a multi-input problem"""
+        # If we had a single list of answers, just return the results
+        if len(results) == 1:
+            return results[0]
+
+        # Start by constructing a list of all the grades: question, result_number
+        full_grades = np.zeros([len(results), len(results[0]['input_list'])])
+        for index, result in enumerate(results):
+            for qnum, grade in enumerate(result['input_list']):
+                full_grades[index, qnum] = grade['grade_decimal']
+
+        # Find the best scores
+        scores = full_grades.sum(axis=1)
+        max_score = np.max(scores)
+        best_results = np.where(scores == max_score)[0]
+
+        # best_results is now an array containing the indices of the results that score
+        # the best. If there's only one best, return it
+        if len(best_results) == 1:
+            return results[best_results[0]]
+
+        # To choose between the remaining bests, pick out the scores from the leaders
+        culled_grades = full_grades[best_results].T
+        culled_results = [result for index, result in enumerate(results) if index in best_results]
+
+        # Find which of the culled results did best at each input
+        max_vals = np.amax(culled_grades, axis=1)
+        max_vals = np.array([max_vals]).T
+        high_scoring = culled_grades == max_vals
+        # high_scoring is a matrix the same shape as full_grades
+        # It stores True/False values for whether that result was the best for that input
+
+        # Run through the culled_grades matrix to figure out which results are still in
+        # the running after each input
+        in_the_running = np.array([True] * len(high_scoring))
+        for scores in culled_grades:
+            # Cull the list
+            test_cull = np.logical_and(in_the_running, scores)
+            if np.count_nonzero(test_cull) == 0:
+                # Results that were already knocked out scored well here. Ignore
+                continue
+            in_the_running = test_cull
+            if np.count_nonzero(in_the_running) == 1:
+                # Return the winner!
+                index = np.where(in_the_running)[0][0]
+                return culled_results[index]
+
+        # Everything is exactly the same, possibly excepting messages.
+        # Just return the first result in our remaining list.
+        return culled_results[np.where(in_the_running)[0][0]]
+
+    @staticmethod
+    def get_best_single_result(results):
+        """Compute the best result from a single-input problem"""
+        # If we had a single list of answers, just return the results
+        if len(results) == 1:
+            return results[0]
+
+        # Compute the best result for the student in the same way ItemGrader does
+        best_score = max([r['grade_decimal'] for r in results])
+        best_results = [r for r in results if r['grade_decimal'] == best_score]
+        best_result_with_longest_msg = max(best_results, key=lambda r: len(r['msg']))
+        return best_result_with_longest_msg
 
     def multi_check(self, answers, student_list):
         """
@@ -197,6 +313,8 @@ class ListGrader(AbstractGrader):
                 input_list = [self.config['subgrader'].check(*pair) for pair in compare]
         else:
             input_list = self.find_optimal_order(self.config['subgrader'].check, answers, student_list)
+
+        # TODO: If a subgrader was a ListGrader, we need to flatten the response
 
         return {'input_list': input_list, 'overall_message': ''}
 
