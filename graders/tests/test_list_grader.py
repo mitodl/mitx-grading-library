@@ -369,7 +369,9 @@ def test_multiple_list_answers_same_grade():
     grader = ListGrader({
         'answers': (
             [{'expect': 'dog', 'msg': 'dog1'}, 'woof'],
+            ['cat', 'woof'],
             [{'expect': 'dog', 'msg': 'dog2'}, 'woof'],
+            ['dolphin', 'squeak'],
         ),
         'subgrader': StringGrader()
     })
@@ -382,6 +384,8 @@ def test_multiple_list_answers_same_grade():
             {'ok': True, 'grade_decimal': 1.0, 'msg': ''}
         ]
     }
+    printit(result)
+
     assert result == expected_result
 
 def test_multiple_list_answers_single_input():

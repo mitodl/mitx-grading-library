@@ -143,34 +143,34 @@ class ListGrader(AbstractGrader):
         # Step 2: Validate the answers
         self.config['answers'] = self.schema_answers(self.config['answers'])
 
-    def schema_answers(self, answer_tuple):
+    def schema_answers(self, answers_tuple):
         """
         Defines the schema to validate an answer tuple against.
 
         This will transform the input to a tuple as necessary, and then attempt to
-        validate the answer_tuple using the defined subgraders.
+        validate the answers_tuple using the defined subgraders.
 
         Two forms for the answer tuple are acceptable:
 
         1. A list of answers
         2. A tuple of lists of answers
         """
-        # Turn answer_tuple into a tuple if it isn't already
-        if isinstance(answer_tuple, list):
-            if len(answer_tuple) == 1:
+        # Turn answers_tuple into a tuple if it isn't already
+        if isinstance(answers_tuple, list):
+            if len(answers_tuple) == 1:
                 raise ConfigError('ListGrader does not work with a single answer')
-            elif not answer_tuple:  # empty list
+            elif not answers_tuple:  # empty list
                 # Nothing further to check here. This must be a nested grader, which will
                 # be called upon to check answers again a bit later.
                 return tuple()
-            answer_tuple = (answer_tuple,)
-        elif not isinstance(answer_tuple, tuple):
+            answers_tuple = (answers_tuple,)
+        elif not isinstance(answers_tuple, tuple):
             # Should not get here; voluptuous should catch this beforehand
             raise ConfigError("Answer list must be a list or a tuple of lists")
 
         # Check that all lists in the tuple have the same length
-        for answer_list in answer_tuple:
-            if len(answer_list) != len(answer_tuple[0]):
+        for answer_list in answers_tuple:
+            if len(answer_list) != len(answers_tuple[0]):
                 raise ConfigError("All possible list answers must have the same length")
 
         # Check that the subgraders are commensurate with the answers
@@ -180,13 +180,13 @@ class ListGrader(AbstractGrader):
             subgraders = self.config['subgrader']
 
             # Ensure that multiple subgraders are valid
-            if len(subgraders) != len(answer_tuple[0]):
+            if len(subgraders) != len(answers_tuple[0]):
                 raise ConfigError('The number of subgraders and answers are different')
             if not self.config['ordered']:
                 raise ConfigError('Cannot use unordered lists with multiple graders')
 
             # Validate answer_list using the subgraders
-            for answer_list in answer_tuple:
+            for answer_list in answers_tuple:
                 for index, answer in enumerate(answer_list):
                     answer_list[index] = subgraders[index].schema_answers(answer)
         else:
@@ -195,11 +195,11 @@ class ListGrader(AbstractGrader):
             subgrader = self.config['subgrader']
 
             # Validate answer_list using the subgraders
-            for answer_list in answer_tuple:
+            for answer_list in answers_tuple:
                 for index, answer in enumerate(answer_list):
                     answer_list[index] = subgrader.schema_answers(answer)
 
-        return answer_tuple
+        return answers_tuple
 
     def check(self, answers, student_input):
         """Checks student_input against answers, which may be provided"""
@@ -211,74 +211,61 @@ class ListGrader(AbstractGrader):
         if not answers:
             raise ConfigError("Expected at least one answer in answers")
         if not isinstance(answers, tuple):
-            raise ConfigError("Expected answers to be a tuple of answers, instead received {0}".format(type(answers)))
+            msg = "Expected answers to be a tuple of answers, instead received {0}"
+            raise ConfigError(msg.format(type(answers)))
 
-        # Set up the appropriate grader
+        # Go and grade the responses
         if isinstance(student_input, list):
-            grader = self.multi_check
-            multi = True
+            # Compute the results for each answer
+            results = [self.multi_check(answer_list, student_input) for answer_list in answers]
+            return self.get_best_multi_result(results)
         elif isinstance(student_input, basestring):
-            grader = self.single_check
-            multi = False
+            # Compute the results for each answer
+            results = [self.single_check(answer_list, student_input) for answer_list in answers]
+            return self.get_best_single_result(results)
         else:
             msg = "Expected answer to have type <type list>, <type string> " + \
                   "or <type unicode>, but received {t}"
             raise ConfigError(msg.format(t=type(student_input)))
 
-        # Compute the results for each answer
-        results = [grader(answer_list, student_input) for answer_list in answers]
-
+    @staticmethod
+    def get_best_multi_result(results):
+        """Compute the best result from a multi-input problem"""
         # If we had a single list of answers, just return the results
         if len(results) == 1:
             return results[0]
 
-        # We have multiple lists of answers to compare
-        # If it was a single-input list, then just compare the grades directly
-        if not multi:
-            # Compute the best result for the student
-            best_score = max([r['grade_decimal'] for r in results])
-            best_results = [r for r in results if r['grade_decimal'] == best_score]
-            best_result_with_longest_msg = max(best_results, key=lambda r: len(r['msg']))
-            return best_result_with_longest_msg
-
-        # Find which one scores the best
-        net_grades = []
-        for result in results:
-            grade_decimals = [g['grade_decimal'] for g in result['input_list']]
-            net_grades.append(self.calculate_single_grade(grade_decimals, len(answers[0])))
-
-        # Compute the best result for the student
-        best_score = max(net_grades)
-
-        # Find all of the best-scoring results
-        best_results = [
-            results[index] for index, result in enumerate(net_grades) if net_grades[index] == best_score
-        ]
-
-        # If there's only one best scoring result, return that
-        if len(best_results) == 1:
-            return best_results[0]
-
-        # We have a tie for best result
-        # Go through the grades one at a time, finding the result that scores best earliest
-        # in the list of inputs
         # Start by constructing a list of all the grades: question, result_number
-        full_grades = np.zeros([len(answers[0]), len(best_results)])
-        for index, result in enumerate(best_results):
+        full_grades = np.zeros([len(results), len(results[0]['input_list'])])
+        for index, result in enumerate(results):
             for qnum, grade in enumerate(result['input_list']):
-                full_grades[qnum, index] = grade['grade_decimal']
+                full_grades[index, qnum] = grade['grade_decimal']
 
-        # Now we have all of the grades stored
-        max_vals = np.amax(full_grades, axis=1)
+        # Find the best scores
+        scores = full_grades.sum(axis=1)
+        max_score = np.max(scores)
+        best_results = np.where(scores == max_score)[0]
+
+        # best_results is now an array containing the indices of the results that score
+        # the best. If there's only one best, return it
+        if len(best_results) == 1:
+            return results[best_results[0]]
+
+        # To choose between the remaining bests, pick out the scores from the leaders
+        culled_grades = full_grades[best_results].T
+        culled_results = [result for index, result in enumerate(results) if index in best_results]
+
+        # Find which of the culled results did best at each input
+        max_vals = np.amax(culled_grades, axis=1)
         max_vals = np.array([max_vals]).T
-        best_scoring = full_grades == max_vals
-        # best_scoring is a matrix the same shape as full_grades
+        high_scoring = culled_grades == max_vals
+        # high_scoring is a matrix the same shape as full_grades
         # It stores True/False values for whether that result was the best for that input
 
-        # Run through the best_scoring matrix to figure out which results are still in
+        # Run through the culled_grades matrix to figure out which results are still in
         # the running after each input
-        in_the_running = np.array([True] * len(best_results))
-        for scores in best_scoring:
+        in_the_running = np.array([True] * len(high_scoring))
+        for scores in culled_grades:
             # Cull the list
             test_cull = np.logical_and(in_the_running, scores)
             if np.count_nonzero(test_cull) == 0:
@@ -288,11 +275,24 @@ class ListGrader(AbstractGrader):
             if np.count_nonzero(in_the_running) == 1:
                 # Return the winner!
                 index = np.where(in_the_running)[0][0]
-                return best_results[index]
+                return culled_results[index]
 
         # Everything is exactly the same, possibly excepting messages.
         # Just return the first result in our remaining list.
-        return best_results[np.where(in_the_running)[0][0]]
+        return culled_results[np.where(in_the_running)[0][0]]
+
+    @staticmethod
+    def get_best_single_result(results):
+        """Compute the best result from a single-input problem"""
+        # If we had a single list of answers, just return the results
+        if len(results) == 1:
+            return results[0]
+
+        # Compute the best result for the student in the same way ItemGrader does
+        best_score = max([r['grade_decimal'] for r in results])
+        best_results = [r for r in results if r['grade_decimal'] == best_score]
+        best_result_with_longest_msg = max(best_results, key=lambda r: len(r['msg']))
+        return best_result_with_longest_msg
 
     def multi_check(self, answers, student_list):
         """
