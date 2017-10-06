@@ -263,7 +263,7 @@ grader = ListGrader(
 
 In this case, the next level of grader is receiving multiple inputs, and so itself needs to be a ListGrader. The grouping key specifies which group each input belongs to. In this case, answers 1 and 2 will be combined into a list and fed to the subgrader as group 1, as will 3 and 4 as group 2, and 5 and 6 as group 3. The subgrader will then receive a list of two inputs, and each of the items in the answers. Because this is an unordered list, the list grader will try every possible combination and choose the optimal one.
 
-The grouping keys must be integers starting at 1 and increasing. If you have N groups, then all numbers from 1 to N must be present in the grouping. For unordered lists, the groupings must each have the same number of elements.
+The grouping keys must be integers starting at 1 and increasing. If you have N groups, then all numbers from 1 to N must be present in the grouping, but they need not be in monotonic order. So for example, [1, 2, 1, 2] is a valid grouping. For unordered lists, the groupings must each have the same number of elements.
 
 Here is another example. In this case, we have ordered entry, so we can specify a list of subgraders. We have three items in the first grouping and one item in the second, so we use a ListGrader for the first grouping, and a StringGrader for the second. Note that the first entry in answers is a list that is passed directly into the ListGrader, while the second entry is just a string. This second-level ListGrader is unordered.
 
