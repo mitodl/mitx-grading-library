@@ -4,20 +4,15 @@ basic_demo.py
 A simple demo of using the grading library
 """
 import pprint
-from graders import ListGrader, StringGrader
+from graders import *
 
 pp = pprint.PrettyPrinter(indent=4)
 
-list_grader = ListGrader(
+list_grader = SingleListGrader(
     answers=['cat', 'dog', 'unicorn'],
-    subgrader=StringGrader(),
-    length_error=False
+    subgrader=StringGrader()
 )
 
-answers1 = ['cat', 'fish', 'dog']
-demo1 = list_grader(None, answers1)
-pp.pprint(demo1)
-
-answers2 = "cat, fish, dog, zebra"
-demo2 = list_grader(None, answers2)
-pp.pprint(demo2)
+answers = "unicorn, cat, dog, fish"
+demo = list_grader(None, answers)
+pp.pprint(demo)
