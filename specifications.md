@@ -33,7 +33,7 @@ You may also specify the configuration as a configuration dictionary. This may b
 
 ```python
 config = {
-    answers='cat',
+    'answers': 'cat',
     'wrong_msg': 'Try again!'
 }
 grader = MyGrader(config)
