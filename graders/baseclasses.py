@@ -33,10 +33,15 @@ class ObjectWithSchema(object):
         """
         return voluptuous_validate(config, self.schema_config)
 
-    def __init__(self, config=None):
-        """Validate the supplied config for the object"""
-        config = {} if config is None else config
-        self.config = self.validate_config(config)
+    def __init__(self, config=None, **kwargs):
+        """
+        Validate the supplied config for the object, using either a config dict or kwargs,
+        but not both.
+        """
+        if config is None:
+            self.config = self.validate_config(kwargs)
+        else:
+            self.config = self.validate_config(config)
 
     def __repr__(self):
         """Printable representation of the object"""

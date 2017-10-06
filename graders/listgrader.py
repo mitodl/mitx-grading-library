@@ -64,11 +64,11 @@ class ListGrader(AbstractGrader):
 
     Grade a list of strings (multi-input)
         >>> from stringgrader import StringGrader
-        >>> grader = ListGrader({
-        ...     'answers':['cat', 'dog', 'fish'],
-        ...     'subgrader': StringGrader(),
-        ...     'length_error': False
-        ... })
+        >>> grader = ListGrader(
+        ...     answers=['cat', 'dog', 'fish'],
+        ...     subgrader=StringGrader(),
+        ...     length_error=False
+        ... )
         >>> result = grader(None, ['fish', 'cat', 'moose'])
         >>> expected = {'input_list':[
         ...     {'ok': True, 'grade_decimal':1, 'msg':''},
@@ -97,22 +97,22 @@ class ListGrader(AbstractGrader):
         True
 
     Optionally, make order matter:
-        >>> ordered_grader = ListGrader({
-        ...     'answers':['cat', 'dog', 'fish'],
-        ...     'subgrader': StringGrader(),
-        ...     'ordered': True
-        ... })
+        >>> ordered_grader = ListGrader(
+        ...     answers=['cat', 'dog', 'fish'],
+        ...     subgrader=StringGrader(),
+        ...     ordered=True
+        ... )
         >>> result = ordered_grader(None, "cat, fish, moose")
         >>> expected = {'ok':'partial', 'grade_decimal':1/3, 'msg': '' }
         >>> result == expected
         True
 
     Optionally, change the delimiter for single-input:
-        >>> semicolon_grader = ListGrader({
-        ...     'delimiter': ';',
-        ...     'answers':['cat', 'dog', 'fish'],
-        ...     'subgrader': StringGrader()
-        ... })
+        >>> semicolon_grader = ListGrader(
+        ...     delimiter=';',
+        ...     answers=['cat', 'dog', 'fish'],
+        ...     subgrader=StringGrader()
+        ... )
         >>> result = semicolon_grader(None, "cat; fish; moose")
         >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }
         >>> result == expected
@@ -128,7 +128,7 @@ class ListGrader(AbstractGrader):
         Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
     })
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, **kwargs):
         """
         Validate the ListGrader's configuration.
         This is a bit different from other graders, because the validation of the answers
@@ -138,7 +138,7 @@ class ListGrader(AbstractGrader):
         2. Validate the answers by using the subgrader classes
         """
         # Step 1: Validate the configuration of this list using the usual routines
-        super(ListGrader, self).__init__(config)
+        super(ListGrader, self).__init__(config, **kwargs)
 
         # Step 2: Validate the answers
         self.config['answers'] = self.schema_answers(self.config['answers'])
