@@ -57,7 +57,7 @@ class RealInterval(VariableSamplingSet):
     =====
 
     Generate 5 random floats betweens -2 and 4
-    >>> ri = RealInterval({'start':-2, 'stop':4})
+    >>> ri = RealInterval(start=-2, stop=4)
     >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
     [ 2.44247 -0.67699 -1.36759 -0.11255  1.39864]
 
@@ -66,7 +66,7 @@ class RealInterval(VariableSamplingSet):
     >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
     [ 2.9973   2.95767  0.069    0.23813 -1.49541]
 
-    The default is {'start':1, 'stop':3}:
+    The default is start=1, stop=3:
     >>> ri = RealInterval()
     >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
     [ 2.61484  1.38107  2.61687  1.00507  1.87933]
@@ -94,7 +94,7 @@ class ComplexRectangle(VariableSamplingSet):
 
     Usage
     =====
-    >>> rect = ComplexRectangle({'re':[1,4], 'im':[-5,0]})
+    >>> rect = ComplexRectangle(re=[1,4], im=[-5,0])
     >>> rect.gen_sample() # doctest: +SKIP
     (1.90313791936 - 2.94195943775j)
     """
@@ -126,7 +126,7 @@ class NiceFunctions(FunctionSamplingSet):
 
     By default, the generated functions are R-->R. You can specify the
     input and output dimensions:
-    >>> funcs = NiceFunctions({'dims':[3,2]})
+    >>> funcs = NiceFunctions(dims=[3,2])
     >>> f = funcs.gen_sample()
     >>> f(2.3, -1, 4.2) # doctest: +SKIP
     [-1.74656 -0.96909]
