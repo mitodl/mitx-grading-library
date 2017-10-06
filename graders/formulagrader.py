@@ -104,8 +104,8 @@ class ComplexRectangle(VariableSamplingSet):
         Required('im', default=[1, 3]): RealInterval.schema_config
     })
 
-    def __init__(self, config=None):
-        super(ComplexRectangle, self).__init__(config)
+    def __init__(self, config=None, **kwargs):
+        super(ComplexRectangle, self).__init__(config, **kwargs)
         self.re = RealInterval(self.config['re'])
         self.im = RealInterval(self.config['im'])
 
@@ -341,11 +341,11 @@ class FormulaGrader(NumericalGrader):
     =====
 
     Grade a formula containing variables and functions:
-    >>> grader = FormulaGrader({
-    ...     'answers':'a*b + f(c-b) + f(g(a))',
-    ...     'variables':['a', 'b','c'],
-    ...     'functions':['f', 'g']
-    ... })
+    >>> grader = FormulaGrader(
+    ...     answers='a*b + f(c-b) + f(g(a))',
+    ...     variables=['a', 'b','c'],
+    ...     functions=['f', 'g']
+    ... )
     >>> theinput0 = 'f(g(a)) + a*b + f(-b+c)'
     >>> grader(None, theinput0)['ok']
     True
@@ -356,16 +356,16 @@ class FormulaGrader(NumericalGrader):
     The learner's input is compared to expected answer using numerical
     numerical evaluations. By default, 5 evaluations are used with variables
     sampled on the interval [1,3]. The defaults can be overidden:
-    >>> grader = FormulaGrader({
-    ...     'answers': 'b^2 - f(g(a))/4',
-    ...     'variables': ['a', 'b'],
-    ...     'functions': ['f', 'g'],
-    ...     'samples': 3,
-    ...     'sample_from': {
+    >>> grader = FormulaGrader(
+    ...     answers='b^2 - f(g(a))/4',
+    ...     variables=['a', 'b'],
+    ...     functions=['f', 'g'],
+    ...     samples=3,
+    ...     sample_from={
     ...         'a': [-4,1]
     ...     },
-    ...     'tolerance': 0.1
-    ... })
+    ...     tolerance=0.1
+    ... )
     >>> theinput = "b*b - 0.25*f(g(a))"
     >>> grader(None, theinput)['ok']
     True
@@ -373,26 +373,26 @@ class FormulaGrader(NumericalGrader):
     You can also provide specific values to use for any variable or function:
     >>> def square(x):
     ...     return x**2
-    >>> grader = FormulaGrader({
-    ...     'answers': '4*f(a)+b',
-    ...     'variables': ['a','b'],
-    ...     'functions': ['f'],
-    ...     'sample_from': {
+    >>> grader = FormulaGrader(
+    ...     answers='4*f(a)+b',
+    ...     variables=['a','b'],
+    ...     functions=['f'],
+    ...     sample_from={
     ...         'f': UniqueValue(square)
     ...     }
-    ... })
+    ... )
     >>> theinput = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = square
     >>> grader(None, theinput)['ok']
     True
 
     Grade complex-valued expressions:
-    >>> grader = FormulaGrader({
-    ...     'answers': 'abs(z)^2',
-    ...     'variables': ['z'],
-    ...     'sample_from': {
+    >>> grader = FormulaGrader(
+    ...     answers='abs(z)^2',
+    ...     variables=['z'],
+    ...     sample_from={
     ...         'z': ComplexRectangle()
     ...     }
-    ... })
+    ... )
     >>> theinput = 're(z)^2+im(z)^2'
     >>> grader(None, theinput)['ok']
     True
@@ -423,12 +423,12 @@ class FormulaGrader(NumericalGrader):
         'pi': numpy.pi,
     }
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, **kwargs):
         """
         Validate the Formulagrader's configuration.
         First, validate the config in broad strokes, then refine the sample_from entry.
         """
-        super(FormulaGrader, self).__init__(config)
+        super(FormulaGrader, self).__init__(config, **kwargs)
 
         # Construct the schema for sample_from
         # Allow anything that RealInterval can make sense of to be valid

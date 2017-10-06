@@ -15,11 +15,11 @@ class StringGrader(ItemGrader):
 
     Configuration options:
 
-    grader = StringGrader({
-        'answers': 'cat',
-        'strip': True,
-        'case_sensitive' True
-    })
+    grader = StringGrader(
+        answers='cat',
+        strip=True,
+        case_sensitive=True
+    )
 
     answers: List of answers in the typical form
     strip: Whether or not to strip leading and trailing whitespace
