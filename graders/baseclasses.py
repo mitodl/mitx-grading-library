@@ -10,6 +10,10 @@ import abc
 from graders.voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from graders.voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 
+class ConfigError(Exception):
+    """Raised whenever a configuration error occurs"""
+    pass
+
 class ObjectWithSchema(object):
     """Represents a user-facing object whose configuration needs validation."""
 
@@ -198,15 +202,24 @@ class ItemGrader(AbstractGrader):
         # answers should now be a tuple of answers
         # Check that there is at least one answer to compare to
         if not answers:
-            raise ValueError("Expected at least one answer in answers")
+            raise ConfigError("Expected at least one answer in answers")
         if not isinstance(answers, tuple):
             msg = "Expected answers to be a tuple of answers, instead received {0}"
-            raise ValueError(msg.format(type(answers)))
+            raise ConfigError(msg.format(type(answers)))
+
+        # Make sure the input is in the expected format
+        if not isinstance(student_input, basestring):
+            raise ConfigError("Expected string for student_input, received {}".format(type(student_input)))
 
         # Compute the results for each answer
         results = [self.check_response(answer, student_input) for answer in answers]
 
-        # Compute the best result for the student
+        # Now find the best result for the student
+        # If we only had one answer, just return the results
+        if len(results) == 1:
+            return results[0]
+
+        # Otherwise, compute the best result for the student
         best_score = max([r['grade_decimal'] for r in results])
         best_results = [r for r in results if r['grade_decimal'] == best_score]
         best_result_with_longest_msg = max(best_results, key=lambda r: len(r['msg']))
