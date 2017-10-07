@@ -47,6 +47,30 @@ def test_partial_credit_assigment():
     }
     assert grader(None, submission) == expected_result
 
+def test_partial_credit_override():
+    grader0 = SingleListGrader(
+        answers=['moose', 'eagle'],
+        partial_credit=False,
+        subgrader=StringGrader()
+    )
+    grader1 = SingleListGrader(
+        answers=['moose', 'eagle'],
+        subgrader=StringGrader()
+    )
+    submission = "hawk, moose"
+    expected_result0 = {
+        'ok': False,
+        'grade_decimal': 0,
+        'msg': ''
+    }
+    expected_result1 = {
+        'ok': 'partial',
+        'grade_decimal': 0.5,
+        'msg': ''
+    }
+    assert grader0(None, submission) == expected_result0
+    assert grader1(None, submission) == expected_result1
+
 def test_too_many_items():
     grader = SingleListGrader(
         answers=[
