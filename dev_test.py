@@ -6,13 +6,10 @@ from graders import *
 
 pp = pprint.PrettyPrinter(indent=4)
 
-list_grader = SingleListGrader(
-    answers=(['cat', 'dog'], ['goat', 'vole']),
-    subgrader=StringGrader(),
-    length_error=False,
-    ordered=False
+grader = StringGrader(
+    answers=('cat', 'dog'),
+    wrong_msg='nope!'
 )
 
-answers = "cat, vole"
-demo = list_grader(None, answers)
+demo = grader(None, 'horse')
 pp.pprint(demo)
