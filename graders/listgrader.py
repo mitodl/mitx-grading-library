@@ -238,16 +238,15 @@ class ListGrader(AbstractGrader):
         # Go and grade the responses
         if isinstance(student_input, list):
             # Compute the results for each answer
-            results = [self.multi_check(answer_list, student_input) for answer_list in answers]
-            return self.get_best_multi_result(results)
+            results = [self.perform_check(answer_list, student_input) for answer_list in answers]
+            return self.get_best_result(results)
         else:
             msg = "Expected answer to have type <type list>, but received {t}"
             raise ConfigError(msg.format(t=type(student_input)))
 
-    def multi_check(self, answers, student_list):
+    def perform_check(self, answers, student_list):
         """
-        Delegated to by ListGrader.check when student_input is a list.
-        I.e., when customresponse contains multiple inputs.
+        Compare the list of responses from a student against a specific list of answers.
         """
         if len(answers) != len(student_list):
             msg = "The number of answers ({}) and the number of inputs ({}) are different"
@@ -267,7 +266,7 @@ class ListGrader(AbstractGrader):
         return {'input_list': input_list, 'overall_message': ''}
 
     @staticmethod
-    def get_best_multi_result(results):
+    def get_best_result(results):
         """Compute the best result from a multi-input problem"""
         # If we had a single list of answers, just return the results
         if len(results) == 1:
