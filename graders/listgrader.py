@@ -394,7 +394,8 @@ class SingleListGrader(ItemGrader):
         Required('delimiter', default=','): str,
         Required('partial_credit', default=True): bool,
         Required('subgrader'): ItemGrader,
-        Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
+        Required('answers', default=[]): Any(list, (list,)),  # Allow for a tuple of lists
+        Required('wrong_msg', default=""): str  # The ItemGrader wrong_msg
     })
     # Make sure that the ItemGrader schema_expect isn't used
     schema_expect = None

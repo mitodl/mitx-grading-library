@@ -29,6 +29,8 @@ Note that even for numerical input, the answers must be input as strings.
 
 Internally, the ItemGrader converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.
 
+The wrong_msg is only displayed if the score is zero, and there are no other messages.
+
 You may also specify the configuration as a configuration dictionary. This may be helpful if using the same configuration for multiple problems. As an example, the above configuration can be constructed as follows.
 
 ```python
@@ -131,6 +133,19 @@ grader = SingleListGrader(
 Now "cat, octopus" will receive a grade of zero.
 
 
+### Messages
+
+Messages from the individual items are all concatenated together and presented to the student. It is also possible to have a wrong_msg on the SingleListGrader, that is presented to the student if the score is zero and there are no other messages, just like on an ItemGrader.
+
+```python
+grader = SingleListGrader(
+    answers=['cat', 'dog'],
+    subgrader=StringGrader(),
+    wrong_msg='Try again!'
+)
+```
+
+
 ### Option Listing
 
 Here is the full list of options for a SingleListGrader.
@@ -141,7 +156,8 @@ grader = SingleListGrader(
     partial_credit=bool, (default True)
     ordered=bool, (default False)
     length_error=bool, (default False)
-    delimiter=string (default ',')
+    delimiter=string, (default ',')
+    wrong_msg=string (default '')
 )
 ```
 

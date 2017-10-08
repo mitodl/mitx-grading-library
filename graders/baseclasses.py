@@ -120,7 +120,8 @@ class ItemGrader(AbstractGrader):
         Classes that inherit from ItemGrader should extend this schema.
         """
         return Schema({
-            Required('answers', default=tuple()): self.schema_answers
+            Required('answers', default=tuple()): self.schema_answers,
+            Required('wrong_msg', default=""): str
         })
 
     def schema_answers(self, answer_tuple):
@@ -215,14 +216,13 @@ class ItemGrader(AbstractGrader):
         results = [self.check_response(answer, student_input) for answer in answers]
 
         # Now find the best result for the student
-        # If we only had one answer, just return the results
-        if len(results) == 1:
-            return results[0]
-
-        # Otherwise, compute the best result for the student
         best_score = max([r['grade_decimal'] for r in results])
         best_results = [r for r in results if r['grade_decimal'] == best_score]
         best_result_with_longest_msg = max(best_results, key=lambda r: len(r['msg']))
+
+        # Add in wrong_msg if appropriate
+        if best_result_with_longest_msg['msg'] == "" and best_score == 0:
+            best_result_with_longest_msg['msg'] = self.config["wrong_msg"]
 
         return best_result_with_longest_msg
 
