@@ -443,9 +443,12 @@ class SingleListGrader(ItemGrader):
             if len(answer_list) != len(answers_tuple[0]):
                 raise ConfigError("All possible list answers must have the same length")
 
-        # Check that the subgrader is valid
+        # If subgrader is a SingleListGrader, check that it uses a different delimiter
+        # TODO This does not check past the first level of nesting.
         if isinstance(self.config['subgrader'], SingleListGrader):
-            raise ConfigError("Cannot have a SingleListGrader subgrader for SingleListGrader")
+            subgrader = self.config['subgrader']
+            if self.config['delimiter'] == subgrader.config['delimiter']:
+                raise ConfigError("Nested SingleListGraders must use different delimiters.")
 
         # Validate answer_list using the subgrader
         for answer_list in answers_tuple:
@@ -461,8 +464,8 @@ class SingleListGrader(ItemGrader):
         student_list = student_input.split(self.config['delimiter'])
 
         if self.config['length_error'] and len(answers) != len(student_list):
-            msg = 'List length error: Expected {} terms in the list, but received {}'
-            raise ValueError(msg.format(len(answers), len(student_list)))
+            msg = 'List length error: Expected {} terms in the list, but received {}. Separate items with character "{}"'
+            raise ValueError(msg.format(len(answers), len(student_list), self.config['delimiter']))
 
         if self.config['ordered']:
             input_list = [self.config['subgrader'].check(*pair) for pair in zip(answers, student_list)]

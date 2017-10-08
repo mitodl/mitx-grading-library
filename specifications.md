@@ -47,7 +47,7 @@ Such configuration dictionaries will also work with list graders.
 Single Input List Graders
 -------------------------
 
-If you want a response to be a delimiter-separated list of items, you can use a special ItemGrader called SingleListGrader to perform the grading. You need to specify a subgrader (which must be an ItemGrader, but not a SingleListGrader) to evaluate each individual item. The basic usage is as follows.
+If you want a response to be a delimiter-separated list of items, you can use a special ItemGrader called SingleListGrader to perform the grading. You need to specify a subgrader (which must be an ItemGrader, and could even be a SingleListGrader) to evaluate each individual item. The basic usage is as follows.
 
 ```python
 grader = SingleListGrader(
@@ -116,6 +116,20 @@ grader = SingleListGrader(
     delimiter=';'
 )
 ```
+
+By using different delimiters, it is possible to nest SingleListGraders:
+
+```python
+grader = SingleListGrader(
+    answers = [['a', 'b'], ['c', 'd']],
+    subgrader = SingleListGrader(
+        subgrader=StringGrader()
+    ),
+    delimiter=';'
+)
+```
+
+Here the expected student input is `a, b; c, d`.
 
 
 ### Turning Partial Credit Off

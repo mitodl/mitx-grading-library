@@ -154,11 +154,11 @@ def test_wrong_length_string_submission():
     )
     with raises(ValueError) as err:
         grader(None, 'cat,dog,dragon')
-    assert err.value.args[0] == 'List length error: Expected 2 terms in the list, but received 3'
+    assert err.value.args[0] == 'List length error: Expected 2 terms in the list, but received 3. Separate items with character ","'
 
     with raises(ValueError) as err:
         grader(None, 'cat')
-    assert err.value.args[0] == 'List length error: Expected 2 terms in the list, but received 1'
+    assert err.value.args[0] == 'List length error: Expected 2 terms in the list, but received 1. Separate items with character ","'
 
 def test_multiple_list_answers():
     """
@@ -188,3 +188,30 @@ def test_multiple_list_answers():
     expected_result = {'ok': False, 'msg': '', 'grade_decimal': 0}
     result = grader(None, 'badger,grumble')
     assert result == expected_result
+
+def test_nesting():
+    grader = SingleListGrader(
+        answers = [['a', 'b'], ['c', 'd']],
+        subgrader = SingleListGrader(
+            subgrader=StringGrader()
+        ),
+        delimiter=';'
+    )
+    student_input = 'a, b; c, d'
+    expected_result = {
+        'ok':True,
+        'msg':'',
+        'grade_decimal':1
+    }
+    assert grader(None, student_input) == expected_result
+
+def test_nesting_with_same_delimiter_raises_config_error():
+    with raises(ConfigError) as err:
+        # Both delimiters have same default value
+        grader = SingleListGrader(
+            answers = [['a', 'b'], ['c', 'd']],
+            subgrader = SingleListGrader(
+                subgrader=StringGrader()
+            )
+        )
+    assert err.value.args[0] == "Nested SingleListGraders must use different delimiters."
