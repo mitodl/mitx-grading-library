@@ -1,5 +1,5 @@
 """
-ListGrader tests
+Tests for ListGrader
 """
 from __future__ import division
 import pprint

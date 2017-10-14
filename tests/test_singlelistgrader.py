@@ -1,5 +1,5 @@
 """
-SingleSingleListGrader tests
+Tests for SingleListGrader
 """
 from __future__ import division
 import pprint

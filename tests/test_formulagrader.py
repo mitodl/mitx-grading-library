@@ -1,5 +1,8 @@
+"""
+Tests for FormulaGrader and NumericalGrader
+"""
 from __future__ import division
-from .. import *
+from graders import *
 from pytest import approx
 
 def test_square_root_of_negative_number():

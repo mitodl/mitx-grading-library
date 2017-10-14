@@ -1,5 +1,8 @@
+"""
+Tests for StringGrader
+"""
 from __future__ import division
-from .. import *
+from graders import *
 
 def test_single_expect_value_in_config():
     grader = StringGrader(
