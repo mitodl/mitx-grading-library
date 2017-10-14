@@ -3,19 +3,27 @@ Classes for numerical and formula graders
 * NumericalGrader
 * FormulaGrader
 
-Also defines classes for sampling intervals
+Also defines classes for sampling values
 * RealInterval
+* IntegerInterval
 * ComplexRectangle
+* ComplexSector
+* SpecificValues
+and for specifying functions
+* SpecificFunctions
+* RandomFunction
 """
 from numbers import Number
+import abc
 import math
 import random
-import numpy
-from graders.baseclasses import ObjectWithSchema, ItemGrader
+import numpy as np
+from graders.baseclasses import ObjectWithSchema, ItemGrader, ConfigError
 from graders.helpers import calc
 from graders.helpers.calc import UndefinedVariable, UndefinedFunction
-from graders.helpers.validatorfuncs import Positive, NonNegative, PercentageString
-from graders.voluptuous import Schema, Required, All, Any, Range, Length
+from graders.helpers.validatorfuncs import (Positive, NonNegative, PercentageString,
+                                            NumberRange, ListOfType, is_callable)
+from graders.voluptuous import Schema, Required, Any, All
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -23,75 +31,106 @@ __all__ = [
     "FormulaGrader",
     "ComplexRectangle",
     "RealInterval",
+    "IntegerInterval",
     "UndefinedVariable",
-    "UndefinedFunction"
+    "UndefinedFunction",
+    "SpecificValues",
+    "SpecificFunctions",
+    "RandomFunction",
+    "ComplexSector"
 ]
 
 class AbstractSamplingSet(ObjectWithSchema):  # pylint: disable=abstract-method
     """Represents a set from which random samples are taken."""
 
-    # Should have a gen_sample abstract method?
-    pass
+    # This is an abstract base class
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def gen_sample(self):
+        """Generate a sample from this sampling set"""
+        pass
+
 
 class VariableSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-method
-    """Represents a set from which variable random samples are taken."""
-    pass
+    """Represents a set from which random variable samples are taken."""
+
+    # This is an abstract base class
+    __metaclass__ = abc.ABCMeta
+
 
 class FunctionSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-method
-    """Represents a set from which function random samples are taken."""
-    pass
+    """Represents a set from which random function samples are taken."""
 
-# Removed from the class RealInterval, where it was making problems
-# Consider moving to helper
-def standardize_alternate_config(config_as_list):
-    alternate_form = Schema(All(
-        [Number, Number],
-        Length(min=2, max=2)
-    ))
-    config_as_list = alternate_form(config_as_list)
-    return {'start': config_as_list[0], 'stop': config_as_list[1]}
+    # This is an abstract base class
+    __metaclass__ = abc.ABCMeta
 
-class RealInterval(VariableSamplingSet):
-    """Represents an interval of real numbers from which to sample.
+
+class RealInterval(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+    """
+    Represents an interval of real numbers from which to sample.
 
     Usage
     =====
-
     Generate 5 random floats betweens -2 and 4
     >>> ri = RealInterval(start=-2, stop=4)
     >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
     [ 2.44247 -0.67699 -1.36759 -0.11255  1.39864]
 
-    You can initialize with a pair instead of a dict:
+    You can also initialize with an interval:
     >>> ri = RealInterval([-2,4])
     >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
     [ 2.9973   2.95767  0.069    0.23813 -1.49541]
 
-    The default is start=1, stop=3:
+    The default is start=1, stop=5:
     >>> ri = RealInterval()
     >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
     [ 2.61484  1.38107  2.61687  1.00507  1.87933]
     """
-
-    schema_config = Schema(Any(
-        {
-            Required('start', default=1): Number,
-            Required('stop', default=3): Number
-        },
-        standardize_alternate_config
-    ))
+    schema_config = NumberRange()
 
     def gen_sample(self):
-        "Returns a list of n random reals in range [self.start, self.stop]"
+        """Returns a random real number in the range [start, stop]"""
         start, stop = self.config['start'], self.config['stop']
+        return start + (stop - start) * np.random.random_sample()
 
-        width = stop - start
-        uniform_iid = start + width*numpy.random.rand(1)
 
-        return uniform_iid[0]
+class IntegerInterval(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+    """
+    Represents an interval of integers from which to sample.
 
-class ComplexRectangle(VariableSamplingSet):
-    """Represents a rectangle in the complex plane from which to sample.
+    Specify start and stop or [start, stop] to initialize.
+
+    Uses the pythonic idiom that start is included but stop is not.
+
+    Usage
+    =====
+    Generate 5 random floats betweens -2 and 4
+    >>> integer = IntegerInterval(start=-2, stop=5)
+    >>> integer.gen_sample() in list(range(-2,5))
+    True
+
+    You can also initialize with an interval:
+    >>> integer = IntegerInterval([-2,5])
+    >>> integer.gen_sample() in list(range(-2,5))
+    True
+
+    The default is start=1, stop=5:
+    >>> integer = IntegerInterval()
+    >>> integer.gen_sample() in list(range(1,5))
+    True
+    """
+    schema_config = NumberRange(int)
+
+    def gen_sample(self):
+        """Returns a random integer in range(start, stop)"""
+        start, stop = self.config['start'], self.config['stop']
+        return np.random.randint(low=start, high=stop)
+
+
+class ComplexRectangle(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+    """
+    Represents a rectangle in the complex plane from which to sample.
 
     Usage
     =====
@@ -99,191 +138,233 @@ class ComplexRectangle(VariableSamplingSet):
     >>> rect.gen_sample() # doctest: +SKIP
     (1.90313791936 - 2.94195943775j)
     """
-
     schema_config = Schema({
-        Required('re', default=[1, 3]): RealInterval.schema_config,
-        Required('im', default=[1, 3]): RealInterval.schema_config
+        Required('re', default=[1, 3]): NumberRange(),
+        Required('im', default=[1, 3]): NumberRange()
     })
 
     def __init__(self, config=None, **kwargs):
+        """
+        Configure the class as normal, then set up the real and imaginary
+        parts as RealInterval objects
+        """
         super(ComplexRectangle, self).__init__(config, **kwargs)
         self.re = RealInterval(self.config['re'])
         self.im = RealInterval(self.config['im'])
 
     def gen_sample(self):
+        """Generates a random sample in the defined rectangle in the complex plane"""
         return self.re.gen_sample() + self.im.gen_sample()*1j
 
-class NiceFunctions(FunctionSamplingSet):
-    """Represents space of 'nice' functions from which to sample.
+
+class ComplexSector(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+    """
+    Represents an annular sector in the complex plane from which to sample,
+    based on a given range of modulus and argument.
 
     Usage
     =====
+    >>> sect = ComplexSector(modulus=[0,1], argument=[-np.pi,np.pi])
+    >>> sect.gen_sample() # doctest: +SKIP
+    (0.022537684419662009+0.093135340148676249j)
+    """
+    schema_config = Schema({
+        Required('modulus', default=[1, 3]): NumberRange(),
+        Required('argument', default=[0, np.pi/2]): NumberRange()
+    })
 
+    def __init__(self, config=None, **kwargs):
+        """
+        Configure the class as normal, then set up the modulus and argument
+        parts as RealInterval objects
+        """
+        super(ComplexSector, self).__init__(config, **kwargs)
+        self.modulus = RealInterval(self.config['modulus'])
+        self.argument = RealInterval(self.config['argument'])
+
+    def gen_sample(self):
+        """Generates a random sample in the defined annular sector in the complex plane"""
+        return self.modulus.gen_sample() * np.exp(1j * self.argument.gen_sample())
+
+
+class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-methods
+    """
+    Generates a random well-behaved function on demand.
+
+    Currently implemented as a sum of trigonometric functions with
+    random amplitude, frequency and phase.
+
+    Usage
+    =====
     Generate a random continous function:
-    >>> funcs = NiceFunctions()
+    >>> funcs = RandomFunction()
     >>> f = funcs.gen_sample()
     >>> [f(1.2), f(1.2), f(1.3), f(4)] # doctest: +SKIP
     [-1.89324 -1.89324 -2.10722  0.85814]
 
     By default, the generated functions are R-->R. You can specify the
     input and output dimensions:
-    >>> funcs = NiceFunctions(dims=[3,2])
+    >>> funcs = RandomFunction(input_dim=3, output_dim=2)
     >>> f = funcs.gen_sample()
     >>> f(2.3, -1, 4.2) # doctest: +SKIP
     [-1.74656 -0.96909]
     >>> f(2.3, -1.1, 4.2) # doctest: +SKIP
     [-1.88769 -1.32087]
-
-    NOTE:
-        1. Sadly, calc.evaluator can only handle unary functions
-        2. Currently implemented as a sum of trigonometric functions
-        with random phases and periods.
     """
 
     schema_config = Schema({
-        Required('dims', default=[1, 1]): All(
-            list,
-            Length(min=2, max=2),
-            [All(int, Range(0, float('inf')))]
-        ),
+        Required('input_dim', default=1): Positive(int),
+        Required('output_dim', default=1): Positive(int),
+        Required('num_terms', default=3): Positive(int)
     })
 
-    def gen_sample_component(self):
-        """Generates one component of the sample function
-
-        Current Implementation:
-        If x1, x2, x3, ... are inputs, then function is of form
-
-        sin(a11 x1 + b11) + sin(a12 x1 + b12) + ... + sin(a1k x1 + b1k) +
-        sin(a21 x2 + b21) + sin(a22 x2 + b22) + ... + sin(a2k x2 + b2k) +
-        sin(a31 x3 + b31) + sin(a32 x3 + b32) + ... + sin(a3k x3 + b3k) +
-        ...
-        =
-        sum(numpy.sin(C))
-        where
-        C_ij = A_ij*x_i + B_ij
-        """
-        num_terms = 3  # the k-value in docstring
-        dim_input = self.config['dims'][0]
-
-        A = 1 + numpy.random.rand(dim_input, num_terms)
-        B = numpy.pi*numpy.random.rand(dim_input, num_terms)
-
-        def component(*args):
-            X = numpy.array([args]*num_terms).transpose()
-            return numpy.sum(numpy.sin(A*X + B))
-
-        return component
-
     def gen_sample(self):
-        """Returns a randomly chosen 'nice' function."""
+        """
+        Returns a randomly chosen 'nice' function.
 
-        dim_output = self.config['dims'][1]
-        components = [self.gen_sample_component() for j in range(dim_output)]
+        The output is a vector with output_dim dimensions:
+        Y^i = sum_{jk} A^i_{jk} sin(B^i_{jk} X_k + C^i_{jk})
+
+        i ranges from 1 to output_dim
+        j ranges from 1 to num_terms
+        k ranges from 1 to input_dim
+        """
+        # Generate arrays of random values for A, B and C
+        output_dim = self.config['output_dim']
+        input_dim = self.config['input_dim']
+        num_terms = self.config['num_terms']
+        # Amplitudes A range from 0.5 to 1.5
+        A = np.random.rand(output_dim, num_terms, input_dim) + 0.5
+        # Angular frequencies B range from -pi to pi
+        B = 2 * np.pi * (np.random.rand(output_dim, num_terms, input_dim) - 0.5)
+        # Phases C range from 0 to 2*pi
+        C = 2 * np.pi * np.random.rand(output_dim, num_terms, input_dim)
 
         def f(*args):
-            value = numpy.matrix([comp(*args) for comp in components])
-            return value if dim_output > 1 else value.item(0)
+            """Function that generates the random values"""
+            # Check that the dimensions are correct
+            if len(args) != input_dim:
+                msg = "Expected {} arguments, but received {}".format(input_dim, len(args))
+                raise ConfigError(msg)
+
+            # Turn the inputs into an array
+            xvec = np.array(args)
+            # Repeat it into the shape of A, B and C
+            xarray = np.tile(xvec, (output_dim, num_terms, 1))
+            # Compute the output matrix
+            output = A * np.sin(B * xarray + C)
+            # Sum over the j and k terms
+            # We have an old version of numpy going here, so we can't use
+            # fullsum = np.sum(output, axis=(1, 2))
+            fullsum = np.sum(np.sum(output, axis=2), axis=1)
+
+            # Return the result
+            return fullsum if output_dim > 1 else fullsum[0]
 
         return f
 
-class DiscreteValues(VariableSamplingSet, FunctionSamplingSet):
-    """Represents a discrete set of values from which to sample.
 
-    Note:
-        This class is provided just so that FormulaGrader has a consistent
-        gen_sample() method to call when sampling.
+class SpecificValues(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+    """
+    Represents a discrete set of values from which to sample.
+
+    Can be initialized with a single value or a non-empty list of values.
 
     Usage
     =====
-
-    >>> values = DiscreteValues([1,2,3,4])
+    >>> values = SpecificValues(3.142)
+    >>> values.gen_sample() == 3.142
+    True
+    >>> values = SpecificValues([1,2,3,4])
     >>> values.gen_sample() in [1,2,3,4]
     True
-    >>> values = DiscreteValues([numpy.sin, numpy.cos, numpy.tan])
-    >>> values.gen_sample() in [numpy.sin, numpy.cos, numpy.tan]
-    True
     """
 
-    schema_config = Schema(list)
+    # Take in an individual or list of numbers
+    schema_config = Schema(ListOfType(Number))
 
     def gen_sample(self):
+        """Return a random entry from the given list"""
         return random.choice(self.config)
 
-class UniqueValue(VariableSamplingSet, FunctionSamplingSet):
-    """Represents a unique value to sample.
 
-    Note:
-        This class is provided just so that FormulaGrader has a consistent
-        gen_sample() method to call when sampling.
+class SpecificFunctions(FunctionSamplingSet):  # pylint: disable=too-few-public-methods
+    """
+    Represents user-defined functions for use in a grader.
+
+    If desired, multiple functions can be provided in a list, and a random
+    function will be selected when needed.
 
     Usage
     =====
 
-    >>> values = UniqueValue(5)
-    >>> values.gen_sample() == 5
+    >>> functions = SpecificFunctions([np.sin, np.cos, np.tan])
+    >>> functions.gen_sample() in [np.sin, np.cos, np.tan]
     True
     >>> step_func = lambda x : 0 if x<0 else 1
-    >>> values = UniqueValue(step_func)
-    >>> values.gen_sample() == step_func
+    >>> functions = SpecificFunctions(step_func)
+    >>> functions.gen_sample() == step_func
     True
     """
 
-    schema_config = Schema(object)
+    # Take in a function or list of callable objects
+    schema_config = Schema(ListOfType(object, is_callable))
 
     def gen_sample(self):
-        return self.config
+        """Return a random entry from the given list"""
+        return random.choice(self.config)
+
 
 class NumericalGrader(ItemGrader):
     """Class that grades numerical input and expressions"""
 
     # The scimath variants have flexible domain. For example:
-    #   numpy.sqrt(-4+0j) = 2j
-    #   numpy.sqrt(-4) = nan, but
-    #   numpy.lib.scimath.sqrt(-4) = 2j
+    #   np.sqrt(-4+0j) = 2j
+    #   np.sqrt(-4) = nan, but
+    #   np.lib.scimath.sqrt(-4) = 2j
     DEFAULT_FUNCTIONS = {
-        'sin': numpy.sin,
-        'cos': numpy.cos,
-        'tan': numpy.tan,
+        'sin': np.sin,
+        'cos': np.cos,
+        'tan': np.tan,
         'sec': calc.functions.sec,
         'csc': calc.functions.csc,
         'cot': calc.functions.cot,
-        'sqrt': numpy.lib.scimath.sqrt,
-        'log10': numpy.lib.scimath.log10,
-        'log2': numpy.lib.scimath.log2,
-        'ln': numpy.lib.scimath.log,
-        'exp': numpy.exp,
-        'arccos': numpy.lib.scimath.arccos,
-        'arcsin': numpy.lib.scimath.arcsin,
-        'arctan': numpy.arctan,
+        'sqrt': np.lib.scimath.sqrt,
+        'log10': np.lib.scimath.log10,
+        'log2': np.lib.scimath.log2,
+        'ln': np.lib.scimath.log,
+        'exp': np.exp,
+        'arccos': np.lib.scimath.arccos,
+        'arcsin': np.lib.scimath.arcsin,
+        'arctan': np.arctan,
         'arcsec': calc.functions.arcsec,
         'arccsc': calc.functions.arccsc,
         'arccot': calc.functions.arccot,
-        'abs': numpy.abs,
+        'abs': np.abs,
         'fact': math.factorial,
         'factorial': math.factorial,
-        'sinh': numpy.sinh,
-        'cosh': numpy.cosh,
-        'tanh': numpy.tanh,
+        'sinh': np.sinh,
+        'cosh': np.cosh,
+        'tanh': np.tanh,
         'sech': calc.functions.sech,
         'csch': calc.functions.csch,
         'coth': calc.functions.coth,
-        'arcsinh': numpy.arcsinh,
-        'arccosh': numpy.arccosh,
-        'arctanh': numpy.lib.scimath.arctanh,
+        'arcsinh': np.arcsinh,
+        'arccosh': np.arccosh,
+        'arctanh': np.lib.scimath.arctanh,
         'arcsech': calc.functions.arcsech,
         'arccsch': calc.functions.arccsch,
         'arccoth': calc.functions.arccoth,
-        # lambdas because sometimes numpy.real/imag returns an array,
-        're': lambda x: float(numpy.real(x)),
-        'im': lambda x: float(numpy.imag(x)),
-        'conj': numpy.conj,
+        # lambdas because sometimes np.real/imag returns an array,
+        're': lambda x: float(np.real(x)),
+        'im': lambda x: float(np.imag(x)),
+        'conj': np.conj,
     }
     DEFAULT_VARIABLES = {
-        'i': numpy.complex(0, 1),
-        'j': numpy.complex(0, 1),
-        'e': numpy.e,
-        'pi': numpy.pi
+        'i': np.complex(0, 1),
+        'j': np.complex(0, 1),
+        'e': np.e,
+        'pi': np.pi
     }
 
     @staticmethod
@@ -317,9 +398,9 @@ class NumericalGrader(ItemGrader):
         False
 
         Works for vectors and matrices:
-        >>> A = numpy.matrix([[1,2],[-3,1]])
-        >>> B = numpy.matrix([[1.1, 2], [-2.8, 1]])
-        >>> diff = round(numpy.linalg.norm(A-B), 6)
+        >>> A = np.matrix([[1,2],[-3,1]])
+        >>> B = np.matrix([[1.1, 2], [-2.8, 1]])
+        >>> diff = round(np.linalg.norm(A-B), 6)
         >>> diff
         0.223607
         >>> NumericalGrader.within_tolerance(A, B, 0.25)
@@ -328,14 +409,15 @@ class NumericalGrader(ItemGrader):
         # When used within graders, tolerance has already been
         # validated as a Number or PercentageString
         if isinstance(tolerance, str):
-            tolerance = numpy.linalg.norm(x) * float(tolerance[:-1]) * 0.01
+            tolerance = np.linalg.norm(x) * float(tolerance[:-1]) * 0.01
 
-        return numpy.linalg.norm(x-y) < max(tolerance, hard_tolerance)
+        return np.linalg.norm(x-y) < max(tolerance, hard_tolerance)
+
 
 class FormulaGrader(NumericalGrader):
     """ Grades mathematical expressions.
 
-    Similar to EdX formularesponse but more flexible. Allows author
+    Similar to edX formularesponse but more flexible. Allows author
     to specify functions in addition to variables.
 
     Usage
@@ -379,7 +461,7 @@ class FormulaGrader(NumericalGrader):
     ...     variables=['a','b'],
     ...     functions=['f'],
     ...     sample_from={
-    ...         'f': UniqueValue(square)
+    ...         'f': SpecificFunctions(square)
     ...     }
     ... )
     >>> theinput = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = square
@@ -408,7 +490,7 @@ class FormulaGrader(NumericalGrader):
     sample_from: A dictionary mapping synbol (variable or function name) to
         sampling sets. Default sampling sets are:
             for variables, RealInterval([1,3])
-            for functions, NiceFunctions({dims=[1,1]})
+            for functions, RandomFunction({dims=[1,1]})
     tolerance (int or PercentageString): A positive tolerance with which to
         compare numerical evaluations. Default '0.1%'
     case_sensitive (bool): whether symbol names are case senstive. Default True
@@ -418,10 +500,10 @@ class FormulaGrader(NumericalGrader):
     """
 
     DEFAULT_VARIABLES = {
-        'i': numpy.complex(0, 1),
-        'j': numpy.complex(0, 1),
-        'e': numpy.e,
-        'pi': numpy.pi,
+        'i': np.complex(0, 1),
+        'j': np.complex(0, 1),
+        'e': np.e,
+        'pi': np.pi,
     }
 
     def __init__(self, config=None, **kwargs):
@@ -434,11 +516,12 @@ class FormulaGrader(NumericalGrader):
         # Construct the schema for sample_from
         # Allow anything that RealInterval can make sense of to be valid
         variables_sample_from = {
-            Required(varname, default=RealInterval()): Any(VariableSamplingSet, lambda pair: RealInterval(pair))
+            Required(varname, default=RealInterval()):
+                Any(VariableSamplingSet, lambda pair: RealInterval(pair))
             for varname in self.config.get('variables', [])
         }
         functions_sample_from = {
-            Required(funcname, default=NiceFunctions()): FunctionSamplingSet
+            Required(funcname, default=RandomFunction()): FunctionSamplingSet
             for funcname in self.config.get('functions', [])
         }
         sample_from = variables_sample_from
@@ -448,6 +531,8 @@ class FormulaGrader(NumericalGrader):
         # Apply the schema to sample_from
         self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
 
+        # TODO: split sample_from into variables and functions
+        # This will avoid any collisions
 
     @property
     def schema_config(self):
@@ -542,6 +627,7 @@ class FormulaGrader(NumericalGrader):
         return {'ok': False, 'grade_decimal': 0, 'msg': ''}
 
     def check_response(self, answer, student_input):
+        """Check the student response against a given answer"""
         try:
             return self.raw_check(answer, student_input)
         except UndefinedVariable as e:
