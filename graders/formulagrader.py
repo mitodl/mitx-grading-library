@@ -548,5 +548,9 @@ class FormulaGrader(NumericalGrader):
             message = "Invalid Input: {varname} not permitted in answer as a variable".format(varname=str(e))
             raise UndefinedVariable(message)
         except UndefinedFunction as e:
-            message = "Invalid Input: {varname} not permitted in answer as a function (did you forget to use * for multiplication?)".format(varname=str(e))
+            funcnames = e.args[0]
+            valid_var = e.args[1]
+            message = "Invalid Input: {varname} not permitted in answer as a function".format(varname=funcnames)
+            if valid_var:
+                message += " (did you forget to use * for multiplication?)"
             raise UndefinedFunction(message)

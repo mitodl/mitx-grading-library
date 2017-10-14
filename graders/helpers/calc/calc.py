@@ -458,5 +458,6 @@ class ParseAugmenter(object):
 
         bad_funcs = set(func for func in self.functions_used
                         if casify(func) not in valid_functions)
+        func_is_var = any(casify(func) in valid_variables for func in bad_funcs)
         if bad_funcs:
-            raise UndefinedFunction(' '.join(sorted(bad_funcs)))
+            raise UndefinedFunction(' '.join(sorted(bad_funcs)), func_is_var)

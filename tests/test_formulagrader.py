@@ -37,6 +37,11 @@ def test_invalid_input():
     expect = 'Invalid Input: pi not permitted in answer as a function (did you forget to use * for multiplication?)'
     assert err.value.args[0] == expect
 
+    with raises(UndefinedFunction) as err:
+        grader(None, "spin(3)")
+    expect = 'Invalid Input: spin not permitted in answer as a function'
+    assert err.value.args[0] == expect
+
     with raises(UndefinedVariable) as err:
         grader(None, "R")
     expect = 'Invalid Input: R not permitted in answer as a variable'
