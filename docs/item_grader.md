@@ -40,5 +40,14 @@ grader = StringGrader(config)
 
 Such configuration dictionaries also work with SingleListGrader and ListGrader.
 
+Finally, all graders (including all ItemGraders and ListGraders) have an optional debug flag that can be used to output the student response as part of the return message. This may be helpful for diagnosing issues in edX.
+
+```python
+grader = StringGrader(
+    answers='cat',
+    debug=True
+)
+```
+
 
 - [Home](README.md)
