@@ -3,8 +3,9 @@ Tests for ListGrader
 """
 from __future__ import division
 import pprint
-from pytest import approx, raises
-from graders import *
+from pytest import raises
+from graders import (ListGrader, ConfigError, StringGrader, FormulaGrader,
+                     UndefinedVariable, SingleListGrader)
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint
@@ -109,9 +110,8 @@ def test_multiple_graders():
 
     # Test incorrect ordering
     submission = ['1', 'cat']
-    with raises(UndefinedVariable) as err:
+    with raises(UndefinedVariable, match='Invalid Input: cat not permitted in answer'):
         result = grader(None, submission)
-    assert err.value.args[0] == 'Invalid Input: cat not permitted in answer as a variable'
 
     # Test failure
     submission = ['dog', '2']
@@ -128,42 +128,38 @@ def test_multiple_graders():
 def test_multiple_graders_errors():
     """Test that exceptions are raised on bad config"""
     # Wrong number of graders
-    with raises(ConfigError) as err:
-        grader = ListGrader(
+    with raises(ConfigError, match='The number of subgraders and answers are different'):
+        ListGrader(
             answers=['cat', '1'],
             subgrader=[StringGrader()],
             ordered=True
         )
-    assert err.value.args[0] == 'The number of subgraders and answers are different'
 
     # Unordered entry
-    with raises(ConfigError) as err:
-        grader = ListGrader(
+    with raises(ConfigError, match='Cannot use unordered lists with multiple graders'):
+        ListGrader(
             answers=['cat', '1'],
             subgrader=[StringGrader(), StringGrader()],
             ordered=False
         )
-    assert err.value.args[0] == 'Cannot use unordered lists with multiple graders'
 
 def test_wrong_number_of_answers():
     """Check that an error is raised if number of answers != number of inputs"""
-    with raises(ConfigError) as err:
+    expect = 'The number of answers \(2\) and the number of inputs \(1\) are different'
+    with raises(ConfigError, match=expect):
         grader = ListGrader(
             answers=['cat', 'dog'],
             subgrader=StringGrader()
         )
         grader(None, ['cat'])
-    expect = 'The number of answers (2) and the number of inputs (1) are different'
-    assert err.value.args[0] == expect
 
 def test_insufficient_answers():
     """Check that an error is raised if ListGrader is fed only one answer"""
-    with raises(ConfigError) as err:
+    with raises(ConfigError, match='ListGrader does not work with a single answer'):
         ListGrader(
             answers=['cat'],
             subgrader=StringGrader()
         )
-    assert err.value.args[0] == 'ListGrader does not work with a single answer'
 
 def test_zero_answers():
     """Check that ListGrader instantiates without any answers supplied (used in nesting)"""
