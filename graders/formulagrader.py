@@ -13,7 +13,7 @@ import random
 import numpy
 from graders.baseclasses import ObjectWithSchema, ItemGrader
 from graders.helpers import calc
-from graders.helpers.calc import UndefinedVariable
+from graders.helpers.calc import UndefinedVariable, UndefinedFunction
 from graders.helpers.validatorfuncs import Positive, NonNegative, PercentageString
 from graders.voluptuous import Schema, Required, All, Any, Range, Length
 
@@ -23,7 +23,8 @@ __all__ = [
     "FormulaGrader",
     "ComplexRectangle",
     "RealInterval",
-    "UndefinedVariable"
+    "UndefinedVariable",
+    "UndefinedFunction"
 ]
 
 class AbstractSamplingSet(ObjectWithSchema):  # pylint: disable=abstract-method
@@ -544,5 +545,12 @@ class FormulaGrader(NumericalGrader):
         try:
             return self.raw_check(answer, student_input)
         except UndefinedVariable as e:
-            message = "Invalid Input: {varname} not permitted in answer".format(varname=str(e))
+            message = "Invalid Input: {varname} not permitted in answer as a variable".format(varname=str(e))
             raise UndefinedVariable(message)
+        except UndefinedFunction as e:
+            funcnames = e.args[0]
+            valid_var = e.args[1]
+            message = "Invalid Input: {varname} not permitted in answer as a function".format(varname=funcnames)
+            if valid_var:
+                message += " (did you forget to use * for multiplication?)"
+            raise UndefinedFunction(message)

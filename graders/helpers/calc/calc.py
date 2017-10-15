@@ -70,11 +70,7 @@ DEFAULT_VARIABLES = {
     'i': numpy.complex(0, 1),
     'j': numpy.complex(0, 1),
     'e': numpy.e,
-    'pi': numpy.pi,
-    'k': scipy.constants.k,  # Boltzmann: 1.3806488e-23 (Joules/Kelvin)
-    'c': scipy.constants.c,  # Light Speed: 2.998e8 (m/s)
-    'T': 298.15,  # Typical room temperature: 298.15 (Kelvin), same as 25C/77F
-    'q': scipy.constants.e  # Fund. Charge: 1.602176565e-19 (Coulombs)
+    'pi': numpy.pi
 }
 
 # We eliminated the following extreme suffixes:
@@ -92,6 +88,13 @@ SUFFIXES = {
 class UndefinedVariable(Exception):
     """
     Indicate when a student inputs a variable which was not expected.
+    """
+    pass
+
+
+class UndefinedFunction(Exception):
+    """
+    Indicate when a student inputs a function which was not expected.
     """
     pass
 
@@ -163,9 +166,9 @@ def eval_power(parse_result):
             return b**a
         except ValueError:
             # scimath.power is componentwise power on matrices, hence above try
-            return numpy.lib.scimath.power(b,a)    
+            return numpy.lib.scimath.power(b,a)
     power = reduce(lambda a, b: robust_pow(b, a), parse_result)
-    
+
     return power
 
 
@@ -450,8 +453,11 @@ class ParseAugmenter(object):
         # Test if casify(X) is valid, but return the actual bad input (i.e. X)
         bad_vars = set(var for var in self.variables_used
                        if casify(var) not in valid_variables)
-        bad_vars.update(func for func in self.functions_used
-                        if casify(func) not in valid_functions)
-
         if bad_vars:
             raise UndefinedVariable(' '.join(sorted(bad_vars)))
+
+        bad_funcs = set(func for func in self.functions_used
+                        if casify(func) not in valid_functions)
+        func_is_var = any(casify(func) in valid_variables for func in bad_funcs)
+        if bad_funcs:
+            raise UndefinedFunction(' '.join(sorted(bad_funcs)), func_is_var)

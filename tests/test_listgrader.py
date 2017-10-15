@@ -111,7 +111,7 @@ def test_multiple_graders():
     submission = ['1', 'cat']
     with raises(UndefinedVariable) as err:
         result = grader(None, submission)
-    assert err.value.args[0] == 'Invalid Input: cat not permitted in answer'
+    assert err.value.args[0] == 'Invalid Input: cat not permitted in answer as a variable'
 
     # Test failure
     submission = ['dog', '2']
