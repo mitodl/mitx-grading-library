@@ -105,13 +105,15 @@ class AbstractGrader(ObjectWithSchema):
         """
         result = self.check(None, student_input)
         if self.config['debug']:
+            # Construct the debug output
             if isinstance(student_input, list):
-                # Construct the debug output
                 debugoutput = "Student Responses:\n" + "\n".join(student_input)
+            else:
+                debugoutput = "Student Response:\n" + student_input
+            # Append the message
+            if "input_list" in result:
                 result['overall_message'] = debugoutput
             else:
-                # Construct the debug output
-                debugoutput = "Student Response:\n" + student_input
                 if result['msg']:
                     result['msg'] += "\n\n" + debugoutput
                 else:
