@@ -112,9 +112,12 @@ class AbstractGrader(ObjectWithSchema):
                 debugoutput = "Student Response:\n" + student_input
             # Append the message
             if "input_list" in result:
-                result['overall_message'] = debugoutput
+                if result.get('overall_message', ''):
+                    result['overall_message'] += "\n\n" + debugoutput
+                else:
+                    result['overall_message'] = debugoutput
             else:
-                if result['msg']:
+                if result.get('msg', ''):
                     result['msg'] += "\n\n" + debugoutput
                 else:
                     result['msg'] = debugoutput
