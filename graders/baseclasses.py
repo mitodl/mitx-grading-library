@@ -57,6 +57,16 @@ class AbstractGrader(ObjectWithSchema):
     # This is an abstract base class
     __metaclass__ = abc.ABCMeta
 
+    @abc.abstractproperty
+    def schema_config(self):
+        """
+        Defines the default config schema for abstract graders.
+        Classes that inherit from AbstractGrader should extend this schema.
+        """
+        return Schema({
+            Required('debug', default=False): bool  # Use to turn on debug output
+        })
+
     @abc.abstractmethod
     def check(self, answers, student_input):
         """
@@ -93,7 +103,25 @@ class AbstractGrader(ObjectWithSchema):
             The answer that we pass to check is None, indicating that the
             grader should read the answer from its internal configuration.
         """
-        return self.check(None, student_input)
+        result = self.check(None, student_input)
+        if self.config['debug']:
+            # Construct the debug output
+            if isinstance(student_input, list):
+                debugoutput = "Student Responses:\n" + "\n".join(student_input)
+            else:
+                debugoutput = "Student Response:\n" + student_input
+            # Append the message
+            if "input_list" in result:
+                if result.get('overall_message', ''):
+                    result['overall_message'] += "\n\n" + debugoutput
+                else:
+                    result['overall_message'] = debugoutput
+            else:
+                if result.get('msg', ''):
+                    result['msg'] += "\n\n" + debugoutput
+                else:
+                    result['msg'] = debugoutput
+        return result
 
 class ItemGrader(AbstractGrader):
     """
@@ -119,7 +147,8 @@ class ItemGrader(AbstractGrader):
         Defines the default config schema for item graders.
         Classes that inherit from ItemGrader should extend this schema.
         """
-        return Schema({
+        schema = super(ItemGrader, self).schema_config
+        return schema.extend({
             Required('answers', default=tuple()): self.schema_answers,
             Required('wrong_msg', default=""): str
         })

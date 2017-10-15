@@ -9,7 +9,7 @@ Works by farming out the individual objects to other graders.
 from __future__ import division
 import numpy as np
 from graders.helpers import munkres
-from graders.voluptuous import Schema, Required, Any
+from graders.voluptuous import Required, Any
 from graders.baseclasses import AbstractGrader, ItemGrader, ConfigError
 
 # Set the objects to be imported from this grader
@@ -142,12 +142,17 @@ class ListGrader(AbstractGrader):
         True
     """
 
-    # The voluptuous Schema object to validate ListGrader configurations
-    schema_config = Schema({
-        Required('ordered', default=False): bool,
-        Required('subgrader'): Any(AbstractGrader, [AbstractGrader]),
-        Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
-    })
+    @property
+    def schema_config(self):
+        """Define the configuration options for ListGrader"""
+        # Construct the default AbstractGrader schema
+        schema = super(ListGrader, self).schema_config
+        # Append options
+        return schema.extend({
+            Required('ordered', default=False): bool,
+            Required('subgrader'): Any(AbstractGrader, [AbstractGrader]),
+            Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
+        })
 
     def __init__(self, config=None, **kwargs):
         """
@@ -387,16 +392,21 @@ class SingleListGrader(ItemGrader):
         True
     """
 
-    # The voluptuous Schema object to validate SingleListGrader configurations
-    schema_config = Schema({
-        Required('ordered', default=False): bool,
-        Required('length_error', default=False): bool,
-        Required('delimiter', default=','): str,
-        Required('partial_credit', default=True): bool,
-        Required('subgrader'): ItemGrader,
-        Required('answers', default=[]): Any(list, (list,)),  # Allow for a tuple of lists
-        Required('wrong_msg', default=""): str  # The ItemGrader wrong_msg
-    })
+    @property
+    def schema_config(self):
+        """Define the configuration options for SingleListGrader"""
+        # Construct the default ItemGrader schema
+        schema = super(SingleListGrader, self).schema_config
+        # Append options, replacing the ItemGrader 'answers' key
+        return schema.extend({
+            Required('ordered', default=False): bool,
+            Required('length_error', default=False): bool,
+            Required('delimiter', default=','): str,
+            Required('partial_credit', default=True): bool,
+            Required('subgrader'): ItemGrader,
+            Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
+        })
+
     # Make sure that the ItemGrader schema_expect isn't used
     schema_expect = None
 
