@@ -14,7 +14,7 @@ printit = pp.pprint
 def test_order_not_matter():
     grader = ListGrader(
         answers=['cat', 'dog', 'unicorn'],
-        subgraders=StringGrader()
+        subgrader=StringGrader()
     )
     submission = ['cat', 'fish', 'dog']
     expected_result = {
@@ -30,7 +30,7 @@ def test_order_not_matter():
 def test_shorthandAnswers_specification():
     grader = ListGrader(
         answers=['cat', 'dog', 'unicorn'],
-        subgraders=StringGrader()
+        subgrader=StringGrader()
     )
     submission = ['cat', 'fish', 'dog']
     expected_result = {
@@ -46,7 +46,7 @@ def test_shorthandAnswers_specification():
 def test_duplicate_items():
     grader = ListGrader(
         answers=['cat', 'dog', 'unicorn', 'cat', 'cat'],
-        subgraders=StringGrader()
+        subgrader=StringGrader()
     )
     submission = ['cat', 'dog', 'dragon', 'dog', 'cat']
     expected_result = {
@@ -75,7 +75,7 @@ def test_partial_creditAssigment():
                 {'expect': 'unicorn', 'grade_decimal': 0.75, 'msg': "unicorn_msg"}
             )
         ],
-        subgraders=StringGrader()
+        subgrader=StringGrader()
     )
     submission = ["skunk", "lion", "unicorn"]
     expected_result = {
@@ -92,7 +92,7 @@ def test_multiple_graders():
     """Test multiple graders"""
     grader = ListGrader(
         answers=['cat', '1'],
-        subgraders=[StringGrader(), FormulaGrader()],
+        subgrader=[StringGrader(), FormulaGrader()],
         ordered=True
     )
 
@@ -131,7 +131,7 @@ def test_multiple_graders_errors():
     with raises(ConfigError, match='The number of subgraders and answers are different'):
         ListGrader(
             answers=['cat', '1'],
-            subgraders=[StringGrader()],
+            subgrader=[StringGrader()],
             ordered=True
         )
 
@@ -139,7 +139,7 @@ def test_multiple_graders_errors():
     with raises(ConfigError, match='Cannot use unordered lists with multiple graders'):
         ListGrader(
             answers=['cat', '1'],
-            subgraders=[StringGrader(), StringGrader()],
+            subgrader=[StringGrader(), StringGrader()],
             ordered=False
         )
 
@@ -149,7 +149,7 @@ def test_wrong_number_of_inputs():
     with raises(ConfigError, match=expect):
         grader = ListGrader(
             answers=['cat', 'dog'],
-            subgraders=StringGrader()
+            subgrader=StringGrader()
         )
         grader(None, ['cat'])
 
@@ -158,21 +158,21 @@ def test_insufficientAnswers():
     with raises(ConfigError, match='ListGrader does not work with a single answer'):
         ListGrader(
             answers=['cat'],
-            subgraders=StringGrader()
+            subgrader=StringGrader()
         )
 
 def test_zeroAnswers():
     """Check that ListGrader instantiates without any answers supplied (used in nesting)"""
     ListGrader(
         answers=[],
-        subgraders=StringGrader()
+        subgrader=StringGrader()
     )
 
 def test_multiple_listAnswers():
     """Check that a listgrader with multiple possible answers is graded correctly"""
     grader = ListGrader(
         answers=(['cat', 'meow'], ['dog', 'woof']),
-        subgraders=StringGrader()
+        subgrader=StringGrader()
     )
 
     result = grader(None, ['cat', 'meow'])
@@ -233,7 +233,7 @@ def test_multiple_listAnswers_same_grade():
             [{'expect': 'dog', 'msg': 'dog2'}, 'woof'],
             ['dolphin', 'squeak'],
         ),
-        subgraders=StringGrader()
+        subgrader=StringGrader()
     )
 
     result = grader(None, ['dog', 'woof'])
@@ -255,7 +255,7 @@ def test_nested_listgrader():
             ['1', '2'],
             ['3', '4']
         ],
-        subgraders=SingleListGrader(
+        subgrader=SingleListGrader(
             subgrader=StringGrader()
         )
     )
@@ -278,9 +278,9 @@ def test_grouping_errors_subgraderAnd_groups_mismatched_in_size():
                 ['bat', 'ghost', 'pumpkin'],
                 'Halloween'
             ],
-            subgraders=[
+            subgrader=[
                 ListGrader(
-                    subgraders=StringGrader()
+                    subgrader=StringGrader()
                 ),
                 StringGrader()
             ],
@@ -294,9 +294,9 @@ def test_grouping_errors_subgraderAnd_groups_mismatched_in_size():
                 ['bat', 'ghost', 'pumpkin'],
                 'Halloween',
             ],
-            subgraders=[
+            subgrader=[
                 ListGrader(
-                    subgraders=StringGrader()
+                    subgrader=StringGrader()
                 ),
                 StringGrader()
             ],
@@ -313,9 +313,9 @@ def test_grouping_not_contiguous_integers():
                 ['bat', 'ghost', 'pumpkin'],
                 'Halloween',
             ],
-            subgraders=[
+            subgrader=[
                 ListGrader(
-                    subgraders=StringGrader()
+                    subgrader=StringGrader()
                 ),
                 StringGrader()
             ],
@@ -332,9 +332,9 @@ def test_grouping_errors_group_needs_list_grader():
                 ['bat', 'ghost', 'pumpkin'],
                 'Halloween'
             ],
-            subgraders=[
+            subgrader=[
                 ListGrader(
-                    subgraders=StringGrader()
+                    subgrader=StringGrader()
                 ),
                 StringGrader()
             ],
@@ -351,9 +351,9 @@ def test_wrong_number_of_inputs_with_grouping():
                 ['bat', 'ghost', 'pumpkin'],
                 'Halloween'
             ],
-            subgraders=[
+            subgrader=[
                 ListGrader(
-                    subgraders=StringGrader()
+                    subgrader=StringGrader()
                 ),
                 StringGrader()
             ],
@@ -373,8 +373,8 @@ def test_grouping_unordered_inputs():
             ['eagle', 'sparrow', 'hawk']
         ],
         grouping=[1, 2, 1, 2, 1, 2],
-        subgraders=ListGrader(
-            subgraders=StringGrader()
+        subgrader=ListGrader(
+            subgrader=StringGrader()
         )
     )
     student_input = [
@@ -398,7 +398,7 @@ def test_grouping_unordered_inputs():
     }
     assert grader(None, student_input) == expected_result
 
-def test_grouping_with_subgraders_list():
+def test_grouping_with_subgrader_list():
     """Another test of a nested ListGrader with grouping"""
     grader = ListGrader(
         answers=[
@@ -409,9 +409,9 @@ def test_grouping_with_subgraders_list():
             ],
             'Halloween'
         ],
-        subgraders=[
+        subgrader=[
             ListGrader(
-                subgraders=StringGrader()
+                subgrader=StringGrader()
             ),
             StringGrader()
         ],
@@ -455,8 +455,8 @@ def test_multiple_nestingAnd_groups():
                 )
             ],
         ],
-        subgraders=ListGrader(
-            subgraders=[
+        subgrader=ListGrader(
+            subgrader=[
                 FormulaGrader(),
                 StringGrader()
             ],
