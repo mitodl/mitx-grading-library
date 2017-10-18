@@ -189,7 +189,7 @@ class ListGrader(AbstractGrader):
         >>> from stringgrader import StringGrader
         >>> grader = ListGrader(
         ...     answers=['cat', 'dog', 'fish'],
-        ...     subgrader=StringGrader()
+        ...     subgraders=StringGrader()
         ... )
         >>> result = grader(None, ['fish', 'cat', 'moose'])
         >>> expected = {'input_list': [
@@ -209,7 +209,7 @@ class ListGrader(AbstractGrader):
         # Append options
         return schema.extend({
             Required('ordered', default=False): bool,
-            Required('subgrader'): Any(AbstractGrader, [AbstractGrader]),
+            Required('subgraders'): Any(AbstractGrader, [AbstractGrader]),
             Required('grouping', default=[]): [Positive(int)],
             Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
         })
@@ -228,7 +228,7 @@ class ListGrader(AbstractGrader):
         super(ListGrader, self).__init__(config, **kwargs)
 
         # Step 2: Validate the answers
-        self.subgrader_list = isinstance(self.config['subgrader'], list)
+        self.subgrader_list = isinstance(self.config['subgraders'], list)
         self.config['answers'] = self.schema_answers(self.config['answers'])
 
         # Step 3: Validate the grouping
@@ -279,7 +279,7 @@ class ListGrader(AbstractGrader):
         # Check that the subgraders are commensurate with the answers
         if self.subgrader_list:
             # We have a list of subgraders
-            subgraders = self.config['subgrader']
+            subgraders = self.config['subgraders']
 
             # Ensure that multiple subgraders are valid
             if len(subgraders) != len(answers_tuple[0]):
@@ -287,13 +287,13 @@ class ListGrader(AbstractGrader):
             if not self.config['ordered']:
                 raise ConfigError('Cannot use unordered lists with multiple graders')
 
-            # Validate answer_list using the subgrader
+            # Validate answer_list using the subgraders
             for answer_list in answers_tuple:
                 for index, answer in enumerate(answer_list):
                     answer_list[index] = subgraders[index].schema_answers(answer)
         else:
             # We have a single subgrader
-            subgrader = self.config['subgrader']
+            subgrader = self.config['subgraders']
 
             # Validate answer_list using the subgraders
             for answer_list in answers_tuple:
@@ -335,7 +335,7 @@ class ListGrader(AbstractGrader):
         Validate a grouping list
         """
         # Single subgraders must be a ListGrader
-        if not self.subgrader_list and not isinstance(self.config['subgrader'], ListGrader):
+        if not self.subgrader_list and not isinstance(self.config['subgraders'], ListGrader):
             msg = "A ListGrader with groupings must have a ListGrader subgrader " + \
                   "or a list of subgraders"
             raise ConfigError(msg)
@@ -346,13 +346,13 @@ class ListGrader(AbstractGrader):
 
         # If using multiple subgraders, make sure we have the right number of subgraders
         if self.subgrader_list:
-            if len(self.grouping) != len(self.config['subgrader']):
+            if len(self.grouping) != len(self.config['subgraders']):
                 raise ConfigError("Number of subgraders and number of groups are not equal")
             # Furthermore, lists (groups with more than one entry) must go to ListGraders
             for py_idx, group in enumerate(self.grouping):
                 group_idx = py_idx + 1
                 num_items = len(group)
-                subgrader = self.config['subgrader'][py_idx]
+                subgrader = self.config['subgraders'][py_idx]
                 if num_items > 1 and not isinstance(subgrader, ListGrader):
                     msg = "Grouping index {} has {} items, but has a {} subgrader " + \
                           "instead of ListGrader"
@@ -473,17 +473,17 @@ class ListGrader(AbstractGrader):
             compare = zip(answers, grouped_inputs)
             if self.subgrader_list:
                 input_list = [
-                    self.config['subgrader'][index].check(*pair)
+                    self.config['subgraders'][index].check(*pair)
                     for index, pair in enumerate(compare)
                 ]
             else:
                 input_list = [
-                    self.config['subgrader'].check(*pair)
+                    self.config['subgraders'].check(*pair)
                     for pair in compare
                 ]
         else:
             # If unordered, then there is a single subgrader. Find optimal grading.
-            input_list = find_optimal_order(self.config['subgrader'].check, answers, grouped_inputs)
+            input_list = find_optimal_order(self.config['subgraders'].check, answers, grouped_inputs)
 
         # We need to restore the original order of inputs.
         # At this point, input_list contains items each of which is either:
