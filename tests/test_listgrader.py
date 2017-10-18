@@ -27,7 +27,7 @@ def test_order_not_matter():
     }
     assert grader(None, submission) == expected_result
 
-def test_shorthand_answers_specification():
+def test_shorthandAnswers_specification():
     grader = ListGrader(
         answers=['cat', 'dog', 'unicorn'],
         subgrader=StringGrader()
@@ -61,7 +61,7 @@ def test_duplicate_items():
     }
     assert grader(None, submission) == expected_result
 
-def test_partial_credit_assigment():
+def test_partial_creditAssigment():
     grader = ListGrader(
         answers=[
             (
@@ -143,9 +143,9 @@ def test_multiple_graders_errors():
             ordered=False
         )
 
-def test_wrong_number_of_answers():
+def test_wrong_number_of_inputs():
     """Check that an error is raised if number of answers != number of inputs"""
-    expect = 'The number of answers \(2\) and the number of inputs \(1\) are different'
+    expect = r'The number of answers \(2\) and the number of inputs \(1\) are different'
     with raises(ConfigError, match=expect):
         grader = ListGrader(
             answers=['cat', 'dog'],
@@ -153,7 +153,7 @@ def test_wrong_number_of_answers():
         )
         grader(None, ['cat'])
 
-def test_insufficient_answers():
+def test_insufficientAnswers():
     """Check that an error is raised if ListGrader is fed only one answer"""
     with raises(ConfigError, match='ListGrader does not work with a single answer'):
         ListGrader(
@@ -161,14 +161,14 @@ def test_insufficient_answers():
             subgrader=StringGrader()
         )
 
-def test_zero_answers():
+def test_zeroAnswers():
     """Check that ListGrader instantiates without any answers supplied (used in nesting)"""
     ListGrader(
         answers=[],
         subgrader=StringGrader()
     )
 
-def test_multiple_list_answers():
+def test_multiple_listAnswers():
     """Check that a listgrader with multiple possible answers is graded correctly"""
     grader = ListGrader(
         answers=(['cat', 'meow'], ['dog', 'woof']),
@@ -225,7 +225,7 @@ def test_multiple_list_answers():
     }
     assert result == expected_result
 
-def test_multiple_list_answers_same_grade():
+def test_multiple_listAnswers_same_grade():
     grader = ListGrader(
         answers=(
             [{'expect': 'dog', 'msg': 'dog1'}, 'woof'],
@@ -249,7 +249,7 @@ def test_multiple_list_answers_same_grade():
     assert result == expected_result
 
 def test_nested_listgrader():
-    """Check that we can use nested listgraders on multiple single-input lists"""
+    """Check that we can use have a SingleListGrader as a subgrader"""
     grader = ListGrader(
         answers=[
             ['1', '2'],
@@ -268,3 +268,215 @@ def test_nested_listgrader():
         ]
     }
     assert result == expected_result
+
+def test_grouping_errors_subgraderAnd_groups_mismatched_in_size():
+    """Test that errors are raised when nested ListGraders have size mismatches"""
+    # Too many graders
+    with raises(ConfigError, match="Number of subgraders and number of groups are not equal"):
+        ListGrader(
+            answers=[
+                ['bat', 'ghost', 'pumpkin'],
+                'Halloween'
+            ],
+            subgrader=[
+                ListGrader(
+                    subgrader=StringGrader()
+                ),
+                StringGrader()
+            ],
+            ordered=True,
+            grouping=[1, 1, 1, 1]
+        )
+    # Too few graders
+    with raises(ConfigError, match="Number of subgraders and number of groups are not equal"):
+        ListGrader(
+            answers=[
+                ['bat', 'ghost', 'pumpkin'],
+                'Halloween',
+            ],
+            subgrader=[
+                ListGrader(
+                    subgrader=StringGrader()
+                ),
+                StringGrader()
+            ],
+            ordered=True,
+            grouping=[1, 1, 1, 2, 3]
+        )
+
+def test_grouping_not_contiguous_integers():
+    """Test that the group numbers are contiguous integers"""
+    msg = "Grouping should be a list of contiguous positive integers starting at 1."
+    with raises(ConfigError, match=msg):
+        ListGrader(
+            answers=[
+                ['bat', 'ghost', 'pumpkin'],
+                'Halloween',
+            ],
+            subgrader=[
+                ListGrader(
+                    subgrader=StringGrader()
+                ),
+                StringGrader()
+            ],
+            ordered=True,
+            grouping=[1, 1, 1, 3]
+        )
+
+def test_grouping_errors_group_needs_list_grader():
+    """Test that anything with grouping needs a ListGrader"""
+    msg = "Grouping index 2 has 3 items, but has a StringGrader subgrader instead of ListGrader"
+    with raises(ConfigError, match=msg):
+        ListGrader(
+            answers=[
+                ['bat', 'ghost', 'pumpkin'],
+                'Halloween'
+            ],
+            subgrader=[
+                ListGrader(
+                    subgrader=StringGrader()
+                ),
+                StringGrader()
+            ],
+            ordered=True,
+            grouping=[1, 2, 2, 2]
+        )
+
+def test_wrong_number_of_inputs_with_grouping():
+    """Test that the right number of inputs is required"""
+    msg = "Grouping indicates 4 inputs are expected, but only 3 inputs exist."
+    with raises(ConfigError, match=msg):
+        grader = ListGrader(
+            answers=[
+                ['bat', 'ghost', 'pumpkin'],
+                'Halloween'
+            ],
+            subgrader=[
+                ListGrader(
+                    subgrader=StringGrader()
+                ),
+                StringGrader()
+            ],
+            ordered=True,
+            grouping=[2, 1, 1, 1]
+        )
+        grader(None, ['Halloween', 'cat', 'rat'])
+
+def test_grouping_unordered_inputs():
+    """
+    Test nested ListGraders using grouping.
+    Intended to mimick a two-column layout, list mammals in one column birds in another.
+    """
+    grader = ListGrader(
+        answers=[
+            ['cat', 'otter', 'bear'],
+            ['eagle', 'sparrow', 'hawk']
+        ],
+        grouping=[1, 2, 1, 2, 1, 2],
+        subgrader=ListGrader(
+            subgrader=StringGrader()
+        )
+    )
+    student_input = [
+        'hawk', 'otter',
+        'falcon', 'bear',
+        'eagle', 'dog'
+    ]
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            # hawk good, otter good
+            {'ok': True, 'msg': '', 'grade_decimal': 1},
+            {'ok': True, 'msg': '', 'grade_decimal': 1},
+            # falcon bad, bear good
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+            {'ok': True, 'msg': '', 'grade_decimal': 1},
+            # eagle good, dog bad
+            {'ok': True, 'msg': '', 'grade_decimal': 1},
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+        ]
+    }
+    assert grader(None, student_input) == expected_result
+
+def test_grouping_with_subgrader_list():
+    """Another test of a nested ListGrader with grouping"""
+    grader = ListGrader(
+        answers=[
+            [
+                'bat',
+                ('ghost', {'expect': 'spectre', 'grade_decimal': 0.5}),
+                'pumpkin'
+            ],
+            'Halloween'
+        ],
+        subgrader=[
+            ListGrader(
+                subgrader=StringGrader()
+            ),
+            StringGrader()
+        ],
+        ordered=True,
+        grouping=[1, 2, 1, 1]
+    )
+    student_input = ['pumpkin', 'Halloween', 'bird', 'spectre']
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': 'partial', 'grade_decimal': 0.5, 'msg': ''}
+        ]
+    }
+    assert grader(None, student_input) == expected_result
+
+def test_multiple_nestingAnd_groups():
+    """
+    Test of a grouping inside a grouping.
+    Enter the normalized, eigenvalues & eigenvectors of [[1,0],[0,-1]]
+    Of course, in a real problem we wouldn't use StringGrader to grade the numbers
+
+    TODO Expand this test once the required infrastructure is in place
+    """
+    grader = ListGrader(
+        answers=[
+            [
+                {'expect': '1', 'msg': 'first eigenvalue'},
+                (
+                    {'expect': '+1, 0', 'msg': 'positive first eigenvector'},
+                    {'expect': '-1, 0', 'msg': 'negative first eigenvector', 'grade_decimal': 0.8}
+                )
+            ],
+            [
+                {'expect': '-1', 'msg': 'second eigenvalue'},
+                (
+                    {'expect': '0, +1', 'msg': 'positive second eigenvector'},
+                    {'expect': '0, -1', 'msg': 'negative second eigenvector', 'grade_decimal': 0.8}
+                )
+            ],
+        ],
+        subgrader=ListGrader(
+            subgrader=[
+                FormulaGrader(),
+                StringGrader()
+            ],
+            ordered=True,
+            grouping=[1, 2]
+        ),
+        grouping=[1, 1, 2, 2]
+    )
+
+    submission = [
+        '-1', '0, -1',
+        '1', '+1, 0',
+    ]
+    expected = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'msg': 'second eigenvalue', 'grade_decimal': 1},
+            {'ok': 'partial', 'msg': 'negative second eigenvector', 'grade_decimal': 0.8},
+            {'ok': True, 'msg': 'first eigenvalue', 'grade_decimal': 1},
+            {'ok': True, 'msg': 'positive first eigenvector', 'grade_decimal': 1}
+        ]
+    }
+    assert grader(None, submission) == expected

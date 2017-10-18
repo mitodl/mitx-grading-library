@@ -11,19 +11,19 @@ import numpy as np
 from graders.helpers import munkres
 from graders.voluptuous import Required, Any
 from graders.baseclasses import AbstractGrader, ItemGrader, ConfigError
+from graders.helpers.validatorfuncs import Positive
 
 # Set the objects to be imported from this grader
 __all__ = [
     "ListGrader",
-    "SingleListGrader",
-    "ConfigError"
+    "SingleListGrader"
 ]
 
 class _AutomaticFailure(object):  # pylint: disable=too-few-public-methods
     """Used as padding when grading unknown number of inputs on a single input line"""
     pass
 
-def find_optimal_order(check, answers, student_input_list):
+def find_optimal_order(check, answers, student_list):
     """
     Finds optimal assignment (according to check function) of inputs to answers.
 
@@ -33,14 +33,26 @@ def find_optimal_order(check, answers, student_input_list):
         student_input_list (list): a list of student inputs
 
     Returns:
-        A re-ordered input_list to optimally match answers.
+        An optimally-grader input_list whose dictionaries match student_list in order.
 
     NOTE:
         uses https://github.com/bmc/munkres
         to solve https://en.wikipedia.org/wiki/Assignment_problem
     """
-    result_matrix = [[check(a, i) for a in answers] for i in student_input_list]
-    cost_matrix = munkres.make_cost_matrix(result_matrix, lambda r: 1 - r['grade_decimal'])
+    result_matrix = [[check(a, i) for a in answers] for i in student_list]
+
+    def calculate_cost(result):
+        """
+        The result matrix could contain short-form or long-form result dictionaries.
+        If long-form, we need to consolidate grades.
+        Either way, Munkres wants a cost matrix
+        """
+        if 'input_list' in result:
+            grades = [r['grade_decimal'] for r in result['input_list']]
+            result['grade_decimal'] = consolidate_grades(grades)
+        return 1 - result['grade_decimal']
+
+    cost_matrix = munkres.make_cost_matrix(result_matrix, calculate_cost)
     indexes = munkres.Munkres().compute(cost_matrix)
 
     input_list = [result_matrix[i][j] for i, j in indexes]
@@ -68,12 +80,13 @@ def padded_find_optimal_order(check, answers, student_list):
 
     return find_optimal_order(_check, padded_answers, padded_student_list)
 
-def consolidate_grades(grade_decimals, n_expect):
-    """Consolidate several grade_decimals into one.
+def consolidate_grades(grade_decimals, n_expect=None):
+    """
+    Consolidate several grade_decimals into one.
 
     Arguments:
         grade_decimals (list): A list of floats between 0 and 1
-        n_expect (int): expected number of answers
+        n_expect (int): expected number of answers, defaults to length of grade_decimals
     Returns:
         float, either:
             average of grade_decimals padded to length n_extra if
@@ -89,6 +102,9 @@ def consolidate_grades(grade_decimals, n_expect):
         >>> consolidate_grades([1, 0.5, 0, 0, 0], 2)
         0
     """
+    if n_expect is None:
+        n_expect = len(grade_decimals)
+
     n_extra = len(grade_decimals) - n_expect
     if n_extra > 0:
         grade_decimals += [-1] * n_extra
@@ -99,33 +115,76 @@ def consolidate_grades(grade_decimals, n_expect):
 
     return max(0, avg)
 
+def consolidate_cfn_return(input_list, overall_message="", n_expect=None, partial_credit=True):
+    """
+    Consolidates a long-form customresponse return dictionary.
+
+    Inputs:
+        input_list (list): a list of customresponse single-answer dictionaries
+            each has keys 'ok', 'grade_decimal', 'msg'
+        overall_message (str): an overall message
+        n_expect: The expected number of answers, defaults to len(input_list).
+            Used in assigning partial credit.
+
+    Usage
+    =====
+    >>> input_list = [
+    ...     {'ok': True, 'msg': 'msg_0', 'grade_decimal':1},
+    ...     {'ok': 'partial', 'msg': 'msg_1', 'grade_decimal':0.5},
+    ...     {'ok': False, 'msg': 'msg_2', 'grade_decimal':0},
+    ...     {'ok': 'partial', 'msg': 'msg_3', 'grade_decimal':0.1},
+    ... ]
+    >>> expect = {
+    ...     'ok':'partial',
+    ...     'grade_decimal': (1 + 0.5 + 0 + 0.1)/4,
+    ...     'msg': 'summary\\nmsg_0\\nmsg_1\\nmsg_2\\nmsg_3' # escape newlines in docstring
+    ... }
+    >>> result = consolidate_cfn_return(input_list,
+    ...     overall_message = "summary"
+    ... )
+    >>> expect == result
+    True
+    """
+    if n_expect is None:
+        n_expect = len(input_list)
+
+    grade_decimals = [result['grade_decimal'] for result in input_list]
+    grade_decimal = consolidate_grades(grade_decimals, n_expect)
+    if not partial_credit:
+        if grade_decimal < 1:
+            grade_decimal = 0
+    ok_status = ItemGrader.grade_decimal_to_ok(grade_decimal)
+
+    # TODO Discuss: Do we want the overall_message to go first or last?
+    messages = [overall_message] + [result['msg'] for result in input_list]
+
+    result = {
+        'grade_decimal': grade_decimal,
+        'ok': ok_status,
+        'msg': '\n'.join([message for message in messages if message != ''])
+    }
+
+    return result
 
 class ListGrader(AbstractGrader):
     """
-    TODO This docstring is outdated and should be updated once ListGrader conforms
-    to the specifications.
-
-    Grades Lists of items according to a specified subgrader or list of subgraders.
-
-    ListGrader can be used to grade a list of answers according to the
-    supplied subgrader. Works with a multi-input customresponse.
+    ListGrader grades lists of items according to a specified subgrader or list of
+    subgraders. It works with multi-input customresponse problems.
 
     How learners enter lists in customresponse
     ==========================================
-
     Multi-input customresponse:
-        <customresmse cfn="grader">
+        <customresponse cfn="grader">
             <textline/> <!-- learner enters cat -->
             <textline/> <!-- learner enters dog -->
             <textline/> <!-- learner leaves blank -->
-        </customresmse>
+        </customresponse>
         Notes:
             grader receives a list: ['cat', 'dog', None]
-            list will always contain exactly as many items as input tags
+            The list will always contain exactly as many items as input tags
 
     Basic Usage
     ===========
-
     Grade a list of strings (multi-input)
         >>> from stringgrader import StringGrader
         >>> grader = ListGrader(
@@ -133,7 +192,7 @@ class ListGrader(AbstractGrader):
         ...     subgrader=StringGrader()
         ... )
         >>> result = grader(None, ['fish', 'cat', 'moose'])
-        >>> expected = {'input_list':[
+        >>> expected = {'input_list': [
         ...     {'ok': True, 'grade_decimal':1, 'msg':''},
         ...     {'ok': True, 'grade_decimal':1, 'msg':''},
         ...     {'ok': False, 'grade_decimal':0, 'msg':''}
@@ -151,6 +210,7 @@ class ListGrader(AbstractGrader):
         return schema.extend({
             Required('ordered', default=False): bool,
             Required('subgrader'): Any(AbstractGrader, [AbstractGrader]),
+            Required('grouping', default=[]): [Positive(int)],
             Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
         })
 
@@ -158,16 +218,33 @@ class ListGrader(AbstractGrader):
         """
         Validate the ListGrader's configuration.
         This is a bit different from other graders, because the validation of the answers
-        depends on the subgrader items in the config. Hence, we validate in three steps:
+        depends on the subgrader items in the config. Hence, we validate in a few steps:
         0. Subgrader classes are initialized and checked before this class is initialized
         1. Validate the config for this class, checking that answers is a list
         2. Validate the answers by using the subgrader classes
+        3. Validate the grouping
         """
         # Step 1: Validate the configuration of this list using the usual routines
         super(ListGrader, self).__init__(config, **kwargs)
 
         # Step 2: Validate the answers
+        self.subgrader_list = isinstance(self.config['subgrader'], list)
         self.config['answers'] = self.schema_answers(self.config['answers'])
+
+        # Step 3: Validate the grouping
+        # Start by obtaining the grouping list
+        if self.config['grouping']:
+            self.grouping = self.config['grouping']
+        elif self.config['ordered'] and not self.config['grouping']:
+            # Treat an ordered list of answers by using grouping
+            self.grouping = [i for i in range(1, len(self.config['answers'][0]) + 1)]
+        else:
+            self.grouping = None
+        # If we have a grouping list, construct the grouping map and validate
+        if self.grouping:
+            # Create the grouping dictionary
+            self.grouping = self.create_grouping_map(self.grouping)
+            self.validate_grouping()
 
     def schema_answers(self, answers_tuple):
         """
@@ -200,9 +277,8 @@ class ListGrader(AbstractGrader):
                 raise ConfigError("All possible list answers must have the same length")
 
         # Check that the subgraders are commensurate with the answers
-        if isinstance(self.config['subgrader'], list):
+        if self.subgrader_list:
             # We have a list of subgraders
-            self.subgrader_list = True
             subgraders = self.config['subgrader']
 
             # Ensure that multiple subgraders are valid
@@ -217,7 +293,6 @@ class ListGrader(AbstractGrader):
                     answer_list[index] = subgraders[index].schema_answers(answer)
         else:
             # We have a single subgrader
-            self.subgrader_list = False
             subgrader = self.config['subgrader']
 
             # Validate answer_list using the subgraders
@@ -227,6 +302,62 @@ class ListGrader(AbstractGrader):
 
         return answers_tuple
 
+    @staticmethod
+    def create_grouping_map(grouping):
+        """Creates an array mapping groups to input index
+
+        Usage
+        =====
+        >>> grouping = [3, 1, 1, 2, 2, 1, 2]
+        >>> expect = [
+        ...     [1, 2, 5],
+        ...     [3, 4, 6],
+        ...     [0]
+        ... ]
+        >>> expect == ListGrader.create_grouping_map(grouping)
+        True
+        """
+        # Validate the list of groups
+        group_nums = set(grouping)
+        if not group_nums == set(range(1, max(group_nums) + 1)):
+            msg = "Grouping should be a list of contiguous positive integers starting at 1."
+            raise ConfigError(msg)
+
+        # Create the grouping map
+        group_map = [[] for group in group_nums]
+        for index, group_num in enumerate(grouping):
+            group_map[group_num - 1].append(index)
+
+        return group_map
+
+    def validate_grouping(self):
+        """
+        Validate a grouping list
+        """
+        # Single subgraders must be a ListGrader
+        if not self.subgrader_list and not isinstance(self.config['subgrader'], ListGrader):
+            msg = "A ListGrader with groupings must have a ListGrader subgrader " + \
+                  "or a list of subgraders"
+            raise ConfigError(msg)
+
+        # Unordered, we must have a single ListGrader subgrader
+        if not self.config['ordered'] and self.subgrader_list:
+            raise ConfigError("Cannot have multiple subgraders with unordered list")
+
+        # If using multiple subgraders, make sure we have the right number of subgraders
+        if self.subgrader_list:
+            if len(self.grouping) != len(self.config['subgrader']):
+                raise ConfigError("Number of subgraders and number of groups are not equal")
+            # Furthermore, lists (groups with more than one entry) must go to ListGraders
+            for py_idx, group in enumerate(self.grouping):
+                group_idx = py_idx + 1
+                num_items = len(group)
+                subgrader = self.config['subgrader'][py_idx]
+                if num_items > 1 and not isinstance(subgrader, ListGrader):
+                    msg = "Grouping index {} has {} items, but has a {} subgrader " + \
+                          "instead of ListGrader"
+                    raise ConfigError(msg.format(group_idx, num_items, type(subgrader).__name__))
+
     def check(self, answers, student_input):
         """Checks student_input against answers, which may be provided"""
         # If no answers provided, use the internal configuration
@@ -235,7 +366,7 @@ class ListGrader(AbstractGrader):
         # answers should now be a tuple of answers
         # Check that there is at least one answer to compare to
         if not isinstance(answers, tuple):
-            msg = "Expected answers to be a tuple of answers, instead received {0}"
+            msg = "Expected answers to be a tuple of answers, instead received {}"
             raise ConfigError(msg.format(type(answers)))
         if not answers:
             raise ConfigError("Expected at least one answer in answers")
@@ -246,29 +377,129 @@ class ListGrader(AbstractGrader):
             results = [self.perform_check(answer_list, student_input) for answer_list in answers]
             return self.get_best_result(results)
         else:
-            msg = "Expected answer to have type <type list>, but received {t}"
-            raise ConfigError(msg.format(t=type(student_input)))
+            msg = "Expected answer to have type <type list>, but received {}"
+            raise ConfigError(msg.format(type(student_input)))
+
+    @staticmethod
+    def groupify_list(grouping, thelist):
+        """
+        Group inputs in student_list according to grouping
+
+        Inputs:
+            grouping (dict): an array whose entries are lists of indices in original list
+            thelist (list): the list to be groupified
+
+        Usage
+        =====
+        >>> grouping = [[1, 2, 5], [3, 4, 6], [0]]
+        >>> student_input = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+        >>> expected = [
+        ...     ['b', 'c', 'f'],
+        ...     ['d', 'e', 'g'],
+        ...     'a'
+        ... ]
+        >>> result = ListGrader.groupify_list(grouping, student_input)
+        >>> result == expected
+        True
+        """
+        if grouping is None:
+            return thelist
+        result = [
+            thelist[group[0]] if len(group) == 1 else [thelist[idx] for idx in group]
+            for group in grouping
+        ]
+        return result
+
+    @staticmethod
+    def ungroupify_list(grouping, grouped_list):
+        """
+        Inverse of groupify_list.
+
+        Usage
+        =====
+        >>> grouping = [[1, 2, 5], [3, 4, 6], [0]]
+        >>> student_input = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+        >>> expected_grouped = [
+        ...     ['b', 'c', 'f'],
+        ...     ['d', 'e', 'g'],
+        ...     'a'
+        ... ]
+        >>> grouped = ListGrader.groupify_list(grouping, student_input)
+        >>> grouped == expected_grouped
+        True
+        >>> ungrouped = ListGrader.ungroupify_list(grouping, grouped)
+        >>> ungrouped == student_input
+        True
+        """
+        if grouping is None:
+            return grouped_list
+
+        # Get the maximum index we're going to need
+        length = max([item for row in grouping for item in row]) + 1
+        # Initialize the output list
+        ungrouped = [None for _ in range(length)]
+
+        for indices, items in zip(grouping, grouped_list):
+            items = [items] if len(indices) == 1 else items
+            for idx, item in zip(indices, items):
+                ungrouped[idx] = item
+        return ungrouped
+
+    def validate_submission(self, answers, student_list):
+        """
+        Make sure that the student_list has the right number of entries.
+        Compares to both grouping and answers.
+        """
+        if self.config['grouping']:
+            if len(self.config['grouping']) != len(student_list):
+                msg = "Grouping indicates {} inputs are expected, but only {} inputs exist."
+                raise ConfigError(msg.format(len(self.config['grouping']), len(student_list)))
+        else:
+            if len(answers) != len(student_list):
+                msg = "The number of answers ({}) and the number of inputs ({}) are different"
+                raise ConfigError(msg.format(len(answers), len(student_list)))
 
     def perform_check(self, answers, student_list):
         """
         Compare the list of responses from a student against a specific list of answers.
         """
-        if len(answers) != len(student_list):
-            msg = "The number of answers ({}) and the number of inputs ({}) are different"
-            raise ConfigError(msg.format(len(answers), len(student_list)))
+        self.validate_submission(answers, student_list)
+
+        # Group the inputs in preparation for grading
+        grouped_inputs = self.groupify_list(self.grouping, student_list)
 
         if self.config['ordered']:
-            compare = zip(answers, student_list)
+            # If ordered, pass answers and inputs to the appropriate grader.
+            compare = zip(answers, grouped_inputs)
             if self.subgrader_list:
-                input_list = [self.config['subgrader'][index].check(*pair) for index, pair in enumerate(compare)]
+                input_list = [
+                    self.config['subgrader'][index].check(*pair)
+                    for index, pair in enumerate(compare)
+                ]
             else:
-                input_list = [self.config['subgrader'].check(*pair) for pair in compare]
+                input_list = [
+                    self.config['subgrader'].check(*pair)
+                    for pair in compare
+                ]
         else:
-            input_list = find_optimal_order(self.config['subgrader'].check, answers, student_list)
+            # If unordered, then there is a single subgrader. Find optimal grading.
+            input_list = find_optimal_order(self.config['subgrader'].check, answers, grouped_inputs)
 
-        # TODO: If a subgrader was a ListGrader, we need to flatten the response
+        # We need to restore the original order of inputs.
+        # At this point, input_list contains items each of which is either:
+        #   1. short-form item results {'ok':..., 'msg': ..., 'grade_decimal': ...}
+        #   2. long-form list results {'overall_message':..., 'input_list': ...}
+        # Let's change to a nested list of short-results, then ungroup
+        nested = [
+            r['input_list'] if 'input_list' in r else r
+            for r in input_list
+        ]
+        ungrouped = self.ungroupify_list(self.grouping, nested)
 
-        return {'input_list': input_list, 'overall_message': ''}
+        # TODO We're discarding any overall_messages at this point. We should combine them
+        # to form the resulting overall_message
+
+        return {'input_list': ungrouped, 'overall_message': ''}
 
     @staticmethod
     def get_best_result(results):
@@ -425,18 +656,21 @@ class SingleListGrader(ItemGrader):
         # Step 2: Validate the answers
         self.config['answers'] = self.schema_answers(self.config['answers'])
 
-    def schema_answers(self, answers_tuple):
+    def schema_answers(self, answer_tuple):
         """
         Defines the schema to validate an answer tuple against.
 
         This will transform the input to a tuple as necessary, and then attempt to
-        validate the answers_tuple using the defined subgraders.
+        validate the answer_tuple using the defined subgraders.
 
         Two forms for the answer tuple are acceptable:
 
         1. A list of answers
         2. A tuple of lists of answers
         """
+        # Rename from the ItemGrader argument
+        answers_tuple = answer_tuple
+
         # Turn answers_tuple into a tuple if it isn't already
         if isinstance(answers_tuple, list):
             if not answers_tuple:  # empty list
@@ -464,35 +698,33 @@ class SingleListGrader(ItemGrader):
         for answer_list in answers_tuple:
             for index, answer in enumerate(answer_list):
                 answer_list[index] = self.config['subgrader'].schema_answers(answer)
-            if len(answer_list) == 0:
+            if not answer_list:
                 raise ConfigError("Cannot have an empty list of answers")
 
         return answers_tuple
 
-    def check_response(self, answers, student_input):
+    def check_response(self, answer, student_input):
         """Check student_input against a given answer list"""
+        answers = answer  # Rename from the ItemGrader name
         student_list = student_input.split(self.config['delimiter'])
 
         if self.config['length_error'] and len(answers) != len(student_list):
-            msg = 'List length error: Expected {} terms in the list, but received {}. Separate items with character "{}"'
+            msg = 'List length error: Expected {} terms in the list, but received {}. ' + \
+                  'Separate items with character "{}"'
             raise ValueError(msg.format(len(answers), len(student_list), self.config['delimiter']))
 
         if self.config['ordered']:
-            input_list = [self.config['subgrader'].check(*pair) for pair in zip(answers, student_list)]
+            input_list = [
+                self.config['subgrader'].check(*pair)
+                for pair in zip(answers, student_list)
+            ]
         else:
-            input_list = padded_find_optimal_order(self.config['subgrader'].check, answers, student_list)
+            input_list = padded_find_optimal_order(self.config['subgrader'].check,
+                                                   answers,
+                                                   student_list)
 
-        grade_decimals = [g['grade_decimal'] for g in input_list]
-        grade_decimal = consolidate_grades(grade_decimals, len(answers))
-        if not self.config['partial_credit']:
-            if grade_decimal < 1:
-                grade_decimal = 0
-        ok_status = self.grade_decimal_to_ok(grade_decimal)
-
-        result = {
-            'grade_decimal': grade_decimal,
-            'ok': ok_status,
-            'msg': '\n'.join([result['msg'] for result in input_list if result['msg'] != ''])
-        }
+        result = consolidate_cfn_return(input_list,
+                                        n_expect=len(answers),
+                                        partial_credit=self.config['partial_credit'])
 
         return result

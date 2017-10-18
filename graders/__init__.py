@@ -11,6 +11,7 @@ Copyright 2017 Jolyon Bloomfield and Chris Chudzicki
 from graders.stringgrader import *
 from graders.listgrader import *
 from graders.formulagrader import *
+from graders.baseclasses import ConfigError
 
 def import_plugins():
     """Imports all plugins into the global namespace"""
