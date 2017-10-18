@@ -102,9 +102,9 @@ If you find yourself wanting to nest ListGraders, then you will need to specify 
 ```python
 grader = ListGrader(
     answers=[
-        ['cat', 1],
-        ['dog', 2],
-        ['tiger', 3]
+        ['cat', '1'],
+        ['dog', '2'],
+        ['tiger', '3']
     ],
     subgrader=ListGrader(
         subgrader=[StringGrader(), NumericalGrader()]
@@ -141,8 +141,8 @@ Our last pair of examples are for a math class, where we have a matrix that has 
 ```python
 grader = ListGrader(
     answers=[
-        [1, ([1, 0], [-1, 0])],
-        [-1, ([0, 1], [0, -1])],
+        ['1', (['1', '0'], ['-1', '0'])],
+        ['-1', (['0', '1'], ['0', '-1'])],
     ],
     subgrader=ListGrader(
         subgrader=[
@@ -164,8 +164,8 @@ It is possible to specify a grouping on a nested `ListGrader`. The outer `ListGr
 ```python
 grader = ListGrader(
     answers=[
-        [1, ([1, 0], [-1, 0])],
-        [-1, ([0, 1], [0, -1])],
+        ['1', (['1', '0'], ['-1', '0'])],
+        ['-1', (['0', '1'], ['0', '-1'])],
     ],
     subgrader=ListGrader(
         subgrader=[
