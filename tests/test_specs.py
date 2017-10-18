@@ -17,11 +17,11 @@ def test_eigensystem():
             ['1', (['1', '0'], ['-1', '0'])],
             ['-1', (['0', '1'], ['0', '-1'])],
         ],
-        subgrader=ListGrader(
-            subgrader=[
+        subgraders=ListGrader(
+            subgraders=[
                 FormulaGrader(),
                 ListGrader(
-                    subgrader=FormulaGrader()
+                    subgraders=FormulaGrader()
                 )
             ],
             ordered=True,
