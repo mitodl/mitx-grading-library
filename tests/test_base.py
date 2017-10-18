@@ -22,7 +22,7 @@ def test_debug():
 
     grader = ListGrader(
         answers=['cat', 'dog', 'unicorn'],
-        subgraders=StringGrader(),
+        subgrader=StringGrader(),
         debug=True
     )
     expected_result = {
