@@ -248,28 +248,6 @@ def add_defaults(variables,
 
     return (all_variables, all_functions)
 
-class ParserCache(object):
-    """Stores the parser trees for formula strings for reuse"""
-
-    def __init__(self):
-        """Initializes the cache"""
-        self.cache = {}
-
-    def get_parser(self, formula, case_sensitive):
-        """Get a ParseAugmenter object for a given formula"""
-        # Check if it's in the cache
-        if (formula, case_sensitive) in self.cache:
-            return self.cache[(formula, case_sensitive)]
-        # It's not, so construct it
-        parser = ParseAugmenter(formula, case_sensitive)
-        parser.parse_algebra()
-        # Save it!
-        self.cache[(formula, case_sensitive)] = parser
-        # And return it
-        return parser
-
-# The global parser cache
-parsercache = ParserCache()
 
 def evaluator(variables,
     functions,
@@ -289,7 +267,8 @@ def evaluator(variables,
         return float('nan')
 
     # Parse the tree.
-    math_interpreter = parsercache.get_parser(math_expr, case_sensitive)
+    math_interpreter = ParseAugmenter(math_expr, case_sensitive)
+    math_interpreter.parse_algebra()
 
     # Get our variables together.
     all_variables, all_functions = add_defaults(variables,
