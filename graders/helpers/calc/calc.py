@@ -257,15 +257,17 @@ class ParserCache(object):
 
     def get_parser(self, formula, case_sensitive):
         """Get a ParseAugmenter object for a given formula"""
+        # Construct the key
+        key = (formula, case_sensitive)
         # Check if it's in the cache
-        if (formula, case_sensitive) in self.cache:
-            return self.cache[(formula, case_sensitive)]
+        parser = self.cache.get(key, None)
+        if parser is not None:
+            return parser
         # It's not, so construct it
         parser = ParseAugmenter(formula, case_sensitive)
         parser.parse_algebra()
-        # Save it!
-        self.cache[(formula, case_sensitive)] = parser
-        # And return it
+        # Save it for later use before returning it
+        self.cache[key] = parser
         return parser
 
 # The global parser cache
