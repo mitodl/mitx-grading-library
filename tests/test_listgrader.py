@@ -480,3 +480,34 @@ def test_multiple_nestingAnd_groups():
         ]
     }
     assert grader(None, submission) == expected
+
+def test_nested_grouping_ordered():
+    """Test that ordered nested groupings work appropriately"""
+    grader = ListGrader(
+        answers=[
+            ['0', '1'],
+            ['2', '3'],
+        ],
+        subgraders=ListGrader(
+            subgraders=FormulaGrader(),
+            ordered=True
+        ),
+        grouping=[1, 1, 2, 2]
+    )
+
+    def expect(a, b, c, d):
+        return {
+            'input_list': [
+                {'grade_decimal': a, 'msg': '', 'ok': a==1},
+                {'grade_decimal': b, 'msg': '', 'ok': b==1},
+                {'grade_decimal': c, 'msg': '', 'ok': c==1},
+                {'grade_decimal': d, 'msg': '', 'ok': d==1}
+            ],
+            'overall_message': ''
+        }
+    assert grader(None, ['0', '1', '2', '3']) == expect(1, 1, 1, 1)
+    assert grader(None, ['1', '0', '3', '2']) == expect(0, 0, 0, 0)
+    assert grader(None, ['2', '3', '0', '1']) == expect(1, 1, 1, 1)
+    assert grader(None, ['3', '2', '1', '0']) == expect(0, 0, 0, 0)
+    assert grader(None, ['1', '3', '2', '0']) == expect(0, 1, 0, 0)
+    assert grader(None, ['0', '2', '3', '1']) == expect(1, 0, 0, 0)

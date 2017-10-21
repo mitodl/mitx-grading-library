@@ -232,19 +232,12 @@ class ListGrader(AbstractGrader):
         self.config['answers'] = self.schema_answers(self.config['answers'])
 
         # Step 3: Validate the grouping
-        # Start by obtaining the grouping list
         if self.config['grouping']:
-            self.grouping = self.config['grouping']
-        elif self.config['ordered'] and not self.config['grouping']:
-            # Treat an ordered list of answers by using grouping
-            self.grouping = [i for i in range(1, len(self.config['answers'][0]) + 1)]
+            # Create the grouping dictionary
+            self.grouping = self.create_grouping_map(self.config['grouping'])
+            self.validate_grouping()
         else:
             self.grouping = None
-        # If we have a grouping list, construct the grouping map and validate
-        if self.grouping:
-            # Create the grouping dictionary
-            self.grouping = self.create_grouping_map(self.grouping)
-            self.validate_grouping()
 
     def schema_answers(self, answers_tuple):
         """
