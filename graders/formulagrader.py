@@ -20,7 +20,7 @@ import random
 import numpy as np
 from graders.baseclasses import ObjectWithSchema, ItemGrader, ConfigError
 from graders.helpers import calc
-from graders.helpers.calc import UndefinedVariable, UndefinedFunction
+from graders.helpers.calc import UndefinedVariable, UndefinedFunction, UnmatchedParentheses
 from graders.helpers.validatorfuncs import (Positive, NonNegative, PercentageString,
                                             NumberRange, ListOfType, is_callable)
 from graders.voluptuous import Schema, Required, Any, All
@@ -640,3 +640,8 @@ class FormulaGrader(NumericalGrader):
             if valid_var:
                 message += " (did you forget to use * for multiplication?)"
             raise UndefinedFunction(message)
+        except UnmatchedParentheses as e:
+            countL = student_input.count("(")
+            countR = student_input.count(")")
+            msg = "Invalid Input: Parentheses are unmatched ({} opening vs {} closing)"
+            raise UnmatchedParentheses(msg.format(countL, countR))
