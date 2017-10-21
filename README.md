@@ -40,13 +40,13 @@ The basic pattern is the following.
 
 ```xml
 <script type="text/python" system_path="python_lib">
-import graders
-mygrader = GraderType(
+from graders import *
+grader = GraderType(
     [configuration]
 )
 </script>
 
-<customresponse cfn="mygrader">
+<customresponse cfn="grader">
     <textline/>
 </customresponse>
 ```
@@ -57,13 +57,13 @@ Here is an example where we use a StringGrader with answer `cat`.
 
 ```xml
 <script type="text/python" system_path="python_lib">
-import graders
-mygrader = StringGrader(
+from graders import *
+grader = StringGrader(
     answers='cat'
 )
 </script>
 
-<customresponse cfn="mygrader">
+<customresponse cfn="grader">
     <textline/>
 </customresponse>
 ```
@@ -72,14 +72,14 @@ Here is another example where we use a ListGrader to grade two numbers in an uno
 
 ```xml
 <script type="text/python" system_path="python_lib">
-import graders
-mygrader = ListGrader(
+from graders import *
+grader = ListGrader(
     answers=['1', '2']
     subgrader=FormulaGrader()
 )
 </script>
 
-<customresponse cfn="mygrader">
+<customresponse cfn="grader">
     <textline/>
     <textline/>
 </customresponse>
