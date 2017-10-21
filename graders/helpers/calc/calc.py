@@ -99,6 +99,13 @@ class UndefinedFunction(Exception):
     pass
 
 
+class UnmatchedParentheses(Exception):
+    """
+    Indicate when a student's input has unmatched parentheses.
+    """
+    pass
+
+
 def lower_dict(input_dict):
     """
     Convert all keys in a dictionary to lowercase; keep their original values.
@@ -257,6 +264,9 @@ class ParserCache(object):
 
     def get_parser(self, formula, case_sensitive):
         """Get a ParseAugmenter object for a given formula"""
+        # Check the formula for matching parentheses
+        if formula.count("(") != formula.count(")"):
+            raise UnmatchedParentheses()
         # Construct the key
         key = (formula, case_sensitive)
         # Check if it's in the cache

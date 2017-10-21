@@ -1,6 +1,8 @@
-"""Standalone validator functions for use in voluptuous Schema."""
-
-from ..voluptuous import All, Range, NotIn, Invalid
+"""
+Stand-alone validator functions for use in voluptuous Schema
+"""
+from numbers import Number
+from graders.voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
 
 def Positive(thetype):
     if thetype==int:
@@ -23,3 +25,52 @@ def PercentageString(value):
                 pass
 
     raise Invalid("Not a percentage string.")
+
+def number_range_alternate(number_type=Number):
+    """
+    Validator function that coerces a list [start, stop] into a dictionary
+    Uses specific type number_type
+    """
+    def validatorfunc(config_as_list):
+        alternate_form = Schema(All(
+            [number_type, number_type],
+            Length(min=2, max=2)
+        ))
+        config_as_list = alternate_form(config_as_list)
+        return {'start': config_as_list[0], 'stop': config_as_list[1]}
+    return validatorfunc
+
+def NumberRange(number_type=Number):
+    """
+    Schema that allows for a start and stop, or alternatively, a list [start, stop]
+    The type of number can be restricted by specifying number_type=int, for example
+    """
+    return Schema(Any(
+        {
+            Required('start', default=1): number_type,
+            Required('stop', default=5): number_type
+        },
+        number_range_alternate(number_type)
+    ))
+
+def ListOfType(given_type, validator=None):
+    """
+    Validator that allows for a single given_type or a list of given_type.
+    Also allows an extra validator to be applied to each item in the resulting list.
+    """
+    def func(config_input):
+        # Wrap an individual given_type in a list
+        if not isinstance(config_input, list):
+            config_input = [config_input]
+        # Apply the schema
+        if validator:
+            schema = Schema(All([given_type], Length(min=1), [validator]))
+        else:
+            schema = Schema(All([given_type], Length(min=1)))
+        return schema(config_input)
+    return func
+
+@truth
+def is_callable(obj):
+    """Returns true if obj is callable"""
+    return callable(obj)
