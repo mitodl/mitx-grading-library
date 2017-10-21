@@ -1,17 +1,17 @@
-# Downloaded from https://github.com/edx/edx-platform/tree/4697aab44346e8573cae4e934f338300b8a5fded/common/lib/calc/calc
-# MODIDFIED to handle matrices
 """
-Parser and evaluator for FormulaResponse and NumericalResponse
+calc.py
 
-Uses pyparsing to parse. Main function as of now is evaluator().
+Parser and evaluator for mathematical expressions.
+
+Uses pyparsing to parse. Main function is evaluator().
+
+Based on the edX calc.py, but heavily modified.
 """
-
-import math
+from __future__ import division
 import numbers
 import operator
+import numpy as np
 
-import numpy
-import scipy.constants
 from pyparsing import (
     CaselessLiteral,
     Combine,
@@ -29,61 +29,6 @@ from pyparsing import (
     nums,
     stringEnd
 )
-
-import functions
-
-DEFAULT_FUNCTIONS = {
-    'sin': numpy.sin,
-    'cos': numpy.cos,
-    'tan': numpy.tan,
-    'sec': functions.sec,
-    'csc': functions.csc,
-    'cot': functions.cot,
-    'sqrt': numpy.sqrt,
-    'log10': numpy.log10,
-    'log2': numpy.log2,
-    'ln': numpy.log,
-    'exp': numpy.exp,
-    'arccos': numpy.arccos,
-    'arcsin': numpy.arcsin,
-    'arctan': numpy.arctan,
-    'arcsec': functions.arcsec,
-    'arccsc': functions.arccsc,
-    'arccot': functions.arccot,
-    'abs': numpy.abs,
-    'fact': math.factorial,
-    'factorial': math.factorial,
-    'sinh': numpy.sinh,
-    'cosh': numpy.cosh,
-    'tanh': numpy.tanh,
-    'sech': functions.sech,
-    'csch': functions.csch,
-    'coth': functions.coth,
-    'arcsinh': numpy.arcsinh,
-    'arccosh': numpy.arccosh,
-    'arctanh': numpy.arctanh,
-    'arcsech': functions.arcsech,
-    'arccsch': functions.arccsch,
-    'arccoth': functions.arccoth,
-}
-DEFAULT_VARIABLES = {
-    'i': numpy.complex(0, 1),
-    'j': numpy.complex(0, 1),
-    'e': numpy.e,
-    'pi': numpy.pi
-}
-
-# We eliminated the following extreme suffixes:
-#   P (1e15), E (1e18), Z (1e21), Y (1e24),
-#   f (1e-15), a (1e-18), z (1e-21), y (1e-24)
-# since they're rarely used, and potentially confusing.
-# They may also conflict with variables if we ever allow e.g.
-#   5R instead of 5*R
-SUFFIXES = {
-    '%': 0.01, 'k': 1e3, 'M': 1e6, 'G': 1e9, 'T': 1e12,
-    'c': 1e-2, 'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12
-}
-
 
 class UndefinedVariable(Exception):
     """
@@ -106,41 +51,11 @@ class UnmatchedParentheses(Exception):
     pass
 
 
-def lower_dict(input_dict):
-    """
-    Convert all keys in a dictionary to lowercase; keep their original values.
-
-    Keep in mind that it is possible (but not useful?) to define different
-    variables that have the same lowercase representation. It would be hard to
-    tell which is used in the final dict and which isn't.
-    """
-    return {k.lower(): v for k, v in input_dict.iteritems()}
-
-
 # The following few functions define evaluation actions, which are run on lists
 # of results from each parse component. They convert the strings and (previously
 # calculated) numbers into the number that component represents.
 
-algebraic = (numbers.Number, numpy.matrix)
-
-def super_float(text):
-    """
-    Like float, but with SI extensions. 1k goes to 1000.
-    """
-    if text[-1] in SUFFIXES:
-        return float(text[:-1]) * SUFFIXES[text[-1]]
-    else:
-        return float(text)
-
-
-def eval_number(parse_result):
-    """
-    Create a float out of its string parts.
-
-    e.g. [ '7.13', 'e', '3' ] ->  7130
-    Calls super_float above.
-    """
-    return super_float("".join(parse_result))
+algebraic = (numbers.Number, np.matrix)
 
 
 def eval_atom(parse_result):
@@ -166,6 +81,7 @@ def eval_power(parse_result):
         [k for k in parse_result
          if isinstance(k, algebraic)]  # Ignore the '^' marks.
     )
+
     # Having reversed it, raise `b` to the power of `a`.
     def robust_pow(b, a):
         try:
@@ -173,7 +89,8 @@ def eval_power(parse_result):
             return b**a
         except ValueError:
             # scimath.power is componentwise power on matrices, hence above try
-            return numpy.lib.scimath.power(b,a)
+            return np.lib.scimath.power(b, a)
+
     power = reduce(lambda a, b: robust_pow(b, a), parse_result)
 
     return power
@@ -236,25 +153,6 @@ def eval_product(parse_result):
     return prod
 
 
-def add_defaults(variables,
-                functions,
-                case_sensitive,
-                default_variables={},
-                default_functions={}):
-    """
-    Create dictionaries with both the default and user-defined variables.
-    """
-    all_variables = dict(default_variables)
-    all_functions = dict(default_functions)
-    all_variables.update(variables)
-    all_functions.update(functions)
-
-    if not case_sensitive:
-        all_variables = lower_dict(all_variables)
-        all_functions = lower_dict(all_functions)
-
-    return (all_variables, all_functions)
-
 class ParserCache(object):
     """Stores the parser trees for formula strings for reuse"""
 
@@ -262,20 +160,27 @@ class ParserCache(object):
         """Initializes the cache"""
         self.cache = {}
 
-    def get_parser(self, formula, case_sensitive):
+    def get_parser(self, formula, case_sensitive, suffixes):
         """Get a ParseAugmenter object for a given formula"""
         # Check the formula for matching parentheses
         if formula.count("(") != formula.count(")"):
             raise UnmatchedParentheses()
+
         # Construct the key
-        key = (formula, case_sensitive)
+        suffixstr = ""
+        for key in suffixes:
+            suffixstr += key
+        key = (formula, case_sensitive, ''.join(sorted(suffixstr)))
+
         # Check if it's in the cache
         parser = self.cache.get(key, None)
         if parser is not None:
             return parser
+
         # It's not, so construct it
-        parser = ParseAugmenter(formula, case_sensitive)
+        parser = ParseAugmenter(formula, case_sensitive, suffixes)
         parser.parse_algebra()
+
         # Save it for later use before returning it
         self.cache[key] = parser
         return parser
@@ -283,12 +188,8 @@ class ParserCache(object):
 # The global parser cache
 parsercache = ParserCache()
 
-def evaluator(variables,
-    functions,
-    math_expr,
-    case_sensitive=False,
-    default_variables={},
-    default_functions={}):
+
+def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
     """
     Evaluate an expression; that is, take a string of math and return a float.
 
@@ -296,33 +197,47 @@ def evaluator(variables,
      python numbers.
     -Unary functions are passed as a dictionary from string to function.
     """
-    # No need to go further.
-    if math_expr.strip() == "":
+    formula = formula.strip()
+    if formula == "":
+        # No need to go further.
         return float('nan')
 
-    # Parse the tree.
-    math_interpreter = parsercache.get_parser(math_expr, case_sensitive)
+    # Parse the tree
+    math_interpreter = parsercache.get_parser(formula, case_sensitive, suffixes)
 
-    # Get our variables together.
-    all_variables, all_functions = add_defaults(variables,
-                                                 functions,
-                                                 case_sensitive,
-                                                 default_variables,
-                                                 default_functions)
+    # If we're not case sensitive, then lower all variables and functions
+    if not case_sensitive:
+        # Also make the variables and functions lower case
+        variables = {key.lower(): value for key, value in variables.iteritems()}
+        functions = {key.lower(): value for key, value in functions.iteritems()}
 
-    # ...and check them
-    math_interpreter.check_variables(all_variables, all_functions)
+    # Check the variables and functions
+    math_interpreter.check_variables(variables, functions)
 
-    # Create a recursion to evaluate the tree.
+    # Some helper functions...
     if case_sensitive:
         casify = lambda x: x
     else:
-        casify = lambda x: x.lower()  # Lowercase for case insens.
+        casify = lambda x: x.lower()  # Lowercase for case insensitive
 
+    def eval_number(parse_result):
+        """
+        Create a float out of string parts
+        Applies suffixes appropriately
+        e.g. [ '7.13', 'e', '3' ] ->  7130
+        ['5', '%'] -> 0.05
+        """
+        text = "".join(parse_result)
+        if text[-1] in suffixes:
+            return float(text[:-1]) * suffixes[text[-1]]
+        else:
+            return float(text)
+
+    # Create a recursion to evaluate the tree
     evaluate_actions = {
         'number': eval_number,
-        'variable': lambda x: all_variables[casify(x[0])],
-        'function': lambda x: all_functions[casify(x[0])](x[1]),
+        'variable': lambda x: variables[casify(x[0])],
+        'function': lambda x: functions[casify(x[0])](x[1]),
         'atom': eval_atom,
         'power': eval_power,
         'parallel': eval_parallel,
@@ -330,7 +245,8 @@ def evaluator(variables,
         'sum': eval_sum
     }
 
-    return math_interpreter.reduce_tree(evaluate_actions)
+    # Return the result of the evaluation, as well as the set of functions used
+    return math_interpreter.reduce_tree(evaluate_actions), math_interpreter.functions_used
 
 
 class ParseAugmenter(object):
@@ -341,7 +257,7 @@ class ParseAugmenter(object):
     around method to method.
     Eventually holds the parse tree and sets of variables as well.
     """
-    def __init__(self, math_expr, case_sensitive=False):
+    def __init__(self, math_expr, case_sensitive, suffixes):
         """
         Create the ParseAugmenter for a given math expression string.
 
@@ -352,23 +268,19 @@ class ParseAugmenter(object):
         self.tree = None
         self.variables_used = set()
         self.functions_used = set()
+        self.suffixes = suffixes
 
-        def vpa(tokens):
-            """
-            When a variable is recognized, store it in `variables_used`.
-            """
-            varname = tokens[0][0]
-            self.variables_used.add(varname)
+    def variable_parse_action(self, tokens):
+        """
+        When a variable is recognized, store it in `variables_used`.
+        """
+        self.variables_used.add(tokens[0][0])
 
-        def fpa(tokens):
-            """
-            When a function is recognized, store it in `functions_used`.
-            """
-            varname = tokens[0][0]
-            self.functions_used.add(varname)
-
-        self.variable_parse_action = vpa
-        self.function_parse_action = fpa
+    def function_parse_action(self, tokens):
+        """
+        When a function is recognized, store it in `functions_used`.
+        """
+        self.functions_used.add(tokens[0][0])
 
     def parse_algebra(self):
         """
@@ -388,8 +300,8 @@ class ParseAugmenter(object):
         # pyparsing allows spaces between tokens--`Combine` prevents that.
         inner_number = Combine(inner_number)
 
-        # SI suffixes and percent.
-        number_suffix = MatchFirst(Literal(k) for k in SUFFIXES.keys())
+        # Apply suffixes
+        number_suffix = MatchFirst(Literal(k) for k in self.suffixes.keys())
 
         # 0.33k or 17
         plus_minus = Literal('+') | Literal('-')
@@ -411,6 +323,8 @@ class ParseAugmenter(object):
         varname.setParseAction(self.variable_parse_action)
 
         # Same thing for functions.
+        # TODO I think we can allow for primes in function names by adding an extra bit
+        # after inner_varname that is just Word("'")?
         function = Group(inner_varname + Suppress("(") + expr + Suppress(")"))("function")
         function.setParseAction(self.function_parse_action)
 
@@ -474,9 +388,8 @@ class ParseAugmenter(object):
 
     def check_variables(self, valid_variables, valid_functions):
         """
-        Confirm that all the variables used in the tree are valid/defined.
-
-        Otherwise, raise an UndefinedVariable containing all bad variables.
+        Confirm that all the variables and functions used in the tree are defined.
+        Otherwise, raise an UndefinedVariable or UndefinedFunction
         """
         if self.case_sensitive:
             casify = lambda x: x
