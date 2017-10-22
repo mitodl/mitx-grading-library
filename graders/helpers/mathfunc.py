@@ -138,7 +138,7 @@ METRIC_SUFFIXES = {
 
 def within_tolerance(x, y, tolerance):
     """
-    Check that |x-y| <= tolerance or hard_tolerance with appropriate norm.
+    Check that |x-y| <= tolerance with appropriate norm.
 
     Args:
         x: number or array (np array_like)
