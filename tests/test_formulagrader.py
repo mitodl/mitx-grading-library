@@ -283,6 +283,37 @@ def test_ng_metric():
     assert grader(None, "0.02")['ok']
     assert grader(None, "20m")['ok']
 
+def test_ng_userfunction():
+    """Test NumericalGrader with user-defined functions"""
+    grader = NumericalGrader(
+        answers="sin(0.4)/cos(0.4)",
+        user_functions={"hello": np.tan}
+    )
+    assert grader(None, "hello(0.4)")['ok']
+    assert grader(None, "sin(0.4)/cos(0.4)")['ok']
+
+    # Test with function names with primes at the end
+    grader = NumericalGrader(
+        answers="sin(0.4)/cos(0.4)",
+        user_functions={"f'": np.tan}
+    )
+    assert grader(None, "f'(0.4)")['ok']
+
+    grader = NumericalGrader(
+        answers="sin(0.4)/cos(0.4)",
+        user_functions={"function2name_2go''''''": np.tan}
+    )
+    assert grader(None, "function2name_2go''''''(0.4)")['ok']
+
+    # Primes aren't allowed in the middle
+    expect = "Invalid Input: Could not parse 'that'sbad\(1\)' as a formula"
+    with raises(InvalidInput, match=expect):
+        grader = NumericalGrader(
+            answers="1",
+            user_functions={"that'sbad": np.tan}
+        )
+        grader(None, "that'sbad(1)")
+
 def test_ng_blackwhite():
     """Test NumericalGrader with blacklists and whitelists"""
     grader = NumericalGrader(
