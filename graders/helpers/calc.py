@@ -163,8 +163,22 @@ class ParserCache(object):
     def get_parser(self, formula, case_sensitive, suffixes):
         """Get a ParseAugmenter object for a given formula"""
         # Check the formula for matching parentheses
-        if formula.count("(") != formula.count(")"):
-            raise UnmatchedParentheses()
+        count = 0
+        delta = {
+            '(': +1,
+            ')': -1
+        }
+        for index, char in enumerate(formula):
+            if char in delta:
+                count += delta[char]
+                if count < 0:
+                    msg = "Invalid Input: A closing parenthesis was found after segment " + \
+                          "{}, but there is no matching opening parenthesis before it."
+                    raise UnmatchedParentheses(msg.format(formula[0:index]))
+        if count > 0:
+            msg = "Invalid Input: Parentheses are unmatched. " + \
+                  "{} parentheses were opened but never closed."
+            raise UnmatchedParentheses(msg.format(count))
 
         # Construct the key
         suffixstr = ""

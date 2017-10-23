@@ -356,7 +356,7 @@ class NumericalGrader(ItemGrader):
     """
     Grades mathematical expressions.
 
-    Similar to edX formularesponse but much more flexible. Allows author to white/blacklist
+    Similar to edX numericalresponse but much more flexible. Allows author to white/blacklist
     functions, as well as specify user functions and forbidden strings.
     A flag for metric affixes is provided.
     """
@@ -367,11 +367,13 @@ class NumericalGrader(ItemGrader):
         # Construct the default ItemGrader schema
         schema = super(NumericalGrader, self).schema_config
         # Append options
+        forbidden_default = "Invalid Input: This particular answer is forbidden"
         return schema.extend({
             Required('user_functions', default={}): {Extra: is_callable},
             Required('blacklist', default=[]): [str],
-            Required('whitelist', default=[]): [str],
+            Required('whitelist', default=[]): [Any(str, None)],
             Required('forbidden_strings', default=[]): [str],
+            Required('forbidden_message', default=forbidden_default): str,
             Required('required_functions', default=[]): [str],
             Required('tolerance', default='0.1%'): Any(Positive(Number), PercentageString),
             Required('case_sensitive', default=True): bool,
@@ -386,37 +388,51 @@ class NumericalGrader(ItemGrader):
         """
         super(NumericalGrader, self).__init__(config, **kwargs)
 
-        # Construct the function list
-        if self.config["whitelist"]:
-            if self.config["blacklist"]:
+        self.functions = self.construct_functions(self.config["whitelist"],
+                                                  self.config["blacklist"],
+                                                  self.config["user_functions"])
+        self.variables = DEFAULT_VARIABLES.copy()   # Just use the defaults
+        self.suffixes = self.construct_suffixes(self.config["metric_suffixes"])
+
+    @staticmethod
+    def construct_functions(whitelist, blacklist, user_funcs):
+        """Returns the list of available functions, based on the given configuration"""
+        if whitelist:
+            if blacklist:
                 raise ConfigError("Cannot whitelist and blacklist at the same time")
 
-            self.functions = {}
-            for f in self.config["whitelist"]:
+            functions = {}
+            for f in whitelist:
+                if f is None:
+                    # This allows for you to have whitelist = [None], which removes
+                    # all functions from the function list
+                    continue
                 try:
-                    self.functions[f] = DEFAULT_FUNCTIONS[f]
+                    functions[f] = DEFAULT_FUNCTIONS[f]
                 except KeyError:
                     raise ConfigError("Unknown function in whitelist: " + f)
         else:
             # Treat no blacklist as blacklisted with an empty list
-            self.functions = DEFAULT_FUNCTIONS.copy()
-            for f in self.config["blacklist"]:
+            functions = DEFAULT_FUNCTIONS.copy()
+            for f in blacklist:
                 try:
-                    del self.functions[f]
+                    del functions[f]
                 except KeyError:
                     raise ConfigError("Unknown function in blacklist: " + f)
 
         # Add in any custom functions
-        for f in self.config["user_functions"]:
-            self.functions[f] = self.config["user_functions"][f]
+        for f in user_funcs:
+            functions[f] = user_funcs[f]
 
-        # We just use the default list of variables
-        self.variables = DEFAULT_VARIABLES.copy()
+        return functions
 
-        # Construct the list of suffixes
-        self.suffixes = DEFAULT_SUFFIXES.copy()
-        if self.config["metric_suffixes"]:
-            self.suffixes.update(METRIC_SUFFIXES)
+    @staticmethod
+    def construct_suffixes(metric=False):
+        """Returns the list of available suffixes, based on the given configuration"""
+        suffixes = DEFAULT_SUFFIXES.copy()
+        if metric:
+            suffixes.update(METRIC_SUFFIXES)
+        return suffixes
 
     def check_response(self, answer, student_input):
         """Check the student response against a given answer"""
@@ -426,7 +442,7 @@ class NumericalGrader(ItemGrader):
             check = student_input if self.config["case_sensitive"] else student_input.lower()
             if forbid in check:
                 # Don't give away the specific string that is being checked for!
-                raise InvalidInput("Invalid Input: This particular answer is forbidden")
+                raise InvalidInput(self.config["forbidden_message"])
 
         # Now perform the computations
         try:
@@ -445,11 +461,9 @@ class NumericalGrader(ItemGrader):
                 message += " (did you forget to use * for multiplication?)"
             raise UndefinedFunction(message.format(varname=funcnames))
 
-        except UnmatchedParentheses as e:
-            countL = student_input.count("(")
-            countR = student_input.count(")")
-            msg = "Invalid Input: Parentheses are unmatched ({} opening vs {} closing)"
-            raise UnmatchedParentheses(msg.format(countL, countR))
+        except UnmatchedParentheses:
+            # The error message is already written for this error
+            raise
 
         except ValueError as err:
             if 'factorial' in err.message:

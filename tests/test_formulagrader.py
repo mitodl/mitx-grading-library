@@ -206,7 +206,7 @@ def test_ng_expressions():
     assert not grader(None, "0.02+(cos(3/2) + sin(3/2))/cos(3/2 + 2*pi)")['ok']
 
 def test_ng_invalid_input():
-    grader = FormulaGrader(answers='2')
+    grader = NumericalGrader(answers='2')
 
     expect = 'Invalid Input: pi not permitted in answer as a function ' + \
              '\(did you forget to use \* for multiplication\?\)'
@@ -221,9 +221,14 @@ def test_ng_invalid_input():
     with raises(UndefinedVariable, match=expect):
         grader(None, "R")
 
-    expect = 'Invalid Input: Parentheses are unmatched \(1 opening vs 0 closing\)'
+    expect = 'Invalid Input: Parentheses are unmatched. 1 parentheses were opened but never closed.'
     with raises(UnmatchedParentheses, match=expect):
         grader(None, "5*(3")
+
+    expect = 'Invalid Input: A closing parenthesis was found after segment 5\*\(3\), but ' + \
+             'there is no matching opening parenthesis before it.'
+    with raises(UnmatchedParentheses, match=expect):
+        grader(None, "5*(3))")
 
     expect = "Invalid Input: Could not parse '5pp' as a formula"
     with raises(InvalidInput, match=expect):
@@ -345,6 +350,16 @@ def test_ng_blackwhite():
     expect = 'Invalid Input: TAN not permitted in answer as a function'
     with raises(UndefinedFunction, match=expect):
         grader(None, "TAN(0.4)")
+
+    grader = NumericalGrader(
+        answers="1",
+        whitelist=[None]
+    )
+    assert grader(None, "1")['ok']
+    expect = "Invalid Input: cos not permitted in answer as a function"
+    with raises(UndefinedFunction, match=expect):
+        grader(None, "cos(0)")
+    assert not grader.functions   # Check for an empty dictionary
 
     with raises(ConfigError, match="Cannot whitelist and blacklist at the same time"):
         NumericalGrader(
