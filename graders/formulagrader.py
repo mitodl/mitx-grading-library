@@ -569,15 +569,14 @@ class FormulaGrader(NumericalGrader):
     >>> grader(None, theinput)['ok']
     True
 
-    You can also provide specific values to use for any variable or function:
+    You can also provide specific functions using the user_functions key:
     >>> def square(x):
     ...     return x**2
     >>> grader = FormulaGrader(
     ...     answers='4*f(a)+b',
     ...     variables=['a','b'],
-    ...     random_functions=['f'],
-    ...     functions_from={
-    ...         'f': SpecificFunctions(square)
+    ...     user_functions={
+    ...         'f': square
     ...     }
     ... )
     >>> theinput = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = square
