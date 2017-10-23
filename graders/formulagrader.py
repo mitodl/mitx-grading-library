@@ -5,40 +5,49 @@ Classes for numerical and formula graders
 
 Also defines classes for sampling values
 * RealInterval
-* IntegerInterval
+* IntegerRange
+* DiscreteSet
 * ComplexRectangle
 * ComplexSector
-* SpecificValues
 and for specifying functions
 * SpecificFunctions
 * RandomFunction
 """
+from __future__ import division
 from numbers import Number
 import abc
-import math
 import random
 import numpy as np
 from graders.baseclasses import ObjectWithSchema, ItemGrader, ConfigError
-from graders.helpers import calc
-from graders.helpers.calc import UndefinedVariable, UndefinedFunction, UnmatchedParentheses
+from graders.voluptuous import Schema, Required, Any, All, Extra
+from graders.helpers.calc import (UndefinedVariable, UndefinedFunction,
+                                  UnmatchedParentheses, evaluator)
 from graders.helpers.validatorfuncs import (Positive, NonNegative, PercentageString,
-                                            NumberRange, ListOfType, is_callable)
-from graders.voluptuous import Schema, Required, Any, All
+                                            NumberRange, ListOfType, TupleOfType, is_callable)
+from graders.helpers.mathfunc import (DEFAULT_FUNCTIONS, DEFAULT_VARIABLES,
+                                      DEFAULT_SUFFIXES, METRIC_SUFFIXES, within_tolerance)
 
 # Set the objects to be imported from this grader
 __all__ = [
     "NumericalGrader",
     "FormulaGrader",
-    "ComplexRectangle",
     "RealInterval",
-    "IntegerInterval",
-    "UndefinedVariable",
-    "UndefinedFunction",
-    "SpecificValues",
+    "IntegerRange",
+    "DiscreteSet",
+    "ComplexRectangle",
+    "ComplexSector",
     "SpecificFunctions",
     "RandomFunction",
-    "ComplexSector"
+    "UndefinedVariable",
+    "UndefinedFunction",
+    "UnmatchedParentheses",
+    "InvalidInput"
 ]
+
+class InvalidInput(Exception):
+    """Handles special exceptions"""
+    pass
+
 
 class AbstractSamplingSet(ObjectWithSchema):  # pylint: disable=abstract-method
     """Represents a set from which random samples are taken."""
@@ -66,7 +75,7 @@ class FunctionSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-meth
     __metaclass__ = abc.ABCMeta
 
 
-class RealInterval(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+class RealInterval(VariableSamplingSet):
     """
     Represents an interval of real numbers from which to sample.
 
@@ -89,46 +98,65 @@ class RealInterval(VariableSamplingSet):  # pylint: disable=too-few-public-metho
     """
     schema_config = NumberRange()
 
+    def __init__(self, config=None, **kwargs):
+        """
+        Validate the specified configuration.
+        First apply the voluptuous validation.
+        Then ensure that the start and stop are the right way around.
+        """
+        super(RealInterval, self).__init__(config, **kwargs)
+        if self.config['start'] > self.config['stop']:
+            self.config['start'], self.config['stop'] = self.config['stop'], self.config['start']
+
     def gen_sample(self):
         """Returns a random real number in the range [start, stop]"""
         start, stop = self.config['start'], self.config['stop']
         return start + (stop - start) * np.random.random_sample()
 
 
-class IntegerInterval(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+class IntegerRange(VariableSamplingSet):
     """
     Represents an interval of integers from which to sample.
 
     Specify start and stop or [start, stop] to initialize.
 
-    Uses the pythonic idiom that start is included but stop is not.
+    Both start and stop are included in the interval.
 
     Usage
     =====
     Generate 5 random floats betweens -2 and 4
-    >>> integer = IntegerInterval(start=-2, stop=5)
+    >>> integer = IntegerRange(start=-2, stop=4)
     >>> integer.gen_sample() in list(range(-2,5))
     True
 
     You can also initialize with an interval:
-    >>> integer = IntegerInterval([-2,5])
+    >>> integer = IntegerRange([-2,4])
     >>> integer.gen_sample() in list(range(-2,5))
     True
 
     The default is start=1, stop=5:
-    >>> integer = IntegerInterval()
-    >>> integer.gen_sample() in list(range(1,5))
+    >>> integer = IntegerRange()
+    >>> integer.gen_sample() in list(range(1,6))
     True
     """
     schema_config = NumberRange(int)
 
+    def __init__(self, config=None, **kwargs):
+        """
+        Validate the specified configuration.
+        First apply the voluptuous validation.
+        Then ensure that the start and stop are the right way around.
+        """
+        super(IntegerRange, self).__init__(config, **kwargs)
+        if self.config['start'] > self.config['stop']:
+            self.config['start'], self.config['stop'] = self.config['stop'], self.config['start']
+
     def gen_sample(self):
         """Returns a random integer in range(start, stop)"""
-        start, stop = self.config['start'], self.config['stop']
-        return np.random.randint(low=start, high=stop)
+        return np.random.randint(low=self.config['start'], high=self.config['stop'] + 1)
 
 
-class ComplexRectangle(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+class ComplexRectangle(VariableSamplingSet):
     """
     Represents a rectangle in the complex plane from which to sample.
 
@@ -157,7 +185,7 @@ class ComplexRectangle(VariableSamplingSet):  # pylint: disable=too-few-public-m
         return self.re.gen_sample() + self.im.gen_sample()*1j
 
 
-class ComplexSector(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+class ComplexSector(VariableSamplingSet):
     """
     Represents an annular sector in the complex plane from which to sample,
     based on a given range of modulus and argument.
@@ -192,7 +220,8 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
     Generates a random well-behaved function on demand.
 
     Currently implemented as a sum of trigonometric functions with
-    random amplitude, frequency and phase.
+    random amplitude, frequency and phase. You can control the center and amplitude of
+    the resulting oscillations by specifying center and amplitude.
 
     Usage
     =====
@@ -215,7 +244,9 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
     schema_config = Schema({
         Required('input_dim', default=1): Positive(int),
         Required('output_dim', default=1): Positive(int),
-        Required('num_terms', default=3): Positive(int)
+        Required('num_terms', default=3): Positive(int),
+        Required('center', default=0): Number,
+        Required('amplitude', default=10): Positive(Number)
     })
 
     def gen_sample(self):
@@ -233,8 +264,8 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
         output_dim = self.config['output_dim']
         input_dim = self.config['input_dim']
         num_terms = self.config['num_terms']
-        # Amplitudes A range from 0.5 to 1.5
-        A = np.random.rand(output_dim, num_terms, input_dim) + 0.5
+        # Amplitudes A range from 0.5 to 1
+        A = np.random.rand(output_dim, num_terms, input_dim) / 2 + 0.5
         # Angular frequencies B range from -pi to pi
         B = 2 * np.pi * (np.random.rand(output_dim, num_terms, input_dim) - 0.5)
         # Phases C range from 0 to 2*pi
@@ -258,42 +289,48 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
             # fullsum = np.sum(output, axis=(1, 2))
             fullsum = np.sum(np.sum(output, axis=2), axis=1)
 
+            # Scale and translate to fit within center and amplitude
+            fullsum = fullsum * self.config["amplitude"] / self.config["num_terms"]
+            fullsum += self.config["center"]
+
             # Return the result
             return fullsum if output_dim > 1 else fullsum[0]
 
         return f
 
 
-class SpecificValues(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+class DiscreteSet(VariableSamplingSet):  # pylint: disable=too-few-public-methods
     """
     Represents a discrete set of values from which to sample.
 
-    Can be initialized with a single value or a non-empty list of values.
+    Can be initialized with a single value or a non-empty tuple of values.
+
+    Note that we use a tuple instead of a list so that [0,1] isn't confused with (0,1).
+    We would use a set, but unfortunately voluptuous doesn't work with sets.
 
     Usage
     =====
-    >>> values = SpecificValues(3.142)
+    >>> values = DiscreteSet(3.142)
     >>> values.gen_sample() == 3.142
     True
-    >>> values = SpecificValues([1,2,3,4])
-    >>> values.gen_sample() in [1,2,3,4]
+    >>> values = DiscreteSet((1,2,3,4))
+    >>> values.gen_sample() in (1,2,3,4)
     True
     """
 
-    # Take in an individual or list of numbers
-    schema_config = Schema(ListOfType(Number))
+    # Take in an individual or tuple of numbers
+    schema_config = Schema(TupleOfType(Number))
 
     def gen_sample(self):
-        """Return a random entry from the given list"""
+        """Return a random entry from the given set"""
         return random.choice(self.config)
 
 
 class SpecificFunctions(FunctionSamplingSet):  # pylint: disable=too-few-public-methods
     """
-    Represents user-defined functions for use in a grader.
-
-    If desired, multiple functions can be provided in a list, and a random
-    function will be selected when needed.
+    Represents a set of user-defined functions for use in a grader, one of which will
+    be randomly selected. A single function can be provided here, but this is intended
+    for lists of functions to be randomly sampled from.
 
     Usage
     =====
@@ -316,118 +353,197 @@ class SpecificFunctions(FunctionSamplingSet):  # pylint: disable=too-few-public-
 
 
 class NumericalGrader(ItemGrader):
-    """Class that grades numerical input and expressions"""
+    """
+    Grades mathematical expressions.
 
-    # The scimath variants have flexible domain. For example:
-    #   np.sqrt(-4+0j) = 2j
-    #   np.sqrt(-4) = nan, but
-    #   np.lib.scimath.sqrt(-4) = 2j
-    DEFAULT_FUNCTIONS = {
-        'sin': np.sin,
-        'cos': np.cos,
-        'tan': np.tan,
-        'sec': calc.functions.sec,
-        'csc': calc.functions.csc,
-        'cot': calc.functions.cot,
-        'sqrt': np.lib.scimath.sqrt,
-        'log10': np.lib.scimath.log10,
-        'log2': np.lib.scimath.log2,
-        'ln': np.lib.scimath.log,
-        'exp': np.exp,
-        'arccos': np.lib.scimath.arccos,
-        'arcsin': np.lib.scimath.arcsin,
-        'arctan': np.arctan,
-        'arcsec': calc.functions.arcsec,
-        'arccsc': calc.functions.arccsc,
-        'arccot': calc.functions.arccot,
-        'abs': np.abs,
-        'fact': math.factorial,
-        'factorial': math.factorial,
-        'sinh': np.sinh,
-        'cosh': np.cosh,
-        'tanh': np.tanh,
-        'sech': calc.functions.sech,
-        'csch': calc.functions.csch,
-        'coth': calc.functions.coth,
-        'arcsinh': np.arcsinh,
-        'arccosh': np.arccosh,
-        'arctanh': np.lib.scimath.arctanh,
-        'arcsech': calc.functions.arcsech,
-        'arccsch': calc.functions.arccsch,
-        'arccoth': calc.functions.arccoth,
-        # lambdas because sometimes np.real/imag returns an array,
-        're': lambda x: float(np.real(x)),
-        'im': lambda x: float(np.imag(x)),
-        'conj': np.conj,
-    }
-    DEFAULT_VARIABLES = {
-        'i': np.complex(0, 1),
-        'j': np.complex(0, 1),
-        'e': np.e,
-        'pi': np.pi
-    }
+    Similar to edX numericalresponse but much more flexible. Allows author to white/blacklist
+    functions, as well as specify user functions and forbidden strings.
+    A flag for metric affixes is provided.
+    """
+
+    @property
+    def schema_config(self):
+        """Define the configuration options for NumericalGrader"""
+        # Construct the default ItemGrader schema
+        schema = super(NumericalGrader, self).schema_config
+        # Append options
+        forbidden_default = "Invalid Input: This particular answer is forbidden"
+        return schema.extend({
+            Required('user_functions', default={}): {Extra: is_callable},
+            Required('blacklist', default=[]): [str],
+            Required('whitelist', default=[]): [Any(str, None)],
+            Required('forbidden_strings', default=[]): [str],
+            Required('forbidden_message', default=forbidden_default): str,
+            Required('required_functions', default=[]): [str],
+            Required('tolerance', default='0.1%'): Any(Positive(Number), PercentageString),
+            Required('case_sensitive', default=True): bool,
+            Required('metric_suffixes', default=False): bool
+        })
+
+    def __init__(self, config=None, **kwargs):
+        """
+        Validate the specified configuration.
+        First apply the voluptuous validation.
+        Next, construct the lists of functions, variables and suffixes.
+        """
+        super(NumericalGrader, self).__init__(config, **kwargs)
+
+        self.functions = self.construct_functions(self.config["whitelist"],
+                                                  self.config["blacklist"],
+                                                  self.config["user_functions"])
+        self.variables = DEFAULT_VARIABLES.copy()   # Just use the defaults
+        self.suffixes = self.construct_suffixes(self.config["metric_suffixes"])
 
     @staticmethod
-    def within_tolerance(x, y, tolerance, hard_tolerance=10e-6):
-        """Check that ||x-y||<tolerance or hard_tolerance with appropriate norm.
+    def construct_functions(whitelist, blacklist, user_funcs):
+        """Returns the list of available functions, based on the given configuration"""
+        if whitelist:
+            if blacklist:
+                raise ConfigError("Cannot whitelist and blacklist at the same time")
 
-        Args:
-            x: number or array (numpy array_like)
-            y: number or array (numpy array_like)
-            tolerance: Number or PercentageString
-            hard_tolerance: Number, default to 10e-6
+            functions = {}
+            for f in whitelist:
+                if f is None:
+                    # This allows for you to have whitelist = [None], which removes
+                    # all functions from the function list
+                    continue
+                try:
+                    functions[f] = DEFAULT_FUNCTIONS[f]
+                except KeyError:
+                    raise ConfigError("Unknown function in whitelist: " + f)
+        else:
+            # Treat no blacklist as blacklisted with an empty list
+            functions = DEFAULT_FUNCTIONS.copy()
+            for f in blacklist:
+                try:
+                    del functions[f]
+                except KeyError:
+                    raise ConfigError("Unknown function in blacklist: " + f)
 
-        Note:
-            The purpose of hard_tolerance is that if tolerance is specified as
-            a percentage and x is nearly zero, the calculated tolerance could
-            potential be smaller than Python's precision.
+        # Add in any custom functions
+        for f in user_funcs:
+            functions[f] = user_funcs[f]
 
-        Usage
-        =====
+        return functions
 
-        The tolerance can be a number:
-        >>> NumericalGrader.within_tolerance(10, 9.01, 1)
-        True
-        >>> NumericalGrader.within_tolerance(10, 9.01, 0.5)
-        False
+    @staticmethod
+    def construct_suffixes(metric=False):
+        """Returns the list of available suffixes, based on the given configuration"""
+        suffixes = DEFAULT_SUFFIXES.copy()
+        if metric:
+            suffixes.update(METRIC_SUFFIXES)
+        return suffixes
 
-        If tolerance is a percentage, it is a percent of (the norm of) x:
-        >>> NumericalGrader.within_tolerance(10, 9.01, '10%')
-        True
-        >>> NumericalGrader.within_tolerance(9.01, 10, '10%')
-        False
+    def check_response(self, answer, student_input):
+        """Check the student response against a given answer"""
+        # First, check for forbidden strings
+        # Remove whitespace so that students can't trick this check by adding any
+        check = student_input if self.config["case_sensitive"] else student_input.lower()
+        check = "".join([char for char in check if char != " "])
+        for x in self.config["forbidden_strings"]:
+            forbid = x if self.config["case_sensitive"] else x.lower()
+            if forbid in check:
+                # Don't give away the specific string that is being checked for!
+                raise InvalidInput(self.config["forbidden_message"])
 
-        Works for vectors and matrices:
-        >>> A = np.matrix([[1,2],[-3,1]])
-        >>> B = np.matrix([[1.1, 2], [-2.8, 1]])
-        >>> diff = round(np.linalg.norm(A-B), 6)
-        >>> diff
-        0.223607
-        >>> NumericalGrader.within_tolerance(A, B, 0.25)
-        True
-        """
-        # When used within graders, tolerance has already been
-        # validated as a Number or PercentageString
-        if isinstance(tolerance, str):
-            tolerance = np.linalg.norm(x) * float(tolerance[:-1]) * 0.01
+        # Now perform the computations
+        try:
+            return self.raw_check(answer, student_input)
 
-        return np.linalg.norm(x-y) < max(tolerance, hard_tolerance)
+        # And now for all of the things that could possibly have gone wrong...
+        except UndefinedVariable as e:
+            message = "Invalid Input: {varname} not permitted in answer as a variable"
+            raise UndefinedVariable(message.format(varname=str(e)))
+
+        except UndefinedFunction as e:
+            funcnames = e.args[0]
+            valid_var = e.args[1]
+            message = "Invalid Input: {varname} not permitted in answer as a function"
+            if valid_var:
+                message += " (did you forget to use * for multiplication?)"
+            raise UndefinedFunction(message.format(varname=funcnames))
+
+        except UnmatchedParentheses:
+            # The error message is already written for this error
+            raise
+
+        except ValueError as err:
+            if 'factorial' in err.message:
+                # This is thrown when fact() or factorial() is used
+                # that tests on negative and/or non-integer inputs
+                # err.message will be: `factorial() only accepts integral values` or
+                # `factorial() not defined for negative values`
+                raise InvalidInput("Error evaluating factorial() or fact() in input. "
+                                   "These functions can only be used on positive integers.")
+            elif self.config["debug"]:
+                # Check if debug mode is on
+                raise
+            else:
+                # Otherwise, give a generic error message
+                msg = "Invalid Input: Could not parse '{}' as a formula"
+                raise InvalidInput(msg.format(student_input))
+
+        except Exception as err:
+            # Reraise InvalidInput messages
+            if isinstance(err, InvalidInput):
+                raise
+            # Check if debug mode is on
+            if self.config["debug"]:
+                raise
+            # Otherwise, give a generic error message
+            msg = "Invalid Input: Could not parse '{}' as a formula"
+            raise InvalidInput(msg.format(student_input))
+
+    def raw_check(self, answer, student_input):
+        """Perform the numerical check of student_input vs answer"""
+        expected, _ = evaluator(formula=answer['expect'],
+                                case_sensitive=self.config['case_sensitive'],
+                                variables=self.variables,
+                                functions=self.functions,
+                                suffixes=self.suffixes)
+
+        student, used_funcs = evaluator(student_input,
+                                        case_sensitive=self.config['case_sensitive'],
+                                        variables=self.variables,
+                                        functions=self.functions,
+                                        suffixes=self.suffixes)
+
+        # Check that the required functions are used
+        for f in self.config["required_functions"]:
+            ftest = f
+            if not self.config['case_sensitive']:
+                ftest = f.lower()
+                used_funcs = [x.lower() for x in used_funcs]
+            if ftest not in used_funcs:
+                msg = "Invalid Input: Answer must contain the function {}"
+                raise InvalidInput(msg.format(f))
+
+        # Check if the answers agree
+        if not within_tolerance(expected, student, self.config['tolerance']):
+            return {'ok': False, 'grade_decimal': 0, 'msg': ''}
+
+        # This response appears to agree with the expected answer
+        return {
+            'ok': answer['ok'],
+            'grade_decimal': answer['grade_decimal'],
+            'msg': answer['msg']
+        }
 
 
 class FormulaGrader(NumericalGrader):
-    """ Grades mathematical expressions.
+    """
+    Grades mathematical expressions.
 
-    Similar to edX formularesponse but more flexible. Allows author
-    to specify functions in addition to variables.
+    Like NumericalGrader, but allows for variables that are randomly sampled repeatedly
+    in order to determine correctness. Also allows for randomly sampled functions.
 
     Usage
     =====
-
     Grade a formula containing variables and functions:
     >>> grader = FormulaGrader(
     ...     answers='a*b + f(c-b) + f(g(a))',
     ...     variables=['a', 'b','c'],
-    ...     functions=['f', 'g']
+    ...     random_functions=['f', 'g']
     ... )
     >>> theinput0 = 'f(g(a)) + a*b + f(-b+c)'
     >>> grader(None, theinput0)['ok']
@@ -442,7 +558,7 @@ class FormulaGrader(NumericalGrader):
     >>> grader = FormulaGrader(
     ...     answers='b^2 - f(g(a))/4',
     ...     variables=['a', 'b'],
-    ...     functions=['f', 'g'],
+    ...     random_functions=['f', 'g'],
     ...     samples=3,
     ...     sample_from={
     ...         'a': [-4,1]
@@ -453,15 +569,14 @@ class FormulaGrader(NumericalGrader):
     >>> grader(None, theinput)['ok']
     True
 
-    You can also provide specific values to use for any variable or function:
+    You can also provide specific functions using the user_functions key:
     >>> def square(x):
     ...     return x**2
     >>> grader = FormulaGrader(
     ...     answers='4*f(a)+b',
     ...     variables=['a','b'],
-    ...     functions=['f'],
-    ...     sample_from={
-    ...         'f': SpecificFunctions(square)
+    ...     user_functions={
+    ...         'f': square
     ...     }
     ... )
     >>> theinput = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = square
@@ -496,70 +611,124 @@ class FormulaGrader(NumericalGrader):
     case_sensitive (bool): whether symbol names are case senstive. Default True
     failable_evals (int): The nonnegative maximum number of evaluation
          comparisons that can fail with grader still passing. Default 0
-
     """
-
-    DEFAULT_VARIABLES = {
-        'i': np.complex(0, 1),
-        'j': np.complex(0, 1),
-        'e': np.e,
-        'pi': np.pi,
-    }
+    @property
+    def schema_config(self):
+        """Define the configuration options for FormulaGrader"""
+        # Construct the default NumericalGrader schema
+        schema = super(FormulaGrader, self).schema_config
+        # Append options
+        return schema.extend({
+            Required('samples', default=5): Positive(int),
+            Required('variables', default=[]): [str],
+            Required('sample_from', default={}): dict,
+            Required('random_functions', default=[]): [str],
+            Required('functions_from', default={}): dict,
+            Required('failable_evals', default=0): NonNegative(int)
+        })
 
     def __init__(self, config=None, **kwargs):
         """
         Validate the Formulagrader's configuration.
-        First, validate the config in broad strokes, then refine the sample_from entry.
+        First, we allow the NumericalGrader initializer to construct the function list.
+        Second, we refine the sample_from and random_functions_from entries.
+        These two are separate so that there are no name collisions.
         """
         super(FormulaGrader, self).__init__(config, **kwargs)
 
         # Construct the schema for sample_from
-        # Allow anything that RealInterval can make sense of to be valid
-        variables_sample_from = {
+        # First, accept all VariableSamplingSets
+        # Then, accept any list that RealInterval can interpret
+        # Finally, single numbers or tuples of numbers will be handled by DiscreteSet
+        schema_sample_from = Schema({
             Required(varname, default=RealInterval()):
-                Any(VariableSamplingSet, lambda pair: RealInterval(pair))
-            for varname in self.config.get('variables', [])
-        }
-        functions_sample_from = {
-            Required(funcname, default=RandomFunction()): FunctionSamplingSet
-            for funcname in self.config.get('functions', [])
-        }
-        sample_from = variables_sample_from
-        sample_from.update(functions_sample_from)
-        schema_sample_from = Schema(sample_from)
-
-        # Apply the schema to sample_from
-        self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
-
-        # TODO: split sample_from into variables and functions
-        # This will avoid any collisions
-
-    @property
-    def schema_config(self):
-        """Define the configuration options for FormulaGrader"""
-        # Construct the default ItemGrader schema
-        schema = super(FormulaGrader, self).schema_config
-        # Append options
-        return schema.extend({
-            Required('variables', default=[]): [str],
-            Required('functions', default=[]): [str],
-            Required('samples', default=5): Positive(int),
-            Required('sample_from', default={}): dict,
-            Required('tolerance', default='0.1%'): Any(Positive(Number), PercentageString),
-            Required('case_sensitive', default=True): bool,
-            Required('failable_evals', default=0): NonNegative(int)
+                Any(VariableSamplingSet,
+                    All(list, lambda pair: RealInterval(pair)),
+                    lambda tup: DiscreteSet(tup))
+            for varname in self.config['variables']
         })
+        self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
+        # Note that voluptuous ensures that there are no orphaned entries in sample_from
+
+        # Construct the schema for random_functions_from
+        # This can be given a FunctionSamplingSet, just a function, or a list of functions
+        schema_functions_from = Schema({
+            Required(funcname, default=RandomFunction()):
+                Any(FunctionSamplingSet,
+                    lambda func: SpecificFunctions(func))
+            for funcname in self.config['random_functions']
+        })
+        self.config['functions_from'] = schema_functions_from(self.config['functions_from'])
+
+    def raw_check(self, answer, student_input):
+        """Perform the numerical check of student_input vs answer"""
+        var_samples = self.gen_symbols_samples(self.config['variables'],
+                                               self.config['samples'],
+                                               self.config['sample_from'])
+
+        func_samples = self.gen_symbols_samples(self.config['random_functions'],
+                                                self.config['samples'],
+                                                self.config['functions_from'])
+
+        # Make a copy of the functions and variables lists
+        # We'll add the sampled functions/variables in
+        funclist = self.functions.copy()
+        varlist = self.variables.copy()
+
+        num_failures = 0
+        for i in range(self.config['samples']):
+            # Update the functions and variables listings with this sample
+            funclist.update(func_samples[i])
+            varlist.update(var_samples[i])
+
+            # Compute expressions
+            expected, _ = evaluator(formula=answer['expect'],
+                                    case_sensitive=self.config['case_sensitive'],
+                                    variables=varlist,
+                                    functions=funclist,
+                                    suffixes=self.suffixes)
+
+            student, used_funcs = evaluator(student_input,
+                                            case_sensitive=self.config['case_sensitive'],
+                                            variables=varlist,
+                                            functions=funclist,
+                                            suffixes=self.suffixes)
+
+            # Check that the required functions are used
+            # But only the first time!
+            if i == 0:
+                for f in self.config["required_functions"]:
+                    ftest = f
+                    if not self.config['case_sensitive']:
+                        ftest = f.lower()
+                        used_funcs = [x.lower() for x in used_funcs]
+                    if ftest not in used_funcs:
+                        msg = "Invalid Input: Answer must contain the function {}"
+                        raise InvalidInput(msg.format(f))
+
+            # Check if expressions agree
+            if not within_tolerance(expected, student, self.config['tolerance']):
+                num_failures += 1
+                if num_failures > self.config["failable_evals"]:
+                    return {'ok': False, 'grade_decimal': 0, 'msg': ''}
+
+        # This response appears to agree with the expected answer
+        return {
+            'ok': answer['ok'],
+            'grade_decimal': answer['grade_decimal'],
+            'msg': answer['msg']
+        }
 
     @staticmethod
     def gen_symbols_samples(symbols, samples, sample_from):
-        """Generates a list of dictionaries mapping variable names to values.
+        """
+        Generates a list of dictionaries mapping variable names to values.
 
         The symbols argument will usually be self.config['variables']
         or self.config['functions'].
 
         Usage
         =====
-
         >>> variable_samples = FormulaGrader.gen_symbols_samples(
         ...     ['a', 'b'],
         ...     3,
@@ -575,73 +744,7 @@ class FormulaGrader(NumericalGrader):
             {'a': 2.8169225565573566, 'b': -2.6547771579673363}
         ]
         """
-
         return [
             {symbol: sample_from[symbol].gen_sample() for symbol in symbols}
             for j in range(samples)
         ]
-
-    def raw_check(self, answer, student_input):
-        """Check student_input against answer but do not format exceptions."""
-        var_samples = self.gen_symbols_samples(self.config['variables'],
-                                               self.config['samples'],
-                                               self.config['sample_from'])
-
-        func_samples = self.gen_symbols_samples(self.config['functions'],
-                                                self.config['samples'],
-                                                self.config['sample_from'])
-
-        expected_evals = [
-            calc.evaluator(variables,
-                           functions,
-                           answer['expect'],
-                           case_sensitive=self.config['case_sensitive'],
-                           default_variables=self.DEFAULT_VARIABLES,
-                           default_functions=self.DEFAULT_FUNCTIONS)
-            for variables, functions in zip(var_samples, func_samples)
-        ]
-
-        learner_evals = [
-            calc.evaluator(variables,
-                           functions,
-                           student_input,
-                           case_sensitive=self.config['case_sensitive'],
-                           default_variables=self.DEFAULT_VARIABLES,
-                           default_functions=self.DEFAULT_FUNCTIONS)
-            for variables, functions in zip(var_samples, func_samples)
-        ]
-
-        failures = [
-            not self.within_tolerance(e1, e2, self.config['tolerance'])
-            for e1, e2 in zip(expected_evals, learner_evals)
-        ]
-        num_failures = sum(failures)
-
-        if num_failures <= self.config['failable_evals']:
-            return {
-                'ok': answer['ok'],
-                'grade_decimal': answer['grade_decimal'],
-                'msg': answer['msg']
-            }
-
-        return {'ok': False, 'grade_decimal': 0, 'msg': ''}
-
-    def check_response(self, answer, student_input):
-        """Check the student response against a given answer"""
-        try:
-            return self.raw_check(answer, student_input)
-        except UndefinedVariable as e:
-            message = "Invalid Input: {varname} not permitted in answer as a variable".format(varname=str(e))
-            raise UndefinedVariable(message)
-        except UndefinedFunction as e:
-            funcnames = e.args[0]
-            valid_var = e.args[1]
-            message = "Invalid Input: {varname} not permitted in answer as a function".format(varname=funcnames)
-            if valid_var:
-                message += " (did you forget to use * for multiplication?)"
-            raise UndefinedFunction(message)
-        except UnmatchedParentheses as e:
-            countL = student_input.count("(")
-            countR = student_input.count(")")
-            msg = "Invalid Input: Parentheses are unmatched ({} opening vs {} closing)"
-            raise UnmatchedParentheses(msg.format(countL, countR))

@@ -1,11 +1,13 @@
 """
+validatorfuncs.py
+
 Stand-alone validator functions for use in voluptuous Schema
 """
 from numbers import Number
 from graders.voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
 
 def Positive(thetype):
-    if thetype==int:
+    if thetype == int:
         return All(thetype, Range(1, float('inf')))
     else:
         return All(thetype, Range(0, float('inf')), NotIn([0]))
@@ -74,3 +76,20 @@ def ListOfType(given_type, validator=None):
 def is_callable(obj):
     """Returns true if obj is callable"""
     return callable(obj)
+
+def TupleOfType(given_type, validator=None):
+    """
+    Validator that allows for a single given_type or a tuple of given_type.
+    Also allows an extra validator to be applied to each item in the resulting tuple.
+    """
+    def func(config_input):
+        # Wrap an individual given_type in a tuple
+        if not isinstance(config_input, tuple):
+            config_input = (config_input,)
+        # Apply the schema
+        if validator:
+            schema = Schema(All((given_type,), Length(min=1), [validator]))
+        else:
+            schema = Schema(All((given_type,), Length(min=1)))
+        return schema(config_input)
+    return func

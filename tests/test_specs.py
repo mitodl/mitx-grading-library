@@ -21,7 +21,8 @@ def test_eigensystem():
             subgraders=[
                 FormulaGrader(),
                 ListGrader(
-                    subgraders=FormulaGrader()
+                    subgraders=FormulaGrader(),
+                    ordered=True
                 )
             ],
             ordered=True,
