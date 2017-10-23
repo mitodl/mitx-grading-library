@@ -437,9 +437,11 @@ class NumericalGrader(ItemGrader):
     def check_response(self, answer, student_input):
         """Check the student response against a given answer"""
         # First, check for forbidden strings
+        # Remove whitespace so that students can't trick this check by adding any
+        check = student_input if self.config["case_sensitive"] else student_input.lower()
+        check = "".join([char for char in check if char != " "])
         for x in self.config["forbidden_strings"]:
             forbid = x if self.config["case_sensitive"] else x.lower()
-            check = student_input if self.config["case_sensitive"] else student_input.lower()
             if forbid in check:
                 # Don't give away the specific string that is being checked for!
                 raise InvalidInput(self.config["forbidden_message"])

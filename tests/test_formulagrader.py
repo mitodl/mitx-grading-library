@@ -401,13 +401,13 @@ def test_ng_forbidden():
     )
     assert grader(None, '-1')['ok']
     with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
-        grader(None, "3*pi")
+        grader(None, "3 * pi")
     with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
-        grader(None, "pi*3")
+        grader(None, "pi * 3")
     with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
-        grader(None, "sin(3*PI/2)")
+        grader(None, "sin(3*PI   /2)")
     with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
-        grader(None, "sin(PI*3/2)")
+        grader(None, "sin(PI*3/      2)")
 
 def test_ng_required():
     """Test NumericalGrader with required functions in input"""

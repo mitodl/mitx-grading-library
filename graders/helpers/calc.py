@@ -180,6 +180,10 @@ class ParserCache(object):
                   "{} parentheses were opened but never closed."
             raise UnmatchedParentheses(msg.format(count))
 
+        # Strip out any whitespace, so that two otherwise-equivalent formulas are treated
+        # the same
+        formula = "".join([char for char in formula if char != " "])
+
         # Construct the key
         suffixstr = ""
         for key in suffixes:
