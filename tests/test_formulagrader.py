@@ -1,11 +1,11 @@
 """
-Tests for FormulaGrader and NumericalGrader
+Tests for FormulaGrader and FormulaGrader
 """
 from __future__ import division
 import random
 from graders import (
-    NumericalGrader,
     FormulaGrader,
+    NumericalGrader,
     RealInterval,
     IntegerRange,
     DiscreteSet,
@@ -47,7 +47,7 @@ def test_overriding_functions():
     learner_input = 're(z)^2 - im(z)^2 + 2*i*re(z)*im(z)'
     assert not grader(None, learner_input)['ok']
 
-    grader = NumericalGrader(
+    grader = FormulaGrader(
         answers='tan(1)',
         user_functions={'sin': lambda x: x}
     )
@@ -198,15 +198,16 @@ def test_specific_functions():
 def test_ng_expressions():
     """General test of NumericalGrader"""
     grader = NumericalGrader(
-        answers="1+tan(3/2)"
+        answers="1+tan(3/2)",
+        tolerance="0.1%"
     )
     assert grader(None, "(cos(3/2) + sin(3/2))/cos(3/2 + 2*pi)")['ok']
     # Checking tolerance
     assert grader(None, "0.01+(cos(3/2) + sin(3/2))/cos(3/2 + 2*pi)")['ok']
     assert not grader(None, "0.02+(cos(3/2) + sin(3/2))/cos(3/2 + 2*pi)")['ok']
 
-def test_ng_invalid_input():
-    grader = NumericalGrader(answers='2')
+def test_fg_invalid_input():
+    grader = FormulaGrader(answers='2')
 
     expect = 'Invalid Input: pi not permitted in answer as a function ' + \
              '\(did you forget to use \* for multiplication\?\)'
@@ -241,9 +242,9 @@ def test_ng_invalid_input():
     with raises(InvalidInput, match=expect):
         grader(None, "fact(1.5)")
 
-def test_ng_tolerance():
-    """Test of NumericalGrader tolerance"""
-    grader = NumericalGrader(answers="10", tolerance=0.1)
+def test_fg_tolerance():
+    """Test of FormulaGrader tolerance"""
+    grader = FormulaGrader(answers="10", tolerance=0.1)
 
     assert not grader(None, '9.85')['ok']
     assert grader(None, '9.9')['ok']
@@ -251,7 +252,7 @@ def test_ng_tolerance():
     assert grader(None, '10.1')['ok']
     assert not grader(None, '10.15')['ok']
 
-    grader = NumericalGrader(answers="10", tolerance="1%")
+    grader = FormulaGrader(answers="10", tolerance="1%")
 
     assert not grader(None, '9.85')['ok']
     assert grader(None, '9.9')['ok']
@@ -259,18 +260,18 @@ def test_ng_tolerance():
     assert grader(None, '10.1')['ok']
     assert not grader(None, '10.15')['ok']
 
-def test_ng_userfunc():
-    """Test a user function in NumericalGrader"""
-    grader = NumericalGrader(
+def test_fg_userfunc():
+    """Test a user function in FormulaGrader"""
+    grader = FormulaGrader(
         answers="hello(2)",
         user_functions={"hello": lambda x: x**2-1}
     )
     assert grader(None, "5+hello(2)-2-3")['ok']
     assert not grader(None, "hello(1)")['ok']
 
-def test_ng_percent():
-    """Test a percentage suffix in NumericalGrader"""
-    grader = NumericalGrader(
+def test_fg_percent():
+    """Test a percentage suffix in FormulaGrader"""
+    grader = FormulaGrader(
         answers="2%"
     )
     assert grader(None, "2%")['ok']
@@ -278,9 +279,9 @@ def test_ng_percent():
     with raises(InvalidInput, match="Invalid Input: Could not parse '20m' as a formula"):
         grader(None, "20m")
 
-def test_ng_metric():
-    """Test metric suffixes in NumericalGrader"""
-    grader = NumericalGrader(
+def test_fg_metric():
+    """Test metric suffixes in FormulaGrader"""
+    grader = FormulaGrader(
         answers="0.02",
         metric_suffixes=True
     )
@@ -288,9 +289,9 @@ def test_ng_metric():
     assert grader(None, "0.02")['ok']
     assert grader(None, "20m")['ok']
 
-def test_ng_userfunction():
-    """Test NumericalGrader with user-defined functions"""
-    grader = NumericalGrader(
+def test_fg_userfunction():
+    """Test FormulaGrader with user-defined functions"""
+    grader = FormulaGrader(
         answers="sin(0.4)/cos(0.4)",
         user_functions={"hello": np.tan}
     )
@@ -298,13 +299,13 @@ def test_ng_userfunction():
     assert grader(None, "sin(0.4)/cos(0.4)")['ok']
 
     # Test with function names with primes at the end
-    grader = NumericalGrader(
+    grader = FormulaGrader(
         answers="sin(0.4)/cos(0.4)",
         user_functions={"f'": np.tan}
     )
     assert grader(None, "f'(0.4)")['ok']
 
-    grader = NumericalGrader(
+    grader = FormulaGrader(
         answers="sin(0.4)/cos(0.4)",
         user_functions={"function2name_2go''''''": np.tan}
     )
@@ -313,7 +314,7 @@ def test_ng_userfunction():
     # Primes aren't allowed in the middle
     expect = "Invalid Input: Could not parse 'that'sbad\(1\)' as a formula"
     with raises(InvalidInput, match=expect):
-        grader = NumericalGrader(
+        grader = FormulaGrader(
             answers="1",
             user_functions={"that'sbad": np.tan}
         )
@@ -321,14 +322,14 @@ def test_ng_userfunction():
 
     expect = "1 is not a valid name for a function \(must be a string\)"
     with raises(ConfigError, match=expect):
-        NumericalGrader(
+        FormulaGrader(
             answers="1",
             user_functions={1: np.tan}
         )
 
-def test_ng_userconstants():
-    """Test NumericalGrader with user-defined constants"""
-    grader = NumericalGrader(
+def test_fg_userconstants():
+    """Test FormulaGrader with user-defined constants"""
+    grader = FormulaGrader(
         answers="5",
         user_constants={"hello": 5}
     )
@@ -336,14 +337,14 @@ def test_ng_userconstants():
 
     expect = "1 is not a valid name for a constant \(must be a string\)"
     with raises(ConfigError, match=expect):
-        NumericalGrader(
+        FormulaGrader(
             answers="1",
             user_constants={1: 5}
         )
 
-def test_ng_blackwhite():
-    """Test NumericalGrader with blacklists and whitelists"""
-    grader = NumericalGrader(
+def test_fg_blackwhite():
+    """Test FormulaGrader with blacklists and whitelists"""
+    grader = FormulaGrader(
         answers="sin(0.4)/cos(0.4)",
         user_functions={"hello": np.tan},
         blacklist=['tan'],
@@ -358,7 +359,7 @@ def test_ng_blackwhite():
     with raises(UndefinedFunction, match=expect):
         grader(None, "TAN(0.4)")
 
-    grader = NumericalGrader(
+    grader = FormulaGrader(
         answers="sin(0.4)/cos(0.4)",
         user_functions={"hello": np.tan},
         whitelist=['cos', 'sin'],
@@ -373,7 +374,7 @@ def test_ng_blackwhite():
     with raises(UndefinedFunction, match=expect):
         grader(None, "TAN(0.4)")
 
-    grader = NumericalGrader(
+    grader = FormulaGrader(
         answers="1",
         whitelist=[None]
     )
@@ -384,27 +385,27 @@ def test_ng_blackwhite():
     assert not grader.functions   # Check for an empty dictionary
 
     with raises(ConfigError, match="Cannot whitelist and blacklist at the same time"):
-        NumericalGrader(
+        FormulaGrader(
             answers="5",
             blacklist=['tan'],
             whitelist=['tan']
         )
 
     with raises(ConfigError, match="Unknown function in blacklist: test"):
-        NumericalGrader(
+        FormulaGrader(
             answers="5",
             blacklist=['test']
         )
 
     with raises(ConfigError, match="Unknown function in whitelist: test"):
-        NumericalGrader(
+        FormulaGrader(
             answers="5",
             whitelist=['test']
         )
 
-def test_ng_case_sensitive():
-    """Test NumericalGrader with case insensitive input"""
-    grader = NumericalGrader(
+def test_fg_case_sensitive():
+    """Test FormulaGrader with case insensitive input"""
+    grader = FormulaGrader(
         answers="sin(pi)",
         case_sensitive=False,
         tolerance=1e-15
@@ -414,9 +415,9 @@ def test_ng_case_sensitive():
     assert grader(None, "Sin(Pi)")['ok']
     assert grader(None, "SIN(PI)")['ok']
 
-def test_ng_forbidden():
-    """Test NumericalGrader with forbidden strings in input"""
-    grader = NumericalGrader(
+def test_fg_forbidden():
+    """Test FormulaGrader with forbidden strings in input"""
+    grader = FormulaGrader(
         answers="sin(3*pi/2)",
         forbidden_strings=['3*pi', 'pi*3', 'pi/2'],
         case_sensitive=False
@@ -430,17 +431,6 @@ def test_ng_forbidden():
         grader(None, "sin(3*PI   /2)")
     with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
         grader(None, "sin(PI*3/      2)")
-
-def test_ng_required():
-    """Test NumericalGrader with required functions in input"""
-    grader = NumericalGrader(
-        answers="sin(3)/cos(3)",
-        required_functions=['sin', 'cos'],
-        case_sensitive=False
-    )
-    assert grader(None, 'SIN(3)/COS(3)')['ok']
-    with raises(InvalidInput, match="Invalid Input: Answer must contain the function sin"):
-        grader(None, "tan(3)")
 
 def test_fg_variables():
     """General test of FormulaGrader using variables"""
