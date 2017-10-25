@@ -352,47 +352,141 @@ class SpecificFunctions(FunctionSamplingSet):  # pylint: disable=too-few-public-
         return random.choice(self.config)
 
 
-class NumericalGrader(ItemGrader):
+class FormulaGrader(ItemGrader):
     """
-    Grades mathematical expressions.
+    Grades mathematical expressions, like edX FormulaResponse.
 
-    Similar to edX numericalresponse but much more flexible. Allows author to white/blacklist
-    functions, as well as specify user functions and forbidden strings.
-    A flag for metric affixes is provided.
+    TODO: Rewrite these docstrings...
+
+    Usage
+    =====
+    Grade a formula containing variables and functions:
+    >>> grader = FormulaGrader(
+    ...     answers='a*b + f(c-b) + f(g(a))',
+    ...     variables=['a', 'b','c'],
+    ...     user_functions={'f': RandomFunction(), 'g': RandomFunction()}
+    ... )
+    >>> theinput0 = 'f(g(a)) + a*b + f(-b+c)'
+    >>> grader(None, theinput0)['ok']
+    True
+    >>> theinput1 = 'f(g(b)) + 2*a*b + f(b-c)'
+    >>> grader(None, theinput1)['ok']
+    False
+
+    The learner's input is compared to expected answer using numerical
+    numerical evaluations. By default, 5 evaluations are used with variables
+    sampled on the interval [1,3]. The defaults can be overidden:
+    >>> grader = FormulaGrader(
+    ...     answers='b^2 - f(g(a))/4',
+    ...     variables=['a', 'b'],
+    ...     user_functions={'f': RandomFunction(), 'g': RandomFunction()},
+    ...     samples=3,
+    ...     sample_from={
+    ...         'a': [-4,1]
+    ...     },
+    ...     tolerance=0.1
+    ... )
+    >>> theinput = "b*b - 0.25*f(g(a))"
+    >>> grader(None, theinput)['ok']
+    True
+
+    You can also provide specific functions using the user_functions key:
+    >>> def square(x):
+    ...     return x**2
+    >>> grader = FormulaGrader(
+    ...     answers='4*f(a)+b',
+    ...     variables=['a','b'],
+    ...     user_functions={
+    ...         'f': square
+    ...     }
+    ... )
+    >>> theinput = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = square
+    >>> grader(None, theinput)['ok']
+    True
+
+    Grade complex-valued expressions:
+    >>> grader = FormulaGrader(
+    ...     answers='abs(z)^2',
+    ...     variables=['z'],
+    ...     sample_from={
+    ...         'z': ComplexRectangle()
+    ...     }
+    ... )
+    >>> theinput = 're(z)^2+im(z)^2'
+    >>> grader(None, theinput)['ok']
+    True
+
+    Configuration Dictionary Keys
+    =============================
+
+    answers (list): answers, each specified as a string or dictionary.
+    variables (list of str): variable names, default []
+    functions (list of str): function names, default []
+    samples (int): Positive number of samples to use, default 5
+    sample_from: A dictionary mapping synbol (variable or function name) to
+        sampling sets. Default sampling sets are:
+            for variables, RealInterval([1,3])
+            for functions, RandomFunction({dims=[1,1]})
+    tolerance (int or PercentageString): A positive tolerance with which to
+        compare numerical evaluations. Default '0.1%'
+    case_sensitive (bool): whether symbol names are case senstive. Default True
+    failable_evals (int): The nonnegative maximum number of evaluation
+         comparisons that can fail with grader still passing. Default 0
     """
-
     @property
     def schema_config(self):
-        """Define the configuration options for NumericalGrader"""
+        """Define the configuration options for FormulaGrader"""
         # Construct the default ItemGrader schema
-        schema = super(NumericalGrader, self).schema_config
+        schema = super(FormulaGrader, self).schema_config
         # Append options
         forbidden_default = "Invalid Input: This particular answer is forbidden"
         return schema.extend({
-            Required('user_functions', default={}): {Extra: is_callable},
+            Required('user_functions', default={}):
+                {Extra: Any(is_callable, [is_callable], FunctionSamplingSet)},
+            Required('user_constants', default={}): {Extra: Number},
             Required('blacklist', default=[]): [str],
             Required('whitelist', default=[]): [Any(str, None)],
             Required('forbidden_strings', default=[]): [str],
             Required('forbidden_message', default=forbidden_default): str,
             Required('required_functions', default=[]): [str],
-            Required('tolerance', default='0.1%'): Any(Positive(Number), PercentageString),
+            Required('tolerance', default='0.1%'): Any(PercentageString, NonNegative(Number)),
             Required('case_sensitive', default=True): bool,
-            Required('metric_suffixes', default=False): bool
+            Required('metric_suffixes', default=False): bool,
+            Required('samples', default=5): Positive(int),
+            Required('variables', default=[]): [str],
+            Required('sample_from', default={}): dict,
+            Required('failable_evals', default=0): NonNegative(int)
         })
 
     def __init__(self, config=None, **kwargs):
         """
-        Validate the specified configuration.
-        First apply the voluptuous validation.
-        Next, construct the lists of functions, variables and suffixes.
+        Validate the Formulagrader's configuration.
+        First, we allow the ItemGrader initializer to construct the function list.
+        We then construct the lists of functions, suffixes and constants.
+        Finally, we refine the sample_from entry.
         """
-        super(NumericalGrader, self).__init__(config, **kwargs)
+        super(FormulaGrader, self).__init__(config, **kwargs)
 
-        self.functions = self.construct_functions(self.config["whitelist"],
-                                                  self.config["blacklist"],
-                                                  self.config["user_functions"])
-        self.variables = DEFAULT_VARIABLES.copy()   # Just use the defaults
+        # Set up the various lists we use
+        self.functions, self.random_funcs = self.construct_functions(self.config["whitelist"],
+                                                                     self.config["blacklist"],
+                                                                     self.config["user_functions"])
+        self.constants = self.construct_constants(self.config["user_constants"])
         self.suffixes = self.construct_suffixes(self.config["metric_suffixes"])
+
+        # Construct the schema for sample_from
+        # First, accept all VariableSamplingSets
+        # Then, accept any list that RealInterval can interpret
+        # Finally, single numbers or tuples of numbers will be handled by DiscreteSet
+        schema_sample_from = Schema({
+            Required(varname, default=RealInterval()):
+                Any(VariableSamplingSet,
+                    All(list, lambda pair: RealInterval(pair)),
+                    lambda tup: DiscreteSet(tup))
+            for varname in self.config['variables']
+        })
+        self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
+        # Note that voluptuous ensures that there are no orphaned entries in sample_from
 
     @staticmethod
     def construct_functions(whitelist, blacklist, user_funcs):
@@ -420,11 +514,37 @@ class NumericalGrader(ItemGrader):
                 except KeyError:
                     raise ConfigError("Unknown function in blacklist: " + f)
 
-        # Add in any custom functions
+        # Add in any custom functions to the functions and random_funcs lists
+        random_funcs = {}
         for f in user_funcs:
-            functions[f] = user_funcs[f]
+            if not isinstance(f, str):
+                msg = str(f) + " is not a valid name for a function (must be a string)"
+                raise ConfigError(msg)
+            # Check if we have a random function or a normal function
+            if isinstance(user_funcs[f], list):
+                # A list of functions; convert to a SpecificFunctions class
+                random_funcs[f] = SpecificFunctions(user_funcs[f])
+            elif isinstance(user_funcs[f], FunctionSamplingSet):
+                random_funcs[f] = user_funcs[f]
+            else:
+                # f is a normal function
+                functions[f] = user_funcs[f]
 
-        return functions
+        return functions, random_funcs
+
+    @staticmethod
+    def construct_constants(user_consts):
+        """Returns the list of available constants, based on the given configuration"""
+        constants = DEFAULT_VARIABLES.copy()
+
+        # Add in any user constants
+        for var in user_consts:
+            if not isinstance(var, str):
+                msg = str(var) + " is not a valid name for a constant (must be a string)"
+                raise ConfigError(msg)
+            constants[var] = user_consts[var]
+
+        return constants
 
     @staticmethod
     def construct_suffixes(metric=False):
@@ -496,184 +616,18 @@ class NumericalGrader(ItemGrader):
 
     def raw_check(self, answer, student_input):
         """Perform the numerical check of student_input vs answer"""
-        expected, _ = evaluator(formula=answer['expect'],
-                                case_sensitive=self.config['case_sensitive'],
-                                variables=self.variables,
-                                functions=self.functions,
-                                suffixes=self.suffixes)
-
-        student, used_funcs = evaluator(student_input,
-                                        case_sensitive=self.config['case_sensitive'],
-                                        variables=self.variables,
-                                        functions=self.functions,
-                                        suffixes=self.suffixes)
-
-        # Check that the required functions are used
-        for f in self.config["required_functions"]:
-            ftest = f
-            if not self.config['case_sensitive']:
-                ftest = f.lower()
-                used_funcs = [x.lower() for x in used_funcs]
-            if ftest not in used_funcs:
-                msg = "Invalid Input: Answer must contain the function {}"
-                raise InvalidInput(msg.format(f))
-
-        # Check if the answers agree
-        if not within_tolerance(expected, student, self.config['tolerance']):
-            return {'ok': False, 'grade_decimal': 0, 'msg': ''}
-
-        # This response appears to agree with the expected answer
-        return {
-            'ok': answer['ok'],
-            'grade_decimal': answer['grade_decimal'],
-            'msg': answer['msg']
-        }
-
-
-class FormulaGrader(NumericalGrader):
-    """
-    Grades mathematical expressions.
-
-    Like NumericalGrader, but allows for variables that are randomly sampled repeatedly
-    in order to determine correctness. Also allows for randomly sampled functions.
-
-    Usage
-    =====
-    Grade a formula containing variables and functions:
-    >>> grader = FormulaGrader(
-    ...     answers='a*b + f(c-b) + f(g(a))',
-    ...     variables=['a', 'b','c'],
-    ...     random_functions=['f', 'g']
-    ... )
-    >>> theinput0 = 'f(g(a)) + a*b + f(-b+c)'
-    >>> grader(None, theinput0)['ok']
-    True
-    >>> theinput1 = 'f(g(b)) + 2*a*b + f(b-c)'
-    >>> grader(None, theinput1)['ok']
-    False
-
-    The learner's input is compared to expected answer using numerical
-    numerical evaluations. By default, 5 evaluations are used with variables
-    sampled on the interval [1,3]. The defaults can be overidden:
-    >>> grader = FormulaGrader(
-    ...     answers='b^2 - f(g(a))/4',
-    ...     variables=['a', 'b'],
-    ...     random_functions=['f', 'g'],
-    ...     samples=3,
-    ...     sample_from={
-    ...         'a': [-4,1]
-    ...     },
-    ...     tolerance=0.1
-    ... )
-    >>> theinput = "b*b - 0.25*f(g(a))"
-    >>> grader(None, theinput)['ok']
-    True
-
-    You can also provide specific functions using the user_functions key:
-    >>> def square(x):
-    ...     return x**2
-    >>> grader = FormulaGrader(
-    ...     answers='4*f(a)+b',
-    ...     variables=['a','b'],
-    ...     user_functions={
-    ...         'f': square
-    ...     }
-    ... )
-    >>> theinput = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = square
-    >>> grader(None, theinput)['ok']
-    True
-
-    Grade complex-valued expressions:
-    >>> grader = FormulaGrader(
-    ...     answers='abs(z)^2',
-    ...     variables=['z'],
-    ...     sample_from={
-    ...         'z': ComplexRectangle()
-    ...     }
-    ... )
-    >>> theinput = 're(z)^2+im(z)^2'
-    >>> grader(None, theinput)['ok']
-    True
-
-    Configuration Dictionary Keys
-    =============================
-
-    answers (list): answers, each specified as a string or dictionary.
-    variables (list of str): variable names, default []
-    functions (list of str): function names, default []
-    samples (int): Positive number of samples to use, default 5
-    sample_from: A dictionary mapping synbol (variable or function name) to
-        sampling sets. Default sampling sets are:
-            for variables, RealInterval([1,3])
-            for functions, RandomFunction({dims=[1,1]})
-    tolerance (int or PercentageString): A positive tolerance with which to
-        compare numerical evaluations. Default '0.1%'
-    case_sensitive (bool): whether symbol names are case senstive. Default True
-    failable_evals (int): The nonnegative maximum number of evaluation
-         comparisons that can fail with grader still passing. Default 0
-    """
-    @property
-    def schema_config(self):
-        """Define the configuration options for FormulaGrader"""
-        # Construct the default NumericalGrader schema
-        schema = super(FormulaGrader, self).schema_config
-        # Append options
-        return schema.extend({
-            Required('samples', default=5): Positive(int),
-            Required('variables', default=[]): [str],
-            Required('sample_from', default={}): dict,
-            Required('random_functions', default=[]): [str],
-            Required('functions_from', default={}): dict,
-            Required('failable_evals', default=0): NonNegative(int)
-        })
-
-    def __init__(self, config=None, **kwargs):
-        """
-        Validate the Formulagrader's configuration.
-        First, we allow the NumericalGrader initializer to construct the function list.
-        Second, we refine the sample_from and random_functions_from entries.
-        These two are separate so that there are no name collisions.
-        """
-        super(FormulaGrader, self).__init__(config, **kwargs)
-
-        # Construct the schema for sample_from
-        # First, accept all VariableSamplingSets
-        # Then, accept any list that RealInterval can interpret
-        # Finally, single numbers or tuples of numbers will be handled by DiscreteSet
-        schema_sample_from = Schema({
-            Required(varname, default=RealInterval()):
-                Any(VariableSamplingSet,
-                    All(list, lambda pair: RealInterval(pair)),
-                    lambda tup: DiscreteSet(tup))
-            for varname in self.config['variables']
-        })
-        self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
-        # Note that voluptuous ensures that there are no orphaned entries in sample_from
-
-        # Construct the schema for random_functions_from
-        # This can be given a FunctionSamplingSet, just a function, or a list of functions
-        schema_functions_from = Schema({
-            Required(funcname, default=RandomFunction()):
-                Any(FunctionSamplingSet,
-                    lambda func: SpecificFunctions(func))
-            for funcname in self.config['random_functions']
-        })
-        self.config['functions_from'] = schema_functions_from(self.config['functions_from'])
-
-    def raw_check(self, answer, student_input):
-        """Perform the numerical check of student_input vs answer"""
         var_samples = self.gen_symbols_samples(self.config['variables'],
                                                self.config['samples'],
                                                self.config['sample_from'])
 
-        func_samples = self.gen_symbols_samples(self.config['random_functions'],
+        func_samples = self.gen_symbols_samples(self.random_funcs.keys(),
                                                 self.config['samples'],
-                                                self.config['functions_from'])
+                                                self.random_funcs)
 
         # Make a copy of the functions and variables lists
         # We'll add the sampled functions/variables in
         funclist = self.functions.copy()
-        varlist = self.variables.copy()
+        varlist = self.constants.copy()
 
         num_failures = 0
         for i in range(self.config['samples']):
@@ -748,3 +702,28 @@ class FormulaGrader(NumericalGrader):
             {symbol: sample_from[symbol].gen_sample() for symbol in symbols}
             for j in range(samples)
         ]
+
+
+class NumericalGrader(FormulaGrader):
+    """
+    Grades mathematical expressions without random functions or variables.
+
+    This is a convenience class built on top of FormulaGrader that sets a number of
+    default values to be more amenable to grading numerical input. It is set up to mimic
+    NumericalResponse graders in edX.
+    """
+
+    @property
+    def schema_config(self):
+        """Define the configuration options for NumericalGrader"""
+        # Construct the default FormulaGrader schema
+        schema = super(NumericalGrader, self).schema_config
+        # Modify the default FormulaGrader options
+        return schema.extend({
+            Required('user_functions', default={}): {Extra: is_callable},
+            Required('tolerance', default='5%'): Any(PercentageString, NonNegative(Number)),
+            Required('samples', default=1): 1,
+            Required('variables', default=[]): [],
+            Required('sample_from', default={}): {},
+            Required('failable_evals', default=0): 0
+        })
