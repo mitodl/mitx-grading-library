@@ -468,11 +468,9 @@ class FormulaGrader(ItemGrader):
         super(FormulaGrader, self).__init__(config, **kwargs)
 
         # Set up the various lists we use
-        self.random_funcs = {}
-        self.functions = self.construct_functions(self.config["whitelist"],
-                                                  self.config["blacklist"],
-                                                  self.config["user_functions"],
-                                                  self.random_funcs)
+        self.functions, self.random_funcs = self.construct_functions(self.config["whitelist"],
+                                                                     self.config["blacklist"],
+                                                                     self.config["user_functions"])
         self.constants = self.construct_constants(self.config["user_constants"])
         self.suffixes = self.construct_suffixes(self.config["metric_suffixes"])
 
@@ -491,7 +489,7 @@ class FormulaGrader(ItemGrader):
         # Note that voluptuous ensures that there are no orphaned entries in sample_from
 
     @staticmethod
-    def construct_functions(whitelist, blacklist, user_funcs, random_funcs):
+    def construct_functions(whitelist, blacklist, user_funcs):
         """Returns the list of available functions, based on the given configuration"""
         if whitelist:
             if blacklist:
@@ -517,6 +515,7 @@ class FormulaGrader(ItemGrader):
                     raise ConfigError("Unknown function in blacklist: " + f)
 
         # Add in any custom functions to the functions and random_funcs lists
+        random_funcs = {}
         for f in user_funcs:
             if not isinstance(f, str):
                 msg = str(f) + " is not a valid name for a function (must be a string)"
@@ -531,7 +530,7 @@ class FormulaGrader(ItemGrader):
                 # f is a normal function
                 functions[f] = user_funcs[f]
 
-        return functions
+        return functions, random_funcs
 
     @staticmethod
     def construct_constants(user_consts):
