@@ -1,17 +1,19 @@
 **Table of Contents**
 
-- [MITx Graders](#mitx-graders)
+- [MITx Grading Library](#mitx-graders)
 - [Installation](#installation)
 - [Usage in edX](#usage-in-edx)
 - [Grader Documentation](#grader-documentation)
 
-# MITx Graders
+# MITx Grading Library
 
 A library of graders for edX Custom Response problems.
 
-Version 0.2.0
+Version 1.0
 
 Copyright 2017 Jolyon Bloomfield and Chris Chudzicki
+
+We thank the MIT Office of Digital Learning for their support.
 
 # Installation
 

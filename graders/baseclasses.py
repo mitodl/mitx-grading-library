@@ -1,4 +1,6 @@
 """
+baseclasses.py
+
 Contains base classes for the library:
 * ObjectWithSchema
 * AbstractGrader
@@ -9,6 +11,7 @@ import numbers
 import abc
 from graders.voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from graders.voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
+from graders.version import __version__
 
 class ConfigError(Exception):
     """Raised whenever a configuration error occurs"""
@@ -106,10 +109,11 @@ class AbstractGrader(ObjectWithSchema):
         result = self.check(None, student_input)
         if self.config['debug']:
             # Construct the debug output
+            debugoutput = "MITx Grading Library Version " + __version__ + "\n"
             if isinstance(student_input, list):
-                debugoutput = "Student Responses:\n" + "\n".join(student_input)
+                debugoutput += "Student Responses:\n" + "\n".join(student_input)
             else:
-                debugoutput = "Student Response:\n" + student_input
+                debugoutput += "Student Response:\n" + student_input
             # Append the message
             if "input_list" in result:
                 if result.get('overall_message', ''):
