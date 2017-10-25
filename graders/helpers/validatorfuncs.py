@@ -16,17 +16,21 @@ def NonNegative(thetype):
     return All(thetype, Range(0, float('inf')))
 
 def PercentageString(value):
-    """Validate that a string can be interpreted as a percentage."""
+    """Validate that a string can be interpreted as a positive percentage."""
     if isinstance(value, str):
         work = value.strip()
         if work.endswith("%"):
             try:
                 percent = float(work[:-1])
+                if percent < 0:
+                    raise Invalid("Cannot have a negative percentage")
                 return "{percent}%".format(percent=percent)
+            except Invalid:
+                raise
             except:
                 pass
 
-    raise Invalid("Not a percentage string.")
+    raise Invalid("Not a valid percentage string")
 
 def number_range_alternate(number_type=Number):
     """

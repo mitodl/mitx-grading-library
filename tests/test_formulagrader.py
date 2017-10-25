@@ -266,6 +266,11 @@ def test_fg_tolerance():
     assert grader(None, '10')['ok']
     assert not grader(None, '10.000001')['ok']
 
+    expect = "Cannot have a negative percentage for dictionary value @ " + \
+             "data\['tolerance'\]. Got '-1%'"
+    with raises(Error, match=expect):
+        FormulaGrader(answers="10", tolerance="-1%")
+
 def test_fg_userfunc():
     """Test a user function in FormulaGrader"""
     grader = FormulaGrader(
