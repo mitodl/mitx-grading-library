@@ -319,6 +319,28 @@ def test_ng_userfunction():
         )
         grader(None, "that'sbad(1)")
 
+    expect = "1 is not a valid name for a function \(must be a string\)"
+    with raises(ConfigError, match=expect):
+        NumericalGrader(
+            answers="1",
+            user_functions={1: np.tan}
+        )
+
+def test_ng_userconstants():
+    """Test NumericalGrader with user-defined constants"""
+    grader = NumericalGrader(
+        answers="5",
+        user_constants={"hello": 5}
+    )
+    assert grader(None, "hello")['ok']
+
+    expect = "1 is not a valid name for a constant \(must be a string\)"
+    with raises(ConfigError, match=expect):
+        NumericalGrader(
+            answers="1",
+            user_constants={1: 5}
+        )
+
 def test_ng_blackwhite():
     """Test NumericalGrader with blacklists and whitelists"""
     grader = NumericalGrader(

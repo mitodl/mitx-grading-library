@@ -370,6 +370,7 @@ class NumericalGrader(ItemGrader):
         forbidden_default = "Invalid Input: This particular answer is forbidden"
         return schema.extend({
             Required('user_functions', default={}): {Extra: is_callable},
+            Required('user_constants', default={}): {Extra: Number},
             Required('blacklist', default=[]): [str],
             Required('whitelist', default=[]): [Any(str, None)],
             Required('forbidden_strings', default=[]): [str],
@@ -391,7 +392,7 @@ class NumericalGrader(ItemGrader):
         self.functions = self.construct_functions(self.config["whitelist"],
                                                   self.config["blacklist"],
                                                   self.config["user_functions"])
-        self.variables = DEFAULT_VARIABLES.copy()   # Just use the defaults
+        self.constants = self.construct_constants(self.config["user_constants"])
         self.suffixes = self.construct_suffixes(self.config["metric_suffixes"])
 
     @staticmethod
@@ -422,9 +423,26 @@ class NumericalGrader(ItemGrader):
 
         # Add in any custom functions
         for f in user_funcs:
+            if not isinstance(f, str):
+                msg = str(f) + " is not a valid name for a function (must be a string)"
+                raise ConfigError(msg)
             functions[f] = user_funcs[f]
 
         return functions
+
+    @staticmethod
+    def construct_constants(user_consts):
+        """Returns the list of available constants, based on the given configuration"""
+        constants = DEFAULT_VARIABLES.copy()
+
+        # Add in any user constants
+        for var in user_consts:
+            if not isinstance(var, str):
+                msg = str(var) + " is not a valid name for a constant (must be a string)"
+                raise ConfigError(msg)
+            constants[var] = user_consts[var]
+
+        return constants
 
     @staticmethod
     def construct_suffixes(metric=False):
@@ -498,13 +516,13 @@ class NumericalGrader(ItemGrader):
         """Perform the numerical check of student_input vs answer"""
         expected, _ = evaluator(formula=answer['expect'],
                                 case_sensitive=self.config['case_sensitive'],
-                                variables=self.variables,
+                                variables=self.constants,
                                 functions=self.functions,
                                 suffixes=self.suffixes)
 
         student, used_funcs = evaluator(student_input,
                                         case_sensitive=self.config['case_sensitive'],
-                                        variables=self.variables,
+                                        variables=self.constants,
                                         functions=self.functions,
                                         suffixes=self.suffixes)
 
@@ -673,7 +691,7 @@ class FormulaGrader(NumericalGrader):
         # Make a copy of the functions and variables lists
         # We'll add the sampled functions/variables in
         funclist = self.functions.copy()
-        varlist = self.variables.copy()
+        varlist = self.constants.copy()
 
         num_failures = 0
         for i in range(self.config['samples']):
