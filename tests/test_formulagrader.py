@@ -39,7 +39,7 @@ def test_overriding_functions():
     grader = FormulaGrader(
         answers='z^2',
         variables=['z'],
-        random_functions=['re', 'im'],
+        user_functions={'re': RandomFunction(), 'im': RandomFunction()},
         sample_from={
             'z': ComplexRectangle()
         }
@@ -195,9 +195,9 @@ def test_specific_functions():
     ds = SpecificFunctions(abs)
     assert ds.gen_sample() == abs
 
-def test_ng_expressions():
-    """General test of NumericalGrader"""
-    grader = NumericalGrader(
+def test_fg_expressions():
+    """General test of FormulaGrader"""
+    grader = FormulaGrader(
         answers="1+tan(3/2)",
         tolerance="0.1%"
     )
@@ -512,45 +512,80 @@ def test_fg_function_sampling():
     grader = FormulaGrader(
         answers="hello(x)",
         variables=['x'],
-        random_functions=['hello']
+        user_functions={'hello': RandomFunction()}
     )
     assert grader(None, 'hello(x)')['ok']
-    assert isinstance(grader.config["functions_from"]['hello'], RandomFunction)
-
-    with raises(MultipleInvalid, match="extra keys not allowed @ data\['w'\]"):
-        grader = FormulaGrader(random_functions=['x'], functions_from={'w': 2})
+    assert isinstance(grader.random_funcs['hello'], RandomFunction)
 
     grader = FormulaGrader(
         answers="hello(x)",
         variables=['x'],
-        random_functions=['hello'],
-        functions_from={'hello': lambda x: x*x}
+        user_functions={'hello': [lambda x: x*x]}
     )
-    assert isinstance(grader.config["functions_from"]['hello'], SpecificFunctions)
+    assert isinstance(grader.random_funcs['hello'], SpecificFunctions)
     assert grader(None, 'hello(x)')['ok']
 
     grader = FormulaGrader(
         answers="hello(x)",
         variables=['x'],
-        random_functions=['hello'],
-        functions_from={'hello': RandomFunction()}
+        user_functions={'hello': [np.sin, np.cos, np.tan]}
     )
+    assert isinstance(grader.random_funcs['hello'], SpecificFunctions)
     assert grader(None, 'hello(x)')['ok']
 
     grader = FormulaGrader(
         answers="hello(x)",
         variables=['x'],
-        random_functions=['hello'],
-        functions_from={'hello': [np.sin, np.cos, np.tan]}
+        user_functions={'hello': SpecificFunctions([np.sin, np.cos, np.tan])}
     )
-    assert isinstance(grader.config["functions_from"]['hello'], SpecificFunctions)
+    assert isinstance(grader.random_funcs['hello'], SpecificFunctions)
     assert grader(None, 'hello(x)')['ok']
 
-    grader = FormulaGrader(
-        answers="hello(x)",
-        variables=['x'],
-        random_functions=['hello'],
-        functions_from={'hello': SpecificFunctions([np.sin, np.cos, np.tan])}
-    )
-    assert isinstance(grader.config["functions_from"]['hello'], SpecificFunctions)
-    assert grader(None, 'hello(x)')['ok']
+
+def test_ng_config():
+    """Test that the NumericalGrader config bars unwanted entries"""
+    expect = "not a valid value for dictionary value @ data\['failable_evals'\]. Got 1"
+    with raises(Error, match=expect):
+        NumericalGrader(
+            answers="1",
+            failable_evals=1
+        )
+
+    expect = "not a valid value for dictionary value @ data\['samples'\]. Got 2"
+    with raises(Error, match=expect):
+        NumericalGrader(
+            answers="1",
+            samples=2
+        )
+
+    expect = "not a valid value for dictionary value @ data\['variables'\]. Got \['x'\]"
+    with raises(Error, match=expect):
+        NumericalGrader(
+            answers="1",
+            variables=["x"]
+        )
+
+    expect = "not a valid value for dictionary value @ data\['sample_from'\]. " + \
+             "Got {'x': RealInterval\({'start': 1, 'stop': 5}\)}"
+    with raises(Error, match=expect):
+        NumericalGrader(
+            answers="1",
+            sample_from={"x": RealInterval()}
+        )
+
+    expect = "not a valid value for dictionary value @ data\['user_functions'\]\['f'\]. " + \
+             "Got RandomFunction\({'input_dim': 1, 'output_dim': 1, 'num_terms': 3, " + \
+             "'amplitude': 10, 'center': 0}\)"
+    with raises(Error, match=expect):
+        NumericalGrader(
+            answers="1",
+            user_functions={"f": RandomFunction()}
+        )
+
+    expect = "not a valid value for dictionary value @ data\['user_functions'\]\['f'\]. " + \
+             "Got \[<ufunc 'sin'>, <ufunc 'cos'>\]"
+    with raises(Error, match=expect):
+        NumericalGrader(
+            answers="1",
+            user_functions={"f": [np.sin, np.cos]}
+        )
