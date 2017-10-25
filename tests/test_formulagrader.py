@@ -260,6 +260,12 @@ def test_fg_tolerance():
     assert grader(None, '10.1')['ok']
     assert not grader(None, '10.15')['ok']
 
+    grader = FormulaGrader(answers="10", tolerance=0)
+
+    assert not grader(None, '9.999999')['ok']
+    assert grader(None, '10')['ok']
+    assert not grader(None, '10.000001')['ok']
+
 def test_fg_userfunc():
     """Test a user function in FormulaGrader"""
     grader = FormulaGrader(

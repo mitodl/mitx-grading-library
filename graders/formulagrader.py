@@ -449,7 +449,7 @@ class FormulaGrader(ItemGrader):
             Required('forbidden_strings', default=[]): [str],
             Required('forbidden_message', default=forbidden_default): str,
             Required('required_functions', default=[]): [str],
-            Required('tolerance', default='0.1%'): Any(Positive(Number), PercentageString),
+            Required('tolerance', default='0.1%'): Any(NonNegative(Number), PercentageString),
             Required('case_sensitive', default=True): bool,
             Required('metric_suffixes', default=False): bool,
             Required('samples', default=5): Positive(int),
@@ -722,7 +722,7 @@ class NumericalGrader(FormulaGrader):
         # Modify the default FormulaGrader options
         return schema.extend({
             Required('user_functions', default={}): {Extra: is_callable},
-            Required('tolerance', default='5%'): Any(Positive(Number), PercentageString),
+            Required('tolerance', default='5%'): Any(NonNegative(Number), PercentageString),
             Required('samples', default=1): 1,
             Required('variables', default=[]): [],
             Required('sample_from', default={}): {},
