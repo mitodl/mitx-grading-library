@@ -553,7 +553,7 @@ class SingleListGrader(ItemGrader):
     """
     Grades lists of items in a single input box according to a specified subgrader.
 
-    Note that this is an ItemGrader, but contains similar elements to ListGrader.
+    Note that this is an ItemGrader, but has similar behavior to ListGrader.
 
     How learners enter single input lists in customresponse
     ==========================================

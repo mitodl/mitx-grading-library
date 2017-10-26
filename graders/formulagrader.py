@@ -358,82 +358,59 @@ class FormulaGrader(ItemGrader):
     """
     Grades mathematical expressions, like edX FormulaResponse.
 
-    TODO: Rewrite these docstrings...
+    Configuration options:
+        user_functions (dict): A dictionary of user-defined functions that students can
+            use in their solutions (default {}). Eg: {'f': lambda x:x**2}. Can also point
+            a function name to a list of functions, from which one will be chosen randomly,
+            or a FunctionSamplingSet, eg, RandomFunction().
 
-    Usage
-    =====
-    Grade a formula containing variables and functions:
-    >>> grader = FormulaGrader(
-    ...     answers='a*b + f(c-b) + f(g(a))',
-    ...     variables=['a', 'b','c'],
-    ...     user_functions={'f': RandomFunction(), 'g': RandomFunction()}
-    ... )
-    >>> theinput0 = 'f(g(a)) + a*b + f(-b+c)'
-    >>> grader(None, theinput0)['ok']
-    True
-    >>> theinput1 = 'f(g(b)) + 2*a*b + f(b-c)'
-    >>> grader(None, theinput1)['ok']
-    False
+        user_constants (dict): A dictionary of user-defined constants that students can
+            use in their solutions (default {}). Eg: {'c': 3e10}
 
-    The learner's input is compared to expected answer using numerical
-    numerical evaluations. By default, 5 evaluations are used with variables
-    sampled on the interval [1,3]. The defaults can be overidden:
-    >>> grader = FormulaGrader(
-    ...     answers='b^2 - f(g(a))/4',
-    ...     variables=['a', 'b'],
-    ...     user_functions={'f': RandomFunction(), 'g': RandomFunction()},
-    ...     samples=3,
-    ...     sample_from={
-    ...         'a': [-4,1]
-    ...     },
-    ...     tolerance=0.1
-    ... )
-    >>> theinput = "b*b - 0.25*f(g(a))"
-    >>> grader(None, theinput)['ok']
-    True
+        blacklist ([str]): A list of functions that students may not use in their solutions
+            (default []). Eg: ['cos', 'sin']
 
-    You can also provide specific functions using the user_functions key:
-    >>> def square(x):
-    ...     return x**2
-    >>> grader = FormulaGrader(
-    ...     answers='4*f(a)+b',
-    ...     variables=['a','b'],
-    ...     user_functions={
-    ...         'f': square
-    ...     }
-    ... )
-    >>> theinput = 'f(2*a)+b'             # f(2*a) = 4*f(a) for f = square
-    >>> grader(None, theinput)['ok']
-    True
+        whitelist ([str or None]): A list of the only functions that students may use in
+            their solutions (default []). Eg: ['cos', 'sin']. To disallow all functions,
+            use [None].
 
-    Grade complex-valued expressions:
-    >>> grader = FormulaGrader(
-    ...     answers='abs(z)^2',
-    ...     variables=['z'],
-    ...     sample_from={
-    ...         'z': ComplexRectangle()
-    ...     }
-    ... )
-    >>> theinput = 're(z)^2+im(z)^2'
-    >>> grader(None, theinput)['ok']
-    True
+        forbidden_strings ([str]): A list of strings that are forbidden from student
+            solutions (default []). Do not put spaces in these strings. This will match
+            against student input with spaces stripped. For example, if you want to ask
+            for the expansion of sin(2*theta) and expect 2*sin(theta)*cos(theta), you may
+            set this to:
+            ['*theta', 'theta*', 'theta/', '+theta', 'theta+', '-theta', 'theta-']
+            so that students can't just enter 'sin(2*theta)'. Students receive the error
+            message in forbidden_message if they attempt to use these strings in their
+            solution.
 
-    Configuration Dictionary Keys
-    =============================
+        forbidden_message (str): Error message displayed to students when they use forbidden
+            input (default "Invalid Input: This particular answer is forbidden")
 
-    answers (list): answers, each specified as a string or dictionary.
-    variables (list of str): variable names, default []
-    functions (list of str): function names, default []
-    samples (int): Positive number of samples to use, default 5
-    sample_from: A dictionary mapping synbol (variable or function name) to
-        sampling sets. Default sampling sets are:
-            for variables, RealInterval([1,3])
-            for functions, RandomFunction({dims=[1,1]})
-    tolerance (int or PercentageString): A positive tolerance with which to
-        compare numerical evaluations. Default '0.1%'
-    case_sensitive (bool): whether symbol names are case senstive. Default True
-    failable_evals (int): The nonnegative maximum number of evaluation
-         comparisons that can fail with grader still passing. Default 0
+        required_functions ([str]): A list of functions that must be used by the students
+            in their solutions (default []). Eg: ['sin', 'cos']
+
+        tolerance (number or PercentageString): Tolerance with which answers are compared to
+            the solutions. Can be expressed as an absolute number (eg, 0.1), or as a string
+            percentage (default '0.1%'). Must be positive or zero.
+
+        case_sensitive (bool): Should comparison of variable and function names be performed
+            in a case sensitive manner? (default True)
+
+        metric_suffixes (bool): Should metric affixes be available to students to modify
+            answers (default False). If true, then "2m" == 0.002, for example.
+
+        samples (int): The number of times to sample random variables (default 5)
+
+        variables ([str]): A list of variable names (default [])
+
+        sample_from (dict): A dictionary of VariableSamplingSets for specific variables. By
+            default, each variable samples from RealInterval([1, 5]) (default {}). Will
+            also accept a list with two values [a, b] to sample from the real interval
+            between a and b. Will also accept a tuple of discrete values to sample from.
+
+        failable_evals (int): The number of samples that may disagree before the student's
+            answer is marked incorrect (default 0)
     """
     @property
     def schema_config(self):
@@ -713,6 +690,21 @@ class NumericalGrader(FormulaGrader):
     This is a convenience class built on top of FormulaGrader that sets a number of
     default values to be more amenable to grading numerical input. It is set up to mimic
     NumericalResponse graders in edX.
+
+    Configuration options as per FormulaGrader, except:
+        user_functions (dict): A dictionary of user-defined functions that students can
+            use in their solutions (default {}). Cannot have random functions, unlike
+            FormulaGrader. Eg: {'f': lambda x:x**2}
+
+        tolerance (number or PercentageString): As in FormulaGrader (default '5%')
+
+        samples (int): Will always be 1
+
+        variables ([str]): Will always be an empty list
+
+        sample_from (dict): Will always be an empty dictionary
+
+        failable_evals (int): Will always be 0
     """
 
     @property

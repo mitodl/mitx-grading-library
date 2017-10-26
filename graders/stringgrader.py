@@ -15,17 +15,11 @@ class StringGrader(ItemGrader):
     Grader based on exact comparison of strings
 
     Configuration options:
+        strip (bool): Whether or not to strip leading and trailing whitespace
+            from answers/student input before comparing (default True)
 
-    grader = StringGrader(
-        answers='cat',
-        strip=True,
-        case_sensitive=True
-    )
-
-    answers: List of answers in the typical form
-    strip: Whether or not to strip leading and trailing whitespace
-           from answers/student responses before comparing to answers (default True)
-    case_sensitive: Whether to be case sensitive in comparisons (default True)
+        case_sensitive (bool): Whether to be case sensitive in comparing responses to
+            answers (default True)
     """
 
     @property

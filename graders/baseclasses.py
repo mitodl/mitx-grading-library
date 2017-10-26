@@ -55,7 +55,14 @@ class ObjectWithSchema(object):
         return "{classname}({config})".format(classname=self.__class__.__name__, config=self.config)
 
 class AbstractGrader(ObjectWithSchema):
-    """Abstract grader class. All graders must build on this class."""
+    """
+    Abstract grader class. All graders must build on this class.
+
+    Configuration options:
+        debug (bool): Whether to add debug information to the output. Can also affect
+            the types of error messages that are generated to be more technical (for
+            authors) or more user-friendly (for students) (default True)
+    """
 
     # This is an abstract base class
     __metaclass__ = abc.ABCMeta
@@ -144,6 +151,25 @@ class ItemGrader(AbstractGrader):
     to the config, then schema_config should be extended (see StringGrader, for example).
     The only other thing you may want to shadow is schema_expect, to add parsing to
     answers.
+
+    Answers can be provided in one of two forms:
+        * An answer string
+        * A dictionary:
+            {'expect': answer, 'grade_decimal': number, 'ok': value, 'msg'}
+            expect: Stores the expected answer as a string (Required)
+            grade_decimal: Stores the grade as a decimal that this answer should receive.
+                If set, overrides 'ok' entry (default 1)
+            ok: Can be set to True, False, 'partial' or 'computed' (default). Ignored if
+                'grade_decimal' is not 1.
+            msg: Message to return to the student if they provide this answer (default "")
+    Internally, an answer string will be coverted into a dictionary with 'ok'=True.
+
+    Configuration options:
+        answers (varies): A single answer in one of the above forms, or a tuple of answers
+            in the above forms. Not required, as answers can be provided later.
+
+        wrong_msg (str): A generic message to give the students upon submission of an
+            answer that received a grade of 0 (default "")
     """
 
     # This is an abstract base class
@@ -198,8 +224,9 @@ class ItemGrader(AbstractGrader):
                 # Unable to interpret your answer!
                 raise
 
-        # If the 'ok' value is 'computed', then compute what it should be
-        if validated_answer['ok'] == 'computed':
+        # If the 'ok' value is 'computed' or the grade decimal is not 1,
+        # then compute what it should be
+        if validated_answer['ok'] == 'computed' or validated_answer['grade_decimal'] != 1:
             validated_answer['ok'] = self.grade_decimal_to_ok(validated_answer['grade_decimal'])
 
         return validated_answer
