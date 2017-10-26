@@ -28,7 +28,7 @@ def find_optimal_order(check, answers, student_list):
     """
     Finds optimal assignment (according to check function) of inputs to answers.
 
-    Inputs:
+    Arguments:
         answers (list): A list [answers_0, answers_1, ...]
             wherein each answers_i is a valid ItemGrader.config['answers']
         student_input_list (list): a list of student inputs
@@ -120,7 +120,7 @@ def consolidate_cfn_return(input_list, overall_message="", n_expect=None, partia
     """
     Consolidates a long-form customresponse return dictionary.
 
-    Inputs:
+    Arguments:
         input_list (list): a list of customresponse single-answer dictionaries
             each has keys 'ok', 'grade_decimal', 'msg'
         overall_message (str): an overall message
@@ -172,8 +172,6 @@ class ListGrader(AbstractGrader):
     ListGrader grades lists of items according to a specified subgrader or list of
     subgraders. It works with multi-input customresponse problems.
 
-    How learners enter lists in customresponse
-    ==========================================
     Multi-input customresponse:
         <customresponse cfn="grader">
             <textline/> <!-- learner enters cat -->
@@ -184,22 +182,20 @@ class ListGrader(AbstractGrader):
             grader receives a list: ['cat', 'dog', None]
             The list will always contain exactly as many items as input tags
 
-    Basic Usage
-    ===========
-    Grade a list of strings (multi-input)
-        >>> from stringgrader import StringGrader
-        >>> grader = ListGrader(
-        ...     answers=['cat', 'dog', 'fish'],
-        ...     subgraders=StringGrader()
-        ... )
-        >>> result = grader(None, ['fish', 'cat', 'moose'])
-        >>> expected = {'input_list': [
-        ...     {'ok': True, 'grade_decimal':1, 'msg':''},
-        ...     {'ok': True, 'grade_decimal':1, 'msg':''},
-        ...     {'ok': False, 'grade_decimal':0, 'msg':''}
-        ... ], 'overall_message':''}
-        >>> result == expected
-        True
+    Configuration options:
+        ordered (bool): Whether or not the entries should be in the correct order
+            (default False)
+
+        subgraders (AbstractGrader): A grader or a list of graders to use in grading the
+            individual entries (required)
+
+        grouping ([int]): The way to group together inputs when using nested ListGrader
+            classes. See documentation. (default [])
+
+        answers (list, tuple of lists): The list of answers, or a tuple of lists of answers
+            if multiple "correct lists" are available. Each individual answer must conform
+            to the appropriate answer schema for the subgrader. The default is [], as an
+            empty list is allowable if SingleListGrader is being used as a subgrader.
     """
 
     @property
@@ -325,9 +321,7 @@ class ListGrader(AbstractGrader):
         return group_map
 
     def validate_grouping(self):
-        """
-        Validate a grouping list
-        """
+        """Validate a grouping list"""
         # Single subgraders must be a ListGrader
         if not self.subgrader_list and not isinstance(self.config['subgraders'], ListGrader):
             msg = "A ListGrader with groupings must have a ListGrader subgrader " + \
@@ -379,7 +373,7 @@ class ListGrader(AbstractGrader):
         """
         Group inputs in student_list according to grouping
 
-        Inputs:
+        Arguments:
             grouping (dict): an array whose entries are lists of indices in original list
             thelist (list): the list to be groupified
 
@@ -555,9 +549,6 @@ class SingleListGrader(ItemGrader):
 
     Note that this is an ItemGrader, but has similar behavior to ListGrader.
 
-    How learners enter single input lists in customresponse
-    ==========================================
-
     Single-input customresponse:
         <customresponse cfn="grader">
             <textline/> <!-- learner enters 'cat, dog, fish, rabbit' -->
@@ -567,54 +558,24 @@ class SingleListGrader(ItemGrader):
             grader receives a string: 'cat, dog, fish, rabbit'
             learner might enter fewer or more items than author expects
 
-    Basic Usage
-    ===========
+    Configuration options:
+        ordered (bool): Whether or not the entries should be in the correct order
+            (default False)
 
-    Grade a list of strings:
-        >>> from stringgrader import StringGrader
-        >>> grader = SingleListGrader(
-        ...     answers=['cat', 'dog', 'fish'],
-        ...     subgrader=StringGrader(),
-        ...     length_error=False
-        ... )
-        >>> result = grader(None, "cat, fish, moose")
-        >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }
-        >>> result == expected
-        True
+        length_error (bool): Whether to raise an error if the student input has the wrong
+            number of entries (default False)
 
-    Extra items reduce score:
-        >>> result = grader(None, "cat, fish, moose, rabbit")
-        >>> expected = {'ok':'partial', 'grade_decimal':1/3, 'msg': '' }
-        >>> result == expected
-        True
+        delimiter (str): Single character to use as the delimiter between entries (default ',')
 
-    But not below zero:
-        >>> result = grader(None, "cat, fish, moose, rabbit, bear, lion")
-        >>> expected = {'ok':False, 'grade_decimal':0, 'msg': '' }
-        >>> result == expected
-        True
+        partial_credit (bool): Whether to award partial credit for a partly-correct answer
+            (default True)
 
-    Optionally, make order matter:
-        >>> ordered_grader = SingleListGrader(
-        ...     answers=['cat', 'dog', 'fish'],
-        ...     subgrader=StringGrader(),
-        ...     ordered=True
-        ... )
-        >>> result = ordered_grader(None, "cat, fish, moose")
-        >>> expected = {'ok':'partial', 'grade_decimal':1/3, 'msg': '' }
-        >>> result == expected
-        True
+        subgrader (ItemGrader): The grader to use to grade each individual entry (required)
 
-    Optionally, change the delimiter:
-        >>> semicolon_grader = SingleListGrader(
-        ...     delimiter=';',
-        ...     answers=['cat', 'dog', 'fish'],
-        ...     subgrader=StringGrader()
-        ... )
-        >>> result = semicolon_grader(None, "cat; fish; moose")
-        >>> expected = {'ok':'partial', 'grade_decimal':2/3, 'msg': '' }
-        >>> result == expected
-        True
+        answers (list, tuple of lists): The list of answers, or a tuple of lists of answers
+            if multiple "correct lists" are available. Each individual answer must conform
+            to the appropriate answer schema for the subgrader. The default is [], as an
+            empty list is allowable if SingleListGrader is being used as a subgrader.
     """
 
     @property

@@ -216,3 +216,17 @@ def test_nesting_with_same_delimiter_raises_config_error():
                 subgrader=StringGrader()
             )
         )
+
+def test_order_matters():
+    grader = SingleListGrader(
+        answers=['cat', 'dog', 'fish'],
+        subgrader=StringGrader(),
+        ordered=True
+    )
+    submission = "cat, fish, moose"
+    expected_result = {
+        'ok': 'partial',
+        'msg': '',
+        'grade_decimal': 1/3
+    }
+    assert grader(None, submission) == expected_result
