@@ -29,6 +29,12 @@ def test_strip():
     assert not grader(None, " cat ")['ok']
     assert not grader(None, "cat ")['ok']
 
+    grader = StringGrader(answers=" cat", strip=True)
+    assert grader(None, "cat")['ok']
+    assert grader(None, " cat")['ok']
+    assert grader(None, " cat ")['ok']
+    assert grader(None, "cat ")['ok']
+
 def test_case():
     """Tests that case is working correctly"""
     grader = StringGrader(answers="cat", case_sensitive=True)
@@ -45,3 +51,34 @@ def test_case():
     assert not grader(None, "cat")['ok']
     assert not grader(None, "Cat")['ok']
     assert grader(None, "CAT")['ok']
+
+# Documentation tests
+
+def test_docs():
+    """Test that the documentation examples work as intended"""
+    # Opening example
+    grader = StringGrader(
+        answers='cat'
+    )
+    assert grader(None, 'cat')['ok']
+    assert not grader(None, 'Cat')['ok']
+    assert not grader(None, 'CAT')['ok']
+
+    # Case sensitive
+    grader = StringGrader(
+        answers='Cat',
+        case_sensitive=False
+    )
+    assert grader(None, 'cat')['ok']
+    assert grader(None, 'Cat')['ok']
+    assert grader(None, 'CAT')['ok']
+
+    # Strip
+    grader = StringGrader(
+        answers=' cat',
+        strip=False
+    )
+    assert not grader(None, 'cat')['ok']
+    assert grader(None, ' cat')['ok']
+    assert not grader(None, ' cat ')['ok']
+    assert not grader(None, 'cat ')['ok']
