@@ -1,7 +1,8 @@
 """
-StringGrader class
+stringgrader.py
 
-Grades answers that correspond to a text string, such as 'cat' and 'dog'.
+Class for grading inputs that correspond to a text string
+* StringGrader
 """
 from graders.baseclasses import ItemGrader
 from graders.voluptuous import Required
@@ -39,7 +40,13 @@ class StringGrader(ItemGrader):
         })
 
     def check_response(self, answer, student_input):
-        """Grades a student response against a given answer"""
+        """
+        Grades a student response against a given answer
+
+        Arguments:
+            answer (str): The answer to compare to
+            student_input (str): The student's input passed by edX
+        """
         expect = answer['expect']
         student = student_input
 

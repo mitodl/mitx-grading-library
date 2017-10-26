@@ -1,10 +1,11 @@
 """
-ListGrader class
+listgrader.py
 
-This class is responsible for grading anything that contains multiple inputs.
-Also deals with delimiter-separated inputs within a single input box.
+Classes for grading inputs that look like lists:
+* ListGrader (multiple inputs)
+* SingleListGrader (delimiter-separated list in a single input)
 
-Works by farming out the individual objects to other graders.
+Both work by farming out the individual objects to other graders.
 """
 from __future__ import division
 import numpy as np
