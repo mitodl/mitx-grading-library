@@ -13,7 +13,7 @@ For information on installation and how to use the library in edX, see [here](..
 - [Grading Classes](#grading-classes)
 - [Plugins](#plugins)
 
-Grading Classes:
+**Grading Classes**
 
 - [ItemGrader](item_grader.md)
   - [StringGrader](string_grader.md)
@@ -37,17 +37,17 @@ All grading classes are instantiated by calling them. Here, `GradingClass` is a 
 grader = GradingClass(options)
 ````
 
-The options passed to a grading class may be passed using a configuration dictionary, as
+The options provided to a grading class may be passed in directly, as
+
+````python
+grader = GradingClass(name='value')
+````
+
+You can also pass in a configuration dictionary. This may be helpful if using the same configuration for multiple problems.
 
 ````python
 options = {'name': 'value'}
 grader = GradingClass(options)
-````
-
-or by directly passing them in, as follows.
-
-````python
-grader = GradingClass(name='value')
 ````
 
 You cannot 'mix and match' these two options. If a configuration dictionary is supplied, any keyword arguments are ignored.

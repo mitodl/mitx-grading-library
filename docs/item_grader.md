@@ -22,32 +22,11 @@ The answers entry may be:
     {'expect':'unicorn', 'grade_decimal':0, 'msg':'Really?'},
 )
 ```
-Note that even for numerical input, the answers must be input as strings.
+Note that even for numerical input, the answers must be input as strings. By default, `'msg'=''` and `'grade_decimal'=1`.
 
 Internally, the ItemGrader converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.
 
-The wrong_msg is only displayed if the score is zero, and there are no other messages.
-
-You may also specify the configuration as a configuration dictionary. This may be helpful if using the same configuration for multiple problems. As an example, the above configuration can be constructed as follows.
-
-```python
-config = {
-    'answers': 'cat',
-    'wrong_msg': 'Try again!'
-}
-grader = StringGrader(config)
-```
-
-Such configuration dictionaries also work with SingleListGrader and ListGrader.
-
-Finally, all graders (including all ItemGraders and ListGraders) have an optional debug flag that can be used to output the student response as part of the return message. This may be helpful for diagnosing issues in edX.
-
-```python
-grader = StringGrader(
-    answers='cat',
-    debug=True
-)
-```
+The `wrong_msg` is only displayed if the score is zero, and there are no other messages.
 
 
 - [Home](README.md)

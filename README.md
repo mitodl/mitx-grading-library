@@ -66,7 +66,7 @@ grader = StringGrader(
 </script>
 
 <customresponse cfn="grader">
-    <textline/>
+    <textline correct_answer="cat"/>
 </customresponse>
 ```
 
@@ -82,12 +82,12 @@ grader = ListGrader(
 </script>
 
 <customresponse cfn="grader">
-    <textline/>
-    <textline/>
+    <textline correct_answer="1"/>
+    <textline correct_answer="2"/>
 </customresponse>
 ```
 
-TODO: Documentation on how the `expect` keyword works.
+Note that the `correct_answer` entries are only used to show to students when they press "Show Answer". The customresponse tag can also have an `expect` parameter set, but this parameter is completely ignored.
 
 # Grader Documentation
 
