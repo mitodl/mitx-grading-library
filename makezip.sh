@@ -19,6 +19,6 @@ fi
 
 # Create the zip file
 echo Building python_lib.zip...
-zip -r $file graders
+zip -r $file graders LICENSE
 
 echo Done!

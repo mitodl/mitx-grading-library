@@ -1,11 +1,16 @@
 """
-Graders package
-Version 0.3.0
+MITx Gradling Library
+https://github.com/mitodl/mitx-grading-library
+Copyright (c) 2017 Jolyon Bloomfield and Chris Chudzicki
+All Rights Reserved
+
+Version 1.0
 
 An edX python grading library
-
-Copyright 2017 Jolyon Bloomfield and Chris Chudzicki
 """
+
+# Add the current version
+from graders.version import __version__
 
 # All modules defining grading classes must set __all__ to specify
 # which classes are imported with the package
@@ -13,7 +18,6 @@ from graders.stringgrader import *
 from graders.listgrader import *
 from graders.formulagrader import *
 from graders.baseclasses import ConfigError
-
 
 def import_plugins():
     """Imports all plugins into the global namespace"""
