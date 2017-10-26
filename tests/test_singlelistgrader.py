@@ -230,3 +230,10 @@ def test_order_matters():
         'grade_decimal': 1/3
     }
     assert grader(None, submission) == expected_result
+
+def test_docs():
+    """Make sure that the documentation examples work as expected"""
+    grader = SingleListGrader(
+        answers=['cat', 'dog'],
+        subgrader=StringGrader()
+    )

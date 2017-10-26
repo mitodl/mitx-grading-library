@@ -29,4 +29,16 @@ Internally, the ItemGrader converts the answers entry into a tuple of dictionari
 The `wrong_msg` is only displayed if the score is zero, and there are no other messages.
 
 
+Option Listing
+--------------
+
+Here is the full list of options specific to an `ItemGrader`.
+```python
+grader = ItemGrader(
+    answers=answer or tuple of answers,
+    wrong_msg=string (default '')
+)
+```
+
+
 - [Home](README.md)

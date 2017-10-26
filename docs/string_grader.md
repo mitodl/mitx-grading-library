@@ -44,4 +44,16 @@ grader = StringGrader(
 This will accept `cat`, but will reject answers with leading or trailing spaces. By default, `strip=True`.
 
 
+Option Listing
+--------------
+
+Here is the full list of options specific to a `StringGrader`.
+```python
+grader = SingleListGrader(
+    case_sensitive=boole (default True),
+    strip=bool (default False)
+)
+```
+
+
 - [Home](README.md)
