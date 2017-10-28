@@ -332,6 +332,13 @@ class ListGrader(AbstractGrader):
         if not self.config['ordered'] and self.subgrader_list:
             raise ConfigError("Cannot have multiple subgraders with unordered list")
 
+        # Unordered, each group must have the same number of entries
+        if not self.config['ordered']:
+            group_len = len(self.grouping[0])
+            for group in self.grouping:
+                if len(group) != group_len:
+                    raise ConfigError("Groups must all be the same length when unordered")
+
         # If using multiple subgraders, make sure we have the right number of subgraders
         if self.subgrader_list:
             if len(self.grouping) != len(self.config['subgraders']):

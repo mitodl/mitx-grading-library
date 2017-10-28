@@ -14,7 +14,7 @@ grader = ListGrader(
 
 ## Basic usage
 
-Each input is checked against the corresponding answer, using the `ItemGrader` StringGrader.
+In this example, each input is checked against the corresponding answer, using `StringGrader` as the subgrader.
 
 ```python
 grader = ListGrader(
@@ -29,19 +29,20 @@ In the above example, the item grader just sees single strings as the answer. Yo
 
 ```python
 answer1 = (
-        {'expect':'zebra', 'grade_decimal':1},
-        {'expect':'horse', 'grade_decimal':0.45},
-        {'expect':'unicorn', 'grade_decimal':0, 'msg': 'Unicorn? Really?'}
+        {'expect': 'zebra', 'grade_decimal': 1},
+        {'expect': 'horse', 'grade_decimal': 0.45},
+        {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'Unicorn? Really?'}
     )
 answer2 = (
-        {'expect':'cat', 'grade_decimal':1},
-        {'expect':'feline', 'grade_decimal':0.5}
+        {'expect': 'cat', 'grade_decimal': 1},
+        {'expect': 'feline', 'grade_decimal': 0.5}
     )
 grader = ListGrader(
     answers=[answer1, answer2],
     subgraders=StringGrader()
 )
 ```
+In this example, the grader will try assigning the first input to answer1 and the second to answer2, and computing the total score. Then it will repeat, with the inputs switched. The student will receive the highest grade. So, note that while `cat` and `unicorn` will get the unicorn message (and 1/2 points), `zebra` and `unicorn` will not (and also get 1/2 points).
 
 
 ## Ordered Input
@@ -72,7 +73,7 @@ grader = ListGrader(
 ```
 
 
-## Nested List Graders
+## SingleListGraders in ListGrader
 
 Some questions will require nested list graders. Simple versions can make use of a `SingleListGrader` subgrader, as in the following example.
 
@@ -113,7 +114,7 @@ grader = ListGrader(
 )
 ```
 
-In this case, the next level of grader is receiving multiple inputs, and so itself needs to be a ListGrader. The grouping key specifies which group each input belongs to. In this case, answers 1 and 2 will be combined into a list and fed to the subgrader as group 1, as will 3 and 4 as group 2, and 5 and 6 as group 3. The subgraders will then receive a list of two inputs, and each of the items in the answers. Because this is an unordered list, the `ListGrader` will try every possible combination and choose the optimal one.
+In this case, the second level of grader is receiving multiple inputs, and so itself needs to be a ListGrader. The grouping key specifies which group each input belongs to. In this case, answers 1 and 2 will be combined into a list and fed to the subgrader as group 1, as will 3 and 4 as group 2, and 5 and 6 as group 3. The third level of grader (StringGrader and NumericalGrader) will then receive a list of two inputs, and each of the items in the answers. Because this is an unordered list, the `ListGrader` will try every possible combination and choose the optimal one.
 
 The grouping keys must be integers starting at 1 and increasing. If you have N groups, then all numbers from 1 to N must be present in the grouping, but they need not be in monotonic order. So for example, [1, 2, 1, 2] is a valid grouping. For unordered lists, the groupings must each have the same number of elements.
 

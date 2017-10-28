@@ -5,7 +5,7 @@ from __future__ import division
 import pprint
 from pytest import raises
 from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader, NumericalGrader,
-                     UndefinedVariable, SingleListGrader)
+                         UndefinedVariable, SingleListGrader)
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint
@@ -513,6 +513,23 @@ def test_nested_grouping_ordered():
     assert grader(None, ['0', '2', '3', '1']) == expect(1, 0, 0, 0)
 
 
+def test_grouping_unordered_different_lengths():
+    """Test that an error is raised if unordered groupings use different numbers of inputs"""
+    msg = "Groups must all be the same length when unordered"
+    with raises(ConfigError, match=msg):
+        ListGrader(
+            answers=[
+                ['bat', 'ghost', 'pumpkin'],
+                ['Halloween', 'Easter'],
+            ],
+            subgraders=ListGrader(
+                subgraders=StringGrader()
+            ),
+            ordered=False,
+            grouping=[1, 1, 1, 2]
+        )
+
+
 # Documentation Tests
 
 def test_eigensystem():
@@ -549,3 +566,7 @@ def test_eigensystem():
     }
     submissions = ['1', '-1', '0', '-1', '0', '1']
     assert grader(None, submissions) == expected_result
+
+def test_docs():
+    """Tests that the examples in the documentation behave as expected"""
+
