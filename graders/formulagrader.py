@@ -14,7 +14,7 @@ from graders.helpers.calc import (UndefinedVariable, UndefinedFunction,
                                   UnmatchedParentheses, evaluator)
 from graders.helpers.validatorfuncs import (Positive, NonNegative, PercentageString, is_callable)
 from graders.helpers.mathfunc import (construct_functions, construct_constants,
-                                      construct_suffixes, within_tolerance)
+                                      construct_suffixes, within_tolerance, gen_symbols_samples)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -200,13 +200,13 @@ class FormulaGrader(ItemGrader):
 
     def raw_check(self, answer, student_input):
         """Perform the numerical check of student_input vs answer"""
-        var_samples = self.gen_symbols_samples(self.config['variables'],
-                                               self.config['samples'],
-                                               self.config['sample_from'])
+        var_samples = gen_symbols_samples(self.config['variables'],
+                                          self.config['samples'],
+                                          self.config['sample_from'])
 
-        func_samples = self.gen_symbols_samples(self.random_funcs.keys(),
-                                                self.config['samples'],
-                                                self.random_funcs)
+        func_samples = gen_symbols_samples(self.random_funcs.keys(),
+                                           self.config['samples'],
+                                           self.random_funcs)
 
         # Make a copy of the functions and variables lists
         # We'll add the sampled functions/variables in
@@ -256,36 +256,6 @@ class FormulaGrader(ItemGrader):
             'grade_decimal': answer['grade_decimal'],
             'msg': answer['msg']
         }
-
-    @staticmethod
-    def gen_symbols_samples(symbols, samples, sample_from):
-        """
-        Generates a list of dictionaries mapping variable names to values.
-
-        The symbols argument will usually be self.config['variables']
-        or self.config['functions'].
-
-        Usage
-        =====
-        >>> variable_samples = FormulaGrader.gen_symbols_samples(
-        ...     ['a', 'b'],
-        ...     3,
-        ...     {
-        ...         'a': RealInterval([1,3]),
-        ...         'b': RealInterval([-4,-2])
-        ...     }
-        ... )
-        >>> variable_samples # doctest: +SKIP
-        [
-            {'a': 1.4765130193614819, 'b': -2.5596368656227217},
-            {'a': 2.3141937628942406, 'b': -2.8190938526155582},
-            {'a': 2.8169225565573566, 'b': -2.6547771579673363}
-        ]
-        """
-        return [
-            {symbol: sample_from[symbol].gen_sample() for symbol in symbols}
-            for j in range(samples)
-        ]
 
 
 class NumericalGrader(FormulaGrader):

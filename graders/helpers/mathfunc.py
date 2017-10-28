@@ -8,6 +8,7 @@ Contains some helper functions used in grading formulae:
 * construct_functions
 * construct_constants
 * construct_suffixes
+* gen_symbols_samples
 
 Defines:
 * DEFAULT_FUNCTIONS
@@ -262,3 +263,33 @@ def construct_suffixes(metric=False):
     if metric:
         suffixes.update(METRIC_SUFFIXES)
     return suffixes
+
+def gen_symbols_samples(symbols, samples, sample_from):
+    """
+    Generates a list of dictionaries mapping variable names to values.
+
+    The symbols argument will usually be config['variables']
+    or config['functions'].
+
+    Usage
+    =====
+    >>> from graders.sampling import RealInterval
+    >>> variable_samples = gen_symbols_samples(
+    ...     ['a', 'b'],
+    ...     3,
+    ...     {
+    ...         'a': RealInterval([1,3]),
+    ...         'b': RealInterval([-4,-2])
+    ...     }
+    ... )
+    >>> variable_samples # doctest: +SKIP
+    [
+        {'a': 1.4765130193614819, 'b': -2.5596368656227217},
+        {'a': 2.3141937628942406, 'b': -2.8190938526155582},
+        {'a': 2.8169225565573566, 'b': -2.6547771579673363}
+    ]
+    """
+    return [
+        {symbol: sample_from[symbol].gen_sample() for symbol in symbols}
+        for j in range(samples)
+    ]
