@@ -5,6 +5,10 @@ Contains base classes for the library:
 * ObjectWithSchema
 * AbstractGrader
 * ItemGrader
+
+Also containts some error classes:
+* ConfigError
+* InvalidInput
 """
 from __future__ import division
 import numbers
@@ -16,6 +20,12 @@ from graders.version import __version__
 class ConfigError(Exception):
     """Raised whenever a configuration error occurs"""
     pass
+
+
+class InvalidInput(Exception):
+    """Raised whenever user input is invalid"""
+    pass
+
 
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""
