@@ -1,5 +1,4 @@
-ListGrader
-==========
+# ListGrader
 
 `SingleListGrader` can grade a list of items in a single input box, but if you have more than one input box, you need a `ListGrader`. ListGraders work by farming out individual items to subgraders, and then collecting the results and working out the optimal farming scheme for the student. Here are the complete set of options for a ListGrader's grading scheme:
 
@@ -13,7 +12,7 @@ grader = ListGrader(
 ```
 
 
-### Basic usage
+## Basic usage
 
 Each input is checked against the corresponding answer, using the `ItemGrader` StringGrader.
 
@@ -45,7 +44,7 @@ grader = ListGrader(
 ```
 
 
-### Ordered Input
+## Ordered Input
 
 By default, the ListGrader doesn't care what order the inputs are given in, so "cat" and "dog" is equivalent to "dog" and "cat". If you want the inputs to be ordered, simply set ordered to True.
 
@@ -60,7 +59,7 @@ grader = ListGrader(
 Now, "cat" and "dog" will receive full credit, but "dog" and "cat" will receive none.
 
 
-### Multiple Graders
+## Multiple Graders
 
 If you have inhomogeneous inputs, you can grade them using different graders. Simply give a list of subgraders, and the data will be passed into the graders in that order. Note that the length of answers must be the same as the number of subgraders in this case. Further note that you must set ordered to True when using a list of subgraders.
 
@@ -73,7 +72,7 @@ grader = ListGrader(
 ```
 
 
-### Nested List Graders
+## Nested List Graders
 
 Some questions will require nested list graders. Simple versions can make use of a `SingleListGrader` subgrader, as in the following example.
 
@@ -95,7 +94,7 @@ grader = ListGrader(
 The nested `SingleListGrader` will be used to grade the first input box against an unordered answer of 2 and 4, and then the second input box against an unordered answer of 1 and 3.
 
 
-### Grouped Inputs
+## Grouped Inputs
 
 If you find yourself wanting to nest ListGraders, then you will need to specify how the inputs should be grouped together to be passed to the subgraders. A simple example would be to ask for the name and number of each animal in a picture. Each name/number group needs to be graded together. Here is an example of such a question.
 

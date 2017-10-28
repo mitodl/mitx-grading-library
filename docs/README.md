@@ -1,5 +1,4 @@
-MITx Grading Library Documentation
-==================================
+# MITx Grading Library Documentation
 
 This documentation describes how to use the grading library. In particular, it goes through the syntax required to construct each of the different types of graders.
 
@@ -22,14 +21,12 @@ For information on installation and how to use the library in edX, see [here](..
 - [ListGrader](list_grader.md)
 
 
-Overview
---------
+## Overview
 
 The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.
 
 
-Using Grading Classes
----------------------
+## Using Grading Classes
 
 All grading classes are instantiated by calling them. Here, `GradingClass` is a generic grading class (`GradingClass` does not actually exist).
 
@@ -53,8 +50,7 @@ grader = GradingClass(options)
 You cannot 'mix and match' these two options. If a configuration dictionary is supplied, any keyword arguments are ignored.
 
 
-Options
--------
+## Options
 
 Every grading class has a debug option. By default, `debug=False`. To receive debug information from a given grader, specify `debug=True`. Some graders will provide more debug information than others.
 
@@ -65,8 +61,7 @@ grader = GradingClass(debug=True)
 All other options are specific to the grading class in question.
 
 
-Grading Classes
----------------
+## Grading Classes
 
 Grading classes generally fall into two categories: single-input graders and multi-input graders.
 
@@ -81,11 +76,10 @@ Multi-input graders that are just composed of single-input graders working in co
 - [ListGrader](list_grader.md)
 
 
-Plugins
--------
+## Plugins
 
 Any .py file stored in the `plugins` folder will be automatically loaded. All variables in the __all__ list will be made available when doing `from mitxgraders import *`. See `template.py` for an example.
 
-You can define custom grading classes in your plugin. We recommend copying the code from `stringgrader.py`, renaming the class, and building a simple plugin based on `StringGrader` to familiarize yourself with building a plugin.
+You can define custom grading classes in your plugin. To learn how this works, we recommend copying the code from `stringgrader.py`, renaming the class, and building a simple plugin based on `StringGrader`.
 
-If you have built a plugin that you would like to see combined into this library, please contact the authors through [github](https://github.com/mitodl/mitx-grading-library).
+We are happy to include user-contributed plugins in the repository for this library. If you have built a plugin that you would like to see combined into this library, please contact the authors through [github](https://github.com/mitodl/mitx-grading-library). We are also willing to consider incorporating good plugins into the library itself.

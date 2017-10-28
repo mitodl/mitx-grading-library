@@ -1,10 +1,3 @@
-**Table of Contents**
-
-- [MITx Grading Library](#mitx-graders)
-- [Installation](#installation)
-- [Usage in edX](#usage-in-edx)
-- [Grader Documentation](#grader-documentation)
-
 # MITx Grading Library
 
 A library of graders for edX Custom Response problems.
@@ -15,7 +8,13 @@ Copyright 2017 Jolyon Bloomfield and Chris Chudzicki
 
 We thank the MIT Office of Digital Learning for their support.
 
-# Installation
+**Table of Contents**
+
+- [Installation](#installation)
+- [Usage in edX](#usage-in-edx)
+- [Grader Documentation](#grader-documentation)
+
+## Installation
 
 To install:
 
@@ -32,7 +31,8 @@ To use in edX:
 
 1. Download [python_lib.zip](python_lib.zip) and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow).
 
-# Usage in edX
+
+## Usage in edX
 
 In edX, you want to use a Custom Response problem. We provide examples of the XML required to use the grading library in edX.
 
@@ -53,7 +53,7 @@ grader = GraderType(
 </customresponse>
 ```
 
-The configuration depends on the type of grader that you're using. Note that all answers must be passed through the configuration; the `expect` keyword is not used to pass the answer, but is used when a student clicks "Show Answer".
+The configuration depends on the type of grader that you're using. Note that all answers must be passed through the configuration. In particular, the `expect` keyword is ignored by the grader.
 
 Here is an example where we use a StringGrader with answer `cat`.
 
@@ -65,10 +65,12 @@ grader = StringGrader(
 )
 </script>
 
-<customresponse cfn="grader">
-    <textline correct_answer="cat"/>
+<customresponse cfn="grader" expect="cat">
+    <textline/>
 </customresponse>
 ```
+
+The `expect` keyword is ignored by the grader, but is shown when students click on "Show Answer". This works only for single-input problems.
 
 Here is another example where we use a ListGrader to grade two numbers in an unordered fashion.
 
@@ -87,8 +89,9 @@ grader = ListGrader(
 </customresponse>
 ```
 
-Note that the `correct_answer` entries are only used to show to students when they press "Show Answer". The customresponse tag can also have an `expect` parameter set, but this parameter is completely ignored.
+Here, the `correct_answer` entries are shown to students when they click "Show Answer". These values are not provided to the grader. The `correct_answer` keyword can also be used for single-input problems.
 
-# Grader Documentation
+
+## Grader Documentation
 
 [Extensive documentation](docs/README.md) has been compiled for the configuration of the different graders in the library.

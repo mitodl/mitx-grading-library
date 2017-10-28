@@ -1,5 +1,4 @@
-FormulaGrader and NumericalGrader
-=================================
+# FormulaGrader and NumericalGrader
 
 TODO: The below documentation is all old, and should be updated once these classes have been overhauled!
 
@@ -60,5 +59,6 @@ grader = FormulaGrader(
     }
 )
 ```
+
 
 - [Home](README.md)

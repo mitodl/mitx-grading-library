@@ -1,5 +1,4 @@
-ItemGrader
-==========
+# ItemGrader
 
 When an individual input needs to be graded, it is graded by an item grader. All item graders work by specifying answers and their corresponding points/messages, as well as an optional message for wrong answers. In these examples, we use `StringGrader` as an example of how to use a generic ItemGrader. You cannot use a generic ItemGrader by itself.
 
@@ -58,8 +57,7 @@ Internally, the ItemGrader converts the answers entry into a tuple of dictionari
 The `wrong_msg` is only displayed if the score is zero, and there are no other messages.
 
 
-Option Listing
---------------
+## Option Listing
 
 Here is the full list of options specific to an `ItemGrader`.
 ```python
