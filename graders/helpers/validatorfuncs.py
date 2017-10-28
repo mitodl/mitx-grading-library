@@ -7,12 +7,14 @@ from numbers import Number
 from graders.voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
 
 def Positive(thetype):
+    """Demand a positive number type"""
     if thetype == int:
         return All(thetype, Range(1, float('inf')))
     else:
         return All(thetype, Range(0, float('inf')), NotIn([0]))
 
 def NonNegative(thetype):
+    """Demand a non-negative number type"""
     return All(thetype, Range(0, float('inf')))
 
 def PercentageString(value):

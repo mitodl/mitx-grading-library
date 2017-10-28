@@ -17,7 +17,8 @@ from graders.version import __version__
 from graders.stringgrader import *
 from graders.listgrader import *
 from graders.formulagrader import *
-from graders.baseclasses import ConfigError
+from graders.sampling import *
+from graders.baseclasses import ConfigError, InvalidInput
 
 def import_plugins():
     """Imports all plugins into the global namespace"""

@@ -5,6 +5,10 @@ Contains base classes for the library:
 * ObjectWithSchema
 * AbstractGrader
 * ItemGrader
+
+Also containts some error classes:
+* ConfigError
+* InvalidInput
 """
 from __future__ import division
 import numbers
@@ -17,8 +21,14 @@ class ConfigError(Exception):
     """Raised whenever a configuration error occurs"""
     pass
 
+
+class InvalidInput(Exception):
+    """Raised whenever user input is invalid"""
+    pass
+
+
 class ObjectWithSchema(object):
-    """Represents a user-facing object whose configuration needs validation."""
+    """Represents an author-facing object whose configuration needs validation."""
 
     # This is an abstract base class
     __metaclass__ = abc.ABCMeta
@@ -55,7 +65,14 @@ class ObjectWithSchema(object):
         return "{classname}({config})".format(classname=self.__class__.__name__, config=self.config)
 
 class AbstractGrader(ObjectWithSchema):
-    """Abstract grader class. All graders must build on this class."""
+    """
+    Abstract grader class. All graders must build on this class.
+
+    Configuration options:
+        debug (bool): Whether to add debug information to the output. Can also affect
+            the types of error messages that are generated to be more technical (for
+            authors) or more user-friendly (for students) (default True)
+    """
 
     # This is an abstract base class
     __metaclass__ = abc.ABCMeta
@@ -76,37 +93,39 @@ class AbstractGrader(ObjectWithSchema):
         Check student_input for correctness and provide feedback.
 
         Arguments:
-            answers: The expected result and grading information
+            answers: The expected result(s) and grading information
             student_input: The student's input passed by edX
         """
         pass
 
     def __call__(self, expect, student_input):
         """
-        Ignores expect and grades student_input.
+        Used to ask the grading class to grade student_input.
         Used by edX as the check function (cfn).
 
         Arguments:
-            expect: The value of edX customresponse expect attribute
+            expect: The value of edX customresponse expect attribute (ignored)
             student_input: The student's input passed by edX
 
-        NOTES:
-            This function ignores the value of expect. Reason:
+        Notes:
+            This function ignores the value of expect.
 
-            edX requires a two-parameter check function cfn with
-            the signature above. In the graders module, we NEVER use
+            This is because edX requires a two-parameter check function cfn
+            with the signature above. In the graders module, we NEVER use
             the <customresponse /> tag's expect attribute for grading.
 
             (Our check functions require an answer dictionary, as described
             in the documentation.)
 
             But we do want to allow authors to use the edX <customresponse />
-            expect attribute because its value is displayed to students.
+            expect attribute because its value is displayed to students as
+            the "correct" answer.
 
             The answer that we pass to check is None, indicating that the
             grader should read the answer from its internal configuration.
         """
         result = self.check(None, student_input)
+
         if self.config['debug']:
             # Construct the debug output
             debugoutput = "MITx Grading Library Version " + __version__ + "\n"
@@ -125,21 +144,42 @@ class AbstractGrader(ObjectWithSchema):
                     result['msg'] += "\n\n" + debugoutput
                 else:
                     result['msg'] = debugoutput
+
         return result
 
 class ItemGrader(AbstractGrader):
     """
     Abstract base class that represents a grader that grades a single input.
-    Almost all grading classes should inherit from this class. The only exception
-    should be ListGrader.
+    Almost all grading classes should inherit from this class. The most notable
+    exception is ListGrader.
 
     This class looks after the basic schema required to describe answers to a problem,
     allowing for multiple ways of providing those answers. It also looks after checking
     student input against all possible answers.
 
     Inheriting classes must implement check_response. If any extra parameters are added
-    to the config, then schema_config should be shadowed. The only other thing you may
-    want to shadow is schema_expect, to add parsing to answers.
+    to the config, then schema_config should be extended (see StringGrader, for example).
+    The only other thing you may want to shadow is schema_expect, to add parsing to
+    answers.
+
+    Answers can be provided in one of two forms:
+        * An answer string
+        * A dictionary:
+            {'expect': answer, 'grade_decimal': number, 'ok': value, 'msg'}
+            expect: Stores the expected answer as a string (Required)
+            grade_decimal: Stores the grade as a decimal that this answer should receive.
+                If set, overrides 'ok' entry (default 1)
+            ok: Can be set to True, False, 'partial' or 'computed' (default). Ignored if
+                'grade_decimal' is not 1.
+            msg: Message to return to the student if they provide this answer (default "")
+    Internally, an answer string will be coverted into a dictionary with 'ok'=True.
+
+    Configuration options:
+        answers (varies): A single answer in one of the above forms, or a tuple of answers
+            in the above forms. Not required, as answers can be provided later.
+
+        wrong_msg (str): A generic message to give the students upon submission of an
+            answer that received a grade of 0 (default "")
     """
 
     # This is an abstract base class
@@ -159,20 +199,14 @@ class ItemGrader(AbstractGrader):
 
     def schema_answers(self, answer_tuple):
         """
-        Defines the schema to validate an answer tuple against.
+        Defines the schema to validate an answer tuple against (eg, config['answers']).
 
         This will transform the input to a tuple as necessary, and then call
         validate_single_answer to validate individual answers.
 
-        Usually used to validate config['answers'].
-
-        Three forms for the answer tuple are acceptable:
-
-        1. A tuple of dictionaries, each a valid schema_answer
-        2. A tuple of schema_answer['expect'] values
-        3. A single schema_answer['expect'] value
+        Arguments:
+            answer_tuple: The input answers to validate and return in a conforming state
         """
-        # Turn answer_tuple into a tuple if it isn't already
         if not isinstance(answer_tuple, tuple):
             answer_tuple = (answer_tuple,)
         schema = Schema((self.validate_single_answer,))
@@ -182,11 +216,12 @@ class ItemGrader(AbstractGrader):
         """
         Validates a single answer.
         Transforms the answer to conform with schema_answer and returns it.
-        If invalid, raises ValueError.
+        If invalid, raises an error.
 
-        Two forms are acceptable:
-        1. A schema_answer dictionary (we compute the 'ok' value if needed)
-        2. A schema_answer['expect'] value (validated as {'expect': answer})
+        Arguments:
+            answer: The answer to validate. Two forms are acceptable:
+                1. A schema_answer dictionary (we compute the 'ok' value if needed)
+                2. A schema_answer['expect'] value (validated as {'expect': answer})
         """
         try:
             # Try to validate against the answer schema
@@ -197,10 +232,11 @@ class ItemGrader(AbstractGrader):
                 validated_answer = self.schema_answer({'expect': answer, 'ok': True})
             except MultipleInvalid:
                 # Unable to interpret your answer!
-                raise ValueError
+                raise
 
-        # If the 'ok' value is 'computed', then compute what it should be
-        if validated_answer['ok'] == 'computed':
+        # If the 'ok' value is 'computed' or the grade decimal is not 1,
+        # then compute what it should be
+        if validated_answer['ok'] == 'computed' or validated_answer['grade_decimal'] != 1:
             validated_answer['ok'] = self.grade_decimal_to_ok(validated_answer['grade_decimal'])
 
         return validated_answer
@@ -214,7 +250,7 @@ class ItemGrader(AbstractGrader):
     def schema_answer(self):
         """Defines the schema that a fully-specified answer should satisfy."""
         return Schema({
-            Required('expect', default=None): self.schema_expect,
+            Required('expect'): self.schema_expect,
             Required('grade_decimal', default=1): All(numbers.Number, Range(0, 1)),
             Required('msg', default=''): str,
             Required('ok', default='computed'): Any('computed', True, False, 'partial')
@@ -229,21 +265,26 @@ class ItemGrader(AbstractGrader):
         """
         Compares student input to each answer in answers, using check_response.
         Computes the best outcome for the student.
+
+        Arguments:
+            answer: A tuple of answers to compare to, or None to use internal config
+            student_input (str): The student's input passed by edX
         """
         # If no answers provided, use the internal configuration
         answers = self.config['answers'] if answers is None else answers
 
         # answers should now be a tuple of answers
         # Check that there is at least one answer to compare to
+        if not isinstance(answers, tuple):
+            msg = "Expected answers to be a tuple of answers, instead received {}"
+            raise ConfigError(msg.format(type(answers)))
         if not answers:
             raise ConfigError("Expected at least one answer in answers")
-        if not isinstance(answers, tuple):
-            msg = "Expected answers to be a tuple of answers, instead received {0}"
-            raise ConfigError(msg.format(type(answers)))
 
         # Make sure the input is in the expected format
         if not isinstance(student_input, basestring):
-            raise ConfigError("Expected string for student_input, received {}".format(type(student_input)))
+            msg = "Expected string for student_input, received {}"
+            raise ConfigError(msg.format(type(student_input)))
 
         # Compute the results for each answer
         results = [self.check_response(answer, student_input) for answer in answers]

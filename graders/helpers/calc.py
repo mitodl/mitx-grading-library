@@ -5,7 +5,7 @@ Parser and evaluator for mathematical expressions.
 
 Uses pyparsing to parse. Main function is evaluator().
 
-Based on the edX calc.py, but heavily modified.
+Heavily modified from the edX calc.py
 """
 from __future__ import division
 import numbers

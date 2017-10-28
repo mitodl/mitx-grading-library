@@ -3,10 +3,14 @@ mathfunc.py
 
 Contains mathematical functions for use in interpreting formulas.
 
-Also contains some helper functions used in grading formulae:
+Contains some helper functions used in grading formulae:
 * within_tolerance
+* construct_functions
+* construct_constants
+* construct_suffixes
+* gen_symbols_samples
 
-Also defines:
+Defines:
 * DEFAULT_FUNCTIONS
 * DEFAULT_VARIABLES
 * DEFAULT_SUFFIXES
@@ -15,6 +19,8 @@ Also defines:
 from __future__ import division
 import math
 import numpy as np
+from graders.baseclasses import ConfigError
+from graders.sampling import SpecificFunctions, FunctionSamplingSet
 
 # Normal Trig
 def sec(arg):
@@ -176,3 +182,165 @@ def within_tolerance(x, y, tolerance):
         tolerance = tolerance.strip()
         tolerance = np.linalg.norm(x) * float(tolerance[:-1]) * 0.01
     return np.linalg.norm(x-y) <= tolerance
+
+def construct_functions(whitelist, blacklist, user_funcs):
+    """
+    Returns the dictionary of available functions
+
+    Arguments:
+        whitelist (list): List of function names to allow, ignored if empty.
+            To disallow all functions, use whitelist = [None].
+
+        blacklist (list): List of function names to disallow. whitelist and blacklist
+            cannot be used in conjunction.
+
+        user_funcs (dict): Dictionary of "name": function pairs specifying user-defined
+            functions to include.
+
+    Usage
+    =====
+    By default, just returns DEFAULT_FUNCTIONS
+    >>> funcs, random_funcs = construct_functions([], [], {})
+    >>> funcs == DEFAULT_FUNCTIONS
+    True
+    >>> random_funcs == {}
+    True
+
+    To remove all functions, pass in a whitelist of [None]
+    >>> funcs, random_funcs = construct_functions([None], [], {})
+    >>> funcs == {}
+    True
+
+    Whitelisting specifies exactly what functions are allowed
+    >>> funcs, random_funcs = construct_functions(["sin"], [], {})
+    >>> funcs == {"sin": np.sin}
+    True
+
+    Blacklisting removes a function from the list
+    >>> funcs, random_funcs = construct_functions([], ["sin"], {})
+    >>> funcs.get("sin", None) is None
+    True
+    >>> funcs["cos"] == np.cos
+    True
+
+    You can specify user-defined functions
+    >>> from graders.sampling import RandomFunction
+    >>> func = lambda x: x
+    >>> randfunc = RandomFunction()
+    >>> funcs, random_funcs = construct_functions([], [], {"f": func, "g": randfunc})
+    >>> funcs["f"] == func
+    True
+    >>> random_funcs["g"] == randfunc
+    True
+    """
+    if whitelist:
+        if blacklist:
+            raise ConfigError("Cannot whitelist and blacklist at the same time")
+
+        functions = {}
+        for f in whitelist:
+            if f is None:
+                # This allows for you to have whitelist = [None], which removes
+                # all functions from the function list
+                continue
+            try:
+                functions[f] = DEFAULT_FUNCTIONS[f]
+            except KeyError:
+                raise ConfigError("Unknown function in whitelist: " + f)
+    else:
+        # Treat no blacklist as blacklisted with an empty list
+        functions = DEFAULT_FUNCTIONS.copy()
+        for f in blacklist:
+            try:
+                del functions[f]
+            except KeyError:
+                raise ConfigError("Unknown function in blacklist: " + f)
+
+    # Add in any custom functions to the functions and random_funcs lists
+    random_funcs = {}
+    for f in user_funcs:
+        if not isinstance(f, str):
+            msg = str(f) + " is not a valid name for a function (must be a string)"
+            raise ConfigError(msg)
+        # Check if we have a random function or a normal function
+        if isinstance(user_funcs[f], list):
+            # A list of functions; convert to a SpecificFunctions class
+            random_funcs[f] = SpecificFunctions(user_funcs[f])
+        elif isinstance(user_funcs[f], FunctionSamplingSet):
+            random_funcs[f] = user_funcs[f]
+        else:
+            # f is a normal function
+            functions[f] = user_funcs[f]
+
+    return functions, random_funcs
+
+def construct_constants(user_consts):
+    """
+    Returns the dictionary of available constants
+    user_consts is a dictionary of "name": value pairs of constants to add to the defaults
+
+    Usage
+    =====
+    >>> construct_constants({})
+    {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'j': 1j}
+    >>> construct_constants({"T": 1.5})
+    {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'T': 1.5, 'j': 1j}
+    """
+    constants = DEFAULT_VARIABLES.copy()
+
+    # Add in any user constants
+    for var in user_consts:
+        if not isinstance(var, str):
+            msg = str(var) + " is not a valid name for a constant (must be a string)"
+            raise ConfigError(msg)
+        constants[var] = user_consts[var]
+
+    return constants
+
+def construct_suffixes(metric=False):
+    """
+    Returns the dictionary of available suffixes.
+    Setting metric=True adds in the metric suffixes.
+
+    Usage
+    =====
+    >>> construct_suffixes()
+    {'%': 0.01}
+    >>> suff = construct_suffixes(True)
+    >>> suff['G'] == 1e9
+    True
+    """
+    suffixes = DEFAULT_SUFFIXES.copy()
+    if metric:
+        suffixes.update(METRIC_SUFFIXES)
+    return suffixes
+
+def gen_symbols_samples(symbols, samples, sample_from):
+    """
+    Generates a list of dictionaries mapping variable names to values.
+
+    The symbols argument will usually be config['variables']
+    or config['functions'].
+
+    Usage
+    =====
+    >>> from graders.sampling import RealInterval
+    >>> variable_samples = gen_symbols_samples(
+    ...     ['a', 'b'],
+    ...     3,
+    ...     {
+    ...         'a': RealInterval([1,3]),
+    ...         'b': RealInterval([-4,-2])
+    ...     }
+    ... )
+    >>> variable_samples # doctest: +SKIP
+    [
+        {'a': 1.4765130193614819, 'b': -2.5596368656227217},
+        {'a': 2.3141937628942406, 'b': -2.8190938526155582},
+        {'a': 2.8169225565573566, 'b': -2.6547771579673363}
+    ]
+    """
+    return [
+        {symbol: sample_from[symbol].gen_sample() for symbol in symbols}
+        for j in range(samples)
+    ]

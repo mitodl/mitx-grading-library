@@ -4,7 +4,7 @@ Tests for ListGrader
 from __future__ import division
 import pprint
 from pytest import raises
-from graders import (ListGrader, ConfigError, StringGrader, FormulaGrader,
+from graders import (ListGrader, ConfigError, StringGrader, FormulaGrader, NumericalGrader,
                      UndefinedVariable, SingleListGrader)
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -498,10 +498,10 @@ def test_nested_grouping_ordered():
     def expect(a, b, c, d):
         return {
             'input_list': [
-                {'grade_decimal': a, 'msg': '', 'ok': a==1},
-                {'grade_decimal': b, 'msg': '', 'ok': b==1},
-                {'grade_decimal': c, 'msg': '', 'ok': c==1},
-                {'grade_decimal': d, 'msg': '', 'ok': d==1}
+                {'grade_decimal': a, 'msg': '', 'ok': a == 1},
+                {'grade_decimal': b, 'msg': '', 'ok': b == 1},
+                {'grade_decimal': c, 'msg': '', 'ok': c == 1},
+                {'grade_decimal': d, 'msg': '', 'ok': d == 1}
             ],
             'overall_message': ''
         }
@@ -511,3 +511,41 @@ def test_nested_grouping_ordered():
     assert grader(None, ['3', '2', '1', '0']) == expect(0, 0, 0, 0)
     assert grader(None, ['1', '3', '2', '0']) == expect(0, 1, 0, 0)
     assert grader(None, ['0', '2', '3', '1']) == expect(1, 0, 0, 0)
+
+
+# Documentation Tests
+
+def test_eigensystem():
+    """Tests the eigensystem example"""
+    grader = ListGrader(
+        answers=[
+            ['1', (['1', '0'], ['-1', '0'])],
+            ['-1', (['0', '1'], ['0', '-1'])],
+        ],
+        subgraders=ListGrader(
+            subgraders=[
+                NumericalGrader(),
+                ListGrader(
+                    subgraders=NumericalGrader(),
+                    ordered=True
+                )
+            ],
+            ordered=True,
+            grouping=[1, 2, 2]
+        ),
+        grouping=[1, 1, 1, 2, 2, 2]
+    )
+
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''}
+        ]
+    }
+    submissions = ['1', '-1', '0', '-1', '0', '1']
+    assert grader(None, submissions) == expected_result
