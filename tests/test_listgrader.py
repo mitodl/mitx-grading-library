@@ -4,7 +4,7 @@ Tests for ListGrader
 from __future__ import division
 import pprint
 from pytest import raises
-from graders import (ListGrader, ConfigError, StringGrader, FormulaGrader, NumericalGrader,
+from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader, NumericalGrader,
                      UndefinedVariable, SingleListGrader)
 
 pp = pprint.PrettyPrinter(indent=4)

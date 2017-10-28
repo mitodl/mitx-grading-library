@@ -4,7 +4,7 @@ Tests for SingleListGrader
 from __future__ import division
 import pprint
 from pytest import approx, raises
-from graders import ConfigError, StringGrader, SingleListGrader
+from mitxgraders import ConfigError, StringGrader, SingleListGrader
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint

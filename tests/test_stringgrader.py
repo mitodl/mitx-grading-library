@@ -1,7 +1,7 @@
 """
 Tests for StringGrader
 """
-from graders import StringGrader
+from mitxgraders import StringGrader
 
 def test_strip():
     """Tests that strip is working correctly"""

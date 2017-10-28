@@ -16,9 +16,9 @@ from numbers import Number
 import abc
 import random
 import numpy as np
-from graders.baseclasses import ObjectWithSchema, ConfigError
-from graders.voluptuous import Schema, Required
-from graders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
+from mitxgraders.baseclasses import ObjectWithSchema, ConfigError
+from mitxgraders.voluptuous import Schema, Required
+from mitxgraders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
                                             TupleOfType, is_callable)
 
 # Set the objects to be imported from this grader

@@ -4,7 +4,7 @@ basic_demo.py
 A simple demo of using the grading library
 """
 import pprint
-from graders import *
+from mitxgraders import *
 
 pp = pprint.PrettyPrinter(indent=4)
 

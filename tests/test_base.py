@@ -2,8 +2,8 @@
 Tests of base class functionality
 """
 from __future__ import division
-from graders import ListGrader, StringGrader, ConfigError, __version__
-from graders.voluptuous import Error
+from mitxgraders import ListGrader, StringGrader, ConfigError, __version__
+from mitxgraders.voluptuous import Error
 from pytest import raises
 
 def test_debug():

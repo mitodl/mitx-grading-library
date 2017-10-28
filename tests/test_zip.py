@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, 'python_lib.zip')
 # The 0 tells it to search this zip file before even the module directory
 # Hence,
-from graders import *
+from mitxgraders import *
 # loads graders from the zip file
 
 def test_loaded():

@@ -84,7 +84,7 @@ Multi-input graders that are just composed of single-input graders working in co
 Plugins
 -------
 
-Any .py file stored in the `plugins` folder will be automatically loaded. All variables in the __all__ list will be made available when doing `from graders import *`. See `template.py` for an example.
+Any .py file stored in the `plugins` folder will be automatically loaded. All variables in the __all__ list will be made available when doing `from mitxgraders import *`. See `template.py` for an example.
 
 You can define custom grading classes in your plugin. We recommend copying the code from `stringgrader.py`, renaming the class, and building a simple plugin based on `StringGrader` to familiarize yourself with building a plugin.
 
