@@ -133,8 +133,8 @@ Our last pair of examples are for a math class, where we have a matrix that has 
 ```python
 grader = ListGrader(
     answers=[
-        [1, (['1', '0'], ['-1', '0'])],
-        [-1, (['0', '1'], ['0', '-1'])],
+        ['1', (['1', '0'], ['-1', '0'])],
+        ['-1', (['0', '1'], ['0', '-1'])],
     ],
     subgraders=ListGrader(
         subgraders=[
@@ -157,8 +157,8 @@ It is possible to specify a grouping on a nested `ListGrader`. The outer `ListGr
 ```python
 grader = ListGrader(
     answers=[
-        [1, (['1', '0'], ['-1', '0'])],
-        [-1, (['0', '1'], ['0', '-1'])],
+        ['1', (['1', '0'], ['-1', '0'])],
+        ['-1', (['0', '1'], ['0', '-1'])],
     ],
     subgraders=ListGrader(
         subgraders=[

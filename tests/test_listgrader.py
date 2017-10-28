@@ -536,6 +536,17 @@ def test_docs():
         answers=['cat', 'dog'],
         subgraders=StringGrader()
     )
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+        ]
+    }
+    submissions = ['cat', 'dog']
+    assert grader(None, submissions) == expected_result
+    submissions = ['dog', 'cat']
+    assert grader(None, submissions) == expected_result
 
     answer1 = (
         {'expect': 'zebra', 'grade_decimal': 1},
@@ -550,18 +561,63 @@ def test_docs():
         answers=[answer1, answer2],
         subgraders=StringGrader()
     )
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+        ]
+    }
+    submissions = ['cat', 'zebra']
+    assert grader(None, submissions) == expected_result
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': 'partial', 'grade_decimal': 0.5, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': 'Unicorn? Really?'},
+        ]
+    }
+    submissions = ['feline', 'unicorn']
+    assert grader(None, submissions) == expected_result
 
     grader = ListGrader(
         answers=['cat', 'dog'],
         subgraders=StringGrader(),
         ordered=True
     )
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+        ]
+    }
+    submissions = ['cat', 'dog']
+    assert grader(None, submissions) == expected_result
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+        ]
+    }
+    submissions = ['dog', 'cat']
+    assert grader(None, submissions) == expected_result
 
     grader = ListGrader(
         answers=['cat', 'x^2+1'],
         subgraders=[StringGrader(), FormulaGrader(variables=["x"])],
         ordered=True
     )
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+        ]
+    }
+    submissions = ['cat', '(x-i)*(x+i)']
+    assert grader(None, submissions) == expected_result
 
     grader = ListGrader(
         answers=[
@@ -573,6 +629,15 @@ def test_docs():
         ),
         ordered=True
     )
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+        ]
+    }
+    submissions = ['2, 4', '3,1']
+    assert grader(None, submissions) == expected_result
 
     grader = ListGrader(
         answers=[
@@ -586,6 +651,19 @@ def test_docs():
         ),
         grouping=[1, 1, 2, 2, 3, 3]
     )
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+        ]
+    }
+    submissions = ['cat', '1', 'dog', '3', 'tiger', '2']
+    assert grader(None, submissions) == expected_result
 
     grader = ListGrader(
         answers=[
@@ -601,11 +679,22 @@ def test_docs():
         ordered=True,
         grouping=[1, 1, 1, 2]
     )
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+        ]
+    }
+    submissions = ['Halloween', 'bat', 'pumpkin', 'ghost']
+    assert grader(None, submissions) == expected_result
 
     grader = ListGrader(
         answers=[
-            [1, (['1', '0'], ['-1', '0'])],
-            [-1, (['0', '1'], ['0', '-1'])],
+            ['1', (['1', '0'], ['-1', '0'])],
+            ['-1', (['0', '1'], ['0', '-1'])],
         ],
         subgraders=ListGrader(
             subgraders=[
@@ -619,11 +708,22 @@ def test_docs():
         ),
         grouping=[1, 1, 2, 2]
     )
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+        ]
+    }
+    submissions = ['-1', '0, 1', '1', '-1, 0']
+    assert grader(None, submissions) == expected_result
 
     grader = ListGrader(
         answers=[
-            [1, (['1', '0'], ['-1', '0'])],
-            [-1, (['0', '1'], ['0', '-1'])],
+            ['1', (['1', '0'], ['-1', '0'])],
+            ['-1', (['0', '1'], ['0', '-1'])],
         ],
         subgraders=ListGrader(
             subgraders=[
