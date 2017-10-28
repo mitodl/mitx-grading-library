@@ -19,8 +19,8 @@ Defines:
 from __future__ import division
 import math
 import numpy as np
-from graders.baseclasses import ConfigError
-from graders.sampling import SpecificFunctions, FunctionSamplingSet
+from mitxgraders.baseclasses import ConfigError
+from mitxgraders.sampling import SpecificFunctions, FunctionSamplingSet
 
 # Normal Trig
 def sec(arg):
@@ -224,7 +224,7 @@ def construct_functions(whitelist, blacklist, user_funcs):
     True
 
     You can specify user-defined functions
-    >>> from graders.sampling import RandomFunction
+    >>> from mitxgraders.sampling import RandomFunction
     >>> func = lambda x: x
     >>> randfunc = RandomFunction()
     >>> funcs, random_funcs = construct_functions([], [], {"f": func, "g": randfunc})
@@ -324,7 +324,7 @@ def gen_symbols_samples(symbols, samples, sample_from):
 
     Usage
     =====
-    >>> from graders.sampling import RealInterval
+    >>> from mitxgraders.sampling import RealInterval
     >>> variable_samples = gen_symbols_samples(
     ...     ['a', 'b'],
     ...     3,

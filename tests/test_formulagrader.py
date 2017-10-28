@@ -3,7 +3,7 @@ Tests for FormulaGrader and FormulaGrader
 """
 from __future__ import division
 import random
-from graders import (
+from mitxgraders import (
     FormulaGrader,
     NumericalGrader,
     RealInterval,
@@ -19,7 +19,7 @@ from graders import (
     ConfigError,
     InvalidInput
 )
-from graders.voluptuous import Error, MultipleInvalid
+from mitxgraders.voluptuous import Error, MultipleInvalid
 from pytest import raises
 import numpy as np
 

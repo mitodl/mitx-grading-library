@@ -9,10 +9,10 @@ Both work by farming out the individual objects to other graders.
 """
 from __future__ import division
 import numpy as np
-from graders.helpers import munkres
-from graders.voluptuous import Required, Any
-from graders.baseclasses import AbstractGrader, ItemGrader, ConfigError
-from graders.helpers.validatorfuncs import Positive
+from mitxgraders.helpers import munkres
+from mitxgraders.voluptuous import Required, Any
+from mitxgraders.baseclasses import AbstractGrader, ItemGrader, ConfigError
+from mitxgraders.helpers.validatorfuncs import Positive
 
 # Set the objects to be imported from this grader
 __all__ = [

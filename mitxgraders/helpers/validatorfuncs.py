@@ -4,7 +4,7 @@ validatorfuncs.py
 Stand-alone validator functions for use in voluptuous Schema
 """
 from numbers import Number
-from graders.voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
+from mitxgraders.voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
 
 def Positive(thetype):
     """Demand a positive number type"""

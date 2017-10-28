@@ -42,7 +42,7 @@ The basic pattern is the following.
 
 ```xml
 <script type="text/python" system_path="python_lib">
-from graders import *
+from mitxgraders import *
 grader = GraderType(
     [configuration]
 )
@@ -59,7 +59,7 @@ Here is an example where we use a StringGrader with answer `cat`.
 
 ```xml
 <script type="text/python" system_path="python_lib">
-from graders import *
+from mitxgraders import *
 grader = StringGrader(
     answers='cat'
 )
@@ -74,7 +74,7 @@ Here is another example where we use a ListGrader to grade two numbers in an uno
 
 ```xml
 <script type="text/python" system_path="python_lib">
-from graders import *
+from mitxgraders import *
 grader = ListGrader(
     answers=['1', '2']
     subgrader=FormulaGrader()

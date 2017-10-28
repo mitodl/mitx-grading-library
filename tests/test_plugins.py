@@ -1,7 +1,7 @@
 """
 Tests that the plugin implementation is functioning
 """
-from graders import *
+from mitxgraders import *
 
 def test_plugins():
     """

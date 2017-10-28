@@ -13,9 +13,9 @@ Also containts some error classes:
 from __future__ import division
 import numbers
 import abc
-from graders.voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
-from graders.voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
-from graders.version import __version__
+from mitxgraders.voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
+from mitxgraders.voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
+from mitxgraders.version import __version__
 
 class ConfigError(Exception):
     """Raised whenever a configuration error occurs"""

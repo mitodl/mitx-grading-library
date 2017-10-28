@@ -10,15 +10,15 @@ An edX python grading library
 """
 
 # Add the current version
-from graders.version import __version__
+from mitxgraders.version import __version__
 
 # All modules defining grading classes must set __all__ to specify
 # which classes are imported with the package
-from graders.stringgrader import *
-from graders.listgrader import *
-from graders.formulagrader import *
-from graders.sampling import *
-from graders.baseclasses import ConfigError, InvalidInput
+from mitxgraders.stringgrader import *
+from mitxgraders.listgrader import *
+from mitxgraders.formulagrader import *
+from mitxgraders.sampling import *
+from mitxgraders.baseclasses import ConfigError, InvalidInput
 
 def import_plugins():
     """Imports all plugins into the global namespace"""

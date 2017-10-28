@@ -4,8 +4,8 @@ stringgrader.py
 Class for grading inputs that correspond to a text string
 * StringGrader
 """
-from graders.baseclasses import ItemGrader
-from graders.voluptuous import Required
+from mitxgraders.baseclasses import ItemGrader
+from mitxgraders.voluptuous import Required
 
 # Set the objects to be imported from this grader
 __all__ = ["StringGrader"]

@@ -8,12 +8,12 @@ Contains classes for numerical and formula graders
 from __future__ import division
 from numbers import Number
 from sampling import VariableSamplingSet, FunctionSamplingSet, RealInterval, DiscreteSet
-from graders.baseclasses import ItemGrader, InvalidInput
-from graders.voluptuous import Schema, Required, Any, All, Extra
-from graders.helpers.calc import (UndefinedVariable, UndefinedFunction,
+from mitxgraders.baseclasses import ItemGrader, InvalidInput
+from mitxgraders.voluptuous import Schema, Required, Any, All, Extra
+from mitxgraders.helpers.calc import (UndefinedVariable, UndefinedFunction,
                                   UnmatchedParentheses, evaluator)
-from graders.helpers.validatorfuncs import (Positive, NonNegative, PercentageString, is_callable)
-from graders.helpers.mathfunc import (construct_functions, construct_constants,
+from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, PercentageString, is_callable)
+from mitxgraders.helpers.mathfunc import (construct_functions, construct_constants,
                                       construct_suffixes, within_tolerance, gen_symbols_samples)
 
 # Set the objects to be imported from this grader
