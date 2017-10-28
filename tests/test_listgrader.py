@@ -530,14 +530,100 @@ def test_grouping_unordered_different_lengths():
         )
 
 
-# Documentation Tests
+def test_docs():
+    """Tests that the examples in the documentation behave as expected"""
+    grader = ListGrader(
+        answers=['cat', 'dog'],
+        subgraders=StringGrader()
+    )
 
-def test_eigensystem():
-    """Tests the eigensystem example"""
+    answer1 = (
+        {'expect': 'zebra', 'grade_decimal': 1},
+        {'expect': 'horse', 'grade_decimal': 0.45},
+        {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'Unicorn? Really?'}
+    )
+    answer2 = (
+        {'expect': 'cat', 'grade_decimal': 1},
+        {'expect': 'feline', 'grade_decimal': 0.5}
+    )
+    grader = ListGrader(
+        answers=[answer1, answer2],
+        subgraders=StringGrader()
+    )
+
+    grader = ListGrader(
+        answers=['cat', 'dog'],
+        subgraders=StringGrader(),
+        ordered=True
+    )
+
+    grader = ListGrader(
+        answers=['cat', 'x^2+1'],
+        subgraders=[StringGrader(), FormulaGrader(variables=["x"])],
+        ordered=True
+    )
+
     grader = ListGrader(
         answers=[
-            ['1', (['1', '0'], ['-1', '0'])],
-            ['-1', (['0', '1'], ['0', '-1'])],
+            ['2', '4'],
+            ['1', '3']
+        ],
+        subgraders=SingleListGrader(
+            subgrader=NumericalGrader()
+        ),
+        ordered=True
+    )
+
+    grader = ListGrader(
+        answers=[
+            ['cat', '1'],
+            ['dog', '2'],
+            ['tiger', '3']
+        ],
+        subgraders=ListGrader(
+            subgraders=[StringGrader(), NumericalGrader()],
+            ordered=True
+        ),
+        grouping=[1, 1, 2, 2, 3, 3]
+    )
+
+    grader = ListGrader(
+        answers=[
+            ['bat', 'ghost', 'pumpkin'],
+            'Halloween'
+        ],
+        subgraders=[
+            ListGrader(
+                subgraders=StringGrader()
+            ),
+            StringGrader()
+        ],
+        ordered=True,
+        grouping=[1, 1, 1, 2]
+    )
+
+    grader = ListGrader(
+        answers=[
+            [1, (['1', '0'], ['-1', '0'])],
+            [-1, (['0', '1'], ['0', '-1'])],
+        ],
+        subgraders=ListGrader(
+            subgraders=[
+                NumericalGrader(),
+                SingleListGrader(
+                    subgrader=NumericalGrader(),
+                    ordered=True
+                )
+            ],
+            ordered=True
+        ),
+        grouping=[1, 1, 2, 2]
+    )
+
+    grader = ListGrader(
+        answers=[
+            [1, (['1', '0'], ['-1', '0'])],
+            [-1, (['0', '1'], ['0', '-1'])],
         ],
         subgraders=ListGrader(
             subgraders=[
@@ -552,7 +638,6 @@ def test_eigensystem():
         ),
         grouping=[1, 1, 1, 2, 2, 2]
     )
-
     expected_result = {
         'overall_message': '',
         'input_list': [
@@ -566,7 +651,3 @@ def test_eigensystem():
     }
     submissions = ['1', '-1', '0', '-1', '0', '1']
     assert grader(None, submissions) == expected_result
-
-def test_docs():
-    """Tests that the examples in the documentation behave as expected"""
-
