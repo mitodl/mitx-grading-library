@@ -10,6 +10,8 @@ Contains classes for sampling numerical values
 and for specifying functions
 * SpecificFunctions
 * RandomFunction
+
+All of these classes perform random sampling. To obtain a sample, use class.gen_sample()
 """
 from __future__ import division
 from numbers import Number
@@ -19,7 +21,7 @@ import numpy as np
 from mitxgraders.baseclasses import ObjectWithSchema, ConfigError
 from mitxgraders.voluptuous import Schema, Required
 from mitxgraders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
-                                            TupleOfType, is_callable)
+                                                TupleOfType, is_callable)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -62,22 +64,17 @@ class RealInterval(VariableSamplingSet):
     """
     Represents an interval of real numbers from which to sample.
 
+    Config:
+        start (float): Lower end of the range (default 1)
+        stop (float): Upper end of the range (default 5)
+
     Usage
     =====
-    Generate 5 random floats betweens -2 and 4
+    Generate random floats betweens -2 and 4
     >>> ri = RealInterval(start=-2, stop=4)
-    >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
-    [ 2.44247 -0.67699 -1.36759 -0.11255  1.39864]
 
-    You can also initialize with an interval:
+    You can also initialize with an interval as a list:
     >>> ri = RealInterval([-2,4])
-    >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
-    [ 2.9973   2.95767  0.069    0.23813 -1.49541]
-
-    The default is start=1, stop=5:
-    >>> ri = RealInterval()
-    >>> [ri.gen_sample() for j in range(5)] # doctest: +SKIP
-    [ 2.61484  1.38107  2.61687  1.00507  1.87933]
     """
     schema_config = NumberRange()
 
@@ -101,26 +98,19 @@ class IntegerRange(VariableSamplingSet):
     """
     Represents an interval of integers from which to sample.
 
-    Specify start and stop or [start, stop] to initialize.
+    Config:
+        start (int): Lower end of the range (default 1)
+        stop (int): Upper end of the range (default 5)
 
     Both start and stop are included in the interval.
 
     Usage
     =====
-    Generate 5 random floats betweens -2 and 4
+    Generate random integers betweens -2 and 4
     >>> integer = IntegerRange(start=-2, stop=4)
-    >>> integer.gen_sample() in list(range(-2,5))
-    True
 
     You can also initialize with an interval:
     >>> integer = IntegerRange([-2,4])
-    >>> integer.gen_sample() in list(range(-2,5))
-    True
-
-    The default is start=1, stop=5:
-    >>> integer = IntegerRange()
-    >>> integer.gen_sample() in list(range(1,6))
-    True
     """
     schema_config = NumberRange(int)
 
@@ -143,11 +133,13 @@ class ComplexRectangle(VariableSamplingSet):
     """
     Represents a rectangle in the complex plane from which to sample.
 
+    Config:
+        re (list): Range for the real component (default [1,3])
+        im (list): Range for the imaginary component (default [1,3])
+
     Usage
     =====
     >>> rect = ComplexRectangle(re=[1,4], im=[-5,0])
-    >>> rect.gen_sample() # doctest: +SKIP
-    (1.90313791936 - 2.94195943775j)
     """
     schema_config = Schema({
         Required('re', default=[1, 3]): NumberRange(),
@@ -173,11 +165,14 @@ class ComplexSector(VariableSamplingSet):
     Represents an annular sector in the complex plane from which to sample,
     based on a given range of modulus and argument.
 
+    Config:
+        modulus (list): Range for the modulus (default [1,3])
+        argument (list): Range for the argument (default [0,pi/2])
+
     Usage
     =====
+    Sample from the unit circle
     >>> sect = ComplexSector(modulus=[0,1], argument=[-np.pi,np.pi])
-    >>> sect.gen_sample() # doctest: +SKIP
-    (0.022537684419662009+0.093135340148676249j)
     """
     schema_config = Schema({
         Required('modulus', default=[1, 3]): NumberRange(),
@@ -198,30 +193,60 @@ class ComplexSector(VariableSamplingSet):
         return self.modulus.gen_sample() * np.exp(1j * self.argument.gen_sample())
 
 
+class DiscreteSet(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+    """
+    Represents a discrete set of values from which to sample.
+
+    Initialize with a single value or a non-empty tuple of values. Note that we use a
+    tuple instead of a list so that the range [0,1] isn't confused with (0,1). We would
+    use a set, but unfortunately voluptuous doesn't work with sets.
+
+    Usage
+    =====
+    Specify a single value
+    >>> values = DiscreteSet(3.142)
+
+    Specify a tuple of values
+    >>> values = DiscreteSet((1,3,5,7,9))
+    """
+
+    # Take in an individual or tuple of numbers
+    schema_config = Schema(TupleOfType(Number))
+
+    def gen_sample(self):
+        """Return a random entry from the given set"""
+        return random.choice(self.config)
+
+
 class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-methods
     """
     Generates a random well-behaved function on demand.
 
-    Currently implemented as a sum of trigonometric functions with
-    random amplitude, frequency and phase. You can control the center and amplitude of
-    the resulting oscillations by specifying center and amplitude.
+    Currently implemented as a sum of trigonometric functions with random amplitude,
+    frequency and phase. You can control the center and amplitude of the resulting
+    oscillations by specifying center and amplitude.
+
+    Config:
+        input_dim (int): Number of input arguments. 1 is a unary function (default 1)
+        output_dim (int): Number of output dimensions. 1 = scalar, more than 1 is a vector
+            (default 1)
+        num_terms (int): Number of random sinusoid terms to add together (default 3)
+        center (float): Center around which oscillations occur (default 0)
+        amplitude (float): Maximum amplitude of the function (default 10)
 
     Usage
     =====
-    Generate a random continous function:
+    Generate a random continous function
     >>> funcs = RandomFunction()
-    >>> f = funcs.gen_sample()
-    >>> [f(1.2), f(1.2), f(1.3), f(4)] # doctest: +SKIP
-    [-1.89324 -1.89324 -2.10722  0.85814]
 
     By default, the generated functions are R-->R. You can specify the
     input and output dimensions:
     >>> funcs = RandomFunction(input_dim=3, output_dim=2)
-    >>> f = funcs.gen_sample()
-    >>> f(2.3, -1, 4.2) # doctest: +SKIP
-    [-1.74656 -0.96909]
-    >>> f(2.3, -1.1, 4.2) # doctest: +SKIP
-    [-1.88769 -1.32087]
+
+    To control the range of the function, specify a center and amplitude. The bounds of
+    the function will be center - amplitude < func(x) < center + amplitude.
+    The following will give oscillations between 0 and 1.
+    >>> funcs = RandomFunction(center=0.5, amplitude=0.5)
     """
 
     schema_config = Schema({
@@ -282,49 +307,22 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
         return f
 
 
-class DiscreteSet(VariableSamplingSet):  # pylint: disable=too-few-public-methods
-    """
-    Represents a discrete set of values from which to sample.
-
-    Can be initialized with a single value or a non-empty tuple of values.
-
-    Note that we use a tuple instead of a list so that [0,1] isn't confused with (0,1).
-    We would use a set, but unfortunately voluptuous doesn't work with sets.
-
-    Usage
-    =====
-    >>> values = DiscreteSet(3.142)
-    >>> values.gen_sample() == 3.142
-    True
-    >>> values = DiscreteSet((1,2,3,4))
-    >>> values.gen_sample() in (1,2,3,4)
-    True
-    """
-
-    # Take in an individual or tuple of numbers
-    schema_config = Schema(TupleOfType(Number))
-
-    def gen_sample(self):
-        """Return a random entry from the given set"""
-        return random.choice(self.config)
-
-
 class SpecificFunctions(FunctionSamplingSet):  # pylint: disable=too-few-public-methods
     """
     Represents a set of user-defined functions for use in a grader, one of which will
     be randomly selected. A single function can be provided here, but this is intended
     for lists of functions to be randomly sampled from.
 
+    Initialize with either a single function, or a list of functions.
+
     Usage
     =====
-
-    >>> functions = SpecificFunctions([np.sin, np.cos, np.tan])
-    >>> functions.gen_sample() in [np.sin, np.cos, np.tan]
-    True
+    Initialize with a specific function.
     >>> step_func = lambda x : 0 if x<0 else 1
     >>> functions = SpecificFunctions(step_func)
-    >>> functions.gen_sample() == step_func
-    True
+
+    Initialize with a list of functions.
+    >>> functions = SpecificFunctions([np.sin, np.cos, np.tan])
     """
 
     # Take in a function or list of callable objects
