@@ -15,7 +15,7 @@ The `answers` can be used to specify correct answers, specific feedback messages
 1. A single dictionary can be used to specify an answer, feedback, correctness, and partial credit:
 ```python
 grader = StringGrader(
-    answers={'expect':'zebra', 'ok':True, 'grade_decimal':1, 'msg':'Yay!'},
+    answers={'expect': 'zebra', 'ok': True, 'grade_decimal': 1, 'msg': 'Yay!'},
     wrong_msg='Try again!'
 )
 ```
@@ -24,29 +24,30 @@ grader = StringGrader(
   - `'grade_decimal'` (a number between `0` and `1`): The partial credit associated with this answer; default value is `1`.
   - `'ok'` (`True`, `False`, or `'partial'`): The answer's correctness; determines icon used by edX. The default value is inferred from `grade_decimal`.
   - `'msg'` (string): A feedback message associated with this answer.
+
 2. A single `'expect'` value: can be used to specify the correct answer. For example,
 ```python
 grader = StringGrader(
     answers='cat',
     # Equivalent to:
-    # answers={'expect':'ca', 'msg':'', 'grade_decimal':1, 'ok':True}
+    # answers={'expect': 'cat', 'msg': '', 'grade_decimal': 1, 'ok': True}
     wrong_msg='Try again!'
 )
 ```
 Again, most ItemGraders use strings to store `'expect'` values.
 
-* A tuple of dictionaries or strings:
+3. A tuple of dictionaries or strings:
 ```python
 grader = StringGrader(
     answers=(
-      # the correct answer
-      'wolf',
-      # an alternative correct answer
-      'canis lupus',
-      # a partially correct answer
-      {'expect':'dog', 'grade_decimal':0.5, 'msg':'No, not dog!'}
-      # a wrong answer with specific feedback
-      {'expect':'unicorn', 'grade_decimal':0, 'msg': 'No, not unicorn!'}
+        # the correct answer
+        'wolf',
+        # an alternative correct answer
+        'canis lupus',
+        # a partially correct answer
+        {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
+        # a wrong answer with specific feedback
+        {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
     ),
     wrong_msg='Try again!'
 )

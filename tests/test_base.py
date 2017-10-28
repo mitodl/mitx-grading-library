@@ -142,3 +142,50 @@ def test_longer_message_wins_grade_ties():
     result1 = grader1(None, submission)
     result2 = grader2(None, submission)
     assert result1 == result2 == expected_result
+
+def test_docs():
+    """Test the documentation examples"""
+    grader = StringGrader(
+        answers='cat',
+        wrong_msg='Try again!'
+    )
+    assert grader(None, 'cat')['ok']
+
+    grader = StringGrader(
+        answers={'expect': 'zebra', 'ok': True, 'grade_decimal': 1, 'msg': 'Yay!'},
+        wrong_msg='Try again!'
+    )
+    expected_result = {'msg': 'Yay!', 'grade_decimal': 1, 'ok': True}
+    assert grader(None, 'zebra') == expected_result
+    expected_result = {'msg': 'Try again!', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'horse') == expected_result
+
+    grader = StringGrader(
+        answers='cat',
+        # Equivalent to:
+        # answers={'expect': 'cat', 'msg': '', 'grade_decimal': 1, 'ok': True}
+        wrong_msg='Try again!'
+    )
+    expected_result = {'msg': '', 'grade_decimal': 1, 'ok': True}
+    assert grader(None, 'cat') == expected_result
+
+    grader = StringGrader(
+        answers=(
+            # the correct answer
+            'wolf',
+            # an alternative correct answer
+            'canis lupus',
+            # a partially correct answer
+            {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
+            # a wrong answer with specific feedback
+            {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
+        ),
+        wrong_msg='Try again!'
+    )
+    expected_result = {'msg': '', 'grade_decimal': 1, 'ok': True}
+    assert grader(None, 'wolf') == expected_result
+    assert grader(None, 'canis lupus') == expected_result
+    expected_result = {'msg': 'No, not dog!', 'grade_decimal': 0.5, 'ok': 'partial'}
+    assert grader(None, 'dog') == expected_result
+    expected_result = {'msg': 'No, not unicorn!', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'unicorn') == expected_result
