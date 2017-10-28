@@ -11,7 +11,7 @@ from __future__ import division
 import numpy as np
 from mitxgraders.helpers import munkres
 from mitxgraders.voluptuous import Required, Any
-from mitxgraders.baseclasses import AbstractGrader, ItemGrader, ConfigError
+from mitxgraders.baseclasses import AbstractGrader, ItemGrader, ConfigError, InvalidInput
 from mitxgraders.helpers.validatorfuncs import Positive
 
 # Set the objects to be imported from this grader
@@ -331,6 +331,13 @@ class ListGrader(AbstractGrader):
         # Unordered, we must have a single ListGrader subgrader
         if not self.config['ordered'] and self.subgrader_list:
             raise ConfigError("Cannot have multiple subgraders with unordered list")
+
+        # Unordered, each group must have the same number of entries
+        if not self.config['ordered']:
+            group_len = len(self.grouping[0])
+            for group in self.grouping:
+                if len(group) != group_len:
+                    raise ConfigError("Groups must all be the same length when unordered")
 
         # If using multiple subgraders, make sure we have the right number of subgraders
         if self.subgrader_list:
@@ -666,7 +673,9 @@ class SingleListGrader(ItemGrader):
         if self.config['length_error'] and len(answers) != len(student_list):
             msg = 'List length error: Expected {} terms in the list, but received {}. ' + \
                   'Separate items with character "{}"'
-            raise ValueError(msg.format(len(answers), len(student_list), self.config['delimiter']))
+            raise InvalidInput(msg.format(len(answers),
+                                          len(student_list),
+                                          self.config['delimiter']))
 
         if self.config['ordered']:
             input_list = [

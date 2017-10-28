@@ -1,8 +1,7 @@
 """
-Tests for FormulaGrader and FormulaGrader
+Tests for FormulaGrader and NumericalGrader
 """
 from __future__ import division
-import random
 from mitxgraders import (
     FormulaGrader,
     NumericalGrader,
@@ -53,147 +52,6 @@ def test_overriding_functions():
     )
     assert grader(None, 'tan(1)')['ok']
     assert not grader(None, 'sin(1)/cos(1)')['ok']
-
-def test_real_interval():
-    """Tests the RealInterval class"""
-    start = random.random() * 20 - 10
-    stop = random.random() * 20 - 10
-    if start > stop:
-        start, stop = stop, start
-
-    # Right way around
-    ri = RealInterval(start=start, stop=stop)
-    for i in range(10):
-        assert start <= ri.gen_sample() <= stop
-
-    # Wrong way around
-    ri = RealInterval(start=stop, stop=start)
-    for i in range(10):
-        assert start <= ri.gen_sample() <= stop
-
-    # In a list
-    ri = RealInterval([start, stop])
-    for i in range(10):
-        assert start <= ri.gen_sample() <= stop
-
-    # No arguments
-    ri = RealInterval()
-    for i in range(10):
-        assert 1 <= ri.gen_sample() <= 5
-
-    # Rejects tuples
-    with raises(Error, match="expected a dictionary. Got \(1, 3\)"):
-        RealInterval((1, 3))
-
-def test_int_range():
-    """Tests the IntegerRange class"""
-    start = random.randint(-20, 20)
-    stop = random.randint(-20, 20)
-    if start > stop:
-        start, stop = stop, start
-    mylist = list(range(start, stop + 1))
-
-    # Right way around
-    ii = IntegerRange(start=start, stop=stop)
-    for i in range(10):
-        assert ii.gen_sample() in mylist
-
-    # Wrong way around
-    ii = IntegerRange(start=stop, stop=start)
-    for i in range(10):
-        assert ii.gen_sample() in mylist
-
-    # In a list
-    ii = IntegerRange([start, stop])
-    for i in range(10):
-        assert ii.gen_sample() in mylist
-
-    # No arguments
-    ii = IntegerRange()
-    for i in range(10):
-        assert ii.gen_sample() in list(range(1, 6))
-
-def test_complex_rect():
-    """Tests the ComplexRectangle class"""
-    restart = random.random() * 20 - 10
-    restop = random.random() * 20 - 10
-    if restart > restop:
-        restart, restop = restop, restart
-
-    imstart = random.random() * 20 - 10
-    imstop = random.random() * 20 - 10
-    if imstart > imstop:
-        imstart, imstop = imstop, imstart
-
-    cr = ComplexRectangle(re=[restart, restop], im=[imstart, imstop])
-
-    for _ in range(20):
-        sample = cr.gen_sample()
-        assert restart <= np.real(sample) <= restop
-        assert imstart <= np.imag(sample) <= imstop
-
-def test_complex_sect():
-    """Tests the ComplexSector class"""
-    mstart = random.random() * 20
-    mstop = random.random() * 20
-    if mstart > mstop:
-        mstart, mstop = mstop, mstart
-
-    argstart = random.uniform(-np.pi, np.pi)
-    argstop = random.uniform(-np.pi, np.pi)
-    if argstart > argstop:
-        argstart, argstop = argstop, argstart
-
-    cs = ComplexSector(modulus=[mstart, mstop], argument=[argstart, argstop])
-
-    for _ in range(20):
-        sample = cs.gen_sample()
-        assert mstart <= np.abs(sample) <= mstop
-        assert argstart <= np.angle(sample) <= argstop
-
-def test_random_func():
-    """Tests the RandomFunction class"""
-    center = 15
-    amplitude = 2
-    rf = RandomFunction(center=center, amplitude=amplitude)
-
-    func = rf.gen_sample()
-
-    for i in range(20):
-        x = random.uniform(-10, 10)
-        assert func(x) == func(x)
-        assert center - amplitude <= func(x) <= center + amplitude
-
-def test_discrete_set():
-    """Tests the DiscreteSet class"""
-    vals = tuple(np.random.rand(10))
-    ds = DiscreteSet(vals)
-
-    for _ in range(20):
-        assert ds.gen_sample() in vals
-
-    # Single value
-    val = random.uniform(0, 10)
-    ds = DiscreteSet(val)
-    assert ds.gen_sample() == val
-
-    # Rejects lists
-    with raises(Error, match="expected Number @ data\[0\]. Got 1"):
-        DiscreteSet([1, 2])
-
-def test_specific_functions():
-    """Tests the SpecificFunctions class"""
-    funcs = [np.sin, np.cos, np.tan]
-    sf = SpecificFunctions(funcs)
-
-    for _ in range(20):
-        assert sf.gen_sample() in funcs
-
-    # Single functions
-    ds = SpecificFunctions(np.abs)
-    assert ds.gen_sample() == np.abs
-    ds = SpecificFunctions(abs)
-    assert ds.gen_sample() == abs
 
 def test_fg_expressions():
     """General test of FormulaGrader"""
@@ -600,3 +458,152 @@ def test_ng_config():
             answers="1",
             user_functions={"f": [np.sin, np.cos]}
         )
+
+def test_docs():
+    """Test that the documentation examples work as expected"""
+    grader = FormulaGrader(
+        answers='1+x^2+y',
+        variables=['x', 'y']
+    )
+    assert grader(None, '1+x^2+y')['ok']
+
+    grader = FormulaGrader(
+        answers='1+x^2+y+z/2',
+        variables=['x', 'y', 'z'],
+        sample_from={
+            'x': ComplexRectangle(),
+            'y': [2, 6],
+            'z': (1, 3, 4, 8)
+        }
+    )
+    assert grader(None, '1+x^2+y+z/2')['ok']
+
+    grader = FormulaGrader(
+        answers='1+x^2',
+        variables=['x'],
+        samples=10
+    )
+    assert grader(None, '1+x^2')['ok']
+
+    grader = FormulaGrader(
+        answers='1+x^2',
+        variables=['x'],
+        samples=10,
+        failable_evals=1
+    )
+    assert grader(None, '1+x^2')['ok']
+
+    grader = FormulaGrader(
+        answers='abs(z)^2',
+        variables=['z'],
+        sample_from={
+            'z': ComplexRectangle()
+        }
+    )
+    assert grader(None, 'abs(z)^2')['ok']
+
+    grader = FormulaGrader(
+        answers='sqrt(1 - cos(x)^2)',
+        variables=['x'],
+        sample_from={'x': [0, np.pi]},
+        blacklist=['sin']
+    )
+    assert grader(None, 'sqrt(1 - cos(x)^2)')['ok']
+
+    grader = FormulaGrader(
+        answers='sin(x)/cos(x)',
+        variables=['x'],
+        whitelist=['sin', 'cos']
+    )
+    assert grader(None, 'sin(x)/cos(x)')['ok']
+
+    grader = FormulaGrader(
+        answers='pi/2-x',
+        variables=['x'],
+        whitelist=[None]
+    )
+    assert grader(None, 'pi/2-x')['ok']
+
+    grader = FormulaGrader(
+        answers='2*sin(theta)*cos(theta)',
+        variables=['theta'],
+        required_functions=['sin', 'cos']
+    )
+    assert grader(None, '2*sin(theta)*cos(theta)')['ok']
+
+    grader = FormulaGrader(
+        answers='x*x',
+        variables=['x'],
+        user_functions={'f': lambda x: x*x}
+    )
+    assert grader(None, 'x^2')['ok']
+
+    grader = FormulaGrader(
+        answers="f''(x)",
+        variables=['x'],
+        user_functions={"f''": lambda x: x*x}
+    )
+    assert grader(None, "f''(x)")['ok']
+
+    grader = FormulaGrader(
+        answers="x^2",
+        variables=['x'],
+        user_functions={"sin": lambda x: x*x}
+    )
+    assert grader(None, 'sin(x)')['ok']
+
+    grader = FormulaGrader(
+        answers="f(x)",
+        variables=['x'],
+        user_functions={"f": [np.sin, np.cos]}
+    )
+    assert grader(None, 'f(x)')['ok']
+
+    grader = FormulaGrader(
+        answers="f''(x) + omega^2*f(x)",
+        variables=['x', 'omega'],
+        user_functions={
+            "f": RandomFunction(),
+            "f''": RandomFunction()
+        }
+    )
+    assert grader(None, "f''(x)+omega^2*f(x)")['ok']
+
+    grader = FormulaGrader(
+        answers='1/sqrt(1-v^2/c^2)',
+        variables=['v'],
+        user_constants={
+            'c': 3e8
+        }
+    )
+    assert grader(None, '1/sqrt(1-v^2/c^2)')['ok']
+
+    grader = FormulaGrader(
+        answers='2*sin(theta)*cos(theta)',
+        variables=['theta'],
+        forbidden_strings=['*theta', 'theta*', 'theta/', '+theta', 'theta+', '-theta', 'theta-'],
+        forbidden_message="Your answer should only use trigonometric functions acting on theta, not multiples of theta"
+    )
+    assert grader(None, '2*sin(theta)*cos(theta)')['ok']
+
+    grader = FormulaGrader(
+        answers='2*sin(theta)*cos(theta)',
+        variables=['theta'],
+        tolerance=0.00001
+    )
+    assert grader(None, '2*sin(theta)*cos(theta)')['ok']
+
+    grader = FormulaGrader(
+        answers='2*sin(theta)*cos(theta)',
+        variables=['theta'],
+        case_sensitive=False
+    )
+    assert grader(None, '2*Sin(theta)*Cos(theta)')['ok']
+
+    grader = FormulaGrader(
+        answers='2*m',
+        variables=['m'],
+        metric_suffixes=True
+    )
+    assert grader(None, '2*m')['ok']
+    assert not grader(None, '2m')['ok']
