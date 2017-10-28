@@ -11,10 +11,11 @@ from sampling import VariableSamplingSet, FunctionSamplingSet, RealInterval, Dis
 from mitxgraders.baseclasses import ItemGrader, InvalidInput
 from mitxgraders.voluptuous import Schema, Required, Any, All, Extra
 from mitxgraders.helpers.calc import (UndefinedVariable, UndefinedFunction,
-                                  UnmatchedParentheses, evaluator)
-from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, PercentageString, is_callable)
+                                      UnmatchedParentheses, evaluator)
+from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative,
+                                                PercentageString, is_callable)
 from mitxgraders.helpers.mathfunc import (construct_functions, construct_constants,
-                                      construct_suffixes, within_tolerance, gen_symbols_samples)
+                                          construct_suffixes, within_tolerance, gen_symbols_samples)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -99,7 +100,7 @@ class FormulaGrader(ItemGrader):
             Required('forbidden_strings', default=[]): [str],
             Required('forbidden_message', default=forbidden_default): str,
             Required('required_functions', default=[]): [str],
-            Required('tolerance', default='0.1%'): Any(PercentageString, NonNegative(Number)),
+            Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
             Required('case_sensitive', default=True): bool,
             Required('metric_suffixes', default=False): bool,
             Required('samples', default=5): Positive(int),

@@ -458,3 +458,152 @@ def test_ng_config():
             answers="1",
             user_functions={"f": [np.sin, np.cos]}
         )
+
+def test_docs():
+    """Test that the documentation examples work as expected"""
+    grader = FormulaGrader(
+        answers='1+x^2+y',
+        variables=['x', 'y']
+    )
+    assert grader(None, '1+x^2+y')['ok']
+
+    grader = FormulaGrader(
+        answers='1+x^2+y+z/2',
+        variables=['x', 'y', 'z'],
+        sample_from={
+            'x': ComplexRectangle(),
+            'y': [2, 6],
+            'z': (1, 3, 4, 8)
+        }
+    )
+    assert grader(None, '1+x^2+y+z/2')['ok']
+
+    grader = FormulaGrader(
+        answers='1+x^2',
+        variables=['x'],
+        samples=10
+    )
+    assert grader(None, '1+x^2')['ok']
+
+    grader = FormulaGrader(
+        answers='1+x^2',
+        variables=['x'],
+        samples=10,
+        failable_evals=1
+    )
+    assert grader(None, '1+x^2')['ok']
+
+    grader = FormulaGrader(
+        answers='abs(z)^2',
+        variables=['z'],
+        sample_from={
+            'z': ComplexRectangle()
+        }
+    )
+    assert grader(None, 'abs(z)^2')['ok']
+
+    grader = FormulaGrader(
+        answers='sqrt(1 - cos(x)^2)',
+        variables=['x'],
+        sample_from={'x': [0, np.pi]},
+        blacklist=['sin']
+    )
+    assert grader(None, 'sqrt(1 - cos(x)^2)')['ok']
+
+    grader = FormulaGrader(
+        answers='sin(x)/cos(x)',
+        variables=['x'],
+        whitelist=['sin', 'cos']
+    )
+    assert grader(None, 'sin(x)/cos(x)')['ok']
+
+    grader = FormulaGrader(
+        answers='pi/2-x',
+        variables=['x'],
+        whitelist=[None]
+    )
+    assert grader(None, 'pi/2-x')['ok']
+
+    grader = FormulaGrader(
+        answers='2*sin(theta)*cos(theta)',
+        variables=['theta'],
+        required_functions=['sin', 'cos']
+    )
+    assert grader(None, '2*sin(theta)*cos(theta)')['ok']
+
+    grader = FormulaGrader(
+        answers='x*x',
+        variables=['x'],
+        user_functions={'f': lambda x: x*x}
+    )
+    assert grader(None, 'x^2')['ok']
+
+    grader = FormulaGrader(
+        answers="f''(x)",
+        variables=['x'],
+        user_functions={"f''": lambda x: x*x}
+    )
+    assert grader(None, "f''(x)")['ok']
+
+    grader = FormulaGrader(
+        answers="x^2",
+        variables=['x'],
+        user_functions={"sin": lambda x: x*x}
+    )
+    assert grader(None, 'sin(x)')['ok']
+
+    grader = FormulaGrader(
+        answers="f(x)",
+        variables=['x'],
+        user_functions={"f": [np.sin, np.cos]}
+    )
+    assert grader(None, 'f(x)')['ok']
+
+    grader = FormulaGrader(
+        answers="f''(x) + omega^2*f(x)",
+        variables=['x', 'omega'],
+        user_functions={
+            "f": RandomFunction(),
+            "f''": RandomFunction()
+        }
+    )
+    assert grader(None, "f''(x)+omega^2*f(x)")['ok']
+
+    grader = FormulaGrader(
+        answers='1/sqrt(1-v^2/c^2)',
+        variables=['v'],
+        user_constants={
+            'c': 3e8
+        }
+    )
+    assert grader(None, '1/sqrt(1-v^2/c^2)')['ok']
+
+    grader = FormulaGrader(
+        answers='2*sin(theta)*cos(theta)',
+        variables=['theta'],
+        forbidden_strings=['*theta', 'theta*', 'theta/', '+theta', 'theta+', '-theta', 'theta-'],
+        forbidden_message="Your answer should only use trigonometric functions acting on theta, not multiples of theta"
+    )
+    assert grader(None, '2*sin(theta)*cos(theta)')['ok']
+
+    grader = FormulaGrader(
+        answers='2*sin(theta)*cos(theta)',
+        variables=['theta'],
+        tolerance=0.00001
+    )
+    assert grader(None, '2*sin(theta)*cos(theta)')['ok']
+
+    grader = FormulaGrader(
+        answers='2*sin(theta)*cos(theta)',
+        variables=['theta'],
+        case_sensitive=False
+    )
+    assert grader(None, '2*Sin(theta)*Cos(theta)')['ok']
+
+    grader = FormulaGrader(
+        answers='2*m',
+        variables=['m'],
+        metric_suffixes=True
+    )
+    assert grader(None, '2*m')['ok']
+    assert not grader(None, '2m')['ok']
