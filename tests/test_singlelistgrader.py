@@ -4,7 +4,7 @@ Tests for SingleListGrader
 from __future__ import division
 import pprint
 from pytest import approx, raises
-from mitxgraders import ConfigError, StringGrader, SingleListGrader
+from mitxgraders import ConfigError, StringGrader, SingleListGrader, InvalidInput
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint
@@ -154,12 +154,12 @@ def test_wrong_length_string_submission():
     )
     expect = 'List length error: Expected 2 terms in the list, but received 3. ' + \
              'Separate items with character ","'
-    with raises(ValueError, match=expect):
+    with raises(InvalidInput, match=expect):
         grader(None, 'cat,dog,dragon')
 
     expect = 'List length error: Expected 2 terms in the list, but received 1. ' + \
              'Separate items with character ","'
-    with raises(ValueError, match=expect):
+    with raises(InvalidInput, match=expect):
         grader(None, 'cat')
 
 def test_multiple_list_answers():
@@ -237,3 +237,74 @@ def test_docs():
         answers=['cat', 'dog'],
         subgrader=StringGrader()
     )
+    assert grader(None, "cat, dog")["grade_decimal"] == 1
+    assert grader(None, "dog, cat")["grade_decimal"] == 1
+    assert grader(None, "cat, octopus")["grade_decimal"] == 0.5
+    assert grader(None, "cat")["grade_decimal"] == 0.5
+
+    grader = SingleListGrader(
+        answers=(
+            ['cat', 'dog'],
+            ['goat', 'vole'],
+        ),
+        subgrader=StringGrader()
+    )
+    assert grader(None, "cat, dog")["grade_decimal"] == 1
+    assert grader(None, "goat, vole")["grade_decimal"] == 1
+    assert grader(None, "cat, vole")["grade_decimal"] == 0.5
+    assert grader(None, "dog, goat")["grade_decimal"] == 0.5
+
+    grader = SingleListGrader(
+        answers=['cat', 'dog'],
+        subgrader=StringGrader(),
+        ordered=True
+    )
+    assert grader(None, "cat, dog")["grade_decimal"] == 1
+    assert grader(None, "cat")["grade_decimal"] == 0.5
+    assert grader(None, "dog")["grade_decimal"] == 0
+
+    grader = SingleListGrader(
+        answers=['cat', 'dog'],
+        subgrader=StringGrader(),
+        length_error=True
+    )
+    with raises(InvalidInput):
+        grader(None, "cat")
+    with raises(InvalidInput):
+        grader(None, "cat, dog, moose")
+
+    grader = SingleListGrader(
+        answers=['cat', 'dog'],
+        subgrader=StringGrader(),
+        delimiter=';'
+    )
+    assert grader(None, "cat, dog")["grade_decimal"] == 0
+    assert grader(None, "dog, cat")["grade_decimal"] == 0
+    assert grader(None, "cat; dog")["grade_decimal"] == 1
+    assert grader(None, "dog; cat")["grade_decimal"] == 1
+
+    grader = SingleListGrader(
+        answers=[['a', 'b'], ['c', 'd']],
+        subgrader=SingleListGrader(
+            subgrader=StringGrader()
+        ),
+        delimiter=';'
+    )
+    assert grader(None, "a,b;c,d")["grade_decimal"] == 1
+    assert grader(None, "b,a;d,c")["grade_decimal"] == 1
+    assert grader(None, "c,d;a,b")["grade_decimal"] == 1
+    assert grader(None, "a,c;b,d")["grade_decimal"] == 0.5
+
+    grader = SingleListGrader(
+        answers=['cat', 'dog'],
+        subgrader=StringGrader(),
+        partial_credit=False
+    )
+    assert grader(None, "cat, octopus")["grade_decimal"] == 0
+
+    grader = SingleListGrader(
+        answers=['cat', 'dog'],
+        subgrader=StringGrader(),
+        wrong_msg='Try again!'
+    )
+    assert grader(None, "moose, octopus")["msg"] == "Try again!"

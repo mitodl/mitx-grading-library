@@ -38,7 +38,7 @@ grader = SingleListGrader(
 )
 ```
 
-Now `cat, dog` will receive full grades, but `dog, cat` will be marked wrong. Note that `cat` will receive half credit, but `dog` will receive zero. Ordered is false by default.
+Now `cat, dog` will receive full grades, but `dog, cat` will be marked wrong. Note that `cat` will receive half credit, but `dog` will receive zero, as dog is incorrect in the first position. Ordered is false by default.
 
 
 ## Length Checking
@@ -74,15 +74,15 @@ By using different delimiters, it is possible to nest SingleListGraders:
 
 ```python
 grader = SingleListGrader(
-    answers = [['a', 'b'], ['c', 'd']],
-    subgrader = SingleListGrader(
+    answers=[['a', 'b'], ['c', 'd']],
+    subgrader=SingleListGrader(
         subgrader=StringGrader()
     ),
     delimiter=';'
 )
 ```
 
-Here the expected student input is `a, b; c, d`.
+Here the expected student input is `a, b; c, d`. It will also take `b, a; d, c` or `c, d; a, b` due to the unordered nature of both lists. However, `a, c; d, b` is only worth half points.
 
 
 ## Turning Partial Credit Off
