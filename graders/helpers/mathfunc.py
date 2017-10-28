@@ -196,6 +196,42 @@ def construct_functions(whitelist, blacklist, user_funcs):
 
         user_funcs (dict): Dictionary of "name": function pairs specifying user-defined
             functions to include.
+
+    Usage
+    =====
+    By default, just returns DEFAULT_FUNCTIONS
+    >>> funcs, random_funcs = construct_functions([], [], {})
+    >>> funcs == DEFAULT_FUNCTIONS
+    True
+    >>> random_funcs == {}
+    True
+
+    To remove all functions, pass in a whitelist of [None]
+    >>> funcs, random_funcs = construct_functions([None], [], {})
+    >>> funcs == {}
+    True
+
+    Whitelisting specifies exactly what functions are allowed
+    >>> funcs, random_funcs = construct_functions(["sin"], [], {})
+    >>> funcs == {"sin": np.sin}
+    True
+
+    Blacklisting removes a function from the list
+    >>> funcs, random_funcs = construct_functions([], ["sin"], {})
+    >>> funcs.get("sin", None) is None
+    True
+    >>> funcs["cos"] == np.cos
+    True
+
+    You can specify user-defined functions
+    >>> from graders.sampling import RandomFunction
+    >>> func = lambda x: x
+    >>> randfunc = RandomFunction()
+    >>> funcs, random_funcs = construct_functions([], [], {"f": func, "g": randfunc})
+    >>> funcs["f"] == func
+    True
+    >>> random_funcs["g"] == randfunc
+    True
     """
     if whitelist:
         if blacklist:
@@ -242,6 +278,13 @@ def construct_constants(user_consts):
     """
     Returns the dictionary of available constants
     user_consts is a dictionary of "name": value pairs of constants to add to the defaults
+
+    Usage
+    =====
+    >>> construct_constants({})
+    {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'j': 1j}
+    >>> construct_constants({"T": 1.5})
+    {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'T': 1.5, 'j': 1j}
     """
     constants = DEFAULT_VARIABLES.copy()
 
@@ -258,6 +301,14 @@ def construct_suffixes(metric=False):
     """
     Returns the dictionary of available suffixes.
     Setting metric=True adds in the metric suffixes.
+
+    Usage
+    =====
+    >>> construct_suffixes()
+    {'%': 0.01}
+    >>> suff = construct_suffixes(True)
+    >>> suff['G'] == 1e9
+    True
     """
     suffixes = DEFAULT_SUFFIXES.copy()
     if metric:
