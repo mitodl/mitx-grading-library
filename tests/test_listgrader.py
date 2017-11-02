@@ -5,7 +5,7 @@ from __future__ import division
 import pprint
 from pytest import raises
 from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader, NumericalGrader,
-                         UndefinedVariable, SingleListGrader)
+                         CalcError, SingleListGrader)
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint
@@ -110,7 +110,7 @@ def test_multiple_graders():
 
     # Test incorrect ordering
     submission = ['1', 'cat']
-    with raises(UndefinedVariable, match='Invalid Input: cat not permitted in answer'):
+    with raises(CalcError, match='Invalid Input: cat not permitted in answer'):
         result = grader(None, submission)
 
     # Test failure

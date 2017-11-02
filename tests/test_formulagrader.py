@@ -12,9 +12,7 @@ from mitxgraders import (
     ComplexSector,
     SpecificFunctions,
     RandomFunction,
-    UndefinedVariable,
-    UndefinedFunction,
-    UnmatchedParentheses,
+    CalcError,
     ConfigError,
     InvalidInput
 )
@@ -69,35 +67,35 @@ def test_fg_invalid_input():
 
     expect = 'Invalid Input: pi not permitted in answer as a function ' + \
              '\(did you forget to use \* for multiplication\?\)'
-    with raises(UndefinedFunction, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "pi(3)")
 
     expect = 'Invalid Input: spin not permitted in answer as a function'
-    with raises(UndefinedFunction, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "spin(3)")
 
     expect = 'Invalid Input: R not permitted in answer as a variable'
-    with raises(UndefinedVariable, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "R")
 
     expect = 'Invalid Input: Parentheses are unmatched. 1 parentheses were opened but never closed.'
-    with raises(UnmatchedParentheses, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "5*(3")
 
     expect = 'Invalid Input: A closing parenthesis was found after segment 5\*\(3\), but ' + \
              'there is no matching opening parenthesis before it.'
-    with raises(UnmatchedParentheses, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "5*(3))")
 
     expect = "Invalid Input: Could not parse '5pp' as a formula"
-    with raises(InvalidInput, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "5pp")
 
     expect = "Error evaluating factorial\(\) or fact\(\) in input. " + \
              "These functions can only be used on positive integers."
-    with raises(InvalidInput, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "fact(-1)")
-    with raises(InvalidInput, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "fact(1.5)")
 
 def test_fg_tolerance():
@@ -145,7 +143,7 @@ def test_fg_percent():
     )
     assert grader(None, "2%")['ok']
     assert grader(None, "0.02")['ok']
-    with raises(InvalidInput, match="Invalid Input: Could not parse '20m' as a formula"):
+    with raises(CalcError, match="Invalid Input: Could not parse '20m' as a formula"):
         grader(None, "20m")
 
 def test_fg_metric():
@@ -182,7 +180,7 @@ def test_fg_userfunction():
 
     # Primes aren't allowed in the middle
     expect = "Invalid Input: Could not parse 'that'sbad\(1\)' as a formula"
-    with raises(InvalidInput, match=expect):
+    with raises(CalcError, match=expect):
         grader = FormulaGrader(
             answers="1",
             user_functions={"that'sbad": np.tan}
@@ -222,10 +220,10 @@ def test_fg_blackwhite():
     assert grader(None, "hello(0.4)")['ok']
     assert grader(None, "sin(0.4)/cos(0.4)")['ok']
     expect = 'Invalid Input: tan not permitted in answer as a function'
-    with raises(UndefinedFunction, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "tan(0.4)")
     expect = 'Invalid Input: TAN not permitted in answer as a function'
-    with raises(UndefinedFunction, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "TAN(0.4)")
 
     grader = FormulaGrader(
@@ -237,10 +235,10 @@ def test_fg_blackwhite():
     assert grader(None, "hello(0.4)")['ok']
     assert grader(None, "sin(0.4)/cos(0.4)")['ok']
     expect = 'Invalid Input: tan not permitted in answer as a function'
-    with raises(UndefinedFunction, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "tan(0.4)")
     expect = 'Invalid Input: TAN not permitted in answer as a function'
-    with raises(UndefinedFunction, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "TAN(0.4)")
 
     grader = FormulaGrader(
@@ -249,7 +247,7 @@ def test_fg_blackwhite():
     )
     assert grader(None, "1")['ok']
     expect = "Invalid Input: cos not permitted in answer as a function"
-    with raises(UndefinedFunction, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "cos(0)")
     assert not grader.functions   # Check for an empty dictionary
 
