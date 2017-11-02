@@ -10,21 +10,18 @@ from numbers import Number
 from sampling import VariableSamplingSet, FunctionSamplingSet, RealInterval, DiscreteSet
 from mitxgraders.baseclasses import ItemGrader, InvalidInput
 from mitxgraders.voluptuous import Schema, Required, Any, All, Extra
-from mitxgraders.helpers.calc import (UndefinedVariable, UndefinedFunction,
-                                      UnmatchedParentheses, evaluator)
+from mitxgraders.helpers.calc import CalcError, evaluator
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative,
                                                 PercentageString, is_callable)
 from mitxgraders.helpers.mathfunc import (construct_functions, construct_constants,
                                           construct_suffixes, within_tolerance,
-                                          gen_symbols_samples, check_formula)
+                                          gen_symbols_samples)
 
 # Set the objects to be imported from this grader
 __all__ = [
     "NumericalGrader",
     "FormulaGrader",
-    "UndefinedVariable",
-    "UndefinedFunction",
-    "UnmatchedParentheses"
+    "CalcError"
 ]
 
 class FormulaGrader(ItemGrader):
@@ -154,9 +151,9 @@ class FormulaGrader(ItemGrader):
 
         # Now perform the computations
         try:
-            return check_formula(self.raw_check, answer, student_input)
-        except (UndefinedVariable, UndefinedFunction, UnmatchedParentheses, InvalidInput):
-            # These errors have been vetted by check_formula
+            return self.raw_check(answer, student_input)
+        except (CalcError, InvalidInput):
+            # These errors have been vetted already
             raise
         except Exception:
             # If debug mode is on, give the full stack trace

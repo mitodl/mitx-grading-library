@@ -30,23 +30,35 @@ from pyparsing import (
     stringEnd
 )
 
-class UndefinedVariable(Exception):
+class CalcError(Exception):
+    """Base class for errors originating in calc.py"""
+    pass
+
+
+class UndefinedVariable(CalcError):
     """
     Indicate when a student inputs a variable which was not expected.
     """
     pass
 
 
-class UndefinedFunction(Exception):
+class UndefinedFunction(CalcError):
     """
     Indicate when a student inputs a function which was not expected.
     """
     pass
 
 
-class UnmatchedParentheses(Exception):
+class UnmatchedParentheses(CalcError):
     """
     Indicate when a student's input has unmatched parentheses.
+    """
+    pass
+
+
+class FactorialError(CalcError):
+    """
+    Indicate when factorial is called on a bad input
     """
     pass
 
@@ -264,7 +276,19 @@ def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
     }
 
     # Return the result of the evaluation, as well as the set of functions used
-    return math_interpreter.reduce_tree(evaluate_actions), math_interpreter.functions_used
+    try:
+        return math_interpreter.reduce_tree(evaluate_actions), math_interpreter.functions_used
+    except ValueError as err:
+        if 'factorial' in err.message:
+            # This is thrown when fact() or factorial() is used
+            # that tests on negative and/or non-integer inputs
+            # err.message will be: `factorial() only accepts integral values` or
+            # `factorial() not defined for negative values`
+            raise FactorialError("Error evaluating factorial() or fact() in input. " +
+                                 "These functions can only be used on positive integers.")
+        else:
+            # Don't know what this is, or how you want to deal with it
+            raise
 
 
 class ParseAugmenter(object):
@@ -419,10 +443,16 @@ class ParseAugmenter(object):
         bad_vars = set(var for var in self.variables_used
                        if casify(var) not in valid_variables)
         if bad_vars:
-            raise UndefinedVariable(' '.join(sorted(bad_vars)))
+            message = "Invalid Input: {} not permitted in answer as a variable"
+            varnames = ", ".join(sorted(bad_vars))
+            raise UndefinedVariable(message.format(varnames))
 
         bad_funcs = set(func for func in self.functions_used
                         if casify(func) not in valid_functions)
         func_is_var = any(casify(func) in valid_variables for func in bad_funcs)
         if bad_funcs:
-            raise UndefinedFunction(' '.join(sorted(bad_funcs)), func_is_var)
+            funcnames = ', '.join(sorted(bad_funcs))
+            message = "Invalid Input: {} not permitted in answer as a function"
+            if func_is_var:
+                message += " (did you forget to use * for multiplication?)"
+            raise UndefinedFunction(message.format(funcnames))

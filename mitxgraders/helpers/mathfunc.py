@@ -9,7 +9,6 @@ Contains some helper functions used in grading formulae:
 * construct_constants
 * construct_suffixes
 * gen_symbols_samples
-* check_formula
 
 Defines:
 * DEFAULT_FUNCTIONS
@@ -20,10 +19,9 @@ Defines:
 from __future__ import division
 import math
 import numpy as np
-from mitxgraders.baseclasses import ConfigError, InvalidInput
+from mitxgraders.baseclasses import ConfigError
 from mitxgraders.sampling import SpecificFunctions, FunctionSamplingSet
-from mitxgraders.helpers.calc import (UndefinedVariable, UndefinedFunction,
-                                      UnmatchedParentheses)
+
 # Normal Trig
 def sec(arg):
     """Secant"""
@@ -346,41 +344,3 @@ def gen_symbols_samples(symbols, samples, sample_from):
         {symbol: sample_from[symbol].gen_sample() for symbol in symbols}
         for j in range(samples)
     ]
-
-def check_formula(check, answer, student_input):
-    """
-    Calls a given check function for a specific answer and input.
-    Catches and deals with typical exceptions that can be raised from calc.py as part of
-    the check process.
-    """
-    try:
-        return check(answer, student_input)
-
-    # And now for all of the things that could possibly have gone wrong...
-    except UndefinedVariable as e:
-        message = "Invalid Input: {varname} not permitted in answer as a variable"
-        raise UndefinedVariable(message.format(varname=str(e)))
-
-    except UndefinedFunction as e:
-        funcnames = e.args[0]
-        valid_var = e.args[1]
-        message = "Invalid Input: {varname} not permitted in answer as a function"
-        if valid_var:
-            message += " (did you forget to use * for multiplication?)"
-        raise UndefinedFunction(message.format(varname=funcnames))
-
-    except (UnmatchedParentheses, InvalidInput):
-        # The error message is already written for these errors
-        raise
-
-    except ValueError as err:
-        if 'factorial' in err.message:
-            # This is thrown when fact() or factorial() is used
-            # that tests on negative and/or non-integer inputs
-            # err.message will be: `factorial() only accepts integral values` or
-            # `factorial() not defined for negative values`
-            raise InvalidInput("Error evaluating factorial() or fact() in input. " +
-                               "These functions can only be used on positive integers.")
-        else:
-            # Don't know what this is, or how you want to deal with it
-            raise
