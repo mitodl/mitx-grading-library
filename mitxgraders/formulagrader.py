@@ -15,7 +15,8 @@ from mitxgraders.helpers.calc import (UndefinedVariable, UndefinedFunction,
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative,
                                                 PercentageString, is_callable)
 from mitxgraders.helpers.mathfunc import (construct_functions, construct_constants,
-                                          construct_suffixes, within_tolerance, gen_symbols_samples)
+                                          construct_suffixes, within_tolerance,
+                                          gen_symbols_samples, check_formula)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -153,51 +154,18 @@ class FormulaGrader(ItemGrader):
 
         # Now perform the computations
         try:
-            return self.raw_check(answer, student_input)
-
-        # And now for all of the things that could possibly have gone wrong...
-        except UndefinedVariable as e:
-            message = "Invalid Input: {varname} not permitted in answer as a variable"
-            raise UndefinedVariable(message.format(varname=str(e)))
-
-        except UndefinedFunction as e:
-            funcnames = e.args[0]
-            valid_var = e.args[1]
-            message = "Invalid Input: {varname} not permitted in answer as a function"
-            if valid_var:
-                message += " (did you forget to use * for multiplication?)"
-            raise UndefinedFunction(message.format(varname=funcnames))
-
-        except UnmatchedParentheses:
-            # The error message is already written for this error
+            return check_formula(self.raw_check, answer, student_input)
+        except (UndefinedVariable, UndefinedFunction, UnmatchedParentheses, InvalidInput):
+            # These errors have been vetted by check_formula
             raise
-
-        except ValueError as err:
-            if 'factorial' in err.message:
-                # This is thrown when fact() or factorial() is used
-                # that tests on negative and/or non-integer inputs
-                # err.message will be: `factorial() only accepts integral values` or
-                # `factorial() not defined for negative values`
-                raise InvalidInput("Error evaluating factorial() or fact() in input. "
-                                   "These functions can only be used on positive integers.")
-            elif self.config["debug"]:
-                # Check if debug mode is on
+        except Exception:
+            # If debug mode is on, give the full stack trace
+            if self.config["debug"]:
                 raise
             else:
                 # Otherwise, give a generic error message
                 msg = "Invalid Input: Could not parse '{}' as a formula"
                 raise InvalidInput(msg.format(student_input))
-
-        except Exception as err:
-            # Reraise InvalidInput messages
-            if isinstance(err, InvalidInput):
-                raise
-            # Check if debug mode is on
-            if self.config["debug"]:
-                raise
-            # Otherwise, give a generic error message
-            msg = "Invalid Input: Could not parse '{}' as a formula"
-            raise InvalidInput(msg.format(student_input))
 
     def raw_check(self, answer, student_input):
         """Perform the numerical check of student_input vs answer"""
