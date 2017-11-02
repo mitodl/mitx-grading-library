@@ -124,28 +124,45 @@ class AbstractGrader(ObjectWithSchema):
             The answer that we pass to check is None, indicating that the
             grader should read the answer from its internal configuration.
         """
+        # Initialize the debug log
+        # The debug log always exists and is written to, so that it can be accessed
+        # programmatically. It is only output with the grading when config["debug"] is True
+        self.debuglog = []
+        # Add the version to the debug log
+        self.log("MITx Grading Library Version " + __version__)
+        # Add the student inputs to the debug log
+        if isinstance(student_input, list):
+            self.log("Student Responses:\n" + "\n".join(map(str, student_input)))
+        else:
+            self.log("Student Response:\n" + str(student_input))
+
+        # Compute the result of the check
         result = self.check(None, student_input)
 
+        # Append the debug log to the result if requested
         if self.config['debug']:
-            # Construct the debug output
-            debugoutput = "MITx Grading Library Version " + __version__ + "\n"
-            if isinstance(student_input, list):
-                debugoutput += "Student Responses:\n" + "\n".join(student_input)
-            else:
-                debugoutput += "Student Response:\n" + student_input
-            # Append the message
             if "input_list" in result:
+                # Multiple inputs
                 if result.get('overall_message', ''):
-                    result['overall_message'] += "\n\n" + debugoutput
+                    result['overall_message'] += "\n\n" + self.log_output()
                 else:
-                    result['overall_message'] = debugoutput
+                    result['overall_message'] = self.log_output()
             else:
+                # Single input
                 if result.get('msg', ''):
-                    result['msg'] += "\n\n" + debugoutput
+                    result['msg'] += "\n\n" + self.log_output()
                 else:
-                    result['msg'] = debugoutput
+                    result['msg'] = self.log_output()
 
         return result
+
+    def log(self, message):
+        """Append a message to the debug log"""
+        self.debuglog.append(message)
+
+    def log_output(self):
+        """Returns a string of the debug log output"""
+        return "\n".join(self.debuglog)
 
 class ItemGrader(AbstractGrader):
     """
