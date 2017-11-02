@@ -293,6 +293,7 @@ We have made a number of other improvements over the edX formula graders. Here a
 * If students input an expression with mismatched parentheses, this generates an intelligible error message that points to the exact issue.
 * When students use an unknown variable, the resulting error message highlights that the unknown quantity was interpreted as a variable.
 * Similarly, when students use an unknown function, the resulting error message highlights that the unknown quantity was interpreted as a function. If a variable of that name exists, the error message suggests that a multiplication symbol was missing.
+* If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the `debug` flag to True, and a more technical message will usually be displayed.
 
 
 - [Home](README.md)
