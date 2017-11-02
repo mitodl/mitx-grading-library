@@ -88,7 +88,7 @@ def test_fg_invalid_input():
         grader(None, "5*(3))")
 
     expect = "Invalid Input: Could not parse '5pp' as a formula"
-    with raises(InvalidInput, match=expect):
+    with raises(CalcError, match=expect):
         grader(None, "5pp")
 
     expect = "Error evaluating factorial\(\) or fact\(\) in input. " + \
@@ -143,7 +143,7 @@ def test_fg_percent():
     )
     assert grader(None, "2%")['ok']
     assert grader(None, "0.02")['ok']
-    with raises(InvalidInput, match="Invalid Input: Could not parse '20m' as a formula"):
+    with raises(CalcError, match="Invalid Input: Could not parse '20m' as a formula"):
         grader(None, "20m")
 
 def test_fg_metric():
@@ -180,7 +180,7 @@ def test_fg_userfunction():
 
     # Primes aren't allowed in the middle
     expect = "Invalid Input: Could not parse 'that'sbad\(1\)' as a formula"
-    with raises(InvalidInput, match=expect):
+    with raises(CalcError, match=expect):
         grader = FormulaGrader(
             answers="1",
             user_functions={"that'sbad": np.tan}

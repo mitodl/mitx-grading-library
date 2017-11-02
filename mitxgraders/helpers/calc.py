@@ -27,7 +27,8 @@ from pyparsing import (
     alphanums,
     alphas,
     nums,
-    stringEnd
+    stringEnd,
+    ParseException
 )
 
 class CalcError(Exception):
@@ -59,6 +60,13 @@ class UnmatchedParentheses(CalcError):
 class FactorialError(CalcError):
     """
     Indicate when factorial is called on a bad input
+    """
+    pass
+
+
+class UnableToParse(CalcError):
+    """
+    Indicate when a function cannot be parsed
     """
     pass
 
@@ -194,13 +202,13 @@ class ParserCache(object):
 
         # Strip out any whitespace, so that two otherwise-equivalent formulas are treated
         # the same
-        formula = "".join([char for char in formula if char != " "])
+        stripformula = "".join([char for char in formula if char != " "])
 
         # Construct the key
         suffixstr = ""
         for key in suffixes:
             suffixstr += key
-        key = (formula, case_sensitive, ''.join(sorted(suffixstr)))
+        key = (stripformula, case_sensitive, ''.join(sorted(suffixstr)))
 
         # Check if it's in the cache
         parser = self.cache.get(key, None)
@@ -208,8 +216,12 @@ class ParserCache(object):
             return parser
 
         # It's not, so construct it
-        parser = ParseAugmenter(formula, case_sensitive, suffixes)
-        parser.parse_algebra()
+        parser = ParseAugmenter(stripformula, case_sensitive, suffixes)
+        try:
+            parser.parse_algebra()
+        except ParseException:
+            msg = "Invalid Input: Could not parse '{}' as a formula"
+            raise UnableToParse(msg.format(formula))
 
         # Save it for later use before returning it
         self.cache[key] = parser
