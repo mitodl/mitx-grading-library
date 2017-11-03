@@ -17,7 +17,7 @@ def test_debug_with_author_message():
                 "<pre>"
                 "MITx Grading Library Version {version}\n"
                 "{debug_content}"
-                "<pre/>")
+                "</pre>")
     author_message = "nope!"
     debug_content = "Student Response:\nhorse"
     msg = template.format(author_message=author_message,
@@ -36,7 +36,7 @@ def test_debug_without_author_message():
     template = ("<pre>"
                 "MITx Grading Library Version {version}\n"
                 "{debug_content}"
-                "<pre/>")
+                "</pre>")
     debug_content = "Student Response:\nhorse"
     msg = template.format(version=__version__,
                           debug_content=debug_content
@@ -54,7 +54,7 @@ def test_debug_with_input_list():
     template = ("<pre>"
                 "MITx Grading Library Version {version}\n"
                 "{debug_content}"
-                "<pre/>")
+                "</pre>")
     debug_content = "Student Responses:\ncat\nfish\ndog"
     msg = template.format(version=__version__,
                           debug_content=debug_content

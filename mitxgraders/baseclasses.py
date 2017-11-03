@@ -175,7 +175,7 @@ class AbstractGrader(ObjectWithSchema):
     def log_output(self):
         """Returns a string of the debug log output"""
         content = "\n".join(self.debuglog)
-        return "<pre>{content}<pre/>".format(content=content)
+        return "<pre>{content}</pre>".format(content=content)
 
 class ItemGrader(AbstractGrader):
     """
