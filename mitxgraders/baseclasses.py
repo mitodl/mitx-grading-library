@@ -154,7 +154,19 @@ class AbstractGrader(ObjectWithSchema):
                 else:
                     result['msg'] = self.log_output()
 
+        self.format_messages(result)
         return result
+
+    @staticmethod
+    def format_messages(result):
+        """Inserts HTML <br/> tags into messages where newlines are found."""
+
+        if "input_list" in result:
+            result["overall_message"] = result.get("overall_message", "").replace("\n", "<br/>\n")
+            for subresult in result["input_list"]:
+                subresult["msg"] = subresult.get("msg", "").replace("\n", "<br/>\n")
+        else:
+            result["msg"] = result.get("msg", "").replace("\n", "<br/>\n")
 
     def log(self, message):
         """Append a message to the debug log"""
@@ -162,7 +174,8 @@ class AbstractGrader(ObjectWithSchema):
 
     def log_output(self):
         """Returns a string of the debug log output"""
-        return "\n".join(self.debuglog)
+        content = "\n".join(self.debuglog)
+        return "<pre>{content}</pre>".format(content=content)
 
 class ItemGrader(AbstractGrader):
     """

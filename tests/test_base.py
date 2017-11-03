@@ -6,39 +6,68 @@ from mitxgraders import ListGrader, StringGrader, ConfigError, __version__
 from mitxgraders.voluptuous import Error
 from pytest import raises
 
-def test_debug():
-    """Test that debug information is correctly added to the response"""
-    header = 'MITx Grading Library Version ' + __version__ + '\n'
+def test_debug_with_author_message():
     grader = StringGrader(
         answers=('cat', 'dog'),
         wrong_msg='nope!',
         debug=True
     )
-    msg = 'nope!\n\n' + header + 'Student Response:\nhorse'
+    student_response = "horse"
+    template = ("{author_message}\n\n"
+                "<pre>"
+                "MITx Grading Library Version {version}\n"
+                "{debug_content}"
+                "</pre>")
+    author_message = "nope!"
+    debug_content = "Student Response:\nhorse"
+    msg = template.format(author_message=author_message,
+                          version=__version__,
+                          debug_content=debug_content
+                         ).replace("\n", "<br/>\n")
     expected_result = {'msg': msg, 'grade_decimal': 0, 'ok': False}
-    assert grader(None, 'horse') == expected_result
+    assert grader(None, student_response) == expected_result
 
+def test_debug_without_author_message():
     grader = StringGrader(
         answers=('cat', 'dog'),
         debug=True
     )
-    expected_result = {'msg': header + 'Student Response:\ncat', 'grade_decimal': 1, 'ok': True}
-    assert grader(None, 'cat') == expected_result
+    student_response = "horse"
+    template = ("<pre>"
+                "MITx Grading Library Version {version}\n"
+                "{debug_content}"
+                "</pre>")
+    debug_content = "Student Response:\nhorse"
+    msg = template.format(version=__version__,
+                          debug_content=debug_content
+                         ).replace("\n", "<br/>\n")
+    expected_result = {'msg': msg, 'grade_decimal': 0, 'ok': False}
+    assert grader(None, student_response) == expected_result
 
+def test_debug_with_input_list():
     grader = ListGrader(
         answers=['cat', 'dog', 'unicorn'],
         subgraders=StringGrader(),
         debug=True
     )
+    student_response = ["cat", "fish", "dog"]
+    template = ("<pre>"
+                "MITx Grading Library Version {version}\n"
+                "{debug_content}"
+                "</pre>")
+    debug_content = "Student Responses:\ncat\nfish\ndog"
+    msg = template.format(version=__version__,
+                          debug_content=debug_content
+                         ).replace("\n", "<br/>\n")
     expected_result = {
-        'overall_message': header + 'Student Responses:\ncat\nfish\ndog',
+        'overall_message': msg,
         'input_list': [
             {'ok': True, 'grade_decimal': 1, 'msg': ''},
             {'ok': False, 'grade_decimal': 0, 'msg': ''},
             {'ok': True, 'grade_decimal': 1, 'msg': ''}
         ]
     }
-    assert grader(None, ['cat', 'fish', 'dog']) == expected_result
+    assert grader(None, student_response) == expected_result
 
 def test_config():
     """Test giving a class a config dict or arguments"""
