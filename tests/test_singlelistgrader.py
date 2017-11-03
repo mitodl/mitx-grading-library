@@ -42,7 +42,8 @@ def test_partial_credit_assigment():
     submission = "skunk, lion, unicorn"
     expected_result = {
         'ok': 'partial',
-        'msg': "lion_msg\nunicorn_msg",
+        'msg': ("lion_msg<br/>\n"
+                "unicorn_msg"),
         'grade_decimal': approx((1+0.5+0.75)/3)
     }
     assert grader(None, submission) == expected_result
@@ -91,7 +92,8 @@ def test_too_many_items():
     submission = "skunk, fish, lion, unicorn, bear"
     expected_result = {
         'ok': 'partial',
-        'msg': "lion_msg\nunicorn_msg",
+        'msg': ("lion_msg<br/>\n"
+                "unicorn_msg"),
         'grade_decimal': approx((1+0.5+0.75)/3 - 2*1/3)
     }
     assert grader(None, submission) == expected_result
@@ -116,7 +118,8 @@ def test_way_too_many_items_reduces_score_to_zero():
     submission = "skunk, fish, dragon, dog, lion, unicorn, bear"
     expected_result = {
         'ok': False,
-        'msg': "lion_msg\nunicorn_msg",
+        'msg': ("lion_msg<br/>\n"
+                "unicorn_msg"),
         'grade_decimal': 0
     }
     assert grader(None, submission) == expected_result
