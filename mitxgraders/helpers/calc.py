@@ -379,8 +379,7 @@ class ParseAugmenter(object):
         # Same thing for functions
         # Allow primes (apostrophes) at the end of function names, useful for
         # indicating derivatives. Eg, f'(x), g''(x)
-        funcname = inner_varname
-        function = Group(funcname + Suppress("(") + expr + Suppress(")"))("function")
+        function = Group(inner_varname + Suppress("(") + expr + Suppress(")"))("function")
         function.setParseAction(self.function_parse_action)
 
         atom = number | function | varname | "(" + expr + ")"
