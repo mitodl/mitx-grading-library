@@ -165,12 +165,13 @@ def test_fg_userfunction():
     assert grader(None, "hello(0.4)")['ok']
     assert grader(None, "sin(0.4)/cos(0.4)")['ok']
 
-    # Test with function names with primes at the end
+    # Test with variable and function names with primes at the end
     grader = FormulaGrader(
-        answers="sin(0.4)/cos(0.4)",
+        answers="sin(0.4)/cos(0.4)+t''^2",
+        variables=["t''"],
         user_functions={"f'": np.tan}
     )
-    assert grader(None, "f'(0.4)")['ok']
+    assert grader(None, "f'(0.4)+t''^2")['ok']
 
     grader = FormulaGrader(
         answers="sin(0.4)/cos(0.4)",
