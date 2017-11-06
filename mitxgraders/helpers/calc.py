@@ -372,7 +372,7 @@ class ParseAugmenter(object):
 
         # Handle variables passed in. They must start with letters/underscores
         # and may contain numbers afterward.
-        inner_varname = Word(alphas + "_", alphanums + "_")
+        inner_varname = Combine(Word(alphas + "_", alphanums + "_") + ZeroOrMore("'"))
         varname = Group(inner_varname)("variable")
         varname.setParseAction(self.variable_parse_action)
 
