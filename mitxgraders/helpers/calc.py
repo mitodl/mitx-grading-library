@@ -372,15 +372,14 @@ class ParseAugmenter(object):
 
         # Handle variables passed in. They must start with letters/underscores
         # and may contain numbers afterward.
-        inner_varname = Word(alphas + "_", alphanums + "_")
+        inner_varname = Combine(Word(alphas + "_", alphanums + "_") + ZeroOrMore("'"))
         varname = Group(inner_varname)("variable")
         varname.setParseAction(self.variable_parse_action)
 
         # Same thing for functions
         # Allow primes (apostrophes) at the end of function names, useful for
         # indicating derivatives. Eg, f'(x), g''(x)
-        funcname = Combine(inner_varname + Optional(Word("'")))
-        function = Group(funcname + Suppress("(") + expr + Suppress(")"))("function")
+        function = Group(inner_varname + Suppress("(") + expr + Suppress(")"))("function")
         function.setParseAction(self.function_parse_action)
 
         atom = number | function | varname | "(" + expr + ")"
