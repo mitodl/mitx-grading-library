@@ -2,7 +2,7 @@
 Tests of base class functionality
 """
 from __future__ import division
-from mitxgraders import ListGrader, StringGrader, ConfigError, __version__
+from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, __version__
 from mitxgraders.voluptuous import Error
 from pytest import raises
 
@@ -218,3 +218,14 @@ def test_docs():
     assert grader(None, 'dog') == expected_result
     expected_result = {'msg': 'No, not unicorn!', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'unicorn') == expected_result
+
+def test_readme():
+    """Tests that the README.md file examples work"""
+    grader = StringGrader(
+        answers='cat'
+    )
+
+    grader = ListGrader(
+        answers=['1', '2'],
+        subgraders=FormulaGrader()
+    )

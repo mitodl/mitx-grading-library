@@ -78,8 +78,8 @@ Here is another example where we use a ListGrader to grade two numbers in an uno
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
 grader = ListGrader(
-    answers=['1', '2']
-    subgrader=FormulaGrader()
+    answers=['1', '2'],
+    subgraders=FormulaGrader()
 )
 </script>
 
