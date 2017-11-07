@@ -70,6 +70,11 @@ def test_fg_invalid_input():
     with raises(CalcError, match=expect):
         grader(None, "pi(3)")
 
+    expect = 'Invalid Input: Im, Re not permitted in answer as a function ' + \
+             '\(did you mean im, re\?\)'
+    with raises(CalcError, match=expect):
+        grader(None, "Im(3) + Re(2)")
+
     expect = 'Invalid Input: spin not permitted in answer as a function'
     with raises(CalcError, match=expect):
         grader(None, "spin(3)")
