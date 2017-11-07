@@ -17,8 +17,14 @@ if [ -f $file ] ; then
     rm $file
 fi
 
+# Copy the license into the grading folder
+cp LICENSE ./mitxgraders/LICENSE
+
 # Create the zip file
 echo Building python_lib.zip...
-zip -r $file mitxgraders LICENSE
+zip -r $file mitxgraders
+
+# Remove the license from the grading folder
+rm ./mitxgraders/LICENSE
 
 echo Done!
