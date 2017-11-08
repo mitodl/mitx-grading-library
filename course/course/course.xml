@@ -1,7 +1,9 @@
-<course display_name="MITx Grading Library" language="en">
+<course>
   <chapter url_name="examples" display_name="Live Examples">
     <sequential url_name="intro" display_name="Introduction">
-
+      <vertical url_name="v-intro" display_name="Introduction">
+        <html url_name="introduction"/>
+      </vertical>
     </sequential>
     <sequential url_name="intro" display_name="ItemGrader">
 
@@ -12,7 +14,13 @@
     <sequential url_name="intro" display_name="FormulaGrader and NumericalGrader">
 
     </sequential>
-    <sequential url_name="intro" display_name="Introduction">
+    <sequential url_name="intro" display_name="SingleListGrader">
+
+    </sequential>
+    <sequential url_name="intro" display_name="ListGrader">
+
+    </sequential>
+    <sequential url_name="intro" display_name="IntegralGrader">
 
     </sequential>
   </chapter>
