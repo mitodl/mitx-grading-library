@@ -4,6 +4,7 @@
         "display_name": "MITx Grading Library",
         "course_image": "mitx.jpg",
         "display_organization": "MIT",
+        "display_coursenumber": "Demonstration Course",
         "language": "en",
         "start": "2017-01-01T00:00:00Z",
         "showanswer": "always",
