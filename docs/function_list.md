@@ -33,8 +33,8 @@ By default, all of the following functions are made available to students.
 - *arcsech()* Inverse Hyperbolic Secant
 - *arccsch()* Inverse Hyperbolic Cosecant
 - *arccoth()* Inverse Hyperbolic Cotangent
-- *re()* and *Re()* Real part of a complex expression
-- *im()* and *Im()* Imaginary part of a complex expression
+- *re()* Real part of a complex expression
+- *im()* Imaginary part of a complex expression
 - *conj()* Complex conjugate of a complex expression
 
 Unfortunately, some functions will not preview well in the MathJax preview a student sees. For example, `re(z)/2` will not render correctly.

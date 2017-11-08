@@ -128,8 +128,6 @@ DEFAULT_FUNCTIONS = {
     # lambdas because sometimes np.real/imag returns an array,
     're': lambda x: float(np.real(x)),
     'im': lambda x: float(np.imag(x)),
-    'Re': lambda x: float(np.real(x)),
-    'Im': lambda x: float(np.imag(x)),
     'conj': np.conj,
 }
 

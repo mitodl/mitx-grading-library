@@ -460,10 +460,23 @@ class ParseAugmenter(object):
 
         bad_funcs = set(func for func in self.functions_used
                         if casify(func) not in valid_functions)
-        func_is_var = any(casify(func) in valid_variables for func in bad_funcs)
         if bad_funcs:
             funcnames = ', '.join(sorted(bad_funcs))
             message = "Invalid Input: {} not permitted in answer as a function"
-            if func_is_var:
+
+            # Check to see if there is a corresponding variable name
+            if any(casify(func) in valid_variables for func in bad_funcs):
                 message += " (did you forget to use * for multiplication?)"
+
+            # Check to see if there is a different case version of the function
+            caselist = set()
+            if self.case_sensitive:
+                for func2 in bad_funcs:
+                    for func1 in valid_functions:
+                        if func2.lower() == func1.lower():
+                            caselist.add(func1)
+                if len(caselist) > 0:
+                    betternames = ', '.join(sorted(caselist))
+                    message += " (did you mean " + betternames + "?)"
+
             raise UndefinedFunction(message.format(funcnames))
