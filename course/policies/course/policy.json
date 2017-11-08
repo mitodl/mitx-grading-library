@@ -1,0 +1,24 @@
+{
+    "course/course": {
+        "cert_html_view_enabled": false,
+        "display_name": "MITx Grading Library",
+        "course_image": "mitx.jpg",
+        "display_organization": "MIT",
+        "display_coursenumber": "Demonstration Course",
+        "language": "en",
+        "start": "2017-01-01T00:00:00Z",
+        "showanswer": "always",
+        "tabs": [
+            {
+                "course_staff_only": false,
+                "name": "Home",
+                "type": "course_info"
+            },
+            {
+                "course_staff_only": false,
+                "name": "Course",
+                "type": "courseware"
+            }
+        ]
+    }
+}

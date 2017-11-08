@@ -10,9 +10,16 @@ We thank the MIT Office of Digital Learning for their support.
 
 **Table of Contents**
 
+- [Demo Course](#demo-course)
 - [Installation](#installation)
 - [Usage in edX](#usage-in-edx)
 - [Grader Documentation](#grader-documentation)
+
+
+## Demo Course
+
+A demonstration course for the MITx Grading Library can be viewed [here](https://edge.edx.org/courses/course-v1:MITx+grading-library+examples/). The source code for this course is contained in this repository.
+
 
 ## Installation
 

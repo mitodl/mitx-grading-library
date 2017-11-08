@@ -1,0 +1,14 @@
+{
+    "GRADER": [
+        {
+            "drop_count": 0,
+            "min_count": 0,
+            "short_label": "HW",
+            "type": "Homework",
+            "weight": 1
+        }
+    ],
+    "GRADE_CUTOFFS": {
+        "Pass": 0.5
+    }
+}
