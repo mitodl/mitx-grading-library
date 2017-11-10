@@ -21,7 +21,7 @@ We thank the MIT Office of Digital Learning for their support.
 A demonstration course for the MITx Grading Library can be viewed [here](https://edge.edx.org/courses/course-v1:MITx+grading-library+examples/). The source code for this course is contained in this repository.
 
 
-## Installation
+## Local Installation
 
 To install:
 
@@ -34,18 +34,11 @@ This is useful for testing configurations in python, rather than in edX. However
 2. Run `pip install -r requirements.txt` to install the requirements specified in `requirements.txt`.
 3. Run `pytest` to check that tests are passing.
 
-To use in edX:
-
-1. Download [python_lib.zip](python_lib.zip) and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow).
-
 
 ## Usage in edX
+Download [python_lib.zip](python_lib.zip) and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip.
 
-In edX, you want to use a Custom Response problem. We provide examples of the XML required to use the grading library in edX.
-
-A custom response problem is defined using the customresponse tag. It needs to be supplied a check function (cfn), which must be a grader that you have defined in the problem.
-
-The basic pattern is the following.
+A custom response problem is defined using the `<customresponse>` tag. It needs to be supplied a check function (cfn), which must be a grader that you have defined in the problem. The mitxgraders library provides reusable check functions. The basic usage pattern is:
 
 ```xml
 <script type="text/python" system_path="python_lib">
@@ -60,7 +53,7 @@ grader = GraderType(
 </customresponse>
 ```
 
-The configuration depends on the type of grader that you're using. Note that all answers must be passed through the configuration. In particular, the `expect` keyword is ignored by the grader.
+The configuration depends on the type of grader that you're using. Note that all answers must be passed through the configuration. In particular, the `expect`  attribute on `<customresponse>` tag is ignored by our graders.
 
 Here is an example where we use a StringGrader with answer `cat`.
 
@@ -96,7 +89,7 @@ grader = ListGrader(
 </customresponse>
 ```
 
-Here, the `correct_answer` entries are shown to students when they click "Show Answer". These values are not provided to the grader. The `correct_answer` keyword can also be used for single-input problems.
+Here, the `correct_answer` entries are shown to students when they click "Show Answer". These values are not provided to the grader. The `correct_answer` attributes can also be used for single-input problems.
 
 
 ## Grader Documentation

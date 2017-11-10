@@ -9,7 +9,7 @@ All whitespace is stripped from formulas that are entered. So, `1 + x ^ 2` is eq
 
 ## Variables and Sampling
 
-FormulaGrader grades a formula by randomly assigning values to each of the unknown variables, and computing numerical values for both the solution and the student input. If they compare within the desired tolerance enough times, the student input is graded as correct.
+FormulaGrader grades a formula by numerical sampling. That is, random values are  assigned to each of the unknown variables and unknown functions, then the numerical value of the student's input expression and author's answer are calculated. The sampling process is repeated, and if the student answer and author answer compare within the desired tolerance enough times, the student input is graded as correct.
 
 Variables are configured by including a list of strings of each variable name as follows.
 
@@ -225,7 +225,7 @@ If a student tries to use one of these strings, then they receive the `forbidden
 
 ## Tolerance
 
-Student inputs are compared to answers with a numerical tolerance. You can set this as an absolute number (eg, `0.1`) or a percentage (eg, `"0.01%"`, which is the default tolerance).  Tolerances must be positive numbers or percentages.
+Student inputs are compared to answers with a numerical tolerance. You can set this as an absolute number (eg, `0.1`) or a percentage (eg, `"0.01%"`, which is the default tolerance).  Tolerances must be nonnegative numbers or percentages.
 
 ```python
 grader = FormulaGrader(
@@ -235,7 +235,7 @@ grader = FormulaGrader(
 )
 ```
 
-Tolerances are necessary because of numerical roundoff error that lead to small differences in evaluations of algebraically equivalent expressions.
+Tolerances are necessary because of numerical roundoff error that lead to small differences in evaluations of algebraically equivalent expressions. Zero tolerance should be used sparingly, perhaps only with integer sampling and answers.
 
 
 ## Case Sensitive Input
@@ -252,12 +252,11 @@ grader = FormulaGrader(
 
 This will allow students to use `SIN` and `COS` as well as `sin` and `cos`.
 
-
 ## Suffixes
 
 Numbers with a % at the end will be treated as percentages, and converted to the appropriate decimals.
 
-edX also defines a number of metric suffixes (k, M, G, T, m, u, n, and p) that modify a number appropriately. However, in our experience, these metric suffixes lead to more confusion than use. For example, `2M`, which one would expect should be rejected as an error when `2*M` was intended, is graded incorrectly and eats a student's attempt. Similarly for all of the other metric suffixes.
+edX also defines a number of metric suffixes (k, M, G, T, m, u, n, and p) that modify a number appropriately. However, in our experience, these metric suffixes lead to more confusion than use. For example, `2M`, which one would expect should be rejected as an error when `2*M` was intended, is accepted by edX, interpreted as `2*10^6`, marked incorrect, and eats a student's attempt. Similarly for all of the other metric suffixes.
 
 We have therefore made the decision to disable metric suffixes by default. If you want to enable them, you can do so using the following.
 
@@ -287,8 +286,9 @@ If you are grading simple integers (such as 0, 1, 2, -1, etc), you may want to c
 
 ## Other Improvements
 
-We have made a number of other improvements over the edX formula graders. Here are some of the improvements:
+We have made a number of other improvements over the edX formula graders, including:
 
+* Square roots and other functions have a wider domain: with EdX's default FormulaResponse, authors need to be careful that expressions like `sqrt(x-1)` or `(x-1)^0.5` always pass nonnegative inputs to the square root and power functions. Our square root, power, logarithm, and inverse trigonometric functions accept a wider array of inputs (the entire complex plane, minus poles). For this reason, authors can feel safe using the default sample range in most cases.
 * Our parser uses a parsing cache, and hence runs much more efficiently than the edX graders.
 * If students input an expression with mismatched parentheses, this generates an intelligible error message that points to the exact issue.
 * When students use an unknown variable, the resulting error message highlights that the unknown quantity was interpreted as a variable.
