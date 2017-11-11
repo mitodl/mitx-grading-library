@@ -2,6 +2,21 @@
 
 <h1>MITx Grading Library</h1>
 
-<p>Stuff here...</p>
+<h2>About</h2>
+
+<p>edX provides a variety of default problem types. However, it's very easy to want to do something beyond the basics. Using customresponse problems and python graders, it's possible to create much richer problems, but each one has to be individually coded, and this is very time consuming. Until now.</p>
+
+<p>Having tired of recreating the wheel multiple times, we decided to make a python grading library for edX that could handle almost anything you could want to throw at it. The library is designed to be simple to use, give useful error messages, and be incredibly flexible. If what we provide can't handle what you want to do, then you can always write a plugin that leverages the infrastructure we've already created. While we were at it, we implemented a number of long-overdue features and usability improvements over the edX implementation.</p>
+
+<p>We encourage you to play around with the examples that this demonstration course contains, so that you can get an idea of what is possible using this library.</p>
+
+
+<h2>Where can I get it?</h2>
+
+<p>This library is made freely available on <a href="https://github.com/mitodl/mitx-grading-library">github</a>, where you can see the full source code, documentation, and also the source for this demonstration course. We have endeavoured to make this library as simple as possible to set up. Just download the python_lib.zip file and start using it!</p>
+
+<p>This library is released for use under the BSD-3 license. See the github repository for full license details.</p>
+
+<p>The MITx Grading Library was created by Jolyon Bloomfield and Christopher Chudzicki. Copyright 2017</p>
 
 </html>

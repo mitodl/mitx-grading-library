@@ -5,23 +5,35 @@
         <html url_name="introduction"/>
       </vertical>
     </sequential>
-    <sequential url_name="intro" display_name="ItemGrader">
-
+    <sequential url_name="stringgrader" display_name="StringGrader">
+      <vertical url_name="v-string" display_name="To do list">
+        <html url_name="string2do"/>
+      </vertical>
     </sequential>
-    <sequential url_name="intro" display_name="StringGrader">
-
+    <sequential url_name="formulagrader" display_name="FormulaGrader and NumericalGrader">
+      <vertical url_name="v-formula" display_name="To do list">
+        <html url_name="formula2do"/>
+      </vertical>
     </sequential>
-    <sequential url_name="intro" display_name="FormulaGrader and NumericalGrader">
-
+    <sequential url_name="singlelistgrader" display_name="SingleListGrader">
+      <vertical url_name="v-singlelist" display_name="To do list">
+        <html url_name="singlelist2do"/>
+      </vertical>
     </sequential>
-    <sequential url_name="intro" display_name="SingleListGrader">
-
+    <sequential url_name="listgrader" display_name="ListGrader">
+      <vertical url_name="v-list" display_name="To do list">
+        <html url_name="list2do"/>
+      </vertical>
     </sequential>
-    <sequential url_name="intro" display_name="ListGrader">
-
+    <sequential url_name="integralgrader" display_name="IntegralGrader">
+      <vertical url_name="v-integral" display_name="To do list">
+        <html url_name="integral2do"/>
+      </vertical>
     </sequential>
-    <sequential url_name="intro" display_name="IntegralGrader">
-
+    <sequential url_name="latex2edx" display_name="Using with LaTeX2edX">
+      <vertical url_name="v-l2edx" display_name="To do list">
+        <html url_name="latex2edx2do"/>
+      </vertical>
     </sequential>
   </chapter>
 </course>
