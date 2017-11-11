@@ -43,6 +43,8 @@ def import_plugins():
         if hasattr(mod, "__all__"):
             globals().update({name: mod.__dict__[name] for name in mod.__all__})
 
+    globals().update({'loaded_from': "mitxgraders directory"})
+
 
 def import_zip_plugins():
     """Imports all plugins from python_lib.zip into the global namespace"""
@@ -55,7 +57,7 @@ def import_zip_plugins():
         file_list = myzip.namelist()
         plugins = [
             file[:-3] for file in file_list
-            if file.startswith("graders/plugins/")
+            if file.startswith("mitxgraders/plugins/")
             and file.endswith(".py")
             and not file.endswith("__init__.py")
         ]
@@ -73,9 +75,11 @@ def import_zip_plugins():
         if hasattr(mod, "__all__"):
             globals().update({name: mod.__dict__[name] for name in mod.__all__})
 
+    globals().update({'loaded_from': "python_lib.zip"})
+
 
 # Import all the plugins
-if __file__.startswith("python_lib.zip"):
+if "python_lib.zip" in __file__:
     # If this package is inside python_lib.zip, we need to work a little differently
     import_zip_plugins()
 else:
