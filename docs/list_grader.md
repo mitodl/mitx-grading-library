@@ -1,6 +1,6 @@
 # ListGrader
 
-`SingleListGrader` can grade a list of items in a single input box, but if you have more than one input box, you need a `ListGrader`. ListGraders work by farming out individual items to subgraders, and then collecting the results and working out the optimal farming scheme for the student.
+A `ListGrader` is used to grade a list of student inputs wherein each input is entered in a separate answer box. (In contrast, `SingleListGrader` can be used to grade a list of items entered all at once into a single answer box.) ListGraders work by farming out individual items to subgraders, and then collecting the results and working out the optimal farming scheme for the student.
 
 
 ## Basic usage
@@ -105,7 +105,7 @@ grader = ListGrader(
 )
 ```
 
-In this case, the second level of grader is receiving multiple inputs, and so itself needs to be a ListGrader. The grouping key specifies which group each input belongs to. In this case, answers 1 and 2 will be combined into a list and fed to the subgrader as group 1, as will 3 and 4 as group 2, and 5 and 6 as group 3. The third level of grader (StringGrader and NumericalGrader) will then receive a list of two inputs, and each of the items in the answers. Because this is an unordered list, the `ListGrader` will try every possible combination and choose the optimal one.
+In this case, the second level of grader is receiving multiple inputs, and so itself needs to be a ListGrader. The grouping key specifies which group each input belongs to. In this case, answers 1 and 2 will be combined into a list and fed to the subgrader as group 1, as will 3 and 4 as group 2, and 5 and 6 as group 3. The third level of grader (StringGrader and NumericalGrader) will then receive a list of two inputs, and each of the items in the answers. Because this is an unordered list, the `ListGrader` will find the optimal ordering of (animal, number) pairs.
 
 The grouping keys must be integers starting at 1 and increasing. If you have N groups, then all numbers from 1 to N must be present in the grouping, but they need not be in monotonic order. So for example, [1, 2, 1, 2] is a valid grouping. For unordered groups, the groupings must each have the same number of elements.
 

@@ -29,7 +29,7 @@ This will accept `Cat`, `cat` and `CAT`. By default, `case_sensitive=True`.
 
 ## Stripping Input
 
-Leading or trailing spaces in an answer rarely change the meaning of the answer. Hence, by default, we strip all leading and trailing spaces from the student input before comparing to the answer (which we also strip). If you want to keep those spaces around for the comparison, you need to disable strip.
+Leading or trailing spaces in an answer rarely change the meaning of the answer. Hence, by default, we strip all leading and trailing spaces from the student input and author-specified answers before comparison. If you want to keep those spaces around for the comparison, you need to disable strip.
 
 ```python
 grader = StringGrader(

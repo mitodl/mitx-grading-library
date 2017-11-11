@@ -37,7 +37,7 @@ By default, all of the following functions are made available to students.
 - *im()* Imaginary part of a complex expression
 - *conj()* Complex conjugate of a complex expression
 
-Unfortunately, some functions will not preview well in the MathJax preview a student sees. For example, `re(z)/2` will not render correctly.
+Unfortunately, some functions may not preview well in the MathJax preview. For exampling, using `<textline math=1/>`, the input `re(z)/2` does not display correctly.
 
 
 - [FormulaGrader and NumericalGrader](formula_grader.md)
