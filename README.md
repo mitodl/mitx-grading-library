@@ -11,7 +11,7 @@ We thank the MIT Office of Digital Learning for their support.
 **Table of Contents**
 
 - [Demo Course](#demo-course)
-- [Installation](#installation)
+- [Local Installation](#local-installation)
 - [Usage in edX](#usage-in-edx)
 - [Grader Documentation](#grader-documentation)
 

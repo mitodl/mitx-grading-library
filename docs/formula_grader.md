@@ -288,7 +288,7 @@ If you are grading simple integers (such as 0, 1, 2, -1, etc), you may want to c
 
 We have made a number of other improvements over the edX formula graders, including:
 
-* Square roots and other functions have a wider domain: with EdX's default FormulaResponse, authors need to be careful that expressions like `sqrt(x-1)` or `(x-1)^0.5` always pass nonnegative inputs to the square root and power functions. Our square root, power, logarithm, and inverse trigonometric functions accept a wider array of inputs (the entire complex plane, minus poles). For this reason, authors can feel safe using the default sample range in most cases.
+* Square roots and other functions have a wider domain: with edX's default FormulaResponse, authors need to be careful that expressions like `sqrt(x-1)` or `(x-1)^0.5` always pass nonnegative inputs to the square root and power functions. Our square root, power, logarithm, and inverse trigonometric functions accept a wider array of inputs (the entire complex plane, minus poles). For this reason, authors can feel safe using the default sample range in most cases.
 * Our parser uses a parsing cache, and hence runs much more efficiently than the edX graders.
 * If students input an expression with mismatched parentheses, this generates an intelligible error message that points to the exact issue.
 * When students use an unknown variable, the resulting error message highlights that the unknown quantity was interpreted as a variable.
