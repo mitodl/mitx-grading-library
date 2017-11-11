@@ -55,7 +55,7 @@ def import_zip_plugins():
         file_list = myzip.namelist()
         plugins = [
             file[:-3] for file in file_list
-            if file.startswith("graders/plugins/")
+            if file.startswith("mitxgraders/plugins/")
             and file.endswith(".py")
             and not file.endswith("__init__.py")
         ]
