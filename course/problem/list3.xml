@@ -1,0 +1,18 @@
+<problem display_name="Grouped Input" showanswer="always" weight="10" attempts="">
+
+  <p>Number and Animal</p>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = StringGrader(
+    answers='cat'
+)
+</script>
+
+<customresponse cfn="grader">
+  <textline correct_answer="cat"/>
+</customresponse>
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list3.xml" target="_blank">View source</a>
+
+</problem>

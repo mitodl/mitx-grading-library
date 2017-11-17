@@ -8,12 +8,20 @@
 
 <p>Having tired of recreating the wheel multiple times, we decided to make a python grading library for edX that could handle almost anything you could want to throw at it. The library is designed to be simple to use, give useful error messages, and be incredibly flexible. If what we provide can't handle what you want to do, then you can always write a plugin that leverages the infrastructure we've already created. While we were at it, we implemented a number of long-overdue features and usability improvements over the edX implementation.</p>
 
-<p>We encourage you to play around with the examples that this demonstration course contains, so that you can get an idea of what is possible using this library.</p>
+<p>We encourage you to play around with the examples that this demonstration course contains, so that you can get an idea of what is possible using this library. Further examples are available in the full documentation included with the library.</p>
+
+
+<h2>How does it work?</h2>
+
+<p>The library is broken up into individual "graders" to grade different types of problems. Some simple graders just grade a single input, such as StringGrader and FormulaGrader. More complicated graders combine simpler graders to grade multiple entries, such as ListGrader. Examples of how these all work are given in this course.</p>
 
 
 <h2>Where can I get it?</h2>
 
-<p>This library is made freely available on <a href="https://github.com/mitodl/mitx-grading-library">github</a>, where you can see the full source code, documentation, and also the source for this demonstration course. We have endeavoured to make this library as simple as possible to set up. Just download the python_lib.zip file and start using it!</p>
+<p>This library is made freely available on <a href="https://github.com/mitodl/mitx-grading-library">github</a>, where you can see the full source code, documentation, and also the source for this demonstration course. We have endeavoured to make this library as simple as possible to set up and use. Just download the <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a> file and start using it!</p>
+
+
+<h2>Legal details and Credit</h2>
 
 <p>This library is released for use under the BSD-3 license. See the github repository for full license details.</p>
 

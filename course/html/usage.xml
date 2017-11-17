@@ -1,0 +1,59 @@
+<html display_name="Usage">
+
+<h1>Usage</h1>
+
+<h2>Studio</h2>
+
+<p>The library is straightforward to use. To set up, you need to do two things:</p>
+
+<ul>
+  <li>Download <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a></li>
+  <li>Upload python_lib.zip as a static asset (Warning: if you are already using a custom python grading library, then you will need to combine the two!)</li>
+</ul>
+
+<p>To use in a problem, create an advanced problem, and enter the following to see if things are working:</p>
+
+<pre><problem>
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = StringGrader(
+    answers='cat'
+)
+</script>
+
+<customresponse cfn="grader">
+    <textline correct_answer="cat"/>
+</customresponse>
+</problem></pre>
+
+
+<h2>XML</h2>
+
+<p>Very similar to the Studio usage above. To set up:</p>
+
+<ul>
+  <li>Download <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a></li>
+  <li>Upload python_lib.zip as a static asset (Warning: if you are already using a custom python grading library, then you will need to combine the two!)</li>
+</ul>
+
+<p>To use, create a problem, and use the above code to test it out.</p>
+
+
+<h2>LaTeX2edX</h2>
+
+<p>To use this in LaTeX2edX, put the python_lib.zip file in your static folder, as for the XML usage. For a problem script, it's best to put the python in an edXscript environment:</p>
+
+<pre>\begin{edXscript}
+from mitxgraders import *
+grader = StringGrader(
+    answers='cat'
+)
+\end{edXscript}</pre>
+
+<p>Then, put the customresponse tags in an edXxml tag:</p>
+
+<pre>\edXxml{<customresponse cfn="grader">
+    <textline correct_answer="cat"/>
+</customresponse>}</pre>
+
+</html>

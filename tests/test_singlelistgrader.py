@@ -247,12 +247,13 @@ def test_docs():
 
     grader = SingleListGrader(
         answers=(
-            ['cat', 'dog'],
+            [('cat', 'feline'), 'dog'],
             ['goat', 'vole'],
         ),
         subgrader=StringGrader()
     )
     assert grader(None, "cat, dog")["grade_decimal"] == 1
+    assert grader(None, "feline, dog")["grade_decimal"] == 1
     assert grader(None, "goat, vole")["grade_decimal"] == 1
     assert grader(None, "cat, vole")["grade_decimal"] == 0.5
     assert grader(None, "dog, goat")["grade_decimal"] == 0.5

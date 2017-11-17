@@ -65,8 +65,8 @@ grader = StringGrader(
 )
 </script>
 
-<customresponse cfn="grader" expect="cat">
-    <textline/>
+<customresponse cfn="grader">
+    <textline correct_answer="cat"/>
 </customresponse>
 ```
 

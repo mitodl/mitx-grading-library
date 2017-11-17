@@ -1,0 +1,7 @@
+<html display_name="SingleListGrader">
+
+<h1>SingleListGrader</h1>
+
+<p>A SingleListGrader grades a list of responses in a single textbox. The responses can be separated by whatever character you like, and graded using StringGrader/FormulaGrader/etc. These are particularly useful when you want a list of multiple integers.</p>
+
+</html>

@@ -1,0 +1,23 @@
+<problem display_name="Multiple Delimiters" showanswer="always" weight="10" attempts="">
+
+  <p>It's possible to list SingleListGraders by using different delimiters. In the following example, the answer is "a, b; c, d". You can also use "c, d; a, b". However, the sublists are ordered, so "b, a; c, d" is only partly correct (and receives partial credit).</p>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = SingleListGrader(
+    answers=[['a', 'b'], ['c', 'd']],
+    subgrader=SingleListGrader(
+        subgrader=StringGrader(),
+        ordered=True
+    ),
+    delimiter=';'
+)
+</script>
+
+<customresponse cfn="grader">
+  <textline correct_answer="a, b; c, d"/>
+</customresponse>
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/singlelist4.xml" target="_blank">View source</a>
+
+</problem>

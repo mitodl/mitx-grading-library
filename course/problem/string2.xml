@@ -1,0 +1,20 @@
+<problem display_name="StringGrader Options" showanswer="always" weight="10" attempts="">
+
+  <p>By default, StringGrader strips all whitespace from both the answer and input. It is also case sensitive by default. You can turn off both of these behaviors. For example, the answer below is "Hat ", with a single space at the end. This is case sensitive, and requires the space at the end.</p>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = StringGrader(
+    answers='Hat ',
+    case_sensitive=True,
+    strip=False
+)
+</script>
+
+<customresponse cfn="grader">
+  <textline correct_answer="Hat "/>
+</customresponse>
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string2.xml" target="_blank">View source</a>
+
+</problem>

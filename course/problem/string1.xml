@@ -1,0 +1,28 @@
+<problem display_name="Basic Usage" showanswer="always" weight="10" attempts="">
+
+  <p>Here is a basic example. The answer to this problem is "wolf", as is shown when you click on "Show Answer". However, an alternative correct answer is "canis lupus". A partially correct answer is "dog". A special message is displayed for "unicorn", and another message for all other input. This demonstrates the ability to specify various triplets of (answer, score, message). Note that this ability is not limited to StringGraders, but can be used by all graders.</p>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = StringGrader(
+    answers=(
+        # the correct answer
+        'wolf',
+        # an alternative correct answer
+        'canis lupus',
+        # a partially correct answer
+        {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
+        # a wrong answer with specific feedback
+        {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
+    ),
+    wrong_msg='Try again!'
+)
+</script>
+
+<customresponse cfn="grader">
+  <textline correct_answer="wolf"/>
+</customresponse>
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string1.xml" target="_blank">View source</a>
+
+</problem>

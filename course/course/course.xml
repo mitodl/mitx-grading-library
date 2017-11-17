@@ -6,33 +6,51 @@
       </vertical>
     </sequential>
     <sequential url_name="stringgrader" display_name="StringGrader">
-      <vertical url_name="v-string" display_name="To do list">
-        <html url_name="string2do"/>
+      <vertical url_name="v-string" display_name="StringGrader">
+        <html url_name="stringinfo"/>
+        <problem url_name="string1"/>
+        <problem url_name="string2"/>
       </vertical>
     </sequential>
     <sequential url_name="formulagrader" display_name="FormulaGrader and NumericalGrader">
-      <vertical url_name="v-formula" display_name="To do list">
-        <html url_name="formula2do"/>
+      <vertical url_name="v-formula" display_name="FormulaGrader and NumericalGrader">
+        <html url_name="formulainfo"/>
+        <problem url_name="formula1"/>
+        <problem url_name="formula2"/>
+        <problem url_name="formula3"/>
+        <problem url_name="formula4"/>
+        <problem url_name="formula5"/>
+        <problem url_name="formula6"/>
+        <problem url_name="formula7"/>
       </vertical>
     </sequential>
     <sequential url_name="singlelistgrader" display_name="SingleListGrader">
-      <vertical url_name="v-singlelist" display_name="To do list">
-        <html url_name="singlelist2do"/>
+      <vertical url_name="v-singlelist" display_name="SingleListGrader">
+        <html url_name="singlelistinfo"/>
+        <problem url_name="singlelist1"/>
+        <problem url_name="singlelist2"/>
+        <problem url_name="singlelist3"/>
+        <problem url_name="singlelist4"/>
       </vertical>
     </sequential>
     <sequential url_name="listgrader" display_name="ListGrader">
-      <vertical url_name="v-list" display_name="To do list">
-        <html url_name="list2do"/>
+      <vertical url_name="v-list" display_name="ListGrader">
+        <html url_name="listinfo"/>
+        <problem url_name="list1"/>
+        <problem url_name="list2"/>
+        <problem url_name="list3"/>
+        <problem url_name="list4"/>
+        <problem url_name="list5"/>
       </vertical>
     </sequential>
     <sequential url_name="integralgrader" display_name="IntegralGrader">
-      <vertical url_name="v-integral" display_name="To do list">
-        <html url_name="integral2do"/>
+      <vertical url_name="v-integral" display_name="IntegralGrader">
+        <html url_name="integralinfo"/>
       </vertical>
     </sequential>
-    <sequential url_name="latex2edx" display_name="Using with LaTeX2edX">
-      <vertical url_name="v-l2edx" display_name="To do list">
-        <html url_name="latex2edx2do"/>
+    <sequential url_name="usage" display_name="Usage">
+      <vertical url_name="v-usage" display_name="Usage">
+        <html url_name="usage"/>
       </vertical>
     </sequential>
   </chapter>

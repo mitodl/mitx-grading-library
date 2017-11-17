@@ -16,7 +16,7 @@ You can use a tuple of lists to specify multiple lists of answers, just like nor
 ```python
 grader = SingleListGrader(
     answers=(
-        ['cat', 'dog'],
+        [('cat', 'feline'), 'dog'],
         ['goat', 'vole'],
     ),
     subgrader=StringGrader()
