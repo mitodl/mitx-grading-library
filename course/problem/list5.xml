@@ -1,17 +1,46 @@
 <problem display_name="Eigensystem Example" showanswer="always" weight="10" attempts="">
 
-  <p></p>
+  <p>Here is the jewel in the crown of ListGrader: the ability to nest ListGraders.</p>
+
+  <p>Here is a matrix.</p>
+
+  \[M = \left[\begin{array}{cc}1 &amp; 0 \\ 0 &amp; -1\end{array}\right]\]
+
+  <p>Compute the eigenvalues and corresponding eigenvectors of this matrix. You may enter the eigenvalues in any order, but the eigenvectors must be corresponding to the appropriate eigenvalue. The eigenvectors should be normalized; the grader will accept either sign of the eigenvectors though. (Answers: Eigenvalue 1 = 1, Eigenvector 1 = (1, 0). Eigenvector 2 = -1, Eigenvector 2 = (0, 1))</p>
+
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
-grader = StringGrader(
-    answers='cat'
+grader = ListGrader(
+    answers=[
+        ['1', (['1', '0'], ['-1', '0'])],
+        ['-1', (['0', '1'], ['0', '-1'])],
+    ],
+    subgraders=ListGrader(
+        subgraders=[
+            NumericalGrader(),
+            ListGrader(
+                subgraders=NumericalGrader(),
+                ordered=True
+            )
+        ],
+        ordered=True,
+        grouping=[1, 2, 2]
+    ),
+    grouping=[1, 1, 1, 2, 2, 2]
 )
 </script>
 
-<customresponse cfn="grader">
-  <textline correct_answer="cat"/>
+<customresponse cfn="grader" inline="1">
+  <p style="display:inline">Eigenvalue 1: </p><textline inline="1" correct_answer="1"/>
+  <br/>
+  <p style="display:inline">Eigenvector 1: </p><textline inline="1" correct_answer="1"/><textline inline="1" correct_answer="0"/>
+  <br/>
+  <p style="display:inline">Eigenvalue 2: </p><textline inline="1" correct_answer="-1"/>
+  <br/>
+  <p style="display:inline">Eigenvector 2: </p><textline inline="1" correct_answer="0"/><textline inline="1" correct_answer="1"/>
 </customresponse>
+
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list5.xml" target="_blank">View source</a>
 

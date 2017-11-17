@@ -1,17 +1,24 @@
 <problem display_name="Unordered Input" showanswer="always" weight="10" attempts="">
 
-  <p>Two roots of 1</p>
+  <p>A common problem is to have two answers, and want them to be able to be entered in any order, but not the same answer twice. Here is how to do that with ListGrader.</p>
+
+  <p>What are the two roots of unity? (Answer: +1 and -1)</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
-grader = StringGrader(
-    answers='cat'
+grader = ListGrader(
+    answers=['1', '-1'],
+    subgraders=FormulaGrader()
 )
 </script>
 
-<customresponse cfn="grader">
-  <textline correct_answer="cat"/>
+<customresponse cfn="grader" inline="1">
+  <p style="display:inline">First answer: </p><textline math="1" inline="1" correct_answer="1"/>
+  <br/>
+  <p style="display:inline">Second answer: </p><textline math="1" inline="1" correct_answer="-1"/>
 </customresponse>
+
+<p>Try testing different orderings to your answer, entering the same answer twice, etc.</p>
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list1.xml" target="_blank">View source</a>
 

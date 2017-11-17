@@ -1,17 +1,27 @@
 <problem display_name="Embedded Lists" showanswer="always" weight="10" attempts="">
 
-  <p>SingleListGrader in ListGrader</p>
+  <p>It's possible to have a SingleListGrader inside a ListGrader. Separate the numbers between 1 and 10 inclusive into even and odd numbers. Put the odd numbers in one box, and the even numbers in the other. Order is unimportant.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
-grader = StringGrader(
-    answers='cat'
+grader = ListGrader(
+    answers=[
+        ['2', '4', '6', '8', '10'],
+        ['1', '3', '5', '7', '9']
+    ],
+    subgraders=SingleListGrader(
+        subgrader=NumericalGrader()
+    )
 )
 </script>
 
-<customresponse cfn="grader">
-  <textline correct_answer="cat"/>
+<customresponse cfn="grader" inline="1">
+  <textline math="1" inline="1" correct_answer="2,4,6,8,10"/>
+  <br/>
+  <textline math="1" inline="1" correct_answer="1,3,5,7,9"/>
 </customresponse>
+
+<p>Note that partial credit is awarded if applicable.</p>
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list2.xml" target="_blank">View source</a>
 
