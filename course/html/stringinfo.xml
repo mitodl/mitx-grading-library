@@ -1,7 +1,5 @@
 <html display_name="StringGrader">
 
-<h1>StringGrader</h1>
-
 <p>The StringGrader grader grades raw text (also known as "strings"). It is a very basic grader, which makes it a good place to start.</p>
 
 </html>

@@ -1,7 +1,5 @@
 <html display_name="ListGrader">
 
-<h1>ListGrader</h1>
-
 <p>Whenever there is more than one input to a logical problem unit, you will need to use a ListGrader to combine the inputs. ListGraders allow you to have items that are ordered/unordered and in groups. You can even nest ListGraders to construct problems that are very simple on pen and paper, but until now have been basically impossible in edX.</p>
 
 </html>

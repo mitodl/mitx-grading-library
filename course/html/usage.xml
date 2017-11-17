@@ -1,7 +1,5 @@
 <html display_name="Usage">
 
-<h1>Usage</h1>
-
 <h2>Studio</h2>
 
 <p>The library is straightforward to use. To set up, you need to do two things:</p>
@@ -13,18 +11,18 @@
 
 <p>To use in a problem, create an advanced problem, and enter the following to see if things are working:</p>
 
-<pre><problem>
-<script type="text/python" system_path="python_lib">
+<pre>&lt;problem&gt;
+&lt;script type=&quot;text/python&quot; system_path=&quot;python_lib&quot;&gt;
 from mitxgraders import *
 grader = StringGrader(
-    answers='cat'
+    answers=&apos;cat&apos;
 )
-</script>
+&lt;/script&gt;
 
-<customresponse cfn="grader">
-    <textline correct_answer="cat"/>
-</customresponse>
-</problem></pre>
+&lt;customresponse cfn=&quot;grader&quot;&gt;
+    &lt;textline correct_answer=&quot;cat&quot;/&gt;
+&lt;/customresponse&gt;
+&lt;/problem&gt;</pre>
 
 
 <h2>XML</h2>
@@ -33,7 +31,7 @@ grader = StringGrader(
 
 <ul>
   <li>Download <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a></li>
-  <li>Upload python_lib.zip as a static asset (Warning: if you are already using a custom python grading library, then you will need to combine the two!)</li>
+  <li>Put python_lib.zip in your static folder (Warning: if you are already using a custom python grading library, then you will need to combine the two!)</li>
 </ul>
 
 <p>To use, create a problem, and use the above code to test it out.</p>
@@ -46,14 +44,14 @@ grader = StringGrader(
 <pre>\begin{edXscript}
 from mitxgraders import *
 grader = StringGrader(
-    answers='cat'
+    answers=&apos;cat&apos;
 )
 \end{edXscript}</pre>
 
 <p>Then, put the customresponse tags in an edXxml tag:</p>
 
-<pre>\edXxml{<customresponse cfn="grader">
-    <textline correct_answer="cat"/>
-</customresponse>}</pre>
+<pre>\edXxml{&lt;customresponse cfn=&quot;grader&quot;&gt;
+    &lt;textline correct_answer=&quot;cat&quot;/&gt;
+&lt;/customresponse&gt;}</pre>
 
 </html>
