@@ -98,6 +98,15 @@ def test_too_many_items():
     }
     assert grader(None, submission) == expected_result
 
+def test_ordered_wrong_number():
+    grader = SingleListGrader(
+        answers=["tiger", "skunk"],
+        subgrader=StringGrader(),
+        length_error=False
+    )
+    assert grader(None, "tiger, skunk, horse")["grade_decimal"] == 0.5
+    assert grader(None, "tiger")["grade_decimal"] == 0.5
+
 def test_way_too_many_items_reduces_score_to_zero():
     grader = SingleListGrader(
         answers=[

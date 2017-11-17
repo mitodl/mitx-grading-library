@@ -59,27 +59,23 @@ def find_optimal_order(check, answers, student_list):
     input_list = [result_matrix[i][j] for i, j in indexes]
     return input_list
 
-def padded_find_optimal_order(check, answers, student_list):
+def get_padded_lists(list1, list2):
     """
-    Same as find_optimal_order, but keeps track of missing and extra answers.
-
-    Idea is:
-        use _AutomaticFailure to pad expect and answers to equal length
-        modify check to reject _AutomaticFailure
+    Pads the shorter of list1 and list2 and returns copies of both
     """
-    if len(answers) == len(student_list):
-        return find_optimal_order(check, answers, student_list)
+    maxlen = max(len(list1), len(list2))
+    padded1 = list1 + [_AutomaticFailure()]*(maxlen-len(list1))
+    padded2 = list2 + [_AutomaticFailure()]*(maxlen-len(list2))
 
-    maxlen = max(len(answers), len(student_list))
-    padded_answers = answers + [_AutomaticFailure()]*(maxlen-len(answers))
-    padded_student_list = student_list + [_AutomaticFailure()]*(maxlen-len(student_list))
+    return padded1, padded2
 
+def padded_check(check):
+    """Wraps a check function to reject _AutomaticFailure"""
     def _check(ans, inp):
         if isinstance(ans, _AutomaticFailure) or isinstance(inp, _AutomaticFailure):
             return {'ok': False, 'msg': '', 'grade_decimal': 0}
         return check(ans, inp)
-
-    return find_optimal_order(_check, padded_answers, padded_student_list)
+    return _check
 
 def consolidate_grades(grade_decimals, n_expect=None):
     """
@@ -677,15 +673,19 @@ class SingleListGrader(ItemGrader):
                                           len(student_list),
                                           self.config['delimiter']))
 
+        # We need to keep track of missing and extra answers.
+        # Idea is:
+        #    use _AutomaticFailure to pad expect and answers to equal length
+        #    modify check to reject _AutomaticFailure
+        pad_ans, pad_stud = get_padded_lists(answers, student_list)
+        # Modify the check function to deal with the padding
+        checker = padded_check(self.config['subgrader'].check)
+
+        # Compute the results
         if self.config['ordered']:
-            input_list = [
-                self.config['subgrader'].check(*pair)
-                for pair in zip(answers, student_list)
-            ]
+            input_list = [checker(*pair) for pair in zip(pad_ans, pad_stud)]
         else:
-            input_list = padded_find_optimal_order(self.config['subgrader'].check,
-                                                   answers,
-                                                   student_list)
+            input_list = find_optimal_order(checker, pad_ans, pad_stud)
 
         result = consolidate_cfn_return(input_list,
                                         n_expect=len(answers),
