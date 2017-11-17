@@ -2,6 +2,7 @@
 Tests that python_lib.zip loads correctly
 """
 
+import os
 import pytest
 import mitxgraders
 
@@ -22,6 +23,8 @@ def loadzip():
     # And restore the old version of the library
     reload(mitxgraders)
 
+@pytest.mark.skipif("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true",
+                    reason="Skipping this test on Travis CI.")
 def test_zipfile(loadzip):
     """Test that the plugins have loaded properly from the zip file"""
     # Make sure that we have the zip file
