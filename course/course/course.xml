@@ -21,7 +21,6 @@
         <problem url_name="formula4"/>
         <problem url_name="formula5"/>
         <problem url_name="formula6"/>
-        <problem url_name="formula7"/>
       </vertical>
     </sequential>
     <sequential url_name="singlelistgrader" display_name="SingleListGrader">

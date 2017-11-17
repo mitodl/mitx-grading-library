@@ -1,16 +1,24 @@
 <problem display_name="Factorial Function" showanswer="always" weight="10" attempts="">
 
-  <p></p>
+  <p>We have significantly expanded the sampling capabilities of our grader compared to edX. For example, we can sample integers, allowing us to use the factorial function. Here is an example.</p>
+
+  <p> What is the Taylor series expansion of \(\exp(x)\) about \(x = 0\)? (Answer: "x^n/fact(n)")</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
-grader = StringGrader(
-    answers='cat'
+grader = FormulaGrader(
+    answers='x^n/fact(n)',
+    variables=['x', 'n'],
+    sample_from={
+        'x': RealInterval(),
+        'n': IntegerRange([0, 7])
+    }
 )
 </script>
 
-<customresponse cfn="grader">
-  <textline correct_answer="cat"/>
+<p style="display:inline">[mathjaxinline]e^x = \sum_{n = 0}^\infty[/mathjaxinline] </p>
+<customresponse cfn="grader" inline="1">
+  <textline math="1" inline="1" correct_answer="x^n/fact(n)"/>
 </customresponse>
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula2.xml" target="_blank">View source</a>
