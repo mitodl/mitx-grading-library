@@ -21,16 +21,16 @@ grader = FormulaGrader(
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
-grader = FormulaGrader(
+grader2 = FormulaGrader(
     answers='abs(z)^2',
     variables=['z'],
     sample_from={
-        'x': ComplexRect()
+        'z': ComplexRectangle()
     }
 )
 </script>
 
-<customresponse cfn="grader">
+<customresponse cfn="grader2">
   <textline math="1" correct_answer="abs(z)^2"/>
 </customresponse>
 

@@ -5,7 +5,7 @@
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
 grader = FormulaGrader(
-    answers="x'+vt",
+    answers="x'+v*t",
     variables=["x'", 'v', 't']
 )
 </script>

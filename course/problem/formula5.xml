@@ -24,9 +24,8 @@ grader = FormulaGrader(
 )
 </script>
 
-<p style="display:inline">[mathjaxinline]e^x = \sum_{n = 0}^\infty[/mathjaxinline] </p>
 <customresponse cfn="grader" inline="1">
-  <textline math="1" inline="1" correct_answer="x^n/fact(n)"/>
+  <textline math="1" inline="1" correct_answer="H(x)*f''(tau)"/>
 </customresponse>
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula5.xml" target="_blank">View source</a>

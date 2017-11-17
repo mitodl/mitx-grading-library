@@ -2,14 +2,15 @@
 
   <p>By default, the grader accepts any number of inputs in the list (try it in some of the other examples!). If you want to raise an error if the number of inputs is wrong, then you can do that too.</p>
 
-  <p>In 3D, what are the components of the \(\hat{y}\) unit vector? (Answer: 0, 1, 0). Try putting in two or four components instead of three.</p>
+  <p>In 3D, what are the components of the \(\hat{y}\) unit vector? (Answer: 0, 1, 0). Try putting in two or four components instead of three. Also note that this input is ordered.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
-mygrader = SingleListGrader(
+grader = SingleListGrader(
     answers=['0', '1', '0'],
     subgrader=FormulaGrader(),
-    length_error=True
+    length_error=True,
+    ordered=True
 )
 </script>
 

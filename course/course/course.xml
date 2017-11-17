@@ -45,6 +45,7 @@
     <sequential url_name="integralgrader" display_name="IntegralGrader">
       <vertical url_name="v-integral" display_name="IntegralGrader">
         <html url_name="integralinfo"/>
+        <problem url_name="integral1"/>
       </vertical>
     </sequential>
     <sequential url_name="usage" display_name="Usage">

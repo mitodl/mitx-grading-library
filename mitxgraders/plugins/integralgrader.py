@@ -97,7 +97,7 @@ class IntegralGrader(AbstractGrader):
         input_positions (dict): Specifies which integration parameters the student
             is required to enter. The default value of input_positions is:
 
-                innput_positions = {
+                input_positions = {
                     'lower': 1,
                     'upper': 2,
                     'integrand': 3,

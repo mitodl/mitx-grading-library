@@ -1,17 +1,73 @@
 <problem display_name="IntegralGrader Example" showanswer="always" weight="10" attempts="">
 
-  <p>Example problem with pretty input</p>
+<p>This style of problem is used in an introductory calculus course, to assess students on setting up an integral. It works by comparing the value of the integral that the student inputs to the value of the integral in the answer. Thus, different variables of integration can be used, and equivalent integrals are graded correct. (Credit: Jennifer French, MIT)</p>
+
+<p>The below plot is a graph of the function \(y = e^x\).</p>
+<center>
+  <img src="/static/integral.svg" width="250 px" style="margin: 5px 5px 5px 5px; border:0px"/>
+</center>
+<p>Write the area of the shaded region as a definite integral.</p>
+
+<span>
+<style>
+  .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline input {
+    min-width: 0 !important;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax {
+    display: inline-block !important;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax_Preview {
+    display: inline-block !important;
+  }
+</style>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
-grader = StringGrader(
-    answers='cat'
+grader = IntegralGrader(
+    answers={
+        'lower':'0',
+        'upper':'1',
+        'integrand':'e^x',
+        'integration_variable':'x'
+    },
+    input_positions = {
+        'upper': 1,
+        'integrand': 2,
+        'lower': 3
+    }
 )
 </script>
 
 <customresponse cfn="grader">
-  <textline correct_answer="cat"/>
+  <table>
+    <col style="width:10%"/>
+    <col style="width:90%"/>
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <textline size="5" correct_answer="1"/>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p> \( \displaystyle \huge{ \int }\)</p>
+        </td>
+        <td>
+          <br/>
+          <formulaequationinput inline="1" size="10" correct_answer="e^x" trailing_text="  [mathjaxinline] dx [/mathjaxinline]"/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <textline size="5" correct_answer="0"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </customresponse>
+</span>
+
+<p>While the expected answer is 1, e^x and 0 (top to bottom), by making a substitution \(x = 2u\), an equivalent integral is 0.5, 2*e^(2*x), 0 (top to bottom). As these integrals integrate to the same value, they will both be graded correct.</p>
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/integral1.xml" target="_blank">View source</a>
 

@@ -1,8 +1,8 @@
 <problem display_name="Factorial Function" showanswer="always" weight="10" attempts="">
 
-  <p>We have significantly expanded the sampling capabilities of our grader compared to edX. For example, we can sample integers, allowing us to use the factorial function. Here is an example.</p>
+  <p>We have significantly expanded the sampling capabilities of our grader compared to edX. For example, we can sample integers, allowing us to use the factorial function (which is also defined in edX!). Here is an example.</p>
 
-  <p> What is the Taylor series expansion of \(\exp(x)\) about \(x = 0\)? (Answer: "x^n/fact(n)")</p>
+  <p> What is the Taylor series expansion of \(\exp(x)\) about \(x = 0\)? (Answer: "x^n/(fact(n))"). Unfortunately, the math preview doesn't recognize fact() as a function properly, necessitating wrapping it in an extra set of parentheses to make it display as expected.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *

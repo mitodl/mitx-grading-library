@@ -15,7 +15,7 @@
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
 grader = FormulaGrader(
-    answers='x^n/fact(n)',
+    answers='2*sin(x)*cos(x)',
     variables=['x'],
     whitelist=['sin', 'cos'],
     required_functions=['sin', 'cos'],
@@ -23,7 +23,6 @@ grader = FormulaGrader(
 )
 </script>
 
-<p style="display:inline">[mathjaxinline]e^x = \sum_{n = 0}^\infty[/mathjaxinline] </p>
 <customresponse cfn="grader" inline="1">
   <textline math="1" inline="1" correct_answer="2*sin(x)*cos(x)"/>
 </customresponse>
