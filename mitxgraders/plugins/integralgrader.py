@@ -7,14 +7,15 @@ and upper limits, and integration variable, and an integrand.
 
 from __future__ import division
 from numbers import Number
-from mitxgraders.sampling import VariableSamplingSet, FunctionSamplingSet, RealInterval, DiscreteSet
+from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
+                                  DiscreteSet, gen_symbols_samples, construct_functions,
+                                  construct_constants)
 from mitxgraders.baseclasses import AbstractGrader, InvalidInput, ConfigError
 from mitxgraders.voluptuous import Schema, Required, Any, All, Extra
 from mitxgraders.helpers.calc import (CalcError, evaluator)
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative,
                                                 PercentageString, is_callable)
-from mitxgraders.helpers.mathfunc import (construct_functions, construct_constants,
-                                          within_tolerance, gen_symbols_samples)
+from mitxgraders.helpers.mathfunc import within_tolerance
 from scipy import integrate
 
 __all__ = ["IntegralGrader"]

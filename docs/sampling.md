@@ -12,6 +12,7 @@ These sampling classes are available for use in FormulaGrader.
   - [DiscreteSet](#discreteset)
   - [ComplexRectangle](#complexrectangle)
   - [ComplexSector](#complexsector)
+  - [DependentSampler](#dependentsampler)
 - [Function Sampling](#function_sampling)
   - [SpecificFunctions](#specificfunctions)
   - [RandomFunction](#randomfunction)
@@ -83,6 +84,16 @@ Sample complex numbers from an annular sector in the complex plane, specified by
 sampler = ComplexSector(modulus=[0, 1], argument=[-np.pi, np.pi])
 # The default is modulus=[1, 3], argument=[0, pi/2]
 sampler = ComplexSector()
+````
+
+
+### DependentSampler
+
+Compute a value for a variable based on the values of other variables. The sampler must be initialized with a list of variables that it depends on, as well as the formula used to perform the computation. The formula can use any base functions, but no user-defined functions. DependentSamplers can depend on other dependent variables. If you construct a self-referential chain, an error will occur.
+
+````python
+# Set radius based on the random values of x, y and z
+sampler = DependentSampler(depends=["x", "y", "z"], formula="sqrt(x^2+y^2+z^2)")
 ````
 
 
