@@ -611,3 +611,8 @@ def test_docs():
     )
     assert grader(None, '2*m')['ok']
     assert not grader(None, '2m')['ok']
+
+def test_empty_input():
+    """Make sure that empty input doesn't crash"""
+    grader = FormulaGrader(answers="1")
+    assert not grader(None, '')['ok']
