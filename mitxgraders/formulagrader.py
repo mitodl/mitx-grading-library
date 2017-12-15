@@ -149,6 +149,10 @@ class FormulaGrader(ItemGrader):
                 # Don't give away the specific string that is being checked for!
                 raise InvalidInput(self.config["forbidden_message"])
 
+        # Check for empty inputs
+        if check == "":
+            return {'ok': False, 'grade_decimal': 0, 'msg': ''}
+
         # Now perform the computations
         try:
             return self.raw_check(answer, student_input)

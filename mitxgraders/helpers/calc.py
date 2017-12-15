@@ -182,6 +182,10 @@ class ParserCache(object):
 
     def get_parser(self, formula, case_sensitive, suffixes):
         """Get a ParseAugmenter object for a given formula"""
+        # Check for empty formula
+        if formula.strip() == "":
+            return None
+
         # Check the formula for matching parentheses
         count = 0
         delta = {
@@ -246,6 +250,8 @@ def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
 
     # Parse the tree
     math_interpreter = parsercache.get_parser(formula, case_sensitive, suffixes)
+    if math_interpreter is None:
+        return None
 
     # If we're not case sensitive, then lower all variables and functions
     if not case_sensitive:
