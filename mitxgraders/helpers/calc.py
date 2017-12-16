@@ -238,11 +238,25 @@ def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
     -Variables are passed as a dictionary from string to value. They must be
      python numbers.
     -Unary functions are passed as a dictionary from string to function.
+
+    Usage
+    =====
+    >>> evaluator("1+1", {}, {}, {}, True)
+    (2.0, set([]))
+    >>> evaluator("1+x", {"x": 5}, {}, {}, True)
+    (6.0, set([]))
+    >>> evaluator("square(2)", {}, {"square": lambda x: x*x}, {}, True)
+    (4.0, set(['square']))
+    >>> evaluator("", {}, {}, {}, True)
+    (nan, set([]))
     """
+    if formula is None:
+        # No need to go further.
+        return float('nan'), set()
     formula = formula.strip()
     if formula == "":
         # No need to go further.
-        return float('nan')
+        return float('nan'), set()
 
     # Parse the tree
     math_interpreter = parsercache.get_parser(formula, case_sensitive, suffixes)
