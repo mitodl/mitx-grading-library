@@ -1,7 +1,5 @@
 <problem display_name="Restrictions on Input" showanswer="always" weight="10" attempts="">
 
-  <p>Blacklists, Whitelists, required functions and forbidden strings</p>
-
   <p>Sometimes you want students to answer a question like "What is \(\sin(2x)\)?". The answer you want is "2*sin(x)*cos(x)". However, students can type in "sin(2*x)" and will still be graded correct.</p>
 
   <p>We introduce a number of tools to address this. The first is the concept of whitelists and blacklists. It's possible to set a blacklist of functions, which disallows the use of those mathematical functions in the answer. It's also possible to instead have a whitelist, where you specify the only functions that you want students to have access to.</p>

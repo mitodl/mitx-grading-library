@@ -10,10 +10,13 @@ from mitxgraders import (
     ComplexRectangle,
     ComplexSector,
     SpecificFunctions,
-    RandomFunction
+    RandomFunction,
+    DependentSampler,
+    ConfigError
 )
+from mitxgraders.sampling import gen_symbols_samples
 from mitxgraders.voluptuous import Error
-from pytest import raises
+from pytest import raises, approx
 import numpy as np
 
 def test_real_interval():
@@ -188,6 +191,9 @@ def test_docs():
     # The default is modulus=[1, 3], argument=[0, pi/2]
     sampler = ComplexSector()
 
+    # Test dependent sampling
+    sampler = DependentSampler(depends=["x", "y", "z"], formula="sqrt(x^2+y^2+z^2)")
+
     # Select either sin or cos randomly
     functionsampler = SpecificFunctions([np.cos, np.sin])
     # Always select a single lambda function
@@ -203,3 +209,59 @@ def test_docs():
 
     # Generate a function that takes in two values and outputs a 3D vector
     functionsampler = RandomFunction(input_dim=2, output_dim=3)
+
+def test_dependent_sampler():
+    """Tests the DependentSampler class"""
+    # Test basic usage and multiple samples
+    result = gen_symbols_samples(
+        ["a", "b"],
+        2,
+        {
+            'a': IntegerRange([1, 1]),
+            'b': DependentSampler(depends=["a"], formula="a+1")
+        }
+    )
+    assert result == [{"a": 1, "b": 2.0}, {"a": 1, "b": 2.0}]
+
+    result = gen_symbols_samples(
+        ["a", "b", "c", "d"],
+        1,
+        {
+            'a': RealInterval([1, 1]),
+            'd': DependentSampler(depends=["c"], formula="c+1"),
+            'c': DependentSampler(depends=["b"], formula="b+1"),
+            'b': DependentSampler(depends=["a"], formula="a+1")
+        }
+    )[0]
+    assert result["b"] == 2 and result["c"] == 3 and result["d"] == 4
+
+    result = gen_symbols_samples(
+        ["x", "y", "z", "r"],
+        1,
+        {
+            'x': RealInterval([-5, 5]),
+            'y': RealInterval([-5, 5]),
+            'z': RealInterval([-5, 5]),
+            'r': DependentSampler(depends=["x", "y", "z"], formula="sqrt(x^2+y^2+z^2)")
+        }
+    )[0]
+    assert result["x"]**2 + result["y"]**2 + result["z"]**2 == approx(result["r"]**2)
+
+    with raises(ConfigError, match="Circularly dependent DependentSamplers detected: x, y"):
+        gen_symbols_samples(
+            ["x", "y"],
+            1,
+            {
+                'x': DependentSampler(depends=["y"], formula="1"),
+                'y': DependentSampler(depends=["x"], formula="1")
+            }
+        )
+
+    with raises(ConfigError, match=r"Formula error in dependent sampling formula: 1\+\(2"):
+        gen_symbols_samples(
+            ["x"],
+            1,
+            {
+                'x': DependentSampler(depends=[], formula="1+(2")
+            }
+        )

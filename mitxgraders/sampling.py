@@ -7,9 +7,16 @@ Contains classes for sampling numerical values
 * DiscreteSet
 * ComplexRectangle
 * ComplexSector
+* DependentSampler
 and for specifying functions
 * SpecificFunctions
 * RandomFunction
+
+Contains some helper functions used in grading formulae:
+* gen_symbols_samples
+* construct_functions
+* construct_constants
+* construct_suffixes
 
 All of these classes perform random sampling. To obtain a sample, use class.gen_sample()
 """
@@ -22,6 +29,9 @@ from mitxgraders.baseclasses import ObjectWithSchema, ConfigError
 from mitxgraders.voluptuous import Schema, Required
 from mitxgraders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
                                                 TupleOfType, is_callable)
+from mitxgraders.helpers.mathfunc import (DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
+                                          DEFAULT_VARIABLES, METRIC_SUFFIXES)
+from mitxgraders.helpers.calc import CalcError, evaluator
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -31,7 +41,8 @@ __all__ = [
     "ComplexRectangle",
     "ComplexSector",
     "SpecificFunctions",
-    "RandomFunction"
+    "RandomFunction",
+    "DependentSampler"
 ]
 
 class AbstractSamplingSet(ObjectWithSchema):  # pylint: disable=abstract-method
@@ -331,3 +342,241 @@ class SpecificFunctions(FunctionSamplingSet):  # pylint: disable=too-few-public-
     def gen_sample(self):
         """Return a random entry from the given list"""
         return random.choice(self.config)
+
+
+class DependentSampler(VariableSamplingSet):
+    """
+    Represents a variable that depends on other variables.
+
+    You must initialize with the list of variables this depends on as well as the formula
+    for this variable. Note that only base formulas and suffixes are available for this
+    computation.
+
+    Usage
+    =====
+    Specify a single value
+    >>> ds = DependentSampler(depends=['x', 'y', 'z'], formula="sqrt(x^2+y^2+z^2)")
+    """
+
+    # Take in an individual or tuple of numbers
+    schema_config = Schema({
+        Required('depends'): [str],
+        Required('formula'): str,
+        Required('case_sensitive', default=True): bool
+    })
+
+    def gen_sample(self):
+        """Return a random entry from the given set"""
+        raise Exception("DependentSampler must be invoked with compute_sample.")
+
+    def compute_sample(self, sample_dict):
+        """Compute the value of this sample"""
+        try:
+            result, _ = evaluator(formula=self.config['formula'],
+                                  case_sensitive=self.config['case_sensitive'],
+                                  variables=sample_dict,
+                                  functions=DEFAULT_FUNCTIONS,
+                                  suffixes=DEFAULT_SUFFIXES)
+        except CalcError:
+            raise ConfigError("Formula error in dependent sampling formula: " +
+                              self.config["formula"])
+
+        return result
+
+def is_subset(iterable, iterable_superset):
+    """
+    Helper function for gen_symbols_samples below.
+    Checks to see if every item in iterable is in iterable_superset.
+    """
+    for item in iterable:
+        if item not in iterable_superset:
+            return False
+    return True
+
+def gen_symbols_samples(symbols, samples, sample_from):
+    """
+    Generates a list of dictionaries mapping variable names to values.
+
+    The symbols argument will usually be config['variables']
+    or config['functions'].
+
+    Usage
+    =====
+    >>> variable_samples = gen_symbols_samples(
+    ...     ['a', 'b'],
+    ...     3,
+    ...     {
+    ...         'a': RealInterval([1,3]),
+    ...         'b': RealInterval([-4,-2])
+    ...     }
+    ... )
+    >>> variable_samples # doctest: +SKIP
+    [
+        {'a': 1.4765130193614819, 'b': -2.5596368656227217},
+        {'a': 2.3141937628942406, 'b': -2.8190938526155582},
+        {'a': 2.8169225565573566, 'b': -2.6547771579673363}
+    ]
+    """
+    # Separate independent and dependent symbols
+    independent = [
+        symbol for symbol in symbols
+        if not isinstance(sample_from[symbol], DependentSampler)
+    ]
+
+    # Generate the samples
+    sample_list = []
+    for _ in range(samples):
+        # Generate independent samples
+        sample_dict = {symbol: sample_from[symbol].gen_sample() for symbol in independent}
+
+        # Generate dependent samples, following chains as necessary
+        unevaluated_dependents = {
+            symbol: sample_from[symbol].config['depends'] for symbol in symbols
+            if isinstance(sample_from[symbol], DependentSampler)
+        }
+        while unevaluated_dependents:
+            progress_made = False
+            for symbol, dependencies in unevaluated_dependents.items():
+                if is_subset(dependencies, sample_dict):
+                    sample_dict[symbol] = sample_from[symbol].compute_sample(sample_dict)
+                    del unevaluated_dependents[symbol]
+                    progress_made = True
+
+            if not progress_made:
+                bad_symbols = ", ".join(sorted(unevaluated_dependents.keys()))
+                raise ConfigError("Circularly dependent DependentSamplers detected: " +
+                                  bad_symbols)
+
+        sample_list.append(sample_dict)
+    return sample_list
+
+def construct_functions(whitelist, blacklist, user_funcs):
+    """
+    Returns the dictionary of available functions
+
+    Arguments:
+        whitelist (list): List of function names to allow, ignored if empty.
+            To disallow all functions, use whitelist = [None].
+
+        blacklist (list): List of function names to disallow. whitelist and blacklist
+            cannot be used in conjunction.
+
+        user_funcs (dict): Dictionary of "name": function pairs specifying user-defined
+            functions to include.
+
+    Usage
+    =====
+    By default, just returns DEFAULT_FUNCTIONS
+    >>> funcs, random_funcs = construct_functions([], [], {})
+    >>> funcs == DEFAULT_FUNCTIONS
+    True
+    >>> random_funcs == {}
+    True
+
+    To remove all functions, pass in a whitelist of [None]
+    >>> funcs, random_funcs = construct_functions([None], [], {})
+    >>> funcs == {}
+    True
+
+    Whitelisting specifies exactly what functions are allowed
+    >>> funcs, random_funcs = construct_functions(["sin"], [], {})
+    >>> funcs == {"sin": np.sin}
+    True
+
+    Blacklisting removes a function from the list
+    >>> funcs, random_funcs = construct_functions([], ["sin"], {})
+    >>> funcs.get("sin", None) is None
+    True
+    >>> funcs["cos"] == np.cos
+    True
+
+    You can specify user-defined functions
+    >>> func = lambda x: x
+    >>> randfunc = RandomFunction()
+    >>> funcs, random_funcs = construct_functions([], [], {"f": func, "g": randfunc})
+    >>> funcs["f"] == func
+    True
+    >>> random_funcs["g"] == randfunc
+    True
+    """
+    if whitelist:
+        if blacklist:
+            raise ConfigError("Cannot whitelist and blacklist at the same time")
+
+        functions = {}
+        for f in whitelist:
+            if f is None:
+                # This allows for you to have whitelist = [None], which removes
+                # all functions from the function list
+                continue
+            try:
+                functions[f] = DEFAULT_FUNCTIONS[f]
+            except KeyError:
+                raise ConfigError("Unknown function in whitelist: " + f)
+    else:
+        # Treat no blacklist as blacklisted with an empty list
+        functions = DEFAULT_FUNCTIONS.copy()
+        for f in blacklist:
+            try:
+                del functions[f]
+            except KeyError:
+                raise ConfigError("Unknown function in blacklist: " + f)
+
+    # Add in any custom functions to the functions and random_funcs lists
+    random_funcs = {}
+    for f in user_funcs:
+        if not isinstance(f, str):
+            msg = str(f) + " is not a valid name for a function (must be a string)"
+            raise ConfigError(msg)
+        # Check if we have a random function or a normal function
+        if isinstance(user_funcs[f], list):
+            # A list of functions; convert to a SpecificFunctions class
+            random_funcs[f] = SpecificFunctions(user_funcs[f])
+        elif isinstance(user_funcs[f], FunctionSamplingSet):
+            random_funcs[f] = user_funcs[f]
+        else:
+            # f is a normal function
+            functions[f] = user_funcs[f]
+
+    return functions, random_funcs
+
+def construct_constants(user_consts):
+    """
+    Returns the dictionary of available constants
+    user_consts is a dictionary of "name": value pairs of constants to add to the defaults
+
+    Usage
+    =====
+    >>> construct_constants({})
+    {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'j': 1j}
+    >>> construct_constants({"T": 1.5})
+    {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'T': 1.5, 'j': 1j}
+    """
+    constants = DEFAULT_VARIABLES.copy()
+
+    # Add in any user constants
+    for var in user_consts:
+        if not isinstance(var, str):
+            msg = str(var) + " is not a valid name for a constant (must be a string)"
+            raise ConfigError(msg)
+        constants[var] = user_consts[var]
+
+    return constants
+
+def construct_suffixes(metric=False):
+    """
+    Returns the dictionary of available suffixes.
+    Setting metric=True adds in the metric suffixes.
+
+    Usage
+    =====
+    >>> construct_suffixes()
+    {'%': 0.01}
+    >>> suff = construct_suffixes(True)
+    >>> suff['G'] == 1e9
+    True
+    """
+    suffixes = DEFAULT_SUFFIXES.copy()
+    if metric:
+        suffixes.update(METRIC_SUFFIXES)
+    return suffixes

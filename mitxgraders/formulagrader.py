@@ -7,15 +7,15 @@ Contains classes for numerical and formula graders
 """
 from __future__ import division
 from numbers import Number
-from sampling import VariableSamplingSet, FunctionSamplingSet, RealInterval, DiscreteSet
+from sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval, DiscreteSet,
+                      gen_symbols_samples, construct_functions, construct_constants,
+                      construct_suffixes)
 from mitxgraders.baseclasses import ItemGrader, InvalidInput
 from mitxgraders.voluptuous import Schema, Required, Any, All, Extra
 from mitxgraders.helpers.calc import CalcError, evaluator
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative,
                                                 PercentageString, is_callable)
-from mitxgraders.helpers.mathfunc import (construct_functions, construct_constants,
-                                          construct_suffixes, within_tolerance,
-                                          gen_symbols_samples)
+from mitxgraders.helpers.mathfunc import within_tolerance
 
 # Set the objects to be imported from this grader
 __all__ = [
