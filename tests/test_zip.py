@@ -11,7 +11,9 @@ def loadzip():
     """pytest fixture to dynamically load the library from python_lib.zip"""
     # Add python_lib.zip to the path for searching for modules
     import sys
-    sys.path.insert(0, '/Users/jolyon/gitrepos/mitx-graders/mitx-graders/python_lib.zip')
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    zip_path = os.path.join(parent_dir, 'python_lib.zip')
+    sys.path.insert(0, zip_path)
     # The 0 tells it to search this zip file before even the module directory
     # Hence,
     reload(mitxgraders)
