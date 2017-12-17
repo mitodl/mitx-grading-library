@@ -46,7 +46,7 @@ def import_plugins():
     globals().update({'loaded_from': "mitxgraders directory"})
 
 
-def import_zip_plugins():
+def import_zip_plugins():  # pragma: no cover
     """Imports all plugins from python_lib.zip into the global namespace"""
     import os
     import importlib
@@ -81,7 +81,7 @@ def import_zip_plugins():
 # Import all the plugins
 if "python_lib.zip" in __file__:
     # If this package is inside python_lib.zip, we need to work a little differently
-    import_zip_plugins()
+    import_zip_plugins()  # pragma: no cover
 else:
     import_plugins()
 

@@ -155,7 +155,7 @@ class FormulaGrader(ItemGrader):
         except (CalcError, InvalidInput):
             # These errors have been vetted already
             raise
-        except Exception:
+        except Exception:  # pragma: no cover
             # If debug mode is on, give the full stack trace
             if self.config["debug"]:
                 raise

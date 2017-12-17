@@ -56,6 +56,8 @@ def test_int_range():
     stop = random.randint(-20, 20)
     if start > stop:
         start, stop = stop, start
+    if start == stop:
+        stop += 1
     mylist = list(range(start, stop + 1))
 
     # Right way around
@@ -67,6 +69,10 @@ def test_int_range():
     ii = IntegerRange(start=stop, stop=start)
     for i in range(10):
         assert ii.gen_sample() in mylist
+
+    # With only one selection
+    ii = IntegerRange(start=4, stop=4)
+    assert ii.gen_sample() == 4
 
     # In a list
     ii = IntegerRange([start, stop])
@@ -128,6 +134,12 @@ def test_random_func():
         x = random.uniform(-10, 10)
         assert func(x) == func(x)
         assert center - amplitude <= func(x) <= center + amplitude
+
+    with raises(Exception, match="Expected 2 arguments, but received 1"):
+        RandomFunction(input_dim=2).gen_sample()(1)
+
+    with raises(Exception, match="Expected 1 arguments, but received 2"):
+        RandomFunction(input_dim=1).gen_sample()(1, 2)
 
 def test_discrete_set():
     """Tests the DiscreteSet class"""
@@ -265,3 +277,6 @@ def test_dependent_sampler():
                 'x': DependentSampler(depends=[], formula="1+(2")
             }
         )
+
+    with raises(Exception, match="DependentSampler must be invoked with compute_sample."):
+        DependentSampler(depends=[], formula="1").gen_sample()

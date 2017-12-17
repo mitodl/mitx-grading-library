@@ -638,3 +638,14 @@ def test_empty_input():
     """Make sure that empty input doesn't crash"""
     grader = FormulaGrader(answers="1")
     assert not grader(None, '')['ok']
+
+def test_errors():
+    """
+    Test unhandled error catching.
+    Div by zero is the only one I'm aware of at the moment!
+    """
+    grader = FormulaGrader(
+        answers='4'
+    )
+    with raises(CalcError, match="Division by zero occurred. Check your input's denominators."):
+        grader(None, '1/0')

@@ -102,8 +102,8 @@ def handle_np_floating_errors(err, flag):
         raise OverflowError
     elif 'value' in err:
         raise ValueError
-    else:
-        raise Exception(err) # should not happen
+    else:  # pragma: no cover
+        raise Exception(err)
 
 np.seterrcall(handle_np_floating_errors)
 np.seterr(divide='call', over='call', invalid='call')
@@ -478,7 +478,7 @@ class ParseAugmenter(object):
         expr << sum_term  # pylint: disable=pointless-statement
         self.tree = (expr + stringEnd).parseString(self.math_expr)[0]
 
-    def reduce_tree(self, handle_actions, terminal_converter=None):
+    def reduce_tree(self, handle_actions):
         """
         Call `handle_actions` recursively on `self.tree` and return result.
 
@@ -488,8 +488,6 @@ class ParseAugmenter(object):
           nodes in the list, they will be given as their processed forms also.
          -output: whatever to be passed to the level higher, and what to
           return for the final node.
-        `terminal_converter` is a function that takes in a token and returns a
-        processed form. The default of `None` just leaves them as strings.
         """
         def handle_node(node):
             """
@@ -500,10 +498,7 @@ class ParseAugmenter(object):
             """
             if not isinstance(node, ParseResults):
                 # Then treat it as a terminal node.
-                if terminal_converter is None:
-                    return node
-                else:
-                    return terminal_converter(node)
+                return node
 
             node_name = node.getName()
             if node_name not in handle_actions:  # pragma: no cover

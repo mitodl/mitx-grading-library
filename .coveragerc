@@ -1,3 +1,4 @@
 [run]
 omit = mitxgraders/voluptuous/*
        mitxgraders/helpers/munkres.py
+branch = false

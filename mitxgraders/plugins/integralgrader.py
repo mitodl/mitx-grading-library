@@ -301,13 +301,13 @@ class IntegralGrader(AbstractGrader):
         # Now perform the computations
         try:
             return self.raw_check(answers, structured_input)
-        except (CalcError, InvalidInput):
+        except (CalcError, InvalidInput, ConfigError):
             # These errors have been vetted already
             raise
         except IntegrationError as e:
             msg = "There appears to be an error with the integral you entered: {}"
             raise IntegrationError(msg.format(e.message))
-        except Exception:
+        except Exception:  # pragma: no cover
             # If debug mode is on, give the full stack trace
             if self.config["debug"]:
                 raise

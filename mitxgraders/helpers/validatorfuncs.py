@@ -94,7 +94,7 @@ def TupleOfType(given_type, validator=None):
             config_input = (config_input,)
         # Apply the schema
         if validator:
-            schema = Schema(All((given_type,), Length(min=1), [validator]))
+            schema = Schema(All((given_type,), Length(min=1), (validator, )))
         else:
             schema = Schema(All((given_type,), Length(min=1)))
         return schema(config_input)

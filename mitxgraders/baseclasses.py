@@ -6,7 +6,7 @@ Contains base classes for the library:
 * AbstractGrader
 * ItemGrader
 
-Also containts some error classes:
+Also contains some error classes:
 * ConfigError
 * InvalidInput
 """
@@ -41,7 +41,6 @@ class ObjectWithSchema(object):
         parts of the config based on the config, do so in the __init__ method. See ListGrader
         for an example.
         """
-        pass
 
     def validate_config(self, config):
         """
@@ -96,7 +95,6 @@ class AbstractGrader(ObjectWithSchema):
             answers: The expected result(s) and grading information
             student_input: The student's input passed by edX
         """
-        pass
 
     def __call__(self, expect, student_input):
         """
@@ -305,7 +303,7 @@ class ItemGrader(AbstractGrader):
 
         # answers should now be a tuple of answers
         # Check that there is at least one answer to compare to
-        if not isinstance(answers, tuple):
+        if not isinstance(answers, tuple):  # pragma: no cover
             msg = "Expected answers to be a tuple of answers, instead received {}"
             raise ConfigError(msg.format(type(answers)))
         if not answers:
@@ -341,4 +339,3 @@ class ItemGrader(AbstractGrader):
             answer (schema_answer): The answer to compare to
             student_input (str): The student's input passed by edX
         """
-        pass
