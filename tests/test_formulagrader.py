@@ -97,7 +97,7 @@ def test_fg_invalid_input():
         grader(None, "5pp")
 
     expect = "Error evaluating factorial\(\) or fact\(\) in input. " + \
-             "These functions can only be used on positive integers."
+             "These functions can only be used on nonnegative integers."
     with raises(CalcError, match=expect):
         grader(None, "fact(-1)")
     with raises(CalcError, match=expect):

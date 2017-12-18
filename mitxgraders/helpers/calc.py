@@ -83,7 +83,7 @@ class FunctionEvalError(CalcError):
 
 class UnableToParse(CalcError):
     """
-    Indicate when a expression cannot be parsed
+    Indicate when an expression cannot be parsed
     """
     pass
 
@@ -346,7 +346,7 @@ def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
                 # err.message will be: `factorial() only accepts integral values` or
                 # `factorial() not defined for negative values`
                 raise FactorialError("Error evaluating factorial() or fact() in input. " +
-                                     "These functions can only be used on positive integers.")
+                                     "These functions can only be used on nonnegative integers.")
             else:
                 # Don't know what this is, or how you want to deal with it
                 # Call it a domain issue.
