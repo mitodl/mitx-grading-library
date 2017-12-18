@@ -14,7 +14,7 @@ from mitxgraders import (
     RandomFunction,
     CalcError,
     ConfigError,
-    InvalidInput
+    InvalidInput,
 )
 from mitxgraders.voluptuous import Error, MultipleInvalid
 from pytest import raises
@@ -97,11 +97,33 @@ def test_fg_invalid_input():
         grader(None, "5pp")
 
     expect = "Error evaluating factorial\(\) or fact\(\) in input. " + \
-             "These functions can only be used on positive integers."
+             "These functions can only be used on nonnegative integers."
     with raises(CalcError, match=expect):
         grader(None, "fact(-1)")
     with raises(CalcError, match=expect):
         grader(None, "fact(1.5)")
+
+    expect = ("There was an error evaluating csc\(...\). "
+              "Its input does not seem to be in its domain.")
+    with raises(CalcError, match=expect):
+        grader(None, 'csc(0)')
+
+    expect = "There was an error evaluating sinh\(...\). \(Numerical overflow\)."
+    with raises(CalcError, match=expect):
+        grader(None, 'sinh(10000)')
+
+    expect = ("There was an error evaluating arccosh\(...\). "
+              "Its input does not seem to be in its domain.")
+    with raises(CalcError, match=expect):
+        grader(None, 'arccosh(0)')
+
+    expect = "Division by zero occurred. Check your input's denominators."
+    with raises(CalcError, match=expect):
+        grader(None, '1/0')
+
+    expect = "Numerical overflow occurred. Does your input contain very large numbers?"
+    with raises(CalcError, match=expect):
+        grader(None, '2^10000')
 
 def test_fg_tolerance():
     """Test of FormulaGrader tolerance"""

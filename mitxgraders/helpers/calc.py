@@ -64,12 +64,49 @@ class FactorialError(CalcError):
     pass
 
 
+class CalcZeroDivisionError(CalcError):
+    """
+    Indicates division by zero
+    """
+
+
+class CalcOverflowError(CalcError):
+    """
+    Indicates numerical overflow
+    """
+
+class FunctionEvalError(CalcError):
+    """
+    Indicates that something has gone wrong during function evaluation.
+    """
+
+
 class UnableToParse(CalcError):
     """
-    Indicate when a function cannot be parsed
+    Indicate when an expression cannot be parsed
     """
     pass
 
+
+# Numpy's default behavior is to raise warnings on div by zero and overflow. Let's change that.
+# https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.seterr.html
+# https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.seterrcall.html#numpy.seterrcall
+
+def handle_np_floating_errors(err, flag):
+    """
+    Used by np.seterr to handle floating point errors with flag set to 'call'.
+    """
+    if 'divide by zero' in err:
+        raise ZeroDivisionError
+    elif 'overflow' in err:
+        raise OverflowError
+    elif 'value' in err:
+        raise ValueError
+    else:
+        raise Exception(err) # should not happen
+
+np.seterrcall(handle_np_floating_errors)
+np.seterr(divide='call', over='call', invalid='call')
 
 # The following few functions define evaluation actions, which are run on lists
 # of results from each parse component. They convert the strings and (previously
@@ -289,11 +326,40 @@ def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
         else:
             return float(text)
 
+    def eval_function(parse_result):
+        name, arg = parse_result
+        try:
+            return functions[casify(name)](arg)
+        except ZeroDivisionError:
+            # It would be really nice to tell student the symbolic argument as part of this message,
+            # but making symbolic argument available would require some nontrivial restructing
+            msg = ("There was an error evaluating {name}(...). "
+                   "Its input does not seem to be in its domain.").format(name=name)
+            raise CalcZeroDivisionError(msg)
+        except OverflowError:
+            msg = "There was an error evaluating {name}(...). (Numerical overflow).".format(name=name)
+            raise CalcOverflowError(msg)
+        except Exception as err: # pylint: disable=W0703
+            if isinstance(err, ValueError) and 'factorial' in err.message:
+                # This is thrown when fact() or factorial() is used
+                # that tests on negative and/or non-integer inputs
+                # err.message will be: `factorial() only accepts integral values` or
+                # `factorial() not defined for negative values`
+                raise FactorialError("Error evaluating factorial() or fact() in input. " +
+                                     "These functions can only be used on nonnegative integers.")
+            else:
+                # Don't know what this is, or how you want to deal with it
+                # Call it a domain issue.
+                msg = ("There was an error evaluating {name}(...). "
+                       "Its input does not seem to be in its domain.").format(name=name)
+                raise FunctionEvalError(msg)
+
+
     # Create a recursion to evaluate the tree
     evaluate_actions = {
         'number': eval_number,
         'variable': lambda x: variables[casify(x[0])],
-        'function': lambda x: functions[casify(x[0])](x[1]),
+        'function': eval_function,
         'atom': eval_atom,
         'power': eval_power,
         'parallel': eval_parallel,
@@ -301,20 +367,16 @@ def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
         'sum': eval_sum
     }
 
-    # Return the result of the evaluation, as well as the set of functions used
     try:
+        # Return the result of the evaluation, as well as the set of functions used
         return math_interpreter.reduce_tree(evaluate_actions), math_interpreter.functions_used
-    except ValueError as err:
-        if 'factorial' in err.message:
-            # This is thrown when fact() or factorial() is used
-            # that tests on negative and/or non-integer inputs
-            # err.message will be: `factorial() only accepts integral values` or
-            # `factorial() not defined for negative values`
-            raise FactorialError("Error evaluating factorial() or fact() in input. " +
-                                 "These functions can only be used on positive integers.")
-        else:
-            # Don't know what this is, or how you want to deal with it
-            raise
+    except ZeroDivisionError:
+        raise CalcZeroDivisionError("Division by zero occurred. Check your input's denominators.")
+    except OverflowError:
+        raise CalcOverflowError("Numerical overflow occurred. Does your input contain very large numbers?")
+    except Exception:
+        # Don't know what this is, or how you want to deal with it
+        raise
 
 
 class ParseAugmenter(object):
