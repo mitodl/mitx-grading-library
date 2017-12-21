@@ -11,6 +11,8 @@
     <li>m(1-sin(2*m)) (forgot multiplication before brackets)</li>
     <li>m*(1-sin(2m)) (forgot multiplication in 2*m)</li>
     <li>x*(1-sin(2m)) (unknown variable x)</li>
+    <li>1/0 (division by zero)</li>
+    <li>10^400 (overflow)</li>
   </ul>
 
 <script type="text/python" system_path="python_lib">
