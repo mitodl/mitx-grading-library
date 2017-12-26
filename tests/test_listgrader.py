@@ -751,3 +751,35 @@ def test_docs():
     }
     submissions = ['1', '-1', '0', '-1', '0', '1']
     assert grader(None, submissions) == expected_result
+
+def test_errors():
+    """Tests to ensure that errors are raised appropriately"""
+    # All answers have same length in tuple
+    with raises(ConfigError, match="All possible list answers must have the same length"):
+        grader = ListGrader(
+            answers=(["1", "2", "3"], ["1", "2"]),
+            subgraders=StringGrader()
+        )
+
+    # When using grouping, single subgraders must be ListGrader
+    with raises(ConfigError, match="A ListGrader with groupings must have a ListGrader subgrader or a list of subgraders"):
+        grader = ListGrader(
+            answers=["1", "2", "3"],
+            subgraders=StringGrader(),
+            grouping=[1, 1, 2]
+        )
+
+    # Must have an answer!
+    with raises(ConfigError, match="Expected at least one answer in answers"):
+        grader = ListGrader(
+            subgraders=StringGrader()
+        )
+        grader(None, ["Hello"])
+
+    # Bad input
+    with raises(ConfigError, match="Expected answer to have type <type list>, but received <type 'tuple'>"):
+        grader = ListGrader(
+            answers=["hello", "there"],
+            subgraders=StringGrader()
+        )
+        grader(None, ("hello", "there"))

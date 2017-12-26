@@ -253,7 +253,7 @@ class ListGrader(AbstractGrader):
                 # be called upon to check answers again a bit later.
                 return tuple()
             answers_tuple = (answers_tuple,)
-        elif not isinstance(answers_tuple, tuple):
+        elif not isinstance(answers_tuple, tuple):  # pragma: no cover
             # Should not get here; voluptuous should catch this beforehand
             raise ConfigError("Answer list must be a list or a tuple of lists")
 
@@ -324,10 +324,6 @@ class ListGrader(AbstractGrader):
                   "or a list of subgraders"
             raise ConfigError(msg)
 
-        # Unordered, we must have a single ListGrader subgrader
-        if not self.config['ordered'] and self.subgrader_list:
-            raise ConfigError("Cannot have multiple subgraders with unordered list")
-
         # Unordered, each group must have the same number of entries
         if not self.config['ordered']:
             group_len = len(self.grouping[0])
@@ -356,7 +352,7 @@ class ListGrader(AbstractGrader):
 
         # answers should now be a tuple of answers
         # Check that there is at least one answer to compare to
-        if not isinstance(answers, tuple):
+        if not isinstance(answers, tuple):  # pragma: no cover
             msg = "Expected answers to be a tuple of answers, instead received {}"
             raise ConfigError(msg.format(type(answers)))
         if not answers:
@@ -636,7 +632,7 @@ class SingleListGrader(ItemGrader):
                 # be called upon to check answers again a bit later.
                 return tuple()
             answers_tuple = (answers_tuple,)
-        elif not isinstance(answers_tuple, tuple):
+        elif not isinstance(answers_tuple, tuple):  # pragma: no cover
             # Should not get here; voluptuous should catch this beforehand
             raise ConfigError("Answer list must be a list or a tuple of lists")
 

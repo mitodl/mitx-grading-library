@@ -321,3 +321,19 @@ def test_docs():
         wrong_msg='Try again!'
     )
     assert grader(None, "moose, octopus")["msg"] == "Try again!"
+
+def test_errors():
+    """Tests to ensure that errors are raised appropriately"""
+    # All answers have same length in tuple
+    with raises(ConfigError, match="All possible list answers must have the same length"):
+        grader = SingleListGrader(
+            answers=(["1", "2", "3"], ["1", "2"]),
+            subgrader=StringGrader()
+        )
+
+    # Answers must not be empty
+    with raises(ConfigError, match="Cannot have an empty list of answers"):
+        grader = SingleListGrader(
+            answers=([], []),
+            subgrader=StringGrader()
+        )

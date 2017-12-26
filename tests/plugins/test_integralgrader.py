@@ -2,20 +2,21 @@ from mitxgraders.plugins.integralgrader import IntegralGrader, IntegrationError
 from mitxgraders.baseclasses import InvalidInput, ConfigError
 from pytest import raises
 from mitxgraders.version import __version__
+from mitxgraders import CalcError
 
 # Configuration Error Test
 def test_wrong_number_of_inputs_raises_error():
     grader = IntegralGrader(
         answers={
-            'lower':'a',
-            'upper':'b',
-            'integrand':'x^2',
-            'integration_variable':'x'
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
         },
         input_positions={
-            'integrand':1,
-            'lower':2,
-            'upper':3
+            'integrand': 1,
+            'lower': 2,
+            'upper': 3
         },
         variables=['a', 'b']
     )
@@ -30,16 +31,16 @@ def test_duplicate_input_positions():
     with raises(ConfigError, msg=expected_message):
         IntegralGrader(
             answers={
-                'lower':'a',
-                'upper':'b',
-                'integrand':'x^2',
-                'integration_variable':'x'
+                'lower': 'a',
+                'upper': 'b',
+                'integrand': 'x^2',
+                'integration_variable': 'x'
             },
             input_positions={
-                'integrand':1,
-                'lower':2,
-                'upper':3,
-                'integration_variable':3
+                'integrand': 1,
+                'lower': 2,
+                'upper': 3,
+                'integration_variable': 3
             },
             variables=['a', 'b']
         )
@@ -50,14 +51,14 @@ def test_skipped_input_positions():
     with raises(ConfigError, msg=expected_message):
         IntegralGrader(
             answers={
-                'lower':'a',
-                'upper':'b',
-                'integrand':'x^2',
-                'integration_variable':'x'
+                'lower': 'a',
+                'upper': 'b',
+                'integrand': 'x^2',
+                'integration_variable': 'x'
             },
             input_positions={
-                'integrand':1,
-                'integration_variable':3,
+                'integrand': 1,
+                'integration_variable': 3,
             },
             variables=['a', 'b']
         )
@@ -67,10 +68,10 @@ def test_skipped_input_positions():
 def test_user_provided_integration_conflict_raises_error():
     grader = IntegralGrader(
         answers={
-            'lower':'a',
-            'upper':'b',
-            'integrand':'x^2',
-            'integration_variable':'x'
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
         },
         variables=['a', 'b']
     )
@@ -83,10 +84,10 @@ def test_user_provided_integration_conflict_raises_error():
 def test_user_provided_integration_variable_has_invalid_name():
     grader = IntegralGrader(
         answers={
-            'lower':'a',
-            'upper':'b',
-            'integrand':'x^2',
-            'integration_variable':'x'
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
         },
         variables=['a', 'b']
     )
@@ -100,10 +101,10 @@ def test_user_provided_integration_variable_has_invalid_name():
 def test_empty_input_raises_error():
     grader = IntegralGrader(
         answers={
-            'lower':'a',
-            'upper':'b',
-            'integrand':'x^2',
-            'integration_variable':'x'
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
         },
         variables=['a', 'b']
     )
@@ -116,10 +117,10 @@ def test_empty_input_raises_error():
 def test_quadratic_integral_finite():
     grader = IntegralGrader(
         answers={
-            'lower':'a',
-            'upper':'b',
-            'integrand':'x^2',
-            'integration_variable':'x'
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
         },
         variables=['a', 'b'],
     )
@@ -127,17 +128,17 @@ def test_quadratic_integral_finite():
     student_input0 = ['a', 'b', 'x^2', 'x']
     # u = ln(x)
     student_input1 = ['ln(a)', 'ln(b)', 'e^(3*u)', 'u']
-    expected_result = {'ok':True, 'grade_decimal':1, 'msg':''}
+    expected_result = {'ok': True, 'grade_decimal': 1, 'msg': ''}
     assert grader(None, student_input0) == expected_result
     assert grader(None, student_input1) == expected_result
 
 def test_convergent_improper_integral_on_infinite_domain():
     grader = IntegralGrader(
         answers={
-            'lower':'1',
-            'upper':'infty',
-            'integrand':'1/x^5',
-            'integration_variable':'x'
+            'lower': '1',
+            'upper': 'infty',
+            'integrand': '1/x^5',
+            'integration_variable': 'x'
         },
         variables=['a', 'b'],
     )
@@ -147,7 +148,7 @@ def test_convergent_improper_integral_on_infinite_domain():
     student_input1 = ['pi/4', 'pi/2', '1/tan(u)^5*sec(u)^2', 'u']
     # The numerical value, integrated over interval with width 1
     student_input2 = ['0', '1', '1/4', 't']
-    expected_result = {'ok':True, 'grade_decimal':1, 'msg':''}
+    expected_result = {'ok': True, 'grade_decimal': 1, 'msg': ''}
     assert grader(None, student_input0) == expected_result
     assert grader(None, student_input1) == expected_result
     assert grader(None, student_input2) == expected_result
@@ -155,17 +156,17 @@ def test_convergent_improper_integral_on_infinite_domain():
 def test_convergent_improper_integral_on_finite_domain_with_poles():
     grader = IntegralGrader(
         answers={
-            'lower':'-1',
-            'upper':'1',
-            'integrand':'1/sqrt(1-x^2)',
-            'integration_variable':'x'
+            'lower': '-1',
+            'upper': '1',
+            'integrand': '1/sqrt(1-x^2)',
+            'integration_variable': 'x'
         }
     )
     # The same answer as instructor
     student_input0 = ['-1', '1', '1/sqrt(1-t^2)', 't']
     # x = cos(u)
     student_input1 = ['-pi/2', 'pi/2', '1/cos(u)*cos(u)', 'u']
-    expected_result = {'ok':True, 'grade_decimal':1, 'msg':''}
+    expected_result = {'ok': True, 'grade_decimal': 1, 'msg': ''}
     assert grader(None, student_input0) == expected_result
     assert grader(None, student_input1) == expected_result
 
@@ -173,10 +174,10 @@ def test_convergent_improper_integral_on_finite_domain_with_poles():
 def test_author_provided_integration_variable():
     grader = IntegralGrader(
         answers={
-            'lower':'a',
-            'upper':'b',
-            'integrand':'x^2',
-            'integration_variable':'x'
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
         },
         input_positions={
             'lower': 1,
@@ -186,52 +187,52 @@ def test_author_provided_integration_variable():
         variables=['a', 'b']
     )
     student_input = ['a', 'b', 'x^2']
-    expected_result = {'ok':True, 'grade_decimal':1, 'msg':''}
+    expected_result = {'ok': True, 'grade_decimal': 1, 'msg': ''}
     assert grader(None, student_input) == expected_result
 
 def test_reordered_inputs():
     grader = IntegralGrader(
         answers={
-            'lower':'a',
-            'upper':'b',
-            'integrand':'x^2',
-            'integration_variable':'x'
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
         },
         input_positions={
-            'integrand':1,
-            'lower':3,
-            'upper':2,
+            'integrand': 1,
+            'lower': 3,
+            'upper': 2,
         },
         variables=['a', 'b']
     )
     student_input = ['x^2', 'b', 'a']
-    expected_result = {'ok':True, 'grade_decimal':1, 'msg':''}
+    expected_result = {'ok': True, 'grade_decimal': 1, 'msg': ''}
     assert grader(None, student_input) == expected_result
 
 def test_integration_options_are_passed_correctly():
     grader0 = IntegralGrader(
         answers={
-            'lower':'-1',
-            'upper':'2',
-            'integrand':'1/x',
-            'integration_variable':'x'
+            'lower': '-1',
+            'upper': '2',
+            'integrand': '1/x',
+            'integration_variable': 'x'
         }
     )
     # grader1 will pass options to scipy.integrate.quad so as to
     # avoid the singularity at x=0
     grader1 = IntegralGrader(
         answers={
-            'lower':'-1',
-            'upper':'2',
-            'integrand':'1/x',
-            'integration_variable':'x'
+            'lower': '-1',
+            'upper': '2',
+            'integrand': '1/x',
+            'integration_variable': 'x'
         },
         integrator_options={
             'points': [0]
         }
     )
     student_input = ['-1', '2', '1/x', 'x']
-    expected_result = {'ok':True, 'grade_decimal':1, 'msg':''}
+    expected_result = {'ok': True, 'grade_decimal': 1, 'msg': ''}
     msg = ("There appears to be an error with the integral you entered: "
            "The integral is probably divergent, or slowly convergent.")
     # grader0 should raise an error because of singularity
@@ -247,28 +248,41 @@ def test_divergent_integral_infinite_domain_raises_error():
     with raises(IntegrationError, match=msg):
         grader = IntegralGrader(
             answers={
-                'lower':'1',
-                'upper':'infty',
-                'integrand':'1/x^2',
-                'integration_variable':'x'
+                'lower': '1',
+                'upper': 'infty',
+                'integrand': '1/x^2',
+                'integration_variable': 'x'
             }
         )
         student_input = ['0', '1', '1/x^2', 'x']
         grader(None, student_input)
 
+def test_divergent_integral_config_raises_error():
+    with raises(ConfigError, match="The algorithm does not converge"):
+        grader = IntegralGrader(
+            answers={
+                'lower': '-1',
+                'upper': '1',
+                'integrand': '1/(x-0.276)^2',
+                'integration_variable': 'x'
+            }
+        )
+        student_input = ['-1', '1', 'x^2', 'x']
+        grader(None, student_input)
+
 # Debug Test
 def test_debug_message():
     grader = IntegralGrader(
-        answers= {
-            'lower':'1',
-            'upper':'8',
-            'integrand':'sin(s)',
-            'integration_variable':'s'
+        answers={
+            'lower': '1',
+            'upper': '8',
+            'integrand': 'sin(s)',
+            'integration_variable': 's'
         },
         debug=True,
         samples=2
     )
-    student_input = ['1', '8', 'sin(x)','x']
+    student_input = ['1', '8', 'sin(x)', 'x']
     expected_message = (
         "<pre>"
         "MITx Grading Library Version VERSION\n"
@@ -312,5 +326,49 @@ def test_debug_message():
         "Number of integrand evaluations: 21\n"
         "</pre>"
     ).replace("VERSION", __version__).replace("\n", "<br/>\n")
-    expected_result = {'ok':True, 'grade_decimal':1, 'msg':expected_message}
+    expected_result = {'ok': True, 'grade_decimal': 1, 'msg': expected_message}
     assert grader(None, student_input) == expected_result
+
+def test_error_catching():
+    grader = IntegralGrader(
+        answers={
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
+        },
+        input_positions={
+            'integrand': 1,
+            'lower': 2,
+            'upper': 3
+        },
+        variables=['a', 'b']
+    )
+    student_input = ['1+', '1', '2']
+    expected_message = ("Invalid Input: Could not parse '1+' as a formula")
+    with raises(CalcError, msg=expected_message):
+        grader(None, student_input)
+
+    student_input = ['1/0', '1', '2']
+    expected_message = ("Division by zero occurred. Check your input's denominators.")
+    with raises(CalcError, msg=expected_message):
+        grader(None, student_input)
+
+def test_wrong_answer():
+    grader = IntegralGrader(
+        answers={
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
+        },
+        input_positions={
+            'integrand': 1,
+            'lower': 2,
+            'upper': 3
+        },
+        variables=['a', 'b']
+    )
+    student_input = ['x', '2', '3']
+    expect = {'grade_decimal': 0, 'msg': '', 'ok': False}
+    assert grader(None, student_input) == expect

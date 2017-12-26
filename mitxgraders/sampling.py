@@ -54,7 +54,6 @@ class AbstractSamplingSet(ObjectWithSchema):  # pylint: disable=abstract-method
     @abc.abstractmethod
     def gen_sample(self):
         """Generate a sample from this sampling set"""
-        pass
 
 
 class VariableSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-method
