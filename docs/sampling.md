@@ -6,16 +6,30 @@ These sampling classes are available for use in FormulaGrader.
 
 **Table of Contents**
 
-- [Variable Sampling](#variable_sampling)
+- [Variable Names](#variable-names)
+- [Variable Sampling](#variable-sampling)
   - [RealInterval](#realinterval)
   - [IntegerRange](#integerrange)
   - [DiscreteSet](#discreteset)
   - [ComplexRectangle](#complexrectangle)
   - [ComplexSector](#complexsector)
   - [DependentSampler](#dependentsampler)
-- [Function Sampling](#function_sampling)
+- [Function Sampling](#function-sampling)
   - [SpecificFunctions](#specificfunctions)
   - [RandomFunction](#randomfunction)
+
+
+## Variable Names
+
+Variable names must start with a letter, and can continue with letters, numbers, and underscores. Variable names may conclude with an arbitrary number of apostrophes. The same naming conventions apply to user-defined constants.
+
+It is also possible to have tensor variable names. The following three forms are available:
+
+- T^{ijk}
+- T_{ijk}
+- T_{ijk}^{123} (note that lowered indices must come first)
+
+The tensor name itself must only contain letters. The indices may be any combination of letters and numbers. After the indices, you may have apostrophes, such as T^{ijk}'' (tensors can be differentiated too!).
 
 
 ## Variable Sampling

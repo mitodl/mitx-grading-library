@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 1.0.3
+
+* Added tensor variable names
+
 ## Version 1.0.2
 
 * Added error messages for overflow, division-by-zero, and out-of-domain errors in formulas
