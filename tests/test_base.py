@@ -314,3 +314,5 @@ def test_tensors():
     assert evaluator("U_{ijk}^{123}", {"U_{ijk}^{123}":2}, {}, {})[0] == 2
     assert evaluator("U_{ijk}^{123}'''''", {"U_{ijk}^{123}'''''":2}, {}, {})[0] == 2
     assert evaluator("U_{ijk}^2", {"U_{ijk}":2}, {}, {})[0] == 4
+    assert evaluator("U^{ijk}^2", {"U^{ijk}":2}, {}, {})[0] == 4
+    assert evaluator("U_{ijk}^{123}^2", {"U_{ijk}^{123}":2}, {}, {})[0] == 4

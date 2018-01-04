@@ -451,7 +451,8 @@ class ParseAugmenter(object):
         # and may contain numbers and underscores afterward.
         inner_varname = Combine(Word(alphas, alphanums + "_") + ZeroOrMore("'"))
         # Alternative variable name in tensor format
-        # Tensor name must be alphas only, indices may be alphanumeric
+        # Tensor name must start with a letter, continue with alphanums
+        # Indices may be alphanumeric
         # e.g., U_{ijk}^{123}
         upper_indices = Literal("^{") + Word(alphanums) + Literal("}")
         lower_indices = Literal("_{") + Word(alphanums) + Literal("}")
