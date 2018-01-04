@@ -306,3 +306,13 @@ def test_math():
     assert -arcsech(sech(x)) == approx(x)
     assert arccsch(csch(x)) == approx(x)
     assert arccoth(coth(x)) == approx(x)
+
+def test_tensors():
+    """Test tensor variable names in calc.py"""
+    assert evaluator("U^{ijk}", {"U^{ijk}":2}, {}, {})[0] == 2
+    assert evaluator("U_{ijk}/2", {"U_{ijk}":2}, {}, {})[0] == 1
+    assert evaluator("U_{ijk}^{123}", {"U_{ijk}^{123}":2}, {}, {})[0] == 2
+    assert evaluator("U_{ijk}^{123}'''''", {"U_{ijk}^{123}'''''":2}, {}, {})[0] == 2
+    assert evaluator("U_{ijk}^2", {"U_{ijk}":2}, {}, {})[0] == 4
+    assert evaluator("U^{ijk}^2", {"U^{ijk}":2}, {}, {})[0] == 4
+    assert evaluator("U_{ijk}^{123}^2", {"U_{ijk}^{123}":2}, {}, {})[0] == 4
