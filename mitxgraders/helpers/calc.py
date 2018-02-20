@@ -448,32 +448,32 @@ class ParseAugmenter(object):
         # Predefine recursive variables.
         expr = Forward()
 
-        # Handle variables passed in. Variables should be of the form
-        #   front + subscripts + lower_indices + upper_indices + tail
+        # Handle variables passed in. Variables may be either of two forms:
+        #   1. front + subscripts + tail
+        #   2. front + lower_indices + upper_indices + tail
         # where:
         #   front (required):
         #       starts with alpha, followed by alphanumeric
         #   subscripts (optional):
         #       any combination of alphanumeric and underscores
         #   lower_indices (optional):
-        #       like subscripts, but with curly braces, e.g., U_{ijk}. Intended
-        #       for consistency with upper-index tensor notation.
+        #       Of form "_{<alaphnumeric>}"
         #   upper_indices (optional):
-        #       e.g., U_{ijk}^{123}
+        #       Of form "^{<alaphnumeric>}"
         #   tail:
         #       any number of primes
         front = Word(alphas, alphanums)
-        # ~FollowedBy prevents capturing lower_indices starting character.
         subscripts = Word(alphanums + '_') + ~FollowedBy('{')
         lower_indices = Literal("_{") + Word(alphanums) + Literal("}")
         upper_indices = Literal("^{") + Word(alphanums) + Literal("}")
         tail = ZeroOrMore("'")
         inner_varname = Combine(
             front +
-            Optional(subscripts) +
-            Optional(lower_indices) +
-            Optional(upper_indices) +
-            Optional(tail)
+            Optional(
+                subscripts |
+                ( Optional(lower_indices) + Optional(upper_indices) )
+                ) +
+            tail # optional already by ZeroOrMore
             )
         varname = Group(inner_varname)("variable")
         varname.setParseAction(self.variable_parse_action)
