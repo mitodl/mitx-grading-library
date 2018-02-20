@@ -316,3 +316,5 @@ def test_tensors():
     assert evaluator("U_{ijk}^2", {"U_{ijk}":2}, {}, {})[0] == 4
     assert evaluator("U^{ijk}^2", {"U^{ijk}":2}, {}, {})[0] == 4
     assert evaluator("U_{ijk}^{123}^2", {"U_{ijk}^{123}":2}, {}, {})[0] == 4
+    # Regular subscripts still work:
+    assert evaluator("U_cat/2 + T_dog_", {"U_cat":2, "T_dog_":4}, {}, {})[0] == 5
