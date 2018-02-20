@@ -471,7 +471,7 @@ class ParseAugmenter(object):
             front +
             Optional(
                 subscripts |
-                ( Optional(lower_indices) + Optional(upper_indices) )
+                (Optional(lower_indices) + Optional(upper_indices))
                 ) +
             tail # optional already by ZeroOrMore
             )
