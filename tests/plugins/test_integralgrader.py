@@ -260,7 +260,7 @@ def test_integration_options_are_passed_correctly():
     assert grader1(None, student_input) == expected_result
 
 # Integral Evaluation Error tests
-def test_divergent_integral_infinite_domain_raises_error():
+def test_learner_divergent_integral_real_part_raises_integration_error():
     msg = ("There appears to be an error with the integral you entered: "
            "The integral is probably divergent, or slowly convergent.")
     with raises(IntegrationError, match=msg):
@@ -275,13 +275,43 @@ def test_divergent_integral_infinite_domain_raises_error():
         student_input = ['0', '1', '1/x^2', 'x']
         grader(None, student_input)
 
-def test_divergent_integral_config_raises_error():
+def test_author_divergent_integral_real_part_raises_config_error():
     with raises(ConfigError, match="The algorithm does not converge"):
         grader = IntegralGrader(
             answers={
                 'lower': '-1',
                 'upper': '1',
                 'integrand': '1/(x-0.276)^2',
+                'integration_variable': 'x'
+            }
+        )
+        student_input = ['-1', '1', 'x^2', 'x']
+        grader(None, student_input)
+
+def test_learner_divergent_integral_imag_part_raises_integration_error():
+    msg = ("There appears to be an error with the integral you entered: "
+           "The integral is probably divergent, or slowly convergent.")
+    with raises(IntegrationError, match=msg):
+        grader = IntegralGrader(
+            complex_integrand=True,
+            answers={
+                'lower': '1',
+                'upper': 'infty',
+                'integrand': 'e^(-x) + i/x^2',
+                'integration_variable': 'x'
+            }
+        )
+        student_input = ['0', '1', 'e^(-x) + i/x^2', 'x']
+        grader(None, student_input)
+
+def test_author_divergent_integral_imag_part_raises_config_error():
+    with raises(ConfigError, match="The algorithm does not converge"):
+        grader = IntegralGrader(
+            complex_integrand=True,
+            answers={
+                'lower': '-1',
+                'upper': '1',
+                'integrand': 'x + i/(x-0.276)^2',
                 'integration_variable': 'x'
             }
         )
