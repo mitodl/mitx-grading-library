@@ -6,7 +6,7 @@ import math
 import random
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, CalcError, __version__
 from mitxgraders.voluptuous import Error, Invalid, truth
-from mitxgraders.helpers.calc import evaluator
+from mitxgraders.helpers.calc import evaluator, UnableToParse
 from mitxgraders.helpers import validatorfuncs
 from mitxgraders.helpers.mathfunc import (cot, arcsec, arccsc, arccot, sech, csch, coth,
                                           arcsech, arccsch, arccoth, sec, csc)
@@ -307,8 +307,9 @@ def test_math():
     assert arccsch(csch(x)) == approx(x)
     assert arccoth(coth(x)) == approx(x)
 
-def test_tensors():
-    """Test tensor variable names in calc.py"""
+def test_varnames():
+    """Test variable names in calc.py"""
+    # Tensor variable names
     assert evaluator("U^{ijk}", {"U^{ijk}":2}, {}, {})[0] == 2
     assert evaluator("U_{ijk}/2", {"U_{ijk}":2}, {}, {})[0] == 1
     assert evaluator("U_{ijk}^{123}", {"U_{ijk}^{123}":2}, {}, {})[0] == 2
@@ -316,3 +317,10 @@ def test_tensors():
     assert evaluator("U_{ijk}^2", {"U_{ijk}":2}, {}, {})[0] == 4
     assert evaluator("U^{ijk}^2", {"U^{ijk}":2}, {}, {})[0] == 4
     assert evaluator("U_{ijk}^{123}^2", {"U_{ijk}^{123}":2}, {}, {})[0] == 4
+    # Regular variable names
+    assert evaluator("U_cat/2 + Th3_dog__7a_", {"U_cat":2, "Th3_dog__7a_":4}, {}, {})[0] == 5
+    # tensor subscripts need braces
+    with raises(UnableToParse):
+        assert evaluator("U_123^{ijk}", {}, {}, {})
+    with raises(UnableToParse):
+        assert evaluator("T_1_{123}^{ijk}", {}, {}, {})

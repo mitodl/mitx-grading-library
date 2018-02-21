@@ -23,6 +23,7 @@ from pyparsing import (
     ParseResults,
     Suppress,
     Word,
+    FollowedBy,
     ZeroOrMore,
     alphanums,
     alphas,
@@ -447,20 +448,34 @@ class ParseAugmenter(object):
         # Predefine recursive variables.
         expr = Forward()
 
-        # Handle variables passed in. They must start with a letter
-        # and may contain numbers and underscores afterward.
-        inner_varname = Combine(Word(alphas, alphanums + "_") + ZeroOrMore("'"))
-        # Alternative variable name in tensor format
-        # Tensor name must start with a letter, continue with alphanums
-        # Indices may be alphanumeric
-        # e.g., U_{ijk}^{123}
-        upper_indices = Literal("^{") + Word(alphanums) + Literal("}")
+        # Handle variables passed in. Variables may be either of two forms:
+        #   1. front + subscripts + tail
+        #   2. front + lower_indices + upper_indices + tail
+        # where:
+        #   front (required):
+        #       starts with alpha, followed by alphanumeric
+        #   subscripts (optional):
+        #       any combination of alphanumeric and underscores
+        #   lower_indices (optional):
+        #       Of form "_{<alaphnumeric>}"
+        #   upper_indices (optional):
+        #       Of form "^{<alaphnumeric>}"
+        #   tail:
+        #       any number of primes
+        front = Word(alphas, alphanums)
+        subscripts = Word(alphanums + '_') + ~FollowedBy('{')
         lower_indices = Literal("_{") + Word(alphanums) + Literal("}")
-        tensor = Combine(Word(alphas, alphanums) + Optional(lower_indices) +
-                         Optional(upper_indices) + ZeroOrMore("'"))
-        # Test for tensor first, then generic variable with underscores for backwards
-        # compatability
-        varname = Group(tensor | inner_varname)("variable")
+        upper_indices = Literal("^{") + Word(alphanums) + Literal("}")
+        tail = ZeroOrMore("'")
+        inner_varname = Combine(
+            front +
+            Optional(
+                subscripts |
+                (Optional(lower_indices) + Optional(upper_indices))
+                ) +
+            tail # optional already by ZeroOrMore
+            )
+        varname = Group(inner_varname)("variable")
         varname.setParseAction(self.variable_parse_action)
 
         # Same thing for functions
