@@ -85,7 +85,7 @@ class IntegralGrader(AbstractGrader):
     Grades a student-entered integral by comparing numerically with
     an author-specified integral.
 
-    WARNING
+    WARNINGS
     =======
     This grader numerically evaluates the student- and instructor-specified
     integrals using scipy.integrate.quad. This quadrature-based integration
@@ -101,10 +101,18 @@ class IntegralGrader(AbstractGrader):
     In some cases, problems might be avoided by using the integrator_options
     configuration key to provide extra instructions to scipy.integrate.quad.
 
+    Additionally, take care that the integration limits are real-valued.
+    For example, if sqrt(1-a^2) is an integration limit, the sampling range
+    for variable 'a' must gaurantee that the limit sqrt(1-a^2) is real. By
+    default, variables sample from the real interval [1,3].
+
     Configuration Options
     =====================
         answers (dict, required): Specifies author's answer. Has required keys lower,
             upper, integrand, integration_variable, which each take string values.
+
+        complex_integrand (bool): Specifies whether the integrand is allowed to
+            be complex-valued. Defaults to False.
 
         input_positions (dict): Specifies which integration parameters the student
             is required to enter. The default value of input_positions is:
