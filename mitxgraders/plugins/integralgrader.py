@@ -6,6 +6,7 @@ and upper limits, and integration variable, and an integrand.
 """
 
 from __future__ import division
+from functools import wraps
 from numbers import Number
 from scipy import integrate
 from numpy import real, imag
@@ -72,6 +73,8 @@ class IntegrationError(Exception):
 
 def check_output_is_real(func, error, message):
     """Decorate a function to check that its output is real or raise error with specifed message."""
+
+    @wraps(func)
     def wrapper(x):
         output = func(x)
         if not isinstance(output, float):
