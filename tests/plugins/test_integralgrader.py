@@ -259,6 +259,28 @@ def test_integration_options_are_passed_correctly():
     # grader1 avoids the singularity and should work
     assert grader1(None, student_input) == expected_result
 
+def test_complex_integrand_grades_as_expected():
+    grader = IntegralGrader(
+        complex_integrand=True,
+        answers={
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'e^(i*x)',
+            'integration_variable': 'x'
+        },
+        variables=['a', 'b'],
+    )
+    # Correct
+    student_input_a = ['a', 'b', 'cos(x)+i*sin(x)', 'x']
+    expected_a = {'ok': True, 'grade_decimal': 1, 'msg': ''}
+    assert grader(None, student_input_a) == expected_a
+    # correct real part / imag part
+    student_input_b1 = ['a', 'b', 'cos(x)+i*x', 'x']
+    student_input_b2 = ['a', 'b', 'x+i*sin(x)', 'x']
+    expected_b = {'ok': False, 'grade_decimal': 0, 'msg': ''}
+    assert grader(None, student_input_b1) == expected_b
+    assert grader(None, student_input_b2) == expected_b
+
 # Integral Evaluation Error tests
 def test_learner_divergent_integral_real_part_raises_integration_error():
     msg = ("There appears to be an error with the integral you entered: "
@@ -363,7 +385,7 @@ def test_student_has_complex_limits_raises_IntegrationError():
         student_input = ['0', 'sqrt(1-a^2)', 'x^2', 'x']
         grader(None, student_input)
 
-def test_athor_has_complex_integrand_raises_ConfigError():
+def test_athor_has_unexpected_complex_integrand_raises_ConfigError():
     with raises(ConfigError, match="Integration Error with author's stored answer: Integrand"):
         grader = IntegralGrader(
             answers={
@@ -380,7 +402,7 @@ def test_athor_has_complex_integrand_raises_ConfigError():
         student_input = ['0', '1', 'x^2', 'x']
         grader(None, student_input)
 
-def test_student_has_complex_integrand_raises_IntegrationError():
+def test_student_has_unexpected_complex_integrand_raises_IntegrationError():
     with raises(IntegrationError,
                 match=(
                     "There appears to be an error "

@@ -72,13 +72,13 @@ class IntegrationError(Exception):
 
 def check_output_is_real(func, error, message):
     """Decorate a function to check that its output is real or raise error with specifed message."""
-    def _func(x):
+    def wrapper(x):
         output = func(x)
         if not isinstance(output, float):
             raise error(message)
         return output
 
-    return _func
+    return wrapper
 
 class IntegralGrader(AbstractGrader):
     """
@@ -422,11 +422,9 @@ class IntegralGrader(AbstractGrader):
             ))
 
             # Check if expressions agree
-            if not within_tolerance(expected_re[0], student_re[0], self.config['tolerance']):
-                num_failures += 1
-                if num_failures > self.config["failable_evals"]:
-                    return {'ok': False, 'grade_decimal': 0, 'msg': ''}
-            if self.config['complex_integrand'] and not within_tolerance(expected_im[0], student_im[0], self.config['tolerance']):
+            expected = expected_re[0] + (expected_im[0] or 0)*1j
+            student = student_re[0] + (student_im[0] or 0)*1j
+            if not within_tolerance(expected, student, self.config['tolerance']):
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
                     return {'ok': False, 'grade_decimal': 0, 'msg': ''}
