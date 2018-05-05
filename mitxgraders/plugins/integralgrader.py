@@ -6,7 +6,10 @@ and upper limits, and integration variable, and an integrand.
 """
 
 from __future__ import division
+from functools import wraps
 from numbers import Number
+from scipy import integrate
+from numpy import real, imag
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants)
@@ -16,7 +19,6 @@ from mitxgraders.helpers.calc import (CalcError, evaluator)
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative,
                                                 PercentageString, is_callable)
 from mitxgraders.helpers.mathfunc import within_tolerance
-from scipy import integrate
 
 __all__ = ["IntegralGrader"]
 
@@ -69,12 +71,24 @@ class IntegrationError(Exception):
     """Represents an error associated with integration"""
     pass
 
+def check_output_is_real(func, error, message):
+    """Decorate a function to check that its output is real or raise error with specifed message."""
+
+    @wraps(func)
+    def wrapper(x):
+        output = func(x)
+        if not isinstance(output, float):
+            raise error(message)
+        return output
+
+    return wrapper
+
 class IntegralGrader(AbstractGrader):
     """
     Grades a student-entered integral by comparing numerically with
     an author-specified integral.
 
-    WARNING
+    WARNINGS
     =======
     This grader numerically evaluates the student- and instructor-specified
     integrals using scipy.integrate.quad. This quadrature-based integration
@@ -90,10 +104,18 @@ class IntegralGrader(AbstractGrader):
     In some cases, problems might be avoided by using the integrator_options
     configuration key to provide extra instructions to scipy.integrate.quad.
 
+    Additionally, take care that the integration limits are real-valued.
+    For example, if sqrt(1-a^2) is an integration limit, the sampling range
+    for variable 'a' must gaurantee that the limit sqrt(1-a^2) is real. By
+    default, variables sample from the real interval [1,3].
+
     Configuration Options
     =====================
         answers (dict, required): Specifies author's answer. Has required keys lower,
             upper, integrand, integration_variable, which each take string values.
+
+        complex_integrand (bool): Specifies whether the integrand is allowed to
+            be complex-valued. Defaults to False.
 
         input_positions (dict): Specifies which integration parameters the student
             is required to enter. The default value of input_positions is:
@@ -177,6 +199,7 @@ class IntegralGrader(AbstractGrader):
                 Required('full_output', default=1): 1,
                 Extra: object
             },
+            Required('complex_integrand', default=False): bool,
             # Most of the below are copied from FormulaGrader
             Required('user_functions', default={}):
                 {Extra: Any(is_callable, [is_callable], FunctionSamplingSet)},
@@ -193,20 +216,28 @@ class IntegralGrader(AbstractGrader):
 
     debug_appendix_template = (
         "\n"
-        "Integration Data for Sample Number {samplenum}\n"
-        "Variables: {variables}\n"
         "==============================================\n"
-        "Student Integration Data\n"
-        "=============================================\n"
-        "Numerical Value: {student_eval}\n"
-        "Error Estimate: {student_error}\n"
-        "Number of integrand evaluations: {student_neval}\n"
-        "\n\n"
-        "Author Integration Data\n"
-        "=============================================\n"
-        "Numerical Value: {author_eval}\n"
-        "Error Estimate: {author_error}\n"
-        "Number of integrand evaluations: {author_neval}\n"
+        "Integration Data for Sample Number {samplenum}\n"
+        "==============================================\n"
+        "Variables: {variables}\n"
+        "\n"
+        "========== Student Integration Data, Real Part\n"
+        "Numerical Value: {student_re_eval}\n"
+        "Error Estimate: {student_re_error}\n"
+        "Number of integrand evaluations: {student_re_neval}\n"
+        "========== Student Integration Data, Imaginary Part\n"
+        "Numerical Value: {student_im_eval}\n"
+        "Error Estimate: {student_im_error}\n"
+        "Number of integrand evaluations: {student_im_neval}\n"
+        "\n"
+        "========== Author Integration Data, Real Part\n"
+        "Numerical Value: {author_re_eval}\n"
+        "Error Estimate: {author_re_error}\n"
+        "Number of integrand evaluations: {author_re_neval}\n"
+        "========== Author Integration Data, Imaginary Part\n"
+        "Numerical Value: {author_im_eval}\n"
+        "Error Estimate: {author_im_error}\n"
+        "Number of integrand evaluations: {author_im_neval}\n"
         ""
     )
 
@@ -338,42 +369,65 @@ class IntegralGrader(AbstractGrader):
             funcscope.update(func_samples[i])
             varscope.update(var_samples[i])
 
-            expected = self.evaluate_int(answer['integrand'],
-                                         answer['lower'],
-                                         answer['upper'],
-                                         answer['integration_variable'],
-                                         varscope=varscope,
-                                         funcscope=funcscope)
+            # Evaluate integrals. Error handling here is in two parts because
+            # 1. custom error messages we've added
+            # 2. scipy's warnings re-raised as error messages
+            try:
+                expected_re, expected_im = self.evaluate_int(
+                    answer['integrand'],
+                    answer['lower'],
+                    answer['upper'],
+                    answer['integration_variable'],
+                    varscope=varscope,
+                    funcscope=funcscope
+                )
+            except IntegrationError as e:
+                msg = "Integration Error with author's stored answer: {}"
+                raise ConfigError(msg.format(e.message))
 
-            student = self.evaluate_int(cleaned_input['integrand'],
-                                        cleaned_input['lower'],
-                                        cleaned_input['upper'],
-                                        cleaned_input['integration_variable'],
-                                        varscope=varscope,
-                                        funcscope=funcscope)
+            student_re, student_im = self.evaluate_int(
+                cleaned_input['integrand'],
+                cleaned_input['lower'],
+                cleaned_input['upper'],
+                cleaned_input['integration_variable'],
+                varscope=varscope,
+                funcscope=funcscope
+                )
 
             # scipy raises integration warnings when things go wrong,
             # except they aren't really warnings, they're just printed to stdout
             # so we use quad's full_output option to catch the messages, and then raise errors.
             # The 4th component only exists when its warning message is non-empty
-            if len(student) == 4:
-                raise IntegrationError(student[3])
-            if len(expected) == 4:
-                raise ConfigError(expected[3])
+            if len(student_re) == 4:
+                raise IntegrationError(student_re[3])
+            if len(expected_re) == 4:
+                raise ConfigError(expected_re[3])
+            if len(student_im) == 4:
+                raise IntegrationError(student_im[3])
+            if len(expected_im) == 4:
+                raise ConfigError(expected_im[3])
 
             self.log(self.debug_appendix_template.format(
                 samplenum=i,
                 variables=varscope,
-                student_eval=student[0],
-                student_error=student[1],
-                student_neval=student[2]['neval'],
-                author_eval=expected[0],
-                author_error=expected[1],
-                author_neval=expected[2]['neval'],
+                student_re_eval=student_re[0],
+                student_re_error=student_re[1],
+                student_re_neval=student_re[2]['neval'],
+                student_im_eval=student_im[0],
+                student_im_error=student_im[1],
+                student_im_neval=student_im[2]['neval'],
+                author_re_eval=expected_re[0],
+                author_re_error=expected_re[1],
+                author_re_neval=expected_re[2]['neval'],
+                author_im_eval=expected_im[0],
+                author_im_error=expected_im[1],
+                author_im_neval=expected_im[2]['neval'],
             ))
 
             # Check if expressions agree
-            if not within_tolerance(expected[0], student[0], self.config['tolerance']):
+            expected = expected_re[0] + (expected_im[0] or 0)*1j
+            student = student_re[0] + (student_im[0] or 0)*1j
+            if not within_tolerance(expected, student, self.config['tolerance']):
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
                     return {'ok': False, 'grade_decimal': 0, 'msg': ''}
@@ -401,13 +455,16 @@ class IntegralGrader(AbstractGrader):
                              functions=funcscope,
                              suffixes={})
 
+        if isinstance(lower, complex) or isinstance(upper, complex):
+            raise IntegrationError('Integration limits must be real but have evaluated to complex numbers.')
+
         # It is possible that the integration variable might appear in the limits.
         # Some consider this bad practice, but many students do it and Mathematica allows it.
         # We're going to edit the varscope below to contain the integration variable.
         # Let's store the integration variable's initial value in case it has one.
         int_var_initial = varscope[integration_var] if integration_var in varscope else None
 
-        def integrand(x):
+        def raw_integrand(x):
             varscope[integration_var] = x
             value, _ = evaluator(integrand_str,
                                  case_sensitive=self.config['case_sensitive'],
@@ -416,10 +473,19 @@ class IntegralGrader(AbstractGrader):
                                  suffixes={})
             return value
 
-        result = integrate.quad(integrand, lower, upper, **self.config['integrator_options'])
+        if self.config['complex_integrand']:
+            integrand_re = lambda x: real(raw_integrand(x))
+            integrand_im = lambda x: imag(raw_integrand(x))
+            result_re = integrate.quad(integrand_re, lower, upper, **self.config['integrator_options'])
+            result_im = integrate.quad(integrand_im, lower, upper, **self.config['integrator_options'])
+        else:
+            errmsg = "Integrand has evaluated to complex number but must evaluate to a real."
+            integrand = check_output_is_real(raw_integrand, IntegrationError, errmsg)
+            result_re = integrate.quad(integrand, lower, upper, **self.config['integrator_options'])
+            result_im = (None, None, {'neval':None})
 
         # Restore the integration variable's initial value now that we are done integrating
         if int_var_initial is not None:
             varscope[integration_var] = int_var_initial
 
-        return result
+        return result_re, result_im
