@@ -592,8 +592,8 @@ class SingleListGrader(ItemGrader):
             Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
         })
 
-    # Make sure that the ItemGrader schema_expect isn't used
-    schema_expect = None
+    # Make sure that the ItemGrader validate_expect isn't used
+    validate_expect = None
 
     def __init__(self, config=None, **kwargs):
         """

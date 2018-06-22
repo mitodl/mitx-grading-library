@@ -4,6 +4,7 @@ validatorfuncs.py
 Stand-alone validator functions for use in voluptuous Schema
 """
 from numbers import Number
+from inspect import getargspec
 from mitxgraders.voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
 
 def Positive(thetype):
@@ -82,6 +83,49 @@ def ListOfType(given_type, validator=None):
 def is_callable(obj):
     """Returns true if obj is callable"""
     return callable(obj)
+
+def is_callable_with_args(num_args):
+    """
+    Validates that a function is callable and takes num_args arguments
+
+    Examples:
+    >>> def func(x, y): return x + y
+    >>> is_callable_with_args(2)(func) == func
+    True
+    >>> is_callable_with_args(3)(func) == func # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    Invalid: Expected function... to have 3 arguments, instead it has 2
+
+    Callable objects work, too:
+    >>> class Foo:
+    ...     def __call__(self, x):
+    ...         return x
+    >>> foo = Foo()
+    >>> is_callable_with_args(1)(foo) == foo
+    True
+    >>> is_callable_with_args(1)(Foo) # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    Invalid: Expected function... to have 1 arguments, instead it has 2
+    """
+    def _validate(func):
+        # first, check that the function is callable
+        is_callable(func)
+        try:
+            # assume object is a function
+            f_args = len(getargspec(func)[0])
+        except TypeError:
+            # otherwise it is a callable object
+            f_args = len(getargspec(func.__call__)[0])
+            # If obj.__call__ is a bound method, remove one argument
+            if func.__call__.__self__ is not None:
+                f_args += -1
+        if not f_args == num_args:
+            msg = "Expected function {func} to have {num_args} arguments, instead it has {f_args}"
+            raise Invalid(msg.format(func=func, num_args=num_args, f_args=f_args))
+        return func
+
+    return _validate
+
 
 def TupleOfType(given_type, validator=None):
     """
