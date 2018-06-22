@@ -270,6 +270,35 @@ grader = FormulaGrader(
 
 We strongly recommend _not_ doing this when using the following variable names: k, M, G, T, m, u, n, and p.
 
+## Comparer Functions
+By default, FormulaGrader compares the numerically sampled author formula and student formula for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. For example, if grading angles in degrees, it may be useful to compare formulas modulo 360.
+
+To use an alternate comparer, specify the `answers` key as a dictionary with keys `comparer` and `comparer_params` rather than a single string. For example, to compare formulas modulo 360:
+
+```python
+def is_coterminal(comparer_params_evals, student_eval, utils):
+    answer = comparer_params_evals[0]
+    reduced = student_eval % (360)
+    return utils.within_tolerance(answer, reduced)
+
+grader = FormulaGrader(
+    answers={
+        'comparer': is_coterminal,
+        'comparer_params': ['b^2/a'],
+    },
+    variables=['a', 'b'],
+    tolerance='1%'
+)
+```
+
+This grader would accept `'b^2/a'` as well as `'b^2/a + 360'`, `'b^2/a + 720'`, etc.
+
+In the grader configuration, `comparer_params` is a list of strings that are numerically evaluated and passed to the comparer function. The `comparer` function is a user-specified function with signature `comparer(comparer_params_evals, student_eval, utils)`. When `FormulaGrader` calls the comparer function, `comparer` the argument values are:
+- `comparer_params_evals`: The `comparer_params` list, numerically evaluated according to variable and function sampling.
+- `student_eval`: The student's input, numerically evaluated according to variable and function sampling
+- `utils`: A convenience object that may be helpful when writing custom comparer functions. Has properties:
+  - `utils.tolerance`: The tolerance specified in grader configuration, `0.01%` by default
+  - `utils.within_tolerance:` A function with signature `within_tolerance(x, y)` which checks that `y` is within specified tolerance of `x`. Can handle scalars, vectors, and matrices. If tolerance was specified as a percentage, then checks that `|x-y| < tolerance * x`.
 
 ## NumericalGrader
 

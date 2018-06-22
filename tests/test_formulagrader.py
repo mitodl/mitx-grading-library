@@ -679,6 +679,23 @@ def test_docs():
     assert grader(None, '2*m')['ok']
     assert not grader(None, '2m')['ok']
 
+    def is_coterminal(comparer_params_evals, student_eval, utils):
+        answer = comparer_params_evals[0]
+        reduced = student_eval % (360)
+        return utils.within_tolerance(answer, reduced)
+
+    grader = FormulaGrader(
+        answers={
+            'comparer': is_coterminal,
+            'comparer_params': ['b^2/a'],
+        },
+        variables=['a', 'b'],
+        tolerance='1%'
+    )
+    assert grader(None, 'b^2/a')['ok']
+    assert grader(None, 'b^2/a + 720')['ok']
+    assert not grader(None, 'b^2/a + 225')['ok']
+
 def test_empty_input():
     """Make sure that empty input doesn't crash"""
     grader = FormulaGrader(answers="1")

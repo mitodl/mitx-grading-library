@@ -7,16 +7,16 @@ Contains classes for numerical and formula graders
 """
 from __future__ import division
 from numbers import Number
+from collections import namedtuple
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes)
 from mitxgraders.baseclasses import ItemGrader, InvalidInput
-from mitxgraders.voluptuous import Schema, Required, Any, All, Extra, MultipleInvalid, Invalid
+from mitxgraders.voluptuous import Schema, Required, Any, All, Extra, Invalid
 from mitxgraders.helpers.calc import CalcError, evaluator
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
                                                 PercentageString, is_callable_with_args)
 from mitxgraders.helpers.mathfunc import within_tolerance
-from collections import namedtuple
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -82,6 +82,15 @@ class FormulaGrader(ItemGrader):
 
         failable_evals (int): The number of samples that may disagree before the student's
             answer is marked incorrect (default 0)
+
+        answers (str | dict): A string, dictionary, or tuple thereof. If a string is supplied,
+            it represents the correct answer and is compared to student input for equality.
+
+            If a dictionary is supplied, it needs keys:
+                - comparer_params: a list of strings to be numerically sampled and passed to the
+                    comparer function.
+                - comparer: a function with signature `comparer(comparer_params_evals, student_eval,
+                    utils)` that compares student and comparer_params after evaluation.
     """
     @property
     def schema_config(self):
@@ -290,6 +299,29 @@ class FormulaGrader(ItemGrader):
     def validate_required_functions_used(used_funcs, required_funcs, case_sensitive):
         """
         Raise InvalidInput error if used_funcs does not contain all required_funcs
+
+        Examples:
+        >>> FormulaGrader.validate_required_functions_used(
+        ... ['sin', 'cos', 'f', 'g'],
+        ... ['cos', 'f'],
+        ... True
+        ... )
+        True
+        >>> FormulaGrader.validate_required_functions_used(
+        ... ['sin', 'cos', 'F', 'g'],
+        ... ['cos', 'f'],
+        ... True
+        ... )
+        Traceback (most recent call last):
+        InvalidInput: Invalid Input: Answer must contain the function f
+
+        Case insensitive:
+        >>> FormulaGrader.validate_required_functions_used(
+        ... ['sin', 'Cos', 'F', 'g'],
+        ... ['cos', 'f'],
+        ... False
+        ... )
+        True
         """
         for f in required_funcs:
             ftest = f
@@ -299,6 +331,7 @@ class FormulaGrader(ItemGrader):
             if ftest not in used_funcs:
                 msg = "Invalid Input: Answer must contain the function {}"
                 raise InvalidInput(msg.format(f))
+        return True
 
 
 class NumericalGrader(FormulaGrader):
