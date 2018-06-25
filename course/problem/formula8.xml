@@ -1,0 +1,30 @@
+<problem display_name="Custom Comparison Function" showanswer="always" weight="10" attempts="">
+
+  <p>By default, FormulaGrader the numerically samples the author formula and student formula then compares the numerical samples for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. For example, if grading angles in degrees, it may be useful to compare formulas modulo 360.</p>
+
+  <p>The answer to the below question is "b^2/a". You can enter "b^2/a + 2*360", or plus any integer multiple of 360.</p>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import FormulaGrader
+def is_coterminal(comparer_params_evals, student_eval, utils):
+    answer = comparer_params_evals[0]
+    reduced = student_eval % (360)
+    return utils.within_tolerance(answer, reduced)
+
+grader = FormulaGrader(
+    answers={
+        'comparer': is_coterminal,
+        'comparer_params': ['b^2/a'],
+    },
+    variables=['a', 'b'],
+    tolerance='1%'
+)
+</script>
+
+<customresponse cfn="grader" inline="1">
+  <textline math="1" inline="1" correct_answer="b^2/a"/>
+</customresponse>
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula8.xml" target="_blank">View source</a>
+
+</problem>
