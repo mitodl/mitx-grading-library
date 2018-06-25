@@ -2,6 +2,9 @@
 Tests for FormulaGrader and NumericalGrader
 """
 from __future__ import division
+from pytest import raises
+from mock import Mock
+import numpy as np
 from mitxgraders import (
     FormulaGrader,
     NumericalGrader,
@@ -17,8 +20,6 @@ from mitxgraders import (
     InvalidInput,
 )
 from mitxgraders.voluptuous import Error, MultipleInvalid
-from pytest import raises
-import numpy as np
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
@@ -436,6 +437,50 @@ def test_fg_function_sampling():
     assert isinstance(grader.random_funcs['hello'], SpecificFunctions)
     assert grader(None, 'hello(x)')['ok']
 
+def test_fg_custom_comparers():
+
+    def is_coterminal_and_large(comparer_params, student_input, utils):
+        answer = comparer_params[0]
+        min_value = comparer_params[1]
+        reduced = student_input % (360)
+        return utils.within_tolerance(answer, reduced) and student_input > min_value
+
+    mock = Mock(side_effect=is_coterminal_and_large,
+                # The next two kwargs ensure that the Mock behaves nicely for inspect.getargspec
+                spec=is_coterminal_and_large,
+                func_code=is_coterminal_and_large.func_code,)
+
+    grader = FormulaGrader(
+        answers={
+            'comparer': mock,
+            'comparer_params': ['150 + 50', '360 * 2'],
+        },
+        tolerance='1%'
+    )
+    assert grader(None, '200 + 3*360') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+    mock.assert_called_with([200, 720], 1280, grader.comparer_utils)
+
+    assert grader(None, '199 + 3*360') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+    assert grader(None, '197 + 3*360') == {'grade_decimal': 0, 'msg': '', 'ok': False}
+
+def test_fg_config_expect():
+
+    # If trying to use comparer, a detailed validation error is raised
+    expect = ("to have 3 arguments, instead it has 2 for dictionary value @ "
+              "data\['answers'\]\[0\]\['expect'\]\['comparer'\]")
+    with raises(Error, match=expect):
+        FormulaGrader(
+            answers={
+                'comparer': lambda x, y: x + y,
+                'comparer_params': ['150 + 50', '360 * 2']
+            }
+        )
+
+    # If not, a simpler error is raised:
+    expect = ("Something's wrong with grader's 'answers' configuration key. "
+              "Please see documentation for accepted formats.")
+    with raises(Error, match=expect):
+        FormulaGrader(answers=5)
 
 def test_ng_config():
     """Test that the NumericalGrader config bars unwanted entries"""
@@ -633,6 +678,23 @@ def test_docs():
     )
     assert grader(None, '2*m')['ok']
     assert not grader(None, '2m')['ok']
+
+    def is_coterminal(comparer_params_evals, student_eval, utils):
+        answer = comparer_params_evals[0]
+        reduced = student_eval % (360)
+        return utils.within_tolerance(answer, reduced)
+
+    grader = FormulaGrader(
+        answers={
+            'comparer': is_coterminal,
+            'comparer_params': ['b^2/a'],
+        },
+        variables=['a', 'b'],
+        tolerance='1%'
+    )
+    assert grader(None, 'b^2/a')['ok']
+    assert grader(None, 'b^2/a + 720')['ok']
+    assert not grader(None, 'b^2/a + 225')['ok']
 
 def test_empty_input():
     """Make sure that empty input doesn't crash"""

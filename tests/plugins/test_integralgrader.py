@@ -439,7 +439,7 @@ def test_debug_message():
     )
     student_input = ['1', '8', 'sin(x)', 'x']
     expected_message = (
-        "<pre>MITx Grading Library Version 1.0.3<br/>\n"
+        "<pre>MITx Grading Library Version {version}<br/>\n"
         "Student Responses:<br/>\n"
         "1<br/>\n"
         "8<br/>\n"
@@ -449,7 +449,7 @@ def test_debug_message():
         "==============================================<br/>\n"
         "Integration Data for Sample Number 0<br/>\n"
         "==============================================<br/>\n"
-        "Variables: {'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, 's': 5.530375019455111, 'x': 5.530375019455111, 'pi': 3.141592653589793}<br/>\n"
+        "Variables: {{'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, 's': 5.530375019455111, 'x': 5.530375019455111, 'pi': 3.141592653589793}}<br/>\n"
         "<br/>\n"
         "========== Student Integration Data, Real Part<br/>\n"
         "Numerical Value: 0.685802339677<br/>\n"
@@ -473,7 +473,7 @@ def test_debug_message():
         "==============================================<br/>\n"
         "Integration Data for Sample Number 1<br/>\n"
         "==============================================<br/>\n"
-        "Variables: {'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, 's': 5.530375019455111, 'x': 5.530375019455111, 'pi': 3.141592653589793}<br/>\n"
+        "Variables: {{'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, 's': 5.530375019455111, 'x': 5.530375019455111, 'pi': 3.141592653589793}}<br/>\n"
         "<br/>\n"
         "========== Student Integration Data, Real Part<br/>\n"
         "Numerical Value: 0.685802339677<br/>\n"
@@ -493,7 +493,7 @@ def test_debug_message():
         "Error Estimate: None<br/>\n"
         "Number of integrand evaluations: None<br/>\n"
         "</pre>"
-    ).replace("VERSION", __version__)
+    ).format(version=__version__)
     expected_result = {'ok': True, 'grade_decimal': 1, 'msg': expected_message}
     result = grader(None, student_input)
     assert expected_result == result
@@ -512,7 +512,7 @@ def test_debug_message_complex_integrand():
     )
     student_input = ['-1', '5', 'sqrt(x)', 'x']
     expected_message = (
-        "<pre>MITx Grading Library Version 1.0.3<br/>\n"
+        "<pre>MITx Grading Library Version {version}<br/>\n"
         "Student Responses:<br/>\n"
         "-1<br/>\n"
         "5<br/>\n"
@@ -522,7 +522,7 @@ def test_debug_message_complex_integrand():
         "==============================================<br/>\n"
         "Integration Data for Sample Number 0<br/>\n"
         "==============================================<br/>\n"
-        "Variables: {'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, 's': 1.8831785881043805, 'x': 0.022981166359782736, 'pi': 3.141592653589793}<br/>\n"
+        "Variables: {{'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, 's': 1.8831785881043805, 'x': 0.022981166359782736, 'pi': 3.141592653589793}}<br/>\n"
         "<br/>\n"
         "========== Student Integration Data, Real Part<br/>\n"
         "Numerical Value: 7.453559925<br/>\n"
@@ -542,7 +542,7 @@ def test_debug_message_complex_integrand():
         "Error Estimate: 4.1882074502e-14<br/>\n"
         "Number of integrand evaluations: 21<br/>\n"
         "</pre>"
-    ).replace("VERSION", __version__)
+    ).format(version=__version__)
     expected_result = {'ok': False, 'grade_decimal': 0, 'msg': expected_message}
     result = grader(None, student_input)
     assert expected_result == result

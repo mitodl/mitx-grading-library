@@ -4,6 +4,7 @@ validatorfuncs.py
 Stand-alone validator functions for use in voluptuous Schema
 """
 from numbers import Number
+from inspect import getargspec
 from mitxgraders.voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
 
 def Positive(thetype):
@@ -82,6 +83,94 @@ def ListOfType(given_type, validator=None):
 def is_callable(obj):
     """Returns true if obj is callable"""
     return callable(obj)
+
+def get_number_of_args(callable_obj):
+    """
+    Get number of arguments of function or callable object.
+
+    Examples
+    ========
+
+    Works for simple functions:
+    >>> def f(x, y):
+    ...     return x + y
+    >>> get_number_of_args(f)
+    2
+
+    Works with bound and unbound object methods
+    >>> class Foo:
+    ...     def do_stuff(self, x, y, z):
+    ...         return x*y*z
+    >>> get_number_of_args(Foo.do_stuff) # unbound, is NOT automatically passed self as argument
+    4
+    >>> foo = Foo()
+    >>> get_number_of_args(foo.do_stuff) # bound, is automatically passed self as argument
+    3
+
+    Works for bound and unbound callable objects
+    >>> class Bar:
+    ...     def __call__(self, x, y):
+    ...         return x + y
+    >>> get_number_of_args(Bar) # unbound, is NOT automatically passed self as argument
+    3
+    >>> bar = Bar()
+    >>> get_number_of_args(bar) # bound, is automatically passed self as argument
+    2
+    """
+
+    try:
+        # assume object is a function
+        func = callable_obj
+        num_args = len(getargspec(func)[0])
+    except TypeError:
+        # otherwise it is a callable object
+        func = callable_obj.__call__
+        num_args = len(getargspec(func)[0])
+
+    # If func is a bound method, remove one argument
+    # (in Python 2.7, unbound methods have __self__ = None)
+    try:
+        if func.__self__ is not None:
+            num_args += -1
+    except AttributeError:
+        pass
+
+    return num_args
+
+
+def is_callable_with_args(num_args):
+    """
+    Validates that a function is callable and takes num_args arguments
+
+    Examples:
+    >>> def func(x, y): return x + y
+    >>> is_callable_with_args(2)(func) == func
+    True
+    >>> is_callable_with_args(3)(func) == func # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    Invalid: Expected function... to have 3 arguments, instead it has 2
+
+    Callable objects work, too:
+    >>> class Foo:
+    ...     def __call__(self, x):
+    ...         return x
+    >>> foo = Foo()
+    >>> is_callable_with_args(1)(foo) == foo
+    True
+    >>> is_callable_with_args(1)(Foo) # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    Invalid: Expected function... to have 1 arguments, instead it has 2
+    """
+    def _validate(func):
+        # first, check that the function is callable
+        is_callable(func) # raises an error if not callable
+        f_args = get_number_of_args(func)
+        if not f_args == num_args:
+            msg = "Expected function {func} to have {num_args} arguments, instead it has {f_args}"
+            raise Invalid(msg.format(func=func, num_args=num_args, f_args=f_args))
+        return func
+
+    return _validate
 
 def TupleOfType(given_type, validator=None):
     """

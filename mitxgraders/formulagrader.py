@@ -7,14 +7,15 @@ Contains classes for numerical and formula graders
 """
 from __future__ import division
 from numbers import Number
-from sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval, DiscreteSet,
-                      gen_symbols_samples, construct_functions, construct_constants,
-                      construct_suffixes)
+from collections import namedtuple
+from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
+                                  DiscreteSet, gen_symbols_samples, construct_functions,
+                                  construct_constants, construct_suffixes)
 from mitxgraders.baseclasses import ItemGrader, InvalidInput
-from mitxgraders.voluptuous import Schema, Required, Any, All, Extra
+from mitxgraders.voluptuous import Schema, Required, Any, All, Extra, Invalid
 from mitxgraders.helpers.calc import CalcError, evaluator
-from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative,
-                                                PercentageString, is_callable)
+from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
+                                                PercentageString, is_callable_with_args)
 from mitxgraders.helpers.mathfunc import within_tolerance
 
 # Set the objects to be imported from this grader
@@ -81,6 +82,15 @@ class FormulaGrader(ItemGrader):
 
         failable_evals (int): The number of samples that may disagree before the student's
             answer is marked incorrect (default 0)
+
+        answers (str | dict): A string, dictionary, or tuple thereof. If a string is supplied,
+            it represents the correct answer and is compared to student input for equality.
+
+            If a dictionary is supplied, it needs keys:
+                - comparer_params: a list of strings to be numerically sampled and passed to the
+                    comparer function.
+                - comparer: a function with signature `comparer(comparer_params_evals, student_eval,
+                    utils)` that compares student and comparer_params after evaluation.
     """
     @property
     def schema_config(self):
@@ -107,6 +117,61 @@ class FormulaGrader(ItemGrader):
             Required('failable_evals', default=0): NonNegative(int)
         })
 
+    Utils = namedtuple('Utils', ['tolerance', 'within_tolerance'])
+
+    def get_comparer_utils(self):
+        """Get the utils for comparer function."""
+        def _within_tolerance(x, y):
+            return within_tolerance(x, y, self.config['tolerance'])
+        return self.Utils(tolerance=self.config['tolerance'],
+                          within_tolerance=_within_tolerance)
+
+    @staticmethod
+    def default_comparer(comparer_params, student_input, utils):
+        """
+        Default comparer function.
+
+        Assumes comparer_params is just the single expected answer wrapped in a list.
+        """
+        return utils.within_tolerance(comparer_params[0], student_input)
+
+    schema_expect = Schema({
+        Required('comparer_params'): [str],
+        # Functions seem not to be usable as default values, so the default comparer is added later.
+        # https://github.com/alecthomas/voluptuous/issues/340
+        Required('comparer'): is_callable_with_args(3)
+    })
+
+    @classmethod
+    def validate_expect(cls, expect):
+        """
+        Validate the answers's expect key.
+
+        >>> result = FormulaGrader.validate_expect('mc^2')
+        >>> expected = {
+        ... 'comparer_params': ['mc^2'],
+        ... 'comparer': FormulaGrader.default_comparer
+        ... }
+        >>> result == expected
+        True
+        """
+        if isinstance(expect, str):
+            return cls.schema_expect({
+                'comparer': cls.default_comparer,
+                'comparer_params': [expect]
+                })
+
+        try:
+            return cls.schema_expect(expect)
+        except Invalid:
+            # Only raise the detailed error message if author is trying to use comparer.
+            if isinstance(expect, dict) and 'comparer' in expect:
+                raise
+            # Otherwise, be generic.
+            else:
+                raise Invalid("Something's wrong with grader's 'answers' configuration key. "
+                              "Please see documentation for accepted formats.")
+
     def __init__(self, config=None, **kwargs):
         """
         Validate the Formulagrader's configuration.
@@ -115,6 +180,9 @@ class FormulaGrader(ItemGrader):
         Finally, we refine the sample_from entry.
         """
         super(FormulaGrader, self).__init__(config, **kwargs)
+
+        # store the comparer utils
+        self.comparer_utils = self.get_comparer_utils()
 
         # Set up the various lists we use
         self.functions, self.random_funcs = construct_functions(self.config["whitelist"],
@@ -179,6 +247,9 @@ class FormulaGrader(ItemGrader):
         funclist = self.functions.copy()
         varlist = self.constants.copy()
 
+        # Get the comparer function
+        comparer = answer['expect']['comparer']
+
         num_failures = 0
         for i in range(self.config['samples']):
             # Update the functions and variables listings with this sample
@@ -186,32 +257,30 @@ class FormulaGrader(ItemGrader):
             varlist.update(var_samples[i])
 
             # Compute expressions
-            expected, _ = evaluator(formula=answer['expect'],
-                                    case_sensitive=self.config['case_sensitive'],
-                                    variables=varlist,
-                                    functions=funclist,
-                                    suffixes=self.suffixes)
+            comparer_params_eval = [
+                evaluator(formula=param,
+                          case_sensitive=self.config['case_sensitive'],
+                          variables=varlist,
+                          functions=funclist,
+                          suffixes=self.suffixes)[0]
+                for param in answer['expect']['comparer_params']
+                ]
 
-            student, used_funcs = evaluator(student_input,
-                                            case_sensitive=self.config['case_sensitive'],
-                                            variables=varlist,
-                                            functions=funclist,
-                                            suffixes=self.suffixes)
+            student_eval, used_funcs = evaluator(student_input,
+                                                 case_sensitive=self.config['case_sensitive'],
+                                                 variables=varlist,
+                                                 functions=funclist,
+                                                 suffixes=self.suffixes)
 
             # Check that the required functions are used
             # But only the first time!
             if i == 0:
-                for f in self.config["required_functions"]:
-                    ftest = f
-                    if not self.config['case_sensitive']:
-                        ftest = f.lower()
-                        used_funcs = [x.lower() for x in used_funcs]
-                    if ftest not in used_funcs:
-                        msg = "Invalid Input: Answer must contain the function {}"
-                        raise InvalidInput(msg.format(f))
+                self.validate_required_functions_used(used_funcs,
+                                                      self.config['required_functions'],
+                                                      self.config['case_sensitive'])
 
             # Check if expressions agree
-            if not within_tolerance(expected, student, self.config['tolerance']):
+            if not comparer(comparer_params_eval, student_eval, self.comparer_utils):
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
                     return {'ok': False, 'grade_decimal': 0, 'msg': ''}
@@ -222,6 +291,44 @@ class FormulaGrader(ItemGrader):
             'grade_decimal': answer['grade_decimal'],
             'msg': answer['msg']
         }
+
+    @staticmethod
+    def validate_required_functions_used(used_funcs, required_funcs, case_sensitive):
+        """
+        Raise InvalidInput error if used_funcs does not contain all required_funcs
+
+        Examples:
+        >>> FormulaGrader.validate_required_functions_used(
+        ... ['sin', 'cos', 'f', 'g'],
+        ... ['cos', 'f'],
+        ... True
+        ... )
+        True
+        >>> FormulaGrader.validate_required_functions_used(
+        ... ['sin', 'cos', 'F', 'g'],
+        ... ['cos', 'f'],
+        ... True
+        ... )
+        Traceback (most recent call last):
+        InvalidInput: Invalid Input: Answer must contain the function f
+
+        Case insensitive:
+        >>> FormulaGrader.validate_required_functions_used(
+        ... ['sin', 'Cos', 'F', 'g'],
+        ... ['cos', 'f'],
+        ... False
+        ... )
+        True
+        """
+        for f in required_funcs:
+            ftest = f
+            if not case_sensitive:
+                ftest = f.lower()
+                used_funcs = [x.lower() for x in used_funcs]
+            if ftest not in used_funcs:
+                msg = "Invalid Input: Answer must contain the function {}"
+                raise InvalidInput(msg.format(f))
+        return True
 
 
 class NumericalGrader(FormulaGrader):

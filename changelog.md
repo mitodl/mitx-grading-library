@@ -1,5 +1,11 @@
 # Change Log
 
+## Version 1.0.4
+* Authors can now specify a custom comparer function for FormulaGrader
+* IntegralGrader now handles complex integrands, and gives meaningful error messages
+  for complex limits.
+* Miscellaneous bug fixes for tensor variable name parsing
+
 ## Version 1.0.3
 
 * Added tensor variable names

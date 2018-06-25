@@ -187,8 +187,8 @@ class ItemGrader(AbstractGrader):
 
     Inheriting classes must implement check_response. If any extra parameters are added
     to the config, then schema_config should be extended (see StringGrader, for example).
-    The only other thing you may want to shadow is schema_expect, to add parsing to
-    answers.
+    The only other thing you may want to shadow is validate_expect, to add parsing to
+    answers or transform author's answers into a standard form.
 
     Answers can be provided in one of two forms:
         * An answer string
@@ -278,16 +278,20 @@ class ItemGrader(AbstractGrader):
     def schema_answer(self):
         """Defines the schema that a fully-specified answer should satisfy."""
         return Schema({
-            Required('expect'): self.schema_expect,
+            Required('expect'): self.validate_expect,
             Required('grade_decimal', default=1): All(numbers.Number, Range(0, 1)),
             Required('msg', default=''): str,
             Required('ok', default='computed'): Any('computed', True, False, 'partial')
         })
 
-    # Defines the schema that a supplied answer should satisfy.
-    # This is simply a string, because students enter answers as a string.
-    # If this is shadowed, it should only be to parse the string.
-    schema_expect = Schema(str)
+    @staticmethod
+    def validate_expect(expect):
+        """
+        Defines the schema that author's answer should satisfy.
+
+        Usually this is a just a string.
+        """
+        return Schema(str)(expect)
 
     def check(self, answers, student_input):
         """
