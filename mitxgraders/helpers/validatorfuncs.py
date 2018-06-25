@@ -101,10 +101,10 @@ def get_number_of_args(callable_obj):
     >>> class Foo:
     ...     def do_stuff(self, x, y, z):
     ...         return x*y*z
-    >>> get_number_of_args(Foo.do_stuff)
+    >>> get_number_of_args(Foo.do_stuff) # unbound, is NOT automatically passed self as argument
     4
     >>> foo = Foo()
-    >>> get_number_of_args(foo.do_stuff)
+    >>> get_number_of_args(foo.do_stuff) # bound, is automatically passed self as argument
     3
 
     Works for bound and unbound callable objects
@@ -121,13 +121,14 @@ def get_number_of_args(callable_obj):
     try:
         # assume object is a function
         func = callable_obj
-        num_args = len(getargspec(callable_obj)[0])
+        num_args = len(getargspec(func)[0])
     except TypeError:
         # otherwise it is a callable object
         func = callable_obj.__call__
-        num_args = len(getargspec(callable_obj.__call__)[0])
+        num_args = len(getargspec(func)[0])
 
     # If func is a bound method, remove one argument
+    # (in Python 2.7, unbound methods have __self__ = None)
     try:
         if func.__self__ is not None:
             num_args += -1

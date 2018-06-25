@@ -465,9 +465,9 @@ def test_fg_custom_comparers():
 
 def test_fg_config_expect():
 
-    # If trying to use comparer, full a detailed validation error is raised
-    expect = ("to have 3 arguments, instead it has 2 for dictionary value @"
-              " data\['answers'\]\[0\]\['expect'\]\['comparer'\]")
+    # If trying to use comparer, a detailed validation error is raised
+    expect = ("to have 3 arguments, instead it has 2 for dictionary value @ "
+              "data\['answers'\]\[0\]\['expect'\]\['comparer'\]")
     with raises(Error, match=expect):
         FormulaGrader(
             answers={
@@ -477,7 +477,7 @@ def test_fg_config_expect():
         )
 
     # If not, a simpler error is raised:
-    expect = ("Something's wrong with grader's 'answers' configuration key."
+    expect = ("Something's wrong with grader's 'answers' configuration key. "
               "Please see documentation for accepted formats.")
     with raises(Error, match=expect):
         FormulaGrader(answers=5)

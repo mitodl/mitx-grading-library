@@ -131,12 +131,9 @@ class FormulaGrader(ItemGrader):
         """
         Default comparer function.
 
-        Assumes comparer_params is just the expected answer wrapped in a list.
+        Assumes comparer_params is just the single expected answer wrapped in a list.
         """
-        return all([
-            utils.within_tolerance(comparer_param, student_input)
-            for comparer_param in comparer_params
-            ])
+        return utils.within_tolerance(comparer_params[0], student_input)
 
     schema_expect = Schema({
         Required('comparer_params'): [str],
@@ -172,7 +169,7 @@ class FormulaGrader(ItemGrader):
                 raise
             # Otherwise, be generic.
             else:
-                raise Invalid("Something's wrong with grader's 'answers' configuration key."
+                raise Invalid("Something's wrong with grader's 'answers' configuration key. "
                               "Please see documentation for accepted formats.")
 
     def __init__(self, config=None, **kwargs):
