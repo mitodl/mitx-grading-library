@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 1.0.4
+* Authors can now specify a custom comparer function for FormulaGrader
+
 ## Version 1.0.3
 
 * Added tensor variable names
