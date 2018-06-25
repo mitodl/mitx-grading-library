@@ -84,6 +84,59 @@ def is_callable(obj):
     """Returns true if obj is callable"""
     return callable(obj)
 
+def get_number_of_args(callable_obj):
+    """
+    Get number of arguments of function or callable object.
+
+    Examples
+    ========
+
+    Works for simple functions:
+    >>> def f(x, y):
+    ...     return x + y
+    >>> get_number_of_args(f)
+    2
+
+    Works with bound and unbound object methods
+    >>> class Foo:
+    ...     def do_stuff(self, x, y, z):
+    ...         return x*y*z
+    >>> get_number_of_args(Foo.do_stuff)
+    4
+    >>> foo = Foo()
+    >>> get_number_of_args(foo.do_stuff)
+    3
+
+    Works for bound and unbound callable objects
+    >>> class Bar:
+    ...     def __call__(self, x, y):
+    ...         return x + y
+    >>> get_number_of_args(Bar) # unbound, is NOT automatically passed self as argument
+    3
+    >>> bar = Bar()
+    >>> get_number_of_args(bar) # bound, is automatically passed self as argument
+    2
+    """
+
+    try:
+        # assume object is a function
+        func = callable_obj
+        num_args = len(getargspec(callable_obj)[0])
+    except TypeError:
+        # otherwise it is a callable object
+        func = callable_obj.__call__
+        num_args = len(getargspec(callable_obj.__call__)[0])
+
+    # If func is a bound method, remove one argument
+    try:
+        if func.__self__ is not None:
+            num_args += -1
+    except AttributeError:
+        pass
+
+    return num_args
+
+
 def is_callable_with_args(num_args):
     """
     Validates that a function is callable and takes num_args arguments
@@ -109,23 +162,14 @@ def is_callable_with_args(num_args):
     """
     def _validate(func):
         # first, check that the function is callable
-        is_callable(func)
-        try:
-            # assume object is a function
-            f_args = len(getargspec(func)[0])
-        except TypeError:
-            # otherwise it is a callable object
-            f_args = len(getargspec(func.__call__)[0])
-            # If obj.__call__ is a bound method, remove one argument
-            if func.__call__.__self__ is not None:
-                f_args += -1
+        is_callable(func) # raises an error if not callable
+        f_args = get_number_of_args(func)
         if not f_args == num_args:
             msg = "Expected function {func} to have {num_args} arguments, instead it has {f_args}"
             raise Invalid(msg.format(func=func, num_args=num_args, f_args=f_args))
         return func
 
     return _validate
-
 
 def TupleOfType(given_type, validator=None):
     """
