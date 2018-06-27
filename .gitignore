@@ -1,6 +1,6 @@
 *.pyc
 */__pycache__
-*.cache
+*.pytest_cache
 *.sublime-project
 *.sublime-workspace
 *.DS_Store
