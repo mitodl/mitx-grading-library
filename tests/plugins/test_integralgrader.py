@@ -22,13 +22,13 @@ def test_wrong_number_of_inputs_raises_error():
     )
     student_input = ['a', 'b']
     expected_message = ("Expected 3 student inputs but found 2. "
-                        "Inputs should  appear in order ['integrand', 'lower', 'upper'].")
-    with raises(ConfigError, msg=expected_message):
+                        "Inputs should  appear in order \['integrand', 'lower', 'upper'\].")
+    with raises(ConfigError, match=expected_message):
         grader(None, student_input)
 
 def test_duplicate_input_positions():
     expected_message = "Key input_positions has repeated indices."
-    with raises(ConfigError, msg=expected_message):
+    with raises(ConfigError, match=expected_message):
         IntegralGrader(
             answers={
                 'lower': 'a',
@@ -48,7 +48,7 @@ def test_duplicate_input_positions():
 def test_skipped_input_positions():
     expected_message = ("Key input_positions values must be consecutive positive "
                         "integers starting at 1")
-    with raises(ConfigError, msg=expected_message):
+    with raises(ConfigError, match=expected_message):
         IntegralGrader(
             answers={
                 'lower': 'a',
@@ -563,13 +563,13 @@ def test_error_catching():
         variables=['a', 'b']
     )
     student_input = ['1+', '1', '2']
-    expected_message = ("Invalid Input: Could not parse '1+' as a formula")
-    with raises(CalcError, msg=expected_message):
+    expected_message = "Invalid Input: Could not parse '1\+' as a formula"
+    with raises(CalcError, match=expected_message):
         grader(None, student_input)
 
     student_input = ['1/0', '1', '2']
     expected_message = ("Division by zero occurred. Check your input's denominators.")
-    with raises(CalcError, msg=expected_message):
+    with raises(CalcError, match=expected_message):
         grader(None, student_input)
 
 def test_integral_with_complex_integrand():
