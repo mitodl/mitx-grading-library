@@ -98,3 +98,10 @@ Here, the `correct_answer` entries are shown to students when they click "Show A
 ## Grader Documentation
 
 [Extensive documentation](docs/README.md) has been compiled for the configuration of the different graders in the library.
+
+
+## FAQs
+
+* After installing a virtual environment and doing `pip install`, `pytest` returns a number of errors for `no module named error`.
+
+We're not sure why this happens, but if you deactivate your virtual environment and reactivate it again, the issue seems to go away. We've only seen this happen on a completely fresh install.
