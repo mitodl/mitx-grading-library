@@ -314,19 +314,23 @@ def test_fg_case_sensitive():
 def test_fg_forbidden():
     """Test FormulaGrader with forbidden strings in input"""
     grader = FormulaGrader(
-        answers="sin(3*pi/2)",
-        forbidden_strings=['3*pi', 'pi*3', 'pi/2'],
+        answers="2*sin(x)*cos(x)",
+        variables=['x'],
+        forbidden_strings=['+ x', '- x', '*x'],
         case_sensitive=False
     )
-    assert grader(None, '-1')['ok']
+    assert grader(None, '2*sin(x)*cos(x)')['ok']
+
+    # If the answer is mathematically correct AND contains forbidden strings, raise an error:
     with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
-        grader(None, "3 * pi")
+        grader(None, "sin(2 * x)")
     with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
-        grader(None, "pi * 3")
+        grader(None, "sin(x    +    x)")
     with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
-        grader(None, "sin(3*PI   /2)")
-    with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
-        grader(None, "sin(PI*3/      2)")
+        grader(None, "sin(3*X    -X)")
+
+    # If the answer is mathematically incorrect AND contains a forbidden string, mark it wrong
+    assert not grader(None, "sin(3*x)")['ok']
 
 def test_fg_variables():
     """General test of FormulaGrader using variables"""
