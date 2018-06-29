@@ -25,6 +25,10 @@ __all__ = [
     "CalcError"
 ]
 
+def casify(thestring, case_sensitive):
+    """Converts a string to lowercase if not case_sensitive"""
+    return thestring if case_sensitive else thestring.lower()
+
 class FormulaGrader(ItemGrader):
     """
     Grades mathematical expressions, like edX FormulaResponse.
@@ -207,19 +211,16 @@ class FormulaGrader(ItemGrader):
 
     def check_response(self, answer, student_input):
         """Check the student response against a given answer"""
-        # First, check for forbidden strings
-        # Remove whitespace so that students can't trick this check by adding any
-        check = student_input if self.config["case_sensitive"] else student_input.lower()
-        check = "".join([char for char in check if char != " "])
-        for x in self.config["forbidden_strings"]:
-            forbid = x if self.config["case_sensitive"] else x.lower()
-            if forbid in check:
-                # Don't give away the specific string that is being checked for!
-                raise InvalidInput(self.config["forbidden_message"])
 
         # Now perform the computations
         try:
-            return self.raw_check(answer, student_input)
+            result = self.raw_check(answer, student_input)
+            if result['ok'] is True or result['ok'] == 'partial':
+                self.validate_forbidden_strings_not_used(student_input,
+                                                         self.config['forbidden_strings'],
+                                                         self.config['forbidden_message'],
+                                                         self.config['case_sensitive'])
+            return result
         except (CalcError, InvalidInput):
             # These errors have been vetted already
             raise
@@ -320,14 +321,48 @@ class FormulaGrader(ItemGrader):
         ... )
         True
         """
-        for f in required_funcs:
-            ftest = f
-            if not case_sensitive:
-                ftest = f.lower()
-                used_funcs = [x.lower() for x in used_funcs]
-            if ftest not in used_funcs:
+        for func in required_funcs:
+            func = casify(func, case_sensitive)
+            used_funcs = [casify(f, case_sensitive) for f in used_funcs]
+            if func not in used_funcs:
                 msg = "Invalid Input: Answer must contain the function {}"
-                raise InvalidInput(msg.format(f))
+                raise InvalidInput(msg.format(func))
+        return True
+
+    @staticmethod
+    def validate_forbidden_strings_not_used(expr, forbidden_strings, forbidden_msg, case_sensitive):
+        """
+        Ignoring whitespace, checking that expr does not contain any forbidden_strings.
+
+        Usage
+        =====
+
+        Passes validation if no forbidden strings used:
+        >>> FormulaGrader.validate_forbidden_strings_not_used(
+        ... '2*sin(x)*cos(x)',
+        ... ['*x', '+ x', '- x'],
+        ... 'A forbidden string was used!',
+        ... True
+        ... )
+        True
+
+        Fails validation if any forbidden string is used:
+        >>> FormulaGrader.validate_forbidden_strings_not_used(
+        ... 'sin(x+x)',
+        ... ['*x', '+ x', '- x'],
+        ... 'A forbidden string was used!',
+        ... True
+        ... )
+        Traceback (most recent call last):
+        InvalidInput: A forbidden string was used!
+        """
+        stripped_expr = casify(expr, case_sensitive).replace(' ', '')
+
+        for forbidden in forbidden_strings:
+            check_for = casify(forbidden, case_sensitive).replace(' ', '')
+            if check_for in stripped_expr:
+                # Don't give away the specific string that is being checked for!
+                raise InvalidInput(forbidden_msg)
         return True
 
 
