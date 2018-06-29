@@ -45,6 +45,10 @@ __all__ = [
     "DependentSampler"
 ]
 
+def set_seed(seed=None):
+    random.seed(seed)
+    np.random.seed(seed)
+
 class AbstractSamplingSet(ObjectWithSchema):  # pylint: disable=abstract-method
     """Represents a set from which random samples are taken."""
 
