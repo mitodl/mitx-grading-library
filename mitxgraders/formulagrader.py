@@ -8,6 +8,8 @@ Contains classes for numerical and formula graders
 from __future__ import division
 from numbers import Number
 from collections import namedtuple
+from pprint import PrettyPrinter
+import re
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes)
@@ -131,7 +133,7 @@ class FormulaGrader(ItemGrader):
                           within_tolerance=_within_tolerance)
 
     @staticmethod
-    def default_comparer(comparer_params, student_input, utils):
+    def default_equality_comparer(comparer_params, student_input, utils):
         """
         Default comparer function.
 
@@ -154,14 +156,14 @@ class FormulaGrader(ItemGrader):
         >>> result = FormulaGrader.validate_expect('mc^2')
         >>> expected = {
         ... 'comparer_params': ['mc^2'],
-        ... 'comparer': FormulaGrader.default_comparer
+        ... 'comparer': FormulaGrader.default_equality_comparer
         ... }
         >>> result == expected
         True
         """
         if isinstance(expect, str):
             return cls.schema_expect({
-                'comparer': cls.default_comparer,
+                'comparer': cls.default_equality_comparer,
                 'comparer_params': [expect]
                 })
 
@@ -175,6 +177,28 @@ class FormulaGrader(ItemGrader):
             else:
                 raise Invalid("Something's wrong with grader's 'answers' configuration key. "
                               "Please see documentation for accepted formats.")
+
+    debug_appendix_header_template = (
+        "\n"
+        "==============================================================\n"
+        "{grader} Debug Info\n"
+        "==============================================================\n"
+        "Available Functions:\n"
+        "{functions}\n"
+    )
+    debug_appendix_sample_template = (
+        "\n"
+        "==========================================\n"
+        "Evaluation Data for Sample Number {sample_num} of {samples_total}\n"
+        "==========================================\n"
+        "Variables:\n"
+        "{variables}\n"
+        "Student Eval: {student_eval}\n"
+        "Compare to:  {compare_parms_eval}\n" # compare_parms_eval is list, so start 1 char earlier
+        "Comparer Function: {comparer}\n"
+        "Comparison Satisfied: {comparer_result}\n"
+        ""
+    )
 
     def __init__(self, config=None, **kwargs):
         """
@@ -281,7 +305,12 @@ class FormulaGrader(ItemGrader):
                                                       self.config['case_sensitive'])
 
             # Check if expressions agree
-            if not comparer(comparer_params_eval, student_eval, self.comparer_utils):
+            comparer_result = comparer(comparer_params_eval, student_eval, self.comparer_utils)
+            if self.config['debug']:
+                self.log_sample_info(i, varlist, funclist, student_eval,
+                                     comparer, comparer_params_eval, comparer_result)
+
+            if not comparer_result:
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
                     return {'ok': False, 'grade_decimal': 0, 'msg': ''}
@@ -292,6 +321,26 @@ class FormulaGrader(ItemGrader):
             'grade_decimal': answer['grade_decimal'],
             'msg': answer['msg']
         }
+
+    def log_sample_info(self, index, varlist, funclist, student_eval,
+                        comparer, comparer_params_eval, comparer_result):
+        """Add sample information to debug log"""
+        pp = PrettyPrinter(indent=4)
+        if index == 0:
+            self.log(self.debug_appendix_header_template.format(
+                grader=self.__class__.__name__,
+                # The regexp replaces memory locations, e.g., 0x10eb1e848 -> 0x...
+                functions=re.sub(r"0x[0-9a-fA-F]+", "0x...", pp.pformat(funclist))
+            ))
+        self.log(self.debug_appendix_sample_template.format(
+            sample_num=index + 1, # to account for 0 index
+            samples_total=self.config['samples'],
+            variables=pp.pformat(varlist),
+            student_eval=student_eval,
+            comparer=re.sub(r"0x[0-9a-fA-F]+", "0x...", str(comparer)),
+            comparer_result=comparer_result,
+            compare_parms_eval=pp.pformat(comparer_params_eval)
+        ))
 
     @staticmethod
     def validate_required_functions_used(used_funcs, required_funcs, case_sensitive):
