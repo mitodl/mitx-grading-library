@@ -20,6 +20,8 @@ from mitxgraders import (
     InvalidInput,
 )
 from mitxgraders.voluptuous import Error, MultipleInvalid
+from mitxgraders.sampling import set_seed
+from mitxgraders.version import __version__ as VERSION
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
@@ -485,6 +487,104 @@ def test_fg_config_expect():
               "Please see documentation for accepted formats.")
     with raises(Error, match=expect):
         FormulaGrader(answers=5)
+
+def test_fg_debug_log():
+    set_seed(0)
+    grader = FormulaGrader(
+        answers='x^2 + f(y) + z',
+        variables=['x', 'y', 'z'],
+        sample_from={
+            'z': ComplexRectangle()
+        },
+        user_functions={'f': RandomFunction()},
+        samples=2,
+        debug=True
+    )
+    result = grader(None, 'z + x*x + f(y)')
+
+    message = (
+        "<pre>MITx Grading Library Version {version}<br/>\n"
+        "Student Response:<br/>\n"
+        "z + x*x + f(y)<br/>\n"
+        "<br/>\n"
+        "==============================================================<br/>\n"
+        "FormulaGrader Debug Info<br/>\n"
+        "==============================================================<br/>\n"
+        "Available Functions:<br/>\n"
+        "{{   'abs': <ufunc 'absolute'>,<br/>\n"
+        "    'arccos': <function arccos at 0x...>,<br/>\n"
+        "    'arccosh': <ufunc 'arccosh'>,<br/>\n"
+        "    'arccot': <function arccot at 0x...>,<br/>\n"
+        "    'arccoth': <function arccoth at 0x...>,<br/>\n"
+        "    'arccsc': <function arccsc at 0x...>,<br/>\n"
+        "    'arccsch': <function arccsch at 0x...>,<br/>\n"
+        "    'arcsec': <function arcsec at 0x...>,<br/>\n"
+        "    'arcsech': <function arcsech at 0x...>,<br/>\n"
+        "    'arcsin': <function arcsin at 0x...>,<br/>\n"
+        "    'arcsinh': <ufunc 'arcsinh'>,<br/>\n"
+        "    'arctan': <ufunc 'arctan'>,<br/>\n"
+        "    'arctanh': <function arctanh at 0x...>,<br/>\n"
+        "    'conj': <ufunc 'conjugate'>,<br/>\n"
+        "    'cos': <ufunc 'cos'>,<br/>\n"
+        "    'cosh': <ufunc 'cosh'>,<br/>\n"
+        "    'cot': <function cot at 0x...>,<br/>\n"
+        "    'coth': <function coth at 0x...>,<br/>\n"
+        "    'csc': <function csc at 0x...>,<br/>\n"
+        "    'csch': <function csch at 0x...>,<br/>\n"
+        "    'exp': <ufunc 'exp'>,<br/>\n"
+        "    'f': <function f at 0x...>,<br/>\n"
+        "    'fact': <built-in function factorial>,<br/>\n"
+        "    'factorial': <built-in function factorial>,<br/>\n"
+        "    'im': <function <lambda> at 0x...>,<br/>\n"
+        "    'ln': <function log at 0x...>,<br/>\n"
+        "    'log10': <function log10 at 0x...>,<br/>\n"
+        "    'log2': <function log2 at 0x...>,<br/>\n"
+        "    're': <function <lambda> at 0x...>,<br/>\n"
+        "    'sec': <function sec at 0x...>,<br/>\n"
+        "    'sech': <function sech at 0x...>,<br/>\n"
+        "    'sin': <ufunc 'sin'>,<br/>\n"
+        "    'sinh': <ufunc 'sinh'>,<br/>\n"
+        "    'sqrt': <function sqrt at 0x...>,<br/>\n"
+        "    'tan': <ufunc 'tan'>,<br/>\n"
+        "    'tanh': <ufunc 'tanh'>}}<br/>\n"
+        "<br/>\n"
+        "<br/>\n"
+        "==========================================<br/>\n"
+        "Evaluation Data for Sample Number 1 of 2<br/>\n"
+        "==========================================<br/>\n"
+        "Variables:<br/>\n"
+        "{{   'e': 2.718281828459045,<br/>\n"
+        "    'i': 1j,<br/>\n"
+        "    'j': 1j,<br/>\n"
+        "    'pi': 3.141592653589793,<br/>\n"
+        "    'x': 3.195254015709299,<br/>\n"
+        "    'y': 3.860757465489678,<br/>\n"
+        "    'z': (2.205526752143288+2.0897663659937935j)}}<br/>\n"
+        "Student Eval: (14.7111745179+2.08976636599j)<br/>\n"
+        "Compare to:  [(14.711174517877566+2.0897663659937935j)]<br/>\n"
+        "Comparer Function: <function default_equality_comparer at 0x...><br/>\n"
+        "Comparison Satisfied: True<br/>\n"
+        "<br/>\n"
+        "<br/>\n"
+        "==========================================<br/>\n"
+        "Evaluation Data for Sample Number 2 of 2<br/>\n"
+        "==========================================<br/>\n"
+        "Variables:<br/>\n"
+        "{{   'e': 2.718281828459045,<br/>\n"
+        "    'i': 1j,<br/>\n"
+        "    'j': 1j,<br/>\n"
+        "    'pi': 3.141592653589793,<br/>\n"
+        "    'x': 2.694619197355619,<br/>\n"
+        "    'y': 3.5835764522666245,<br/>\n"
+        "    'z': (1.875174422525385+2.7835460015641598j)}}<br/>\n"
+        "Student Eval: (11.9397106851+2.78354600156j)<br/>\n"
+        "Compare to:  [(11.939710685061661+2.7835460015641598j)]<br/>\n"
+        "Comparer Function: <function default_equality_comparer at 0x...><br/>\n"
+        "Comparison Satisfied: True<br/>\n"
+        "</pre>"
+    ).format(version=VERSION)
+    assert result['msg'] == message
+
 
 def test_ng_config():
     """Test that the NumericalGrader config bars unwanted entries"""
