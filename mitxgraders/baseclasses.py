@@ -142,7 +142,7 @@ class AbstractGrader(ObjectWithSchema):
             if "input_list" in result:
                 # Multiple inputs
                 if result.get('overall_message', ''):
-                    result['overall_message'] += "\n\n" + self.log_output()
+                    result['overall_message'] += "\n\n" + self.log_output()  # pragma: no cover
                 else:
                     result['overall_message'] = self.log_output()
             else:
