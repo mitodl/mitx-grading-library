@@ -81,7 +81,7 @@ grader = FormulaGrader(
 
 ### Blacklists and Whitelists
 
-You can disallow specific functions by adding them to the blacklist of functions as a list of disallowed function names. In the following example, `sin` is disallowed.
+You can disallow specific functions by adding them to the blacklist of functions as a list of disallowed function names. In the following example, `sin` is disallowed in correct answers.
 
 ```python
 grader = FormulaGrader(
@@ -92,7 +92,7 @@ grader = FormulaGrader(
 )
 ```
 
-If you want to exclude everything except for a specific set of functions, instead use a whitelist. In the following example, the only allowed functions are sin and cos.
+If you want to exclude everything except for a specific set of functions, instead use a whitelist. In the following example, the only allowed functions in correct answers are sin and cos.
 
 ```python
 grader = FormulaGrader(
