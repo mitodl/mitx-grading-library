@@ -240,7 +240,7 @@ class ParserCache(object):
 
         # Strip out any whitespace, so that two otherwise-equivalent formulas are treated
         # the same
-        stripformula = "".join([char for char in formula if char != " "])
+        stripformula = formula.replace(" ", "")
 
         # Construct the key
         suffixstr = ""
@@ -444,15 +444,15 @@ class ParseAugmenter(object):
         #   subscripts (optional):
         #       any combination of alphanumeric and underscores
         #   lower_indices (optional):
-        #       Of form "_{<alaphnumeric>}"
+        #       Of form "_{(-)<alaphnumeric>}"
         #   upper_indices (optional):
-        #       Of form "^{<alaphnumeric>}"
+        #       Of form "^{(-)<alaphnumeric>}"
         #   tail:
         #       any number of primes
         front = Word(alphas, alphanums)
         subscripts = Word(alphanums + '_') + ~FollowedBy('{')
-        lower_indices = Literal("_{") + Word(alphanums) + Literal("}")
-        upper_indices = Literal("^{") + Word(alphanums) + Literal("}")
+        lower_indices = Literal("_{") + Optional("-") + Word(alphanums) + Literal("}")
+        upper_indices = Literal("^{") + Optional("-") + Word(alphanums) + Literal("}")
         tail = ZeroOrMore("'")
         inner_varname = Combine(
             front +

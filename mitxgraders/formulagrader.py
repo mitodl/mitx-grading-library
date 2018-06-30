@@ -15,7 +15,7 @@ from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, Real
                                   construct_constants, construct_suffixes)
 from mitxgraders.baseclasses import ItemGrader, InvalidInput, ConfigError
 from mitxgraders.voluptuous import Schema, Required, Any, All, Extra, Invalid, Length
-from mitxgraders.helpers.calc import CalcError, evaluator
+from mitxgraders.helpers.calc import CalcError, evaluator, parsercache
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
                                                 PercentageString, is_callable_with_args)
 from mitxgraders.helpers.mathfunc import within_tolerance, DEFAULT_FUNCTIONS
@@ -101,7 +101,7 @@ def validate_only_permitted_functions_used(used_funcs, permitted_functions):
     InvalidInput: Invalid Input: function(s) 'h', 'Sin' not permitted in answer
     """
     used_not_permitted = [f for f in used_funcs if f not in permitted_functions]
-    if used_not_permitted != []:
+    if used_not_permitted:
         func_names = ", ".join(["'{f}'".format(f=f) for f in used_not_permitted])
         message = "Invalid Input: function(s) {} not permitted in answer".format(func_names)
         raise InvalidInput(message)
@@ -174,11 +174,51 @@ def validate_required_functions_used(used_funcs, required_funcs):
     InvalidInput: Invalid Input: Answer must contain the function f
     """
     for func in required_funcs:
-        used_funcs = [f for f in used_funcs]
         if func not in used_funcs:
             msg = "Invalid Input: Answer must contain the function {}"
             raise InvalidInput(msg.format(func))
     return True
+
+def numbered_vars_regexp(numbered_vars):
+    """
+    Creates a regexp to match numbered variables. Catches the full string and the head.
+
+    Arguments:
+        numbered_vars ([str]): a list of variable heads
+
+    Usage
+    =====
+
+    Matches numbered variables:
+    >>> regexp = numbered_vars_regexp(['b', 'c', 'Cat'])
+    >>> regexp.match('b_{12}').groups()
+    ('b_{12}', 'b')
+    >>> regexp.match('b_{-3}').groups()
+    ('b_{-3}', 'b')
+    >>> regexp.match('b_{0}').groups()
+    ('b_{0}', 'b')
+
+    Other variables match, too, in case-sensitive fashion:
+    >>> regexp.match('Cat_{17}').groups()
+    ('Cat_{17}', 'Cat')
+
+    Stuff that shouldn't match does not match:
+    >>> regexp.match('b') == None
+    True
+    >>> regexp.match('b_{05}') == None
+    True
+    >>> regexp.match('b_{-05}') == None
+    True
+    >>> regexp.match('B_{0}') == None
+    True
+    """
+    head_list = '|'.join(map(re.escape, numbered_vars))
+    regexp = (r"^((" + head_list + ")" # Start and match any head (capture full string, head)
+              r"_{" # match _{
+              r"(?:[-]?[1-9]\d*|0)" # match number pattern
+              r"})$") # match closing }, close group, and end of string
+    return re.compile(regexp)
+
 
 class FormulaGrader(ItemGrader):
     """
@@ -229,6 +269,12 @@ class FormulaGrader(ItemGrader):
 
         variables ([str]): A list of variable names (default [])
 
+        numbered_vars ([str]): A list of numbered variable names, which can only occur
+            with a number attached to the end. For example, ['numvar'] will allow students
+            to write `numvar_{0}`, `numvar_{5}` or `numvar_{-2}`. Any integer will be
+            accepted. Use a sample_from entry for `numvar`. Note that a specifically-named
+            variable will take priority over a numbered variable. (default [])
+
         sample_from (dict): A dictionary of VariableSamplingSets for specific variables. By
             default, each variable samples from RealInterval([1, 5]) (default {}). Will
             also accept a list with two values [a, b] to sample from the real interval
@@ -271,6 +317,7 @@ class FormulaGrader(ItemGrader):
             Required('metric_suffixes', default=False): bool,
             Required('samples', default=5): Positive(int),
             Required('variables', default=[]): [str],
+            Required('numbered_vars', default=[]): [str],
             Required('sample_from', default={}): dict,
             Required('failable_evals', default=0): NonNegative(int)
         })
@@ -386,7 +433,7 @@ class FormulaGrader(ItemGrader):
                 Any(VariableSamplingSet,
                     All(list, lambda pair: RealInterval(pair)),
                     lambda tup: DiscreteSet(tup))
-            for varname in self.config['variables']
+            for varname in (self.config['variables'] + self.config['numbered_vars'])
         })
         self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
         # Note that voluptuous ensures that there are no orphaned entries in sample_from
@@ -412,11 +459,52 @@ class FormulaGrader(ItemGrader):
                 msg = "Invalid Input: Could not parse '{}' as a formula"
                 raise InvalidInput(msg.format(student_input))
 
+    def generate_variable_list(self, answer, student_input):
+        """
+        Generates the list of variables required to perform a comparison and the
+        corresponding sampling dictionary, taking into account any numbered variables.
+
+        Returns variable_list, sample_from_dict
+        """
+        # Pre-parse all expressions (these all get cached)
+        parsers = [
+            parsercache.get_parser(expr, self.suffixes)
+            for expr in answer['expect']['comparer_params']
+            ]
+        # If the student input is not empty, parse that too
+        if not (student_input is None or student_input.strip() == ""):
+            parsers.append(parsercache.get_parser(student_input, self.suffixes))
+        # Create a list of all variables used in the expressions
+        vars_used = set().union(*[parser.variables_used for parser in parsers])
+
+        # Initiate the variables list and sample_from dictionary
+        variable_list = self.config['variables'][:]
+        sample_from_dict = self.config['sample_from'].copy()
+
+        # Find all unassigned variables
+        bad_vars = set(var for var in vars_used if var not in variable_list)
+
+        # Check to see if any unassigned variables are numbered_vars
+        regexp = numbered_vars_regexp(self.config['numbered_vars'])
+        for var in bad_vars:
+            match = regexp.match(var)  # Returns None if no match
+            if match:
+                # This variable is a numbered_variable
+                # Go and add it to variable_list with the appropriate sampler
+                (full_string, head) = match.groups()
+                variable_list.append(full_string)
+                sample_from_dict[full_string] = sample_from_dict[head]
+
+        return variable_list, sample_from_dict
+
     def raw_check(self, answer, student_input):
         """Perform the numerical check of student_input vs answer"""
-        var_samples = gen_symbols_samples(self.config['variables'],
+        # Generate samples
+        variable_list, sample_from_dict = self.generate_variable_list(answer,
+                                                                      student_input)
+        var_samples = gen_symbols_samples(variable_list,
                                           self.config['samples'],
-                                          self.config['sample_from'])
+                                          sample_from_dict)
 
         func_samples = gen_symbols_samples(self.random_funcs.keys(),
                                            self.config['samples'],
@@ -521,6 +609,8 @@ class NumericalGrader(FormulaGrader):
 
         variables ([str]): Will always be an empty list
 
+        numbered_vars ([str]): Will always be an empty list
+
         sample_from (dict): Will always be an empty dictionary
 
         failable_evals (int): Will always be 0
@@ -537,6 +627,7 @@ class NumericalGrader(FormulaGrader):
             Required('tolerance', default='5%'): Any(PercentageString, NonNegative(Number)),
             Required('samples', default=1): 1,
             Required('variables', default=[]): [],
+            Required('numbered_vars', default=[]): [],
             Required('sample_from', default={}): {},
             Required('failable_evals', default=0): 0
         })

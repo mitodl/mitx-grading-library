@@ -21,6 +21,7 @@ from mitxgraders import (
 )
 from mitxgraders.voluptuous import Error, MultipleInvalid
 from mitxgraders.sampling import set_seed
+from mitxgraders.helpers.calc import UndefinedVariable
 from mitxgraders.version import __version__ as VERSION
 from mitxgraders.helpers.calc import UndefinedFunction
 
@@ -649,6 +650,17 @@ def test_docs():
     assert grader(None, '1+x^2+y+z/2')['ok']
 
     grader = FormulaGrader(
+        answers='a_{0} + a_{1}*x + 1/2*a_{2}*x^2',
+        variables=['x'],
+        numbered_vars=['a'],
+        sample_from={
+            'x': [-5, 5],
+            'a': [-10, 10]
+        }
+    )
+    assert grader(None, 'a_{0} + a_{1}*x + 1/2*a_{2}*x^2')['ok']
+
+    grader = FormulaGrader(
         answers='1+x^2',
         variables=['x'],
         samples=10
@@ -803,3 +815,18 @@ def test_errors():
     )
     with raises(CalcError, match="Division by zero occurred. Check your input's denominators."):
         grader(None, '1/0')
+
+def test_numbered_vars():
+    """Test that numbered variables work"""
+    grader = FormulaGrader(
+        answers='a_{0}+a_{1}+a_{-1}',
+        variables=['a_{0}'],
+        numbered_vars=['a'],
+        sample_from={
+            'a_{0}': [-5, 5],
+            'a': [-10, 10]
+        }
+    )
+    assert grader(None, 'a_{0}+a_{1}+a_{-1}')['ok']
+    with raises(UndefinedVariable, match="a not permitted in answer as a variable"):
+        grader(None, 'a')

@@ -5,9 +5,9 @@
 
 A library of graders for edX Custom Response problems.
 
-Version 1.0.4 ([changelog](changelog.md))
+Version 1.1.0 ([changelog](changelog.md))
 
-Copyright 2017 Jolyon Bloomfield and Chris Chudzicki
+Copyright 2017-2018 Jolyon Bloomfield and Chris Chudzicki
 
 We thank the MIT Office of Digital Learning for their support.
 
@@ -17,6 +17,7 @@ We thank the MIT Office of Digital Learning for their support.
 - [Local Installation](#local-installation)
 - [Usage in edX](#usage-in-edx)
 - [Grader Documentation](#grader-documentation)
+- [FAQ](#FAQ)
 
 
 ## Demo Course
@@ -100,7 +101,7 @@ Here, the `correct_answer` entries are shown to students when they click "Show A
 [Extensive documentation](docs/README.md) has been compiled for the configuration of the different graders in the library.
 
 
-## FAQs
+## FAQ
 
 * After installing a virtual environment and doing `pip install`, `pytest` returns a number of errors for `no module named error`.
 

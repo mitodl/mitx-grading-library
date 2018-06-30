@@ -1,9 +1,13 @@
 # Change Log
 
+## Version 1.1.0
+* Added numbered variables to FormulaGrader
+* Removed case-insensitive comparisons from FormulaGrader and IntegralGrader. *WARNING:* This breaks backwards compatibility, and is a departure from edX. However, we believe that students should know that `M` and `m` are different variables, and removing case-insensitive comparison fixes a number of ambiguous situations.
+
 ## Version 1.0.5
-* improved debugging information for FormulaGrader
+* Improved debugging information for FormulaGrader
 * FormulaGrader and IntegralGrader perform whitelist, blacklist, and forbidden_string checks after determining answer correctness. Incorrect answers using forbidden strings / functions are now marked incorrect, while correct answers using forbidden strings / functions raise errors.
-* minor improvements to existing unit tests
+* Minor improvements to existing unit tests
 
 ## Version 1.0.4
 * Authors can now specify a custom comparer function for FormulaGrader

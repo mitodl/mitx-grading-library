@@ -39,6 +39,25 @@ grader = FormulaGrader(
 The `sample_from` key must be a dictionary of 'variable_name': sampling_set pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.
 
 
+## Numbered Variables
+
+You can also specify special variables that are numbered. For example, if you specify that `a` is a numbered variable, students can include `a_{0}`, `a_{5}`, `a_{-2}`, etc, using any integer. All entries for a numbered variable will use the sampling set specified by the base name.
+
+````python
+grader = FormulaGrader(
+    answers='a_{0} + a_{1}*x + 1/2*a_{2}*x^2',
+    variables=['x'],
+    numbered_vars=['a'],
+    sample_from={
+        'x': [-5, 5],
+        'a': [-10, 10]
+    }
+)
+````
+
+If you have a variable name that would clash with a numbered variable (say, you defined `a_{0}` and also a numbered variable `a`), then the specific variable has precedence.
+
+
 ## Samples and Failable Evaluations
 
 To control the number of samples that are checked to ensure correctness, you can modify the `samples` key.
@@ -313,6 +332,7 @@ We have made a number of other improvements over the edX formula graders, includ
 * When students use an unknown variable, the resulting error message highlights that the unknown quantity was interpreted as a variable.
 * Similarly, when students use an unknown function, the resulting error message highlights that the unknown quantity was interpreted as a function. If a variable of that name exists, the error message suggests that a multiplication symbol was missing.
 * If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the `debug` flag to True, and a more technical message will usually be displayed.
+* Full sampling details are included when the `debug` flag is set to True.
 
 
 - [Home](README.md)
