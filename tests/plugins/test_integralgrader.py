@@ -425,6 +425,51 @@ def test_student_has_unexpected_complex_integrand_raises_IntegrationError():
         student_input = ['0', '1', 'x+sqrt(-x)', 'x']
         grader(None, student_input)
 
+def test_blacklist_grading():
+    grader = IntegralGrader(
+        answers={
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
+        },
+        variables=['a', 'b'],
+        blacklist=['sin', 'cos']
+    )
+
+    # Correct answer with forbidden functions raises error
+    student_input0 = ['a', 'b', 'x^2 * cos(0) + sin(0)', 'x']
+    with raises(InvalidInput, message="Invalid Input: function(s) 'cos', 'sin' "
+                                      "not permitted in answer"):
+        grader(None, student_input0)
+
+    # Incorrect answer with forbidden functions marked wrong
+    student_input1 = ['a', 'b', 'x^2 * cos(0) + sin(pi/2)', 'x']
+    assert not grader(None, student_input1)['ok']
+
+def test_whitelist_grading():
+    grader = IntegralGrader(
+        answers={
+            'lower': 'a',
+            'upper': 'b',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
+        },
+        variables=['a', 'b'],
+        whitelist=['sin', 'cos']
+    )
+
+    # Correct answer with forbidden functions raises error
+    student_input0 = ['a', 'b', 'x^2 * cos(0) + tan(0)*sec(0)', 'x']
+    with raises(InvalidInput, message="Invalid Input: function(s) 'tan', 'sec' "
+                                      "not permitted in answer"):
+        grader(None, student_input0)
+
+    # Incorrect answer with forbidden functions marked wrong
+    student_input1 = ['a', 'b', 'x^2 * cos(0) + tan(pi/4)', 'x']
+    assert not grader(None, student_input1)['ok']
+
+
 # Debug Test
 def test_debug_message():
     grader = IntegralGrader(
