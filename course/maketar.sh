@@ -1,4 +1,7 @@
 find . -name '*.DS_Store' -type f -delete
-rm course.tar.gz
-tar -cLzf course.tar.gz *
+if [ -f 'course.tar.gz' ]
+then
+  rm course.tar.gz
+fi
+tar -cLzhf course.tar.gz *
 echo "Done"
