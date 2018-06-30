@@ -240,7 +240,7 @@ def test_fg_userconstants():
             user_constants={1: 5}
         )
 
-def test_fg_blackwhite():
+def test_fg_blacklist_grading():
     """Test FormulaGrader with blacklists and whitelists"""
     grader = FormulaGrader(
         answers="sin(0.4)/cos(0.4)",
@@ -249,14 +249,18 @@ def test_fg_blackwhite():
         case_sensitive=False
     )
     assert grader(None, "hello(0.4)")['ok']
+    # Incorrect answers with forbidden function are marked wrong:
+    assert not grader(None, "cos(0.4)/sin(0.4)")['ok']
+    # Correct answers with forbidden function raise error:
     assert grader(None, "sin(0.4)/cos(0.4)")['ok']
-    expect = 'Invalid Input: tan not permitted in answer as a function'
-    with raises(CalcError, match=expect):
+    expect = "Invalid Input: function(s) 'tan' not permitted in answer"
+    with raises(InvalidInput, message=expect):
         grader(None, "tan(0.4)")
-    expect = 'Invalid Input: TAN not permitted in answer as a function'
-    with raises(CalcError, match=expect):
-        grader(None, "TAN(0.4)")
+    expect = "Invalid Input: function(s) 'TAN', 'Tan' not permitted in answer"
+    with raises(InvalidInput, message=expect):
+        grader(None, "(TAN(0.4) + Tan(0.4))/2")
 
+def test_fg_whitelist_grading():
     grader = FormulaGrader(
         answers="sin(0.4)/cos(0.4)",
         user_functions={"hello": np.tan},
@@ -264,12 +268,17 @@ def test_fg_blackwhite():
         case_sensitive=False
     )
     assert grader(None, "hello(0.4)")['ok']
+
+
     assert grader(None, "sin(0.4)/cos(0.4)")['ok']
-    expect = 'Invalid Input: tan not permitted in answer as a function'
-    with raises(CalcError, match=expect):
+    # Incorrect answers with forbidden function are marked wrong:
+    assert not grader(None, "cos(0.4)/sin(0.4)")['ok']
+    # Correct answers with forbidden function raise error:
+    expect = "Invalid Input: function(s) 'tan' not permitted in answer"
+    with raises(InvalidInput, message=expect):
         grader(None, "tan(0.4)")
-    expect = 'Invalid Input: TAN not permitted in answer as a function'
-    with raises(CalcError, match=expect):
+    expect = "Invalid Input: function(s) 'tan' not permitted in answer"
+    with raises(InvalidInput, message=expect):
         grader(None, "TAN(0.4)")
 
     grader = FormulaGrader(
@@ -277,12 +286,12 @@ def test_fg_blackwhite():
         whitelist=[None]
     )
     assert grader(None, "1")['ok']
-    expect = "Invalid Input: cos not permitted in answer as a function"
-    with raises(CalcError, match=expect):
+    expect = "Invalid Input: function(s) 'cos' not permitted in answer"
+    with raises(InvalidInput, message=expect):
         grader(None, "cos(0)")
-    assert not grader.functions   # Check for an empty dictionary
 
-    with raises(ConfigError, match="Cannot whitelist and blacklist at the same time"):
+def test_fg_blacklist_whitelist_config_errors():
+    with raises(ConfigError, message="Cannot whitelist and blacklist at the same time"):
         FormulaGrader(
             answers="5",
             blacklist=['tan'],
@@ -496,6 +505,7 @@ def test_fg_debug_log():
         sample_from={
             'z': ComplexRectangle()
         },
+        blacklist=['sin', 'cos'],
         user_functions={'f': RandomFunction()},
         samples=2,
         debug=True
@@ -503,50 +513,50 @@ def test_fg_debug_log():
     result = grader(None, 'z + x*x + f(y)')
 
     message = (
-        "<pre>MITx Grading Library Version {version}<br/>\n"
+        "<pre>MITx Grading Library Version 1.0.4<br/>\n"
         "Student Response:<br/>\n"
         "z + x*x + f(y)<br/>\n"
         "<br/>\n"
         "==============================================================<br/>\n"
         "FormulaGrader Debug Info<br/>\n"
         "==============================================================<br/>\n"
-        "Available Functions:<br/>\n"
-        "{{   'abs': <ufunc 'absolute'>,<br/>\n"
-        "    'arccos': <function arccos at 0x...>,<br/>\n"
-        "    'arccosh': <ufunc 'arccosh'>,<br/>\n"
-        "    'arccot': <function arccot at 0x...>,<br/>\n"
-        "    'arccoth': <function arccoth at 0x...>,<br/>\n"
-        "    'arccsc': <function arccsc at 0x...>,<br/>\n"
-        "    'arccsch': <function arccsch at 0x...>,<br/>\n"
-        "    'arcsec': <function arcsec at 0x...>,<br/>\n"
-        "    'arcsech': <function arcsech at 0x...>,<br/>\n"
-        "    'arcsin': <function arcsin at 0x...>,<br/>\n"
-        "    'arcsinh': <ufunc 'arcsinh'>,<br/>\n"
-        "    'arctan': <ufunc 'arctan'>,<br/>\n"
-        "    'arctanh': <function arctanh at 0x...>,<br/>\n"
-        "    'conj': <ufunc 'conjugate'>,<br/>\n"
-        "    'cos': <ufunc 'cos'>,<br/>\n"
-        "    'cosh': <ufunc 'cosh'>,<br/>\n"
-        "    'cot': <function cot at 0x...>,<br/>\n"
-        "    'coth': <function coth at 0x...>,<br/>\n"
-        "    'csc': <function csc at 0x...>,<br/>\n"
-        "    'csch': <function csch at 0x...>,<br/>\n"
-        "    'exp': <ufunc 'exp'>,<br/>\n"
+        "Functions available during evaluation and allowed in answer:<br/>\n"
+        "{{   'abs': <function f at 0x...>,<br/>\n"
+        "    'arccos': <function f at 0x...>,<br/>\n"
+        "    'arccosh': <function f at 0x...>,<br/>\n"
+        "    'arccot': <function f at 0x...>,<br/>\n"
+        "    'arccoth': <function f at 0x...>,<br/>\n"
+        "    'arccsc': <function f at 0x...>,<br/>\n"
+        "    'arccsch': <function f at 0x...>,<br/>\n"
+        "    'arcsec': <function f at 0x...>,<br/>\n"
+        "    'arcsech': <function f at 0x...>,<br/>\n"
+        "    'arcsin': <function f at 0x...>,<br/>\n"
+        "    'arcsinh': <function f at 0x...>,<br/>\n"
+        "    'arctan': <function f at 0x...>,<br/>\n"
+        "    'arctanh': <function f at 0x...>,<br/>\n"
+        "    'conj': <function f at 0x...>,<br/>\n"
+        "    'cosh': <function f at 0x...>,<br/>\n"
+        "    'cot': <function f at 0x...>,<br/>\n"
+        "    'coth': <function f at 0x...>,<br/>\n"
+        "    'csc': <function f at 0x...>,<br/>\n"
+        "    'csch': <function f at 0x...>,<br/>\n"
+        "    'exp': <function f at 0x...>,<br/>\n"
         "    'f': <function f at 0x...>,<br/>\n"
-        "    'fact': <built-in function factorial>,<br/>\n"
-        "    'factorial': <built-in function factorial>,<br/>\n"
-        "    'im': <function <lambda> at 0x...>,<br/>\n"
-        "    'ln': <function log at 0x...>,<br/>\n"
-        "    'log10': <function log10 at 0x...>,<br/>\n"
-        "    'log2': <function log2 at 0x...>,<br/>\n"
-        "    're': <function <lambda> at 0x...>,<br/>\n"
-        "    'sec': <function sec at 0x...>,<br/>\n"
-        "    'sech': <function sech at 0x...>,<br/>\n"
-        "    'sin': <ufunc 'sin'>,<br/>\n"
-        "    'sinh': <ufunc 'sinh'>,<br/>\n"
-        "    'sqrt': <function sqrt at 0x...>,<br/>\n"
-        "    'tan': <ufunc 'tan'>,<br/>\n"
-        "    'tanh': <ufunc 'tanh'>}}<br/>\n"
+        "    'fact': <function f at 0x...>,<br/>\n"
+        "    'factorial': <function f at 0x...>,<br/>\n"
+        "    'im': <function f at 0x...>,<br/>\n"
+        "    'ln': <function f at 0x...>,<br/>\n"
+        "    'log10': <function f at 0x...>,<br/>\n"
+        "    'log2': <function f at 0x...>,<br/>\n"
+        "    're': <function f at 0x...>,<br/>\n"
+        "    'sec': <function f at 0x...>,<br/>\n"
+        "    'sech': <function f at 0x...>,<br/>\n"
+        "    'sinh': <function f at 0x...>,<br/>\n"
+        "    'sqrt': <function f at 0x...>,<br/>\n"
+        "    'tan': <function f at 0x...>,<br/>\n"
+        "    'tanh': <function f at 0x...>}}<br/>\n"
+        "Functions available during evaluation and disallowed in answer:<br/>\n"
+        "{{   'cos': <function f at 0x...>, 'sin': <function f at 0x...>}}<br/>\n"
         "<br/>\n"
         "<br/>\n"
         "==========================================<br/>\n"

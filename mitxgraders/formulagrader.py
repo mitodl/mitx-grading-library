@@ -13,12 +13,12 @@ import re
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes)
-from mitxgraders.baseclasses import ItemGrader, InvalidInput
-from mitxgraders.voluptuous import Schema, Required, Any, All, Extra, Invalid
+from mitxgraders.baseclasses import ItemGrader, InvalidInput, ConfigError
+from mitxgraders.voluptuous import Schema, Required, Any, All, Extra, Invalid, Length
 from mitxgraders.helpers.calc import CalcError, evaluator
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
                                                 PercentageString, is_callable_with_args)
-from mitxgraders.helpers.mathfunc import within_tolerance
+from mitxgraders.helpers.mathfunc import within_tolerance, DEFAULT_FUNCTIONS
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -30,6 +30,177 @@ __all__ = [
 def casify(thestring, case_sensitive):
     """Converts a string to lowercase if not case_sensitive"""
     return thestring if case_sensitive else thestring.lower()
+
+# Some of these validators are useful to other classes, e.g., IntegralGrader
+def validate_blacklist_whitelist_config(blacklist, whitelist):
+    """Validates the whitelist/blacklist configuration.
+
+    Voluptuous should already have type-checked blacklist and whitelist. Now check:
+    1. They are not both used
+    2. All whitelist/blacklist functions actually exist
+
+    NOTE: whitelist/blacklist are not casified during configuration validation.
+    """
+    if blacklist and whitelist:
+        raise ConfigError("Cannot whitelist and blacklist at the same time")
+    for func in blacklist:
+        # no need to check user_functions too ... if you don't want student to
+        # use one of the user_functions, just don't add it in the first place.
+        if func not in DEFAULT_FUNCTIONS:
+            raise ConfigError("Unknown function in blacklist: {func}".format(func=func))
+
+    if whitelist == [None]:
+        return
+
+    for func in whitelist:
+        if func not in DEFAULT_FUNCTIONS:
+            raise ConfigError("Unknown function in whitelist: {func}".format(func=func))
+
+def validate_forbidden_strings_not_used(expr, forbidden_strings, forbidden_msg, case_sensitive):
+    """
+    Ignoring whitespace, checking that expr does not contain any forbidden_strings.
+    Usage
+    =====
+    Passes validation if no forbidden strings used:
+    >>> validate_forbidden_strings_not_used(
+    ... '2*sin(x)*cos(x)',
+    ... ['*x', '+ x', '- x'],
+    ... 'A forbidden string was used!',
+    ... True
+    ... )
+    True
+
+    Fails validation if any forbidden string is used:
+    >>> validate_forbidden_strings_not_used(
+    ... 'sin(x+x)',
+    ... ['*x', '+ x', '- x'],
+    ... 'A forbidden string was used!',
+    ... True
+    ... )
+    Traceback (most recent call last):
+    InvalidInput: A forbidden string was used!
+    """
+    stripped_expr = casify(expr, case_sensitive).replace(' ', '')
+    for forbidden in forbidden_strings:
+        check_for = casify(forbidden, case_sensitive).replace(' ', '')
+        if check_for in stripped_expr:
+            # Don't give away the specific string that is being checked for!
+            raise InvalidInput(forbidden_msg)
+    return True
+
+def validate_only_permitted_functions_used(used_funcs, permitted_functions, case_sensitive):
+    """
+    Check that the used_funcs contains only permitted_functions
+    Arguments:
+        used_functions ({str}): set of used function names
+        permitted_functions ({str}): set of permitted function names
+        case_sensitive (bool): whether comparison is case sensitive
+    Usage
+    =====
+    Case-sensitive comparison:
+    >>> validate_only_permitted_functions_used(
+    ... set(['f', 'sin']),
+    ... set(['f', 'g', 'sin', 'cos']),
+    ... True)
+    True
+    >>> validate_only_permitted_functions_used(
+    ... set(['f', 'Sin', 'h']),
+    ... set(['f', 'g', 'sin', 'cos']),
+    ... True)
+    Traceback (most recent call last):
+    InvalidInput: Invalid Input: function(s) 'h', 'Sin' not permitted in answer
+    """
+    casified_permitted = {casify(f, case_sensitive) for f in permitted_functions}
+    used_not_permitted = [f for f in used_funcs
+                          if casify(f, case_sensitive) not in casified_permitted]
+    if used_not_permitted != []:
+        func_names = ", ".join(["'{f}'".format(f=f) for f in used_not_permitted])
+        message = "Invalid Input: function(s) {} not permitted in answer".format(func_names)
+        raise InvalidInput(message)
+    return True
+
+def get_permitted_functions(whitelist, blacklist, always_allowed):
+    """
+    Constructs a set of functions whose usage is permitted.
+    Arguments:
+        whitelist ([str] | [None]): List of allowed function names
+            [None] disallows all except always_allowed
+            [] uses DEFAULT_FUNCTIONS.keys()
+        blacklist ([str]): List of disallowed function names
+        always_allowed (dict): dict whose keys are always-allowed as function names
+    Usage
+    =====
+    Whitelist some functions:
+    >>> always_allowed = {'f1': None, 'f2': None} # values unimportant
+    >>> get_permitted_functions(['sin', 'cos'], [], always_allowed) == set([
+    ... 'sin', 'cos', 'f1', 'f2'
+    ... ])
+    True
+
+    [None] disallows all defaults:
+    >>> always_allowed = {'f1': None, 'f2': None} # values unimportant
+    >>> get_permitted_functions([None], [], always_allowed) == set([
+    ... 'f1', 'f2'
+    ... ])
+    True
+
+    Blacklist some functions:
+    >>> get_permitted_functions([], ['sin', 'cos'], always_allowed) == set(
+    ... DEFAULT_FUNCTIONS).union(['f1', 'f2']).difference(set(['sin', 'cos']))
+    True
+
+    Blacklist and whitelist cannot be simultaneously used:
+    >>> get_permitted_functions(['sin'], ['cos'], always_allowed)
+    Traceback (most recent call last):
+    ValueError: whitelist and blacklist cannot be simultaneously truthy
+    """
+    # should never trigger; Grader's config validation should raise an error first
+    if whitelist and blacklist:
+        raise ValueError('whitelist and blacklist cannot be simultaneously truthy')
+    if whitelist == []:
+        permitted_functions = set(always_allowed).union(
+            set(DEFAULT_FUNCTIONS)
+            ).difference(set(blacklist))
+    elif whitelist == [None]:
+        permitted_functions = set(always_allowed)
+    else:
+        permitted_functions = set(always_allowed).union(whitelist)
+    return permitted_functions
+
+def validate_required_functions_used(used_funcs, required_funcs, case_sensitive):
+    """
+    Raise InvalidInput error if used_funcs does not contain all required_funcs
+
+    Examples:
+    >>> validate_required_functions_used(
+    ... ['sin', 'cos', 'f', 'g'],
+    ... ['cos', 'f'],
+    ... True
+    ... )
+    True
+    >>> validate_required_functions_used(
+    ... ['sin', 'cos', 'F', 'g'],
+    ... ['cos', 'f'],
+    ... True
+    ... )
+    Traceback (most recent call last):
+    InvalidInput: Invalid Input: Answer must contain the function f
+
+    Case insensitive:
+    >>> validate_required_functions_used(
+    ... ['sin', 'Cos', 'F', 'g'],
+    ... ['cos', 'f'],
+    ... False
+    ... )
+    True
+    """
+    for func in required_funcs:
+        func = casify(func, case_sensitive)
+        used_funcs = [casify(f, case_sensitive) for f in used_funcs]
+        if func not in used_funcs:
+            msg = "Invalid Input: Answer must contain the function {}"
+            raise InvalidInput(msg.format(func))
+    return True
 
 class FormulaGrader(ItemGrader):
     """
@@ -109,8 +280,13 @@ class FormulaGrader(ItemGrader):
             Required('user_functions', default={}):
                 {Extra: Any(is_callable, [is_callable], FunctionSamplingSet)},
             Required('user_constants', default={}): {Extra: Number},
+            # Blacklist/Whitelist have additional validation that can't happen here, because
+            # their validation is correlated with each other
             Required('blacklist', default=[]): [str],
-            Required('whitelist', default=[]): [Any(str, None)],
+            Required('whitelist', default=[]): Any(
+                All([None], Length(min=1, max=1)),
+                [str]
+            ),
             Required('forbidden_strings', default=[]): [str],
             Required('forbidden_message', default=forbidden_default): str,
             Required('required_functions', default=[]): [str],
@@ -183,8 +359,10 @@ class FormulaGrader(ItemGrader):
         "==============================================================\n"
         "{grader} Debug Info\n"
         "==============================================================\n"
-        "Available Functions:\n"
-        "{functions}\n"
+        "Functions available during evaluation and allowed in answer:\n"
+        "{functions_allowed}\n"
+        "Functions available during evaluation and disallowed in answer:\n"
+        "{functions_disallowed}\n"
     )
     debug_appendix_sample_template = (
         "\n"
@@ -209,13 +387,17 @@ class FormulaGrader(ItemGrader):
         """
         super(FormulaGrader, self).__init__(config, **kwargs)
 
+        # finish validating blacklist/whitelist
+        validate_blacklist_whitelist_config(self.config['blacklist'], self.config['whitelist'])
+        self.permitted_functions = get_permitted_functions(self.config['whitelist'],
+                                                           self.config['blacklist'],
+                                                           self.config['user_functions'])
+
         # store the comparer utils
         self.comparer_utils = self.get_comparer_utils()
 
         # Set up the various lists we use
-        self.functions, self.random_funcs = construct_functions(self.config["whitelist"],
-                                                                self.config["blacklist"],
-                                                                self.config["user_functions"])
+        self.functions, self.random_funcs = construct_functions(self.config["user_functions"])
         self.constants = construct_constants(self.config["user_constants"])
         self.suffixes = construct_suffixes(self.config["metric_suffixes"])
 
@@ -238,12 +420,9 @@ class FormulaGrader(ItemGrader):
 
         # Now perform the computations
         try:
-            result = self.raw_check(answer, student_input)
+            result, used_funcs = self.raw_check(answer, student_input)
             if result['ok'] is True or result['ok'] == 'partial':
-                self.validate_forbidden_strings_not_used(student_input,
-                                                         self.config['forbidden_strings'],
-                                                         self.config['forbidden_message'],
-                                                         self.config['case_sensitive'])
+                self.post_eval_validation(student_input, used_funcs)
             return result
         except (CalcError, InvalidInput):
             # These errors have been vetted already
@@ -297,13 +476,6 @@ class FormulaGrader(ItemGrader):
                                                  functions=funclist,
                                                  suffixes=self.suffixes)
 
-            # Check that the required functions are used
-            # But only the first time!
-            if i == 0:
-                self.validate_required_functions_used(used_funcs,
-                                                      self.config['required_functions'],
-                                                      self.config['case_sensitive'])
-
             # Check if expressions agree
             comparer_result = comparer(comparer_params_eval, student_eval, self.comparer_utils)
             if self.config['debug']:
@@ -313,25 +485,29 @@ class FormulaGrader(ItemGrader):
             if not comparer_result:
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
-                    return {'ok': False, 'grade_decimal': 0, 'msg': ''}
+                    return {'ok': False, 'grade_decimal': 0, 'msg': ''}, used_funcs
 
         # This response appears to agree with the expected answer
         return {
             'ok': answer['ok'],
             'grade_decimal': answer['grade_decimal'],
             'msg': answer['msg']
-        }
+        }, used_funcs
 
     def log_sample_info(self, index, varlist, funclist, student_eval,
                         comparer, comparer_params_eval, comparer_result):
         """Add sample information to debug log"""
         pp = PrettyPrinter(indent=4)
         if index == 0:
-            self.log(self.debug_appendix_header_template.format(
+            header = self.debug_appendix_header_template.format(
                 grader=self.__class__.__name__,
                 # The regexp replaces memory locations, e.g., 0x10eb1e848 -> 0x...
-                functions=re.sub(r"0x[0-9a-fA-F]+", "0x...", pp.pformat(funclist))
-            ))
+                functions_allowed=pp.pformat({f: funclist['f'] for f in funclist
+                                              if f in self.permitted_functions}),
+                functions_disallowed=pp.pformat({f: funclist['f'] for f in funclist
+                                                 if f not in self.permitted_functions}),
+            )
+            self.log(re.sub(r"0x[0-9a-fA-F]+", "0x...", header))
         self.log(self.debug_appendix_sample_template.format(
             sample_num=index + 1, # to account for 0 index
             samples_total=self.config['samples'],
@@ -342,78 +518,18 @@ class FormulaGrader(ItemGrader):
             compare_parms_eval=pp.pformat(comparer_params_eval)
         ))
 
-    @staticmethod
-    def validate_required_functions_used(used_funcs, required_funcs, case_sensitive):
-        """
-        Raise InvalidInput error if used_funcs does not contain all required_funcs
+    def post_eval_validation(self, expr, used_funcs):
+        """Runs several post-evaluation validator functions"""
+        case_sensitive = self.config['case_sensitive']
+        validate_forbidden_strings_not_used(expr,
+                                            self.config['forbidden_strings'],
+                                            self.config['forbidden_message'],
+                                            case_sensitive)
 
-        Examples:
-        >>> FormulaGrader.validate_required_functions_used(
-        ... ['sin', 'cos', 'f', 'g'],
-        ... ['cos', 'f'],
-        ... True
-        ... )
-        True
-        >>> FormulaGrader.validate_required_functions_used(
-        ... ['sin', 'cos', 'F', 'g'],
-        ... ['cos', 'f'],
-        ... True
-        ... )
-        Traceback (most recent call last):
-        InvalidInput: Invalid Input: Answer must contain the function f
+        validate_required_functions_used(used_funcs, self.config['required_functions'],
+                                         case_sensitive)
 
-        Case insensitive:
-        >>> FormulaGrader.validate_required_functions_used(
-        ... ['sin', 'Cos', 'F', 'g'],
-        ... ['cos', 'f'],
-        ... False
-        ... )
-        True
-        """
-        for func in required_funcs:
-            func = casify(func, case_sensitive)
-            used_funcs = [casify(f, case_sensitive) for f in used_funcs]
-            if func not in used_funcs:
-                msg = "Invalid Input: Answer must contain the function {}"
-                raise InvalidInput(msg.format(func))
-        return True
-
-    @staticmethod
-    def validate_forbidden_strings_not_used(expr, forbidden_strings, forbidden_msg, case_sensitive):
-        """
-        Ignoring whitespace, checking that expr does not contain any forbidden_strings.
-
-        Usage
-        =====
-
-        Passes validation if no forbidden strings used:
-        >>> FormulaGrader.validate_forbidden_strings_not_used(
-        ... '2*sin(x)*cos(x)',
-        ... ['*x', '+ x', '- x'],
-        ... 'A forbidden string was used!',
-        ... True
-        ... )
-        True
-
-        Fails validation if any forbidden string is used:
-        >>> FormulaGrader.validate_forbidden_strings_not_used(
-        ... 'sin(x+x)',
-        ... ['*x', '+ x', '- x'],
-        ... 'A forbidden string was used!',
-        ... True
-        ... )
-        Traceback (most recent call last):
-        InvalidInput: A forbidden string was used!
-        """
-        stripped_expr = casify(expr, case_sensitive).replace(' ', '')
-
-        for forbidden in forbidden_strings:
-            check_for = casify(forbidden, case_sensitive).replace(' ', '')
-            if check_for in stripped_expr:
-                # Don't give away the specific string that is being checked for!
-                raise InvalidInput(forbidden_msg)
-        return True
-
+        validate_only_permitted_functions_used(used_funcs, self.permitted_functions, case_sensitive)
 
 class NumericalGrader(FormulaGrader):
     """

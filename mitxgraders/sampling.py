@@ -453,79 +453,35 @@ def gen_symbols_samples(symbols, samples, sample_from):
         sample_list.append(sample_dict)
     return sample_list
 
-def construct_functions(whitelist, blacklist, user_funcs):
+def construct_functions(user_funcs):
     """
     Returns the dictionary of available functions
 
     Arguments:
-        whitelist (list): List of function names to allow, ignored if empty.
-            To disallow all functions, use whitelist = [None].
-
-        blacklist (list): List of function names to disallow. whitelist and blacklist
-            cannot be used in conjunction.
-
         user_funcs (dict): Dictionary of "name": function pairs specifying user-defined
             functions to include.
 
     Usage
     =====
-    By default, just returns DEFAULT_FUNCTIONS
-    >>> funcs, random_funcs = construct_functions([], [], {})
+    If no user_funcs are specified, DEFAULT_FUNCTIONS is returned
+    >>> funcs, random_funcs = construct_functions({})
     >>> funcs == DEFAULT_FUNCTIONS
     True
     >>> random_funcs == {}
     True
 
-    To remove all functions, pass in a whitelist of [None]
-    >>> funcs, random_funcs = construct_functions([None], [], {})
-    >>> funcs == {}
-    True
-
-    Whitelisting specifies exactly what functions are allowed
-    >>> funcs, random_funcs = construct_functions(["sin"], [], {})
-    >>> funcs == {"sin": np.sin}
-    True
-
-    Blacklisting removes a function from the list
-    >>> funcs, random_funcs = construct_functions([], ["sin"], {})
-    >>> funcs.get("sin", None) is None
-    True
-    >>> funcs["cos"] == np.cos
-    True
-
-    You can specify user-defined functions
+    Or specify user_funcs:
     >>> func = lambda x: x
     >>> randfunc = RandomFunction()
-    >>> funcs, random_funcs = construct_functions([], [], {"f": func, "g": randfunc})
-    >>> funcs["f"] == func
+    >>> funcs, random_funcs = construct_functions({"f": func, "g": randfunc})
+    >>> all([funcs[fn]==DEFAULT_FUNCTIONS[fn] for fn in DEFAULT_FUNCTIONS])
     True
-    >>> random_funcs["g"] == randfunc
+    >>> funcs["f"]==func
+    True
+    >>> random_funcs == {"g": randfunc}
     True
     """
-    if whitelist:
-        if blacklist:
-            raise ConfigError("Cannot whitelist and blacklist at the same time")
-
-        functions = {}
-        for f in whitelist:
-            if f is None:
-                # This allows for you to have whitelist = [None], which removes
-                # all functions from the function list
-                continue
-            try:
-                functions[f] = DEFAULT_FUNCTIONS[f]
-            except KeyError:
-                raise ConfigError("Unknown function in whitelist: " + f)
-    else:
-        # Treat no blacklist as blacklisted with an empty list
-        functions = DEFAULT_FUNCTIONS.copy()
-        for f in blacklist:
-            try:
-                del functions[f]
-            except KeyError:
-                raise ConfigError("Unknown function in blacklist: " + f)
-
-    # Add in any custom functions to the functions and random_funcs lists
+    functions = DEFAULT_FUNCTIONS.copy()
     random_funcs = {}
     for f in user_funcs:
         if not isinstance(f, str):

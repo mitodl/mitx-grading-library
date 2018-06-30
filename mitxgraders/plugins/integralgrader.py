@@ -13,8 +13,13 @@ from numpy import real, imag
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants)
+from mitxgraders.formulagrader import (
+    validate_blacklist_whitelist_config,
+    validate_only_permitted_functions_used,
+    get_permitted_functions
+)
 from mitxgraders.baseclasses import AbstractGrader, InvalidInput, ConfigError
-from mitxgraders.voluptuous import Schema, Required, Any, All, Extra
+from mitxgraders.voluptuous import Schema, Required, Any, All, Extra, Length
 from mitxgraders.helpers.calc import (CalcError, evaluator)
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative,
                                                 PercentageString, is_callable)
@@ -204,8 +209,13 @@ class IntegralGrader(AbstractGrader):
             Required('user_functions', default={}):
                 {Extra: Any(is_callable, [is_callable], FunctionSamplingSet)},
             Required('user_constants', default={}): {Extra: Number},
+            # Blacklist/Whitelist have additional validation that can't happen here, because
+            # their validation is correlated with each other
             Required('blacklist', default=[]): [str],
-            Required('whitelist', default=[]): [Any(str, None)],
+            Required('whitelist', default=[]): Any(
+                All([None], Length(min=1, max=1)),
+                [str]
+            ),
             Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
             Required('case_sensitive', default=True): bool,
             Required('samples', default=1): Positive(int),  # default changed to 1
@@ -264,10 +274,13 @@ class IntegralGrader(AbstractGrader):
 
         # The below are copied from FormulaGrader.__init__
 
-        # Set up the various lists we use
-        self.functions, self.random_funcs = construct_functions(self.config["whitelist"],
-                                                                self.config["blacklist"],
-                                                                self.config["user_functions"])
+        # finish validating blacklist/whitelist
+        validate_blacklist_whitelist_config(self.config['blacklist'], self.config['whitelist'])
+        self.permitted_functions = get_permitted_functions(self.config['whitelist'],
+                                                           self.config['blacklist'],
+                                                           self.config['user_functions'])
+
+        self.functions, self.random_funcs = construct_functions(self.config["user_functions"])
         self.constants = construct_constants(self.config["user_constants"])
         # TODO I would like to move this into construct_constants at some point,
         # perhaps giving construct_constants and optional argument specifying additional defaults
@@ -331,7 +344,10 @@ class IntegralGrader(AbstractGrader):
 
         # Now perform the computations
         try:
-            return self.raw_check(answers, structured_input)
+            result, used_funcs = self.raw_check(answers, structured_input)
+            if result['ok'] is True or result['ok'] == 'partial':
+                self.post_eval_validation(used_funcs)
+            return result
         except (CalcError, InvalidInput, ConfigError):
             # These errors have been vetted already
             raise
@@ -373,7 +389,7 @@ class IntegralGrader(AbstractGrader):
             # 1. custom error messages we've added
             # 2. scipy's warnings re-raised as error messages
             try:
-                expected_re, expected_im = self.evaluate_int(
+                expected_re, expected_im, _ = self.evaluate_int(
                     answer['integrand'],
                     answer['lower'],
                     answer['upper'],
@@ -385,7 +401,7 @@ class IntegralGrader(AbstractGrader):
                 msg = "Integration Error with author's stored answer: {}"
                 raise ConfigError(msg.format(e.message))
 
-            student_re, student_im = self.evaluate_int(
+            student_re, student_im, used_funcs = self.evaluate_int(
                 cleaned_input['integrand'],
                 cleaned_input['lower'],
                 cleaned_input['upper'],
@@ -430,39 +446,60 @@ class IntegralGrader(AbstractGrader):
             if not within_tolerance(expected, student, self.config['tolerance']):
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
-                    return {'ok': False, 'grade_decimal': 0, 'msg': ''}
+                    return {'ok': False, 'grade_decimal': 0, 'msg': ''}, used_funcs
 
         # This response appears to agree with the expected answer
         return {
             'ok': True,
             'grade_decimal': 1,
             'msg': ''
-        }
+        }, used_funcs
+
+    @staticmethod
+    def get_limits_and_funcs(integrand_str, lower_str, upper_str, integration_var,
+                             varscope, funcscope, case_sensitive):
+        """Evals lower/upper limits and gets the functions used in lower/upper/integrand"""
+
+        lower, lower_funcs = evaluator(lower_str,
+                                       case_sensitive=case_sensitive,
+                                       variables=varscope,
+                                       functions=funcscope,
+                                       suffixes={})
+        upper, upper_funcs = evaluator(upper_str,
+                                       case_sensitive=case_sensitive,
+                                       variables=varscope,
+                                       functions=funcscope,
+                                       suffixes={})
+
+        varscope[integration_var] = (upper + lower)/2
+        _, integrand_funcs = evaluator(integrand_str,
+                                       case_sensitive=case_sensitive,
+                                       variables=varscope,
+                                       functions=funcscope,
+                                       suffixes={})
+
+        used_funcs = lower_funcs.union(upper_funcs).union(integrand_funcs)
+
+        return lower, upper, used_funcs
 
     def evaluate_int(self, integrand_str, lower_str, upper_str, integration_var,
                      varscope=None, funcscope=None):
         varscope = {} if varscope is None else varscope
         funcscope = {} if funcscope is None else funcscope
 
-        lower, _ = evaluator(lower_str,
-                             case_sensitive=self.config['case_sensitive'],
-                             variables=varscope,
-                             functions=funcscope,
-                             suffixes={})
-        upper, _ = evaluator(upper_str,
-                             case_sensitive=self.config['case_sensitive'],
-                             variables=varscope,
-                             functions=funcscope,
-                             suffixes={})
-
-        if isinstance(lower, complex) or isinstance(upper, complex):
-            raise IntegrationError('Integration limits must be real but have evaluated to complex numbers.')
-
         # It is possible that the integration variable might appear in the limits.
         # Some consider this bad practice, but many students do it and Mathematica allows it.
         # We're going to edit the varscope below to contain the integration variable.
         # Let's store the integration variable's initial value in case it has one.
         int_var_initial = varscope[integration_var] if integration_var in varscope else None
+
+        lower, upper, used_funcs = self.get_limits_and_funcs(integrand_str, lower_str, upper_str,
+                                                             integration_var, varscope, funcscope,
+                                                             self.config['case_sensitive'])
+
+        if isinstance(lower, complex) or isinstance(upper, complex):
+            raise IntegrationError('Integration limits must be real but have evaluated '
+                                   'to complex numbers.')
 
         def raw_integrand(x):
             varscope[integration_var] = x
@@ -488,4 +525,9 @@ class IntegralGrader(AbstractGrader):
         if int_var_initial is not None:
             varscope[integration_var] = int_var_initial
 
-        return result_re, result_im
+        return result_re, result_im, used_funcs
+
+    def post_eval_validation(self, used_funcs):
+        """Runs post-evaluation validator functions"""
+        case_sensitive = self.config['case_sensitive']
+        validate_only_permitted_functions_used(used_funcs, self.permitted_functions, case_sensitive)
