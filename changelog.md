@@ -3,6 +3,7 @@
 ## Version 1.0.5
 * improved debugging information for FormulaGrader
 * FormulaGrader and IntegralGrader perform whitelist, blacklist, and forbidden_string checks after determining answer correctness. Incorrect answers using forbidden strings / functions are now marked incorrect, while correct answers using forbidden strings / functions raise errors.
+* minor improvements to existing unit tests
 
 ## Version 1.0.4
 * Authors can now specify a custom comparer function for FormulaGrader

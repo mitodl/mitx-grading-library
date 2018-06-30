@@ -154,7 +154,8 @@ def get_permitted_functions(whitelist, blacklist, always_allowed):
     Traceback (most recent call last):
     ValueError: whitelist and blacklist cannot be simultaneously truthy
     """
-    # should never trigger; Grader's config validation should raise an error first
+    # should never trigger except in doctest above,
+    # Grader's config validation should raise an error first
     if whitelist and blacklist:
         raise ValueError('whitelist and blacklist cannot be simultaneously truthy')
     if whitelist == []:
