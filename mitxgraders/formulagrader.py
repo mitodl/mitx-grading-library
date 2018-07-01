@@ -34,8 +34,6 @@ def validate_blacklist_whitelist_config(blacklist, whitelist):
     Voluptuous should already have type-checked blacklist and whitelist. Now check:
     1. They are not both used
     2. All whitelist/blacklist functions actually exist
-
-    NOTE: whitelist/blacklist are not casified during configuration validation.
     """
     if blacklist and whitelist:
         raise ConfigError("Cannot whitelist and blacklist at the same time")
@@ -102,9 +100,7 @@ def validate_only_permitted_functions_used(used_funcs, permitted_functions):
     Traceback (most recent call last):
     InvalidInput: Invalid Input: function(s) 'h', 'Sin' not permitted in answer
     """
-    casified_permitted = {f for f in permitted_functions}
-    used_not_permitted = [f for f in used_funcs
-                          if f not in casified_permitted]
+    used_not_permitted = [f for f in used_funcs if f not in permitted_functions]
     if used_not_permitted != []:
         func_names = ", ".join(["'{f}'".format(f=f) for f in used_not_permitted])
         message = "Invalid Input: function(s) {} not permitted in answer".format(func_names)
@@ -187,7 +183,8 @@ def validate_required_functions_used(used_funcs, required_funcs):
 class FormulaGrader(ItemGrader):
     """
     Grades mathematical expressions, like edX FormulaResponse. Note that comparison will
-    always be performed in a case-sensitive nature.
+    always be performed in a case-sensitive nature, unlike edX, which allows for a
+    case-insensitive comparison.
 
     Configuration options:
         user_functions (dict): A dictionary of user-defined functions that students can
