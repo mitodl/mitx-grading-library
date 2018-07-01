@@ -502,7 +502,7 @@ def test_fg_debug_log():
     result = grader(None, 'z + x*x + f(y)')
 
     message = (
-        "<pre>MITx Grading Library Version 1.1<br/>\n"
+        "<pre>MITx Grading Library Version {version}<br/>\n"
         "Student Response:<br/>\n"
         "z + x*x + f(y)<br/>\n"
         "<br/>\n"
