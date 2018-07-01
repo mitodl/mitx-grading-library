@@ -564,9 +564,9 @@ class FormulaGrader(ItemGrader):
             header = self.debug_appendix_header_template.format(
                 grader=self.__class__.__name__,
                 # The regexp replaces memory locations, e.g., 0x10eb1e848 -> 0x...
-                functions_allowed=pp.pformat({f: funclist['f'] for f in funclist
+                functions_allowed=pp.pformat({f: funclist[f] for f in funclist
                                               if f in self.permitted_functions}),
-                functions_disallowed=pp.pformat({f: funclist['f'] for f in funclist
+                functions_disallowed=pp.pformat({f: funclist[f] for f in funclist
                                                  if f not in self.permitted_functions}),
             )
             self.log(re.sub(r"0x[0-9a-fA-F]+", "0x...", header))
