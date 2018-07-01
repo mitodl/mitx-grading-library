@@ -168,7 +168,6 @@ class IntegralGrader(AbstractGrader):
         whitelist
         blacklist
         tolerance
-        case_sensitive
         samples (default: 1)
         variables
         sample_from
@@ -217,7 +216,6 @@ class IntegralGrader(AbstractGrader):
                 [str]
             ),
             Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
-            Required('case_sensitive', default=True): bool,
             Required('samples', default=1): Positive(int),  # default changed to 1
             Required('variables', default=[]): [str],
             Required('sample_from', default={}): dict,
@@ -457,23 +455,20 @@ class IntegralGrader(AbstractGrader):
 
     @staticmethod
     def get_limits_and_funcs(integrand_str, lower_str, upper_str, integration_var,
-                             varscope, funcscope, case_sensitive):
+                             varscope, funcscope):
         """Evals lower/upper limits and gets the functions used in lower/upper/integrand"""
 
         lower, lower_funcs = evaluator(lower_str,
-                                       case_sensitive=case_sensitive,
                                        variables=varscope,
                                        functions=funcscope,
                                        suffixes={})
         upper, upper_funcs = evaluator(upper_str,
-                                       case_sensitive=case_sensitive,
                                        variables=varscope,
                                        functions=funcscope,
                                        suffixes={})
 
         varscope[integration_var] = (upper + lower)/2
         _, integrand_funcs = evaluator(integrand_str,
-                                       case_sensitive=case_sensitive,
                                        variables=varscope,
                                        functions=funcscope,
                                        suffixes={})
@@ -494,8 +489,7 @@ class IntegralGrader(AbstractGrader):
         int_var_initial = varscope[integration_var] if integration_var in varscope else None
 
         lower, upper, used_funcs = self.get_limits_and_funcs(integrand_str, lower_str, upper_str,
-                                                             integration_var, varscope, funcscope,
-                                                             self.config['case_sensitive'])
+                                                             integration_var, varscope, funcscope)
 
         if isinstance(lower, complex) or isinstance(upper, complex):
             raise IntegrationError('Integration limits must be real but have evaluated '
@@ -504,7 +498,6 @@ class IntegralGrader(AbstractGrader):
         def raw_integrand(x):
             varscope[integration_var] = x
             value, _ = evaluator(integrand_str,
-                                 case_sensitive=self.config['case_sensitive'],
                                  variables=varscope,
                                  functions=funcscope,
                                  suffixes={})
@@ -529,5 +522,4 @@ class IntegralGrader(AbstractGrader):
 
     def post_eval_validation(self, used_funcs):
         """Runs post-evaluation validator functions"""
-        case_sensitive = self.config['case_sensitive']
-        validate_only_permitted_functions_used(used_funcs, self.permitted_functions, case_sensitive)
+        validate_only_permitted_functions_used(used_funcs, self.permitted_functions)

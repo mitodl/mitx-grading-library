@@ -6,7 +6,7 @@ import math
 import random
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, CalcError, __version__
 from mitxgraders.voluptuous import Error, Invalid, truth
-from mitxgraders.helpers.calc import evaluator, UnableToParse
+from mitxgraders.helpers.calc import evaluator, UnableToParse, UndefinedVariable
 from mitxgraders.helpers import validatorfuncs
 from mitxgraders.helpers.mathfunc import (cot, arcsec, arccsc, arccot, sech, csch, coth,
                                           arcsech, arccsch, arccoth, sec, csc)
@@ -258,6 +258,10 @@ def test_calcpy():
     result = evaluator("1 || 1 || 0", {}, {}, {})
     assert result[0] == approx(float('nan'), nan_ok=True)
     assert result[1] == set()
+
+    # Test incorrect case variables
+    with raises(UndefinedVariable, match=r"Invalid Input: X not permitted in answer as a variable \(did you mean x\?\)"):
+        evaluator("X", {"x": 1}, {}, {})
 
 def test_validators():
     """Tests of validatorfuncs.py that aren't covered elsewhere"""

@@ -240,17 +240,7 @@ Tolerances are necessary because of numerical roundoff error that lead to small 
 
 ## Case Sensitive Input
 
-By default, expressions are treated in a case sensitive manner. This means that variables `m` and `M` are distinct variables. If you want to grade answers in a case-insensitive manner, you can use the following.
-
-```python
-grader = FormulaGrader(
-    answers='2*sin(theta)*cos(theta)',
-    variables=['theta'],
-    case_sensitive=False
-)
-```
-
-This will allow students to use `SIN` and `COS` as well as `sin` and `cos`.
+All expressions are treated in a case sensitive manner. This means that variables `m` and `M` are distinct variables. Prior to version 1.1, we had a case-insensitive option available. However, this option is now deprecated, as it was causing issues in the codebase, nobody was using it (that we know of), and the majority of languages are case-sensitive anway.
 
 ## Suffixes
 
