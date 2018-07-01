@@ -22,6 +22,7 @@ from mitxgraders import (
 from mitxgraders.voluptuous import Error, MultipleInvalid
 from mitxgraders.sampling import set_seed
 from mitxgraders.version import __version__ as VERSION
+from mitxgraders.helpers.calc import UndefinedFunction
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
@@ -245,27 +246,25 @@ def test_fg_blacklist_grading():
     grader = FormulaGrader(
         answers="sin(0.4)/cos(0.4)",
         user_functions={"hello": np.tan},
-        blacklist=['tan'],
-        case_sensitive=False
+        blacklist=['tan']
     )
     assert grader(None, "hello(0.4)")['ok']
     # Incorrect answers with forbidden function are marked wrong:
     assert not grader(None, "cos(0.4)/sin(0.4)")['ok']
     # Correct answers with forbidden function raise error:
     assert grader(None, "sin(0.4)/cos(0.4)")['ok']
-    expect = "Invalid Input: function(s) 'tan' not permitted in answer"
-    with raises(InvalidInput, message=expect):
+    expect = r"Invalid Input: function\(s\) 'tan' not permitted in answer"
+    with raises(InvalidInput, match=expect):
         grader(None, "tan(0.4)")
-    expect = "Invalid Input: function(s) 'TAN', 'Tan' not permitted in answer"
-    with raises(InvalidInput, message=expect):
+    expect = r"Invalid Input: TAN, Tan not permitted in answer as a function \(did you mean tan\?\)"
+    with raises(UndefinedFunction, match=expect):
         grader(None, "(TAN(0.4) + Tan(0.4))/2")
 
 def test_fg_whitelist_grading():
     grader = FormulaGrader(
         answers="sin(0.4)/cos(0.4)",
         user_functions={"hello": np.tan},
-        whitelist=['cos', 'sin'],
-        case_sensitive=False
+        whitelist=['cos', 'sin']
     )
     assert grader(None, "hello(0.4)")['ok']
 
@@ -274,11 +273,11 @@ def test_fg_whitelist_grading():
     # Incorrect answers with forbidden function are marked wrong:
     assert not grader(None, "cos(0.4)/sin(0.4)")['ok']
     # Correct answers with forbidden function raise error:
-    expect = "Invalid Input: function(s) 'tan' not permitted in answer"
-    with raises(InvalidInput, message=expect):
+    expect = r"Invalid Input: function\(s\) 'tan' not permitted in answer"
+    with raises(InvalidInput, match=expect):
         grader(None, "tan(0.4)")
-    expect = "Invalid Input: function(s) 'tan' not permitted in answer"
-    with raises(InvalidInput, message=expect):
+    expect = r"Invalid Input: TAN not permitted in answer as a function \(did you mean tan\?\)"
+    with raises(UndefinedFunction, match=expect):
         grader(None, "TAN(0.4)")
 
     grader = FormulaGrader(
@@ -286,12 +285,12 @@ def test_fg_whitelist_grading():
         whitelist=[None]
     )
     assert grader(None, "1")['ok']
-    expect = "Invalid Input: function(s) 'cos' not permitted in answer"
-    with raises(InvalidInput, message=expect):
+    expect = r"Invalid Input: function\(s\) 'cos' not permitted in answer"
+    with raises(InvalidInput, match=expect):
         grader(None, "cos(0)")
 
 def test_fg_blacklist_whitelist_config_errors():
-    with raises(ConfigError, message="Cannot whitelist and blacklist at the same time"):
+    with raises(ConfigError, match="Cannot whitelist and blacklist at the same time"):
         FormulaGrader(
             answers="5",
             blacklist=['tan'],
@@ -310,25 +309,12 @@ def test_fg_blacklist_whitelist_config_errors():
             whitelist=['test']
         )
 
-def test_fg_case_sensitive():
-    """Test FormulaGrader with case insensitive input"""
-    grader = FormulaGrader(
-        answers="sin(pi)",
-        case_sensitive=False,
-        tolerance=1e-15
-    )
-    assert grader(None, "sin(pi)")['ok']
-    assert grader(None, "0")['ok']
-    assert grader(None, "Sin(Pi)")['ok']
-    assert grader(None, "SIN(PI)")['ok']
-
 def test_fg_forbidden():
     """Test FormulaGrader with forbidden strings in input"""
     grader = FormulaGrader(
         answers="2*sin(x)*cos(x)",
         variables=['x'],
-        forbidden_strings=['+ x', '- x', '*x'],
-        case_sensitive=False
+        forbidden_strings=['+ x', '- x', '*x']
     )
     assert grader(None, '2*sin(x)*cos(x)')['ok']
 
@@ -338,7 +324,7 @@ def test_fg_forbidden():
     with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
         grader(None, "sin(x    +    x)")
     with raises(InvalidInput, match="Invalid Input: This particular answer is forbidden"):
-        grader(None, "sin(3*X    -X)")
+        grader(None, "sin(3*x    -x)")
 
     # If the answer is mathematically incorrect AND contains a forbidden string, mark it wrong
     assert not grader(None, "sin(3*x)")['ok']
@@ -356,10 +342,9 @@ def test_fg_required():
     grader = FormulaGrader(
         answers="sin(x)/cos(x)",
         variables=['x'],
-        required_functions=['sin', 'cos'],
-        case_sensitive=False
+        required_functions=['sin', 'cos']
     )
-    assert grader(None, 'SIN(x)/COS(x)')['ok']
+    assert grader(None, 'sin(x)/cos(x)')['ok']
     with raises(InvalidInput, match="Invalid Input: Answer must contain the function sin"):
         grader(None, "tan(x)")
 
@@ -777,13 +762,6 @@ def test_docs():
         tolerance=0.00001
     )
     assert grader(None, '2*sin(theta)*cos(theta)')['ok']
-
-    grader = FormulaGrader(
-        answers='2*sin(theta)*cos(theta)',
-        variables=['theta'],
-        case_sensitive=False
-    )
-    assert grader(None, '2*Sin(theta)*Cos(theta)')['ok']
 
     grader = FormulaGrader(
         answers='2*m',

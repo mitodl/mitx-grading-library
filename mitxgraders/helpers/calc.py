@@ -218,7 +218,7 @@ class ParserCache(object):
         """Initializes the cache"""
         self.cache = {}
 
-    def get_parser(self, formula, case_sensitive, suffixes):
+    def get_parser(self, formula, suffixes):
         """Get a ParseAugmenter object for a given formula"""
         # Check the formula for matching parentheses
         count = 0
@@ -246,7 +246,7 @@ class ParserCache(object):
         suffixstr = ""
         for key in suffixes:
             suffixstr += key
-        key = (stripformula, case_sensitive, ''.join(sorted(suffixstr)))
+        key = (stripformula, ''.join(sorted(suffixstr)))
 
         # Check if it's in the cache
         parser = self.cache.get(key, None)
@@ -254,7 +254,7 @@ class ParserCache(object):
             return parser
 
         # It's not, so construct it
-        parser = ParseAugmenter(stripformula, case_sensitive, suffixes)
+        parser = ParseAugmenter(stripformula, suffixes)
         try:
             parser.parse_algebra()
         except ParseException:
@@ -270,23 +270,24 @@ class ParserCache(object):
 parsercache = ParserCache()
 
 
-def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
+def evaluator(formula, variables, functions, suffixes):
     """
     Evaluate an expression; that is, take a string of math and return a float.
 
     -Variables are passed as a dictionary from string to value. They must be
      python numbers.
     -Unary functions are passed as a dictionary from string to function.
+    -Everything is case sensitive (note, this is different to edX!)
 
     Usage
     =====
-    >>> evaluator("1+1", {}, {}, {}, True)
+    >>> evaluator("1+1", {}, {}, {})
     (2.0, set([]))
-    >>> evaluator("1+x", {"x": 5}, {}, {}, True)
+    >>> evaluator("1+x", {"x": 5}, {}, {})
     (6.0, set([]))
-    >>> evaluator("square(2)", {}, {"square": lambda x: x*x}, {}, True)
+    >>> evaluator("square(2)", {}, {"square": lambda x: x*x}, {})
     (4.0, set(['square']))
-    >>> evaluator("", {}, {}, {}, True)
+    >>> evaluator("", {}, {}, {})
     (nan, set([]))
     """
     if formula is None:
@@ -298,22 +299,10 @@ def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
         return float('nan'), set()
 
     # Parse the tree
-    math_interpreter = parsercache.get_parser(formula, case_sensitive, suffixes)
-
-    # If we're not case sensitive, then lower all variables and functions
-    if not case_sensitive:
-        # Also make the variables and functions lower case
-        variables = {key.lower(): value for key, value in variables.iteritems()}
-        functions = {key.lower(): value for key, value in functions.iteritems()}
+    math_interpreter = parsercache.get_parser(formula, suffixes)
 
     # Check the variables and functions
     math_interpreter.check_variables(variables, functions)
-
-    # Some helper functions...
-    if case_sensitive:
-        casify = lambda x: x
-    else:
-        casify = lambda x: x.lower()  # Lowercase for case insensitive
 
     def eval_number(parse_result):
         """
@@ -331,7 +320,7 @@ def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
     def eval_function(parse_result):
         name, arg = parse_result
         try:
-            return functions[casify(name)](arg)
+            return functions[name](arg)
         except ZeroDivisionError:
             # It would be really nice to tell student the symbolic argument as part of this message,
             # but making symbolic argument available would require some nontrivial restructing
@@ -360,7 +349,7 @@ def evaluator(formula, variables, functions, suffixes, case_sensitive=True):
     # Create a recursion to evaluate the tree
     evaluate_actions = {
         'number': eval_number,
-        'variable': lambda x: variables[casify(x[0])],
+        'variable': lambda x: variables[x[0]],
         'function': eval_function,
         'atom': eval_atom,
         'power': eval_power,
@@ -385,17 +374,15 @@ class ParseAugmenter(object):
     """
     Holds the data for a particular parse.
 
-    Retains the `math_expr` and `case_sensitive` so they needn't be passed
-    around method to method.
+    Retains `math_expr` so it needn't be passed around method to method.
     Eventually holds the parse tree and sets of variables as well.
     """
-    def __init__(self, math_expr, case_sensitive, suffixes):
+    def __init__(self, math_expr, suffixes):
         """
         Create the ParseAugmenter for a given math expression string.
 
         Do the parsing later, when called like `OBJ.parse_algebra()`.
         """
-        self.case_sensitive = case_sensitive
         self.math_expr = math_expr
         self.tree = None
         self.variables_used = set()
@@ -542,38 +529,43 @@ class ParseAugmenter(object):
         Confirm that all the variables and functions used in the tree are defined.
         Otherwise, raise an UndefinedVariable or UndefinedFunction
         """
-        if self.case_sensitive:
-            casify = lambda x: x
-        else:
-            casify = lambda x: x.lower()  # Lowercase for case insens.
 
-        # Test if casify(X) is valid, but return the actual bad input (i.e. X)
         bad_vars = set(var for var in self.variables_used
-                       if casify(var) not in valid_variables)
+                       if var not in valid_variables)
         if bad_vars:
             message = "Invalid Input: {} not permitted in answer as a variable"
             varnames = ", ".join(sorted(bad_vars))
+
+            # Check to see if there is a different case version of the variable
+            caselist = set()
+            for var2 in bad_vars:
+                for var1 in valid_variables:
+                    if var1.lower() == var2.lower():
+                        caselist.add(var1)
+            if len(caselist) > 0:
+                betternames = ', '.join(sorted(caselist))
+                message += " (did you mean " + betternames + "?)"
+
             raise UndefinedVariable(message.format(varnames))
 
         bad_funcs = set(func for func in self.functions_used
-                        if casify(func) not in valid_functions)
+                        if func not in valid_functions)
         if bad_funcs:
             funcnames = ', '.join(sorted(bad_funcs))
             message = "Invalid Input: {} not permitted in answer as a function"
 
             # Check to see if there is a corresponding variable name
-            if any(casify(func) in valid_variables for func in bad_funcs):
+            if any(func in valid_variables for func in bad_funcs):
                 message += " (did you forget to use * for multiplication?)"
 
             # Check to see if there is a different case version of the function
             caselist = set()
-            if self.case_sensitive:
-                for func2 in bad_funcs:
-                    for func1 in valid_functions:
-                        if func2.lower() == func1.lower():
-                            caselist.add(func1)
-                if len(caselist) > 0:
-                    betternames = ', '.join(sorted(caselist))
-                    message += " (did you mean " + betternames + "?)"
+            for func2 in bad_funcs:
+                for func1 in valid_functions:
+                    if func2.lower() == func1.lower():
+                        caselist.add(func1)
+            if len(caselist) > 0:
+                betternames = ', '.join(sorted(caselist))
+                message += " (did you mean " + betternames + "?)"
 
             raise UndefinedFunction(message.format(funcnames))

@@ -364,8 +364,7 @@ class DependentSampler(VariableSamplingSet):
     # Take in an individual or tuple of numbers
     schema_config = Schema({
         Required('depends'): [str],
-        Required('formula'): str,
-        Required('case_sensitive', default=True): bool
+        Required('formula'): str
     })
 
     def gen_sample(self):
@@ -376,7 +375,6 @@ class DependentSampler(VariableSamplingSet):
         """Compute the value of this sample"""
         try:
             result, _ = evaluator(formula=self.config['formula'],
-                                  case_sensitive=self.config['case_sensitive'],
                                   variables=sample_dict,
                                   functions=DEFAULT_FUNCTIONS,
                                   suffixes=DEFAULT_SUFFIXES)

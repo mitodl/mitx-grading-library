@@ -439,8 +439,8 @@ def test_blacklist_grading():
 
     # Correct answer with forbidden functions raises error
     student_input0 = ['a', 'b', 'x^2 * cos(0) + sin(0)', 'x']
-    with raises(InvalidInput, message="Invalid Input: function(s) 'cos', 'sin' "
-                                      "not permitted in answer"):
+    with raises(InvalidInput, match=r"Invalid Input: function\(s\) 'cos', 'sin' "
+                                     "not permitted in answer"):
         grader(None, student_input0)
 
     # Incorrect answer with forbidden functions marked wrong
@@ -461,8 +461,8 @@ def test_whitelist_grading():
 
     # Correct answer with forbidden functions raises error
     student_input0 = ['a', 'b', 'x^2 * cos(0) + tan(0)*sec(0)', 'x']
-    with raises(InvalidInput, message="Invalid Input: function(s) 'tan', 'sec' "
-                                      "not permitted in answer"):
+    with raises(InvalidInput, match=r"Invalid Input: function\(s\) 'sec', 'tan' "
+                                    "not permitted in answer"):
         grader(None, student_input0)
 
     # Incorrect answer with forbidden functions marked wrong
