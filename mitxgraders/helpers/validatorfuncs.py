@@ -3,6 +3,7 @@ validatorfuncs.py
 
 Stand-alone validator functions for use in voluptuous Schema
 """
+import itertools
 from numbers import Number
 from inspect import getargspec
 from mitxgraders.voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
@@ -79,6 +80,38 @@ def ListOfType(given_type, validator=None):
         return schema(config_input)
     return func
 
+def all_unique(iterable):
+    """
+    Voluptuous validator; tests whether all items in an iterable are unique
+
+    Usage
+    =====
+
+    Returns the input if all items are unique:
+    >>> iterable = ['a', 0, '1', '5']
+    >>> all_unique(iterable) == iterable
+    True
+
+    Raises an error if any items are duplicated:
+    >>> iterable = ['a', 0, '1', 'a', '5', 0, '0']
+    >>> all_unique(iterable)
+    Traceback (most recent call last):
+    Invalid: items should be unique, but have unexpected duplicates: ['a', 0]
+    """
+    seen = set()
+    duplicates = set()
+    for item in iterable:
+        if item in seen:
+            duplicates.add(item)
+        else:
+            seen.add(item)
+
+    if duplicates:
+        msg = 'items should be unique, but have unexpected duplicates: {duplicates}'
+        raise Invalid(msg.format(iterable=iterable, duplicates=list(duplicates)))
+
+    return iterable
+
 @truth
 def is_callable(obj):
     """Returns true if obj is callable"""
@@ -136,7 +169,6 @@ def get_number_of_args(callable_obj):
         pass
 
     return num_args
-
 
 def is_callable_with_args(num_args):
     """

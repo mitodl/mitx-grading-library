@@ -83,7 +83,8 @@ class AbstractGrader(ObjectWithSchema):
         Classes that inherit from AbstractGrader should extend this schema.
         """
         return Schema({
-            Required('debug', default=False): bool  # Use to turn on debug output
+            Required('debug', default=False): bool,  # Use to turn on debug output
+            Required('suppress_warnings', default=False): bool
         })
 
     @abc.abstractmethod
