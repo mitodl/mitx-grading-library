@@ -12,6 +12,13 @@ An edX python grading library
 # Add the current version
 from mitxgraders.version import __version__
 
+# Add voluptuous
+try:
+    import voluptuous
+except ImportError:
+    raise ImportError("External dependency 'voluptuous' not found;"
+                      " see https://github.com/mitodl/mitx-grading-library#faq")
+
 # All modules defining grading classes must set __all__ to specify
 # which classes are imported with the package
 from mitxgraders.stringgrader import *

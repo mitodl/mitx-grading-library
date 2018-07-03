@@ -17,7 +17,7 @@ We thank the MIT Office of Digital Learning for their support.
 - [Local Installation](#local-installation)
 - [Usage in edX](#usage-in-edx)
 - [Grader Documentation](#grader-documentation)
-- [FAQ](#FAQ)
+- [FAQ](#faq)
 
 
 ## Demo Course
