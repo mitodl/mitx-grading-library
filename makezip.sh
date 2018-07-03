@@ -6,9 +6,9 @@
 echo Updating .pyc files...
 python basic_demo.py > /dev/null
 
-# Kill all .DS_Store files
-echo Removing all .DS_Store files...
-find . -name '.DS_Store' -type f -delete
+# Kill all .DS_Store files and __pycache__ folders
+echo Removing all .DS_Store and __pycache__ files...
+find . | grep -E "(__pycache__|\.DS_Store)" | xargs rm -rf
 
 # Remove the old python_lib.zip
 file="python_lib.zip"
