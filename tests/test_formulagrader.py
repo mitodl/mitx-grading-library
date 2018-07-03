@@ -5,6 +5,7 @@ from __future__ import division
 from pytest import raises
 from mock import Mock
 import numpy as np
+from voluptuous import Error, MultipleInvalid
 from mitxgraders import (
     FormulaGrader,
     NumericalGrader,
@@ -19,11 +20,9 @@ from mitxgraders import (
     ConfigError,
     InvalidInput,
 )
-from mitxgraders.voluptuous import Error, MultipleInvalid
 from mitxgraders.sampling import set_seed
-from mitxgraders.helpers.calc import UndefinedVariable
 from mitxgraders.version import __version__ as VERSION
-from mitxgraders.helpers.calc import UndefinedFunction
+from mitxgraders.helpers.calc import UndefinedVariable, UndefinedFunction
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(

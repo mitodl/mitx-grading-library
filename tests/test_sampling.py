@@ -3,6 +3,9 @@ Tests for the various sampling classes
 """
 from __future__ import division
 import random
+import numpy as np
+from pytest import raises, approx
+from voluptuous import Error
 from mitxgraders import (
     RealInterval,
     IntegerRange,
@@ -15,9 +18,6 @@ from mitxgraders import (
     ConfigError
 )
 from mitxgraders.sampling import gen_symbols_samples
-from mitxgraders.voluptuous import Error
-from pytest import raises, approx
-import numpy as np
 
 def test_real_interval():
     """Tests the RealInterval class"""

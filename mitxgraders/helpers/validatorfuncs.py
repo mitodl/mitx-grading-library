@@ -3,10 +3,9 @@ validatorfuncs.py
 
 Stand-alone validator functions for use in voluptuous Schema
 """
-import itertools
 from numbers import Number
 from inspect import getargspec
-from mitxgraders.voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
+from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
 
 def Positive(thetype):
     """Demand a positive number type"""
@@ -195,7 +194,7 @@ def is_callable_with_args(num_args):
     """
     def _validate(func):
         # first, check that the function is callable
-        is_callable(func) # raises an error if not callable
+        is_callable(func)  # raises an error if not callable
         f_args = get_number_of_args(func)
         if not f_args == num_args:
             msg = "Expected function {func} to have {num_args} arguments, instead it has {f_args}"

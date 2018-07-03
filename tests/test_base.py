@@ -4,13 +4,13 @@ Tests of base class functionality
 from __future__ import division
 import math
 import random
+from pytest import raises, approx
+from voluptuous import Error, Invalid, truth
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, CalcError, __version__
-from mitxgraders.voluptuous import Error, Invalid, truth
-from mitxgraders.helpers.calc import evaluator, UnableToParse, UndefinedVariable
 from mitxgraders.helpers import validatorfuncs
+from mitxgraders.helpers.calc import evaluator, UnableToParse, UndefinedVariable
 from mitxgraders.helpers.mathfunc import (cot, arcsec, arccsc, arccot, sech, csch, coth,
                                           arcsech, arccsch, arccoth, sec, csc)
-from pytest import raises, approx
 
 def test_debug_with_author_message():
     grader = StringGrader(

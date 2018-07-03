@@ -17,7 +17,7 @@ cp LICENSE ./mitxgraders/LICENSE
 
 # Create the zip file
 echo Building python_lib.zip...
-zip -r $file mitxgraders
+zip -r $file mitxgraders voluptuous
 
 # Remove the license from the grading folder
 rm ./mitxgraders/LICENSE
