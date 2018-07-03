@@ -52,7 +52,16 @@ You cannot 'mix and match' these two options. If a configuration dictionary is s
 
 ## Options
 
-Every grading class has a debug option. By default, `debug=False`. To receive debug information from a given grader, specify `debug=True`. Some graders will provide more debug information than others.
+The options passed to a grading class undergo extensive validation and graders will throw
+errors if instantiated with invalid options.
+
+A few error messages serve only as warnings (e.g., that you are attempting to override a default constant like `pi`). These warning errors can be suppressed by setting
+
+````python
+grader = GradingClass(suppress_warnings=True)
+````
+
+Every grading class also has a debug option. By default, `debug=False`. To receive debug information from a given grader, specify `debug=True`. Some graders will provide more debug information than others.
 
 ````python
 grader = GradingClass(debug=True)

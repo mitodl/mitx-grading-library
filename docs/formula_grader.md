@@ -22,7 +22,7 @@ grader = FormulaGrader(
 
 Note that the `answers` parameter follows all of the usual allowances from ItemGrader.
 
-The variables need to have numbers randomly assigned to them. Each is sampled from a [sampling set](sampling.md), which is RealInterval() by default (random numbers from 1 to 3). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the `sample_from` key.
+The variables need to have numbers randomly assigned to them. Each is sampled from a [sampling set](sampling.md), which is RealInterval() by default (random numbers from 1 to 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the `sample_from` key.
 
 ````python
 grader = FormulaGrader(
@@ -98,55 +98,6 @@ grader = FormulaGrader(
 )
 ```
 
-### Blacklists and Whitelists
-
-You can disallow specific functions by adding them to the blacklist of functions as a list of disallowed function names. In the following example, `sin` is disallowed in correct answers.
-
-```python
-grader = FormulaGrader(
-    answers='sqrt(1 - cos(x)^2)',
-    variables=['x'],
-    sample_from={'x': [0, np.pi]},
-    blacklist=['sin']
-)
-```
-
-If you want to exclude everything except for a specific set of functions, instead use a whitelist. In the following example, the only allowed functions in correct answers are sin and cos.
-
-```python
-grader = FormulaGrader(
-    answers='sin(x)/cos(x)',
-    variables=['x'],
-    whitelist=['sin', 'cos']
-)
-```
-
-If you want to exclude all functions, use the following whitelist.
-
-```python
-grader = FormulaGrader(
-    answers='pi/2-x',
-    variables=['x'],
-    whitelist=[None]
-)
-```
-
-You cannot use a whitelist and a blacklist at the same time.
-
-
-### Required Functions
-
-You can specifically require certain functions to appear in the solution. Any solution that does not include all of these functions will generate an error message. To do this, specify a list of strings of function names that are required.
-
-```python
-grader = FormulaGrader(
-    answers='2*sin(theta)*cos(theta)',
-    variables=['theta'],
-    required_functions=['sin', 'cos']
-)
-```
-
-
 ### User Functions
 
 You can make user-defined functions available for students to use in their answers. To add user-defined functions, pass in a dictionary to the `user_functions` key as follows.
@@ -166,16 +117,6 @@ grader = FormulaGrader(
     answers="f''(x)",
     variables=['x'],
     user_functions={"f''": lambda x: x*x}
-)
-```
-
-If desired, you can override default functions.
-
-```python
-grader = FormulaGrader(
-    answers="x^2",
-    variables=['x'],
-    user_functions={"sin": lambda x: x*x}
 )
 ```
 
@@ -209,7 +150,7 @@ This allows you to grade mathematical expressions that involve unknown functions
 
 ## Constants
 
-By default, four constants are defined: `e`, `pi`, and `i`/`j`. You can define new constants by passing in a dictionary to `user_constants` as follows.
+By default, four constants are defined: `e`, `pi`, and `i=j=sqrt(-1)`. You can define new constants by passing in a dictionary to `user_constants` as follows.
 
 ```python
 grader = FormulaGrader(
@@ -221,14 +162,33 @@ grader = FormulaGrader(
 )
 ```
 
-Constants are like variables that only ever have one value. You can overwrite constants if you like by passing in new definitions in user_constants, but we recommend against this. We also recommend ensuring that your constants and variables all have unique names. Variables will overwrite any constants that have the same name.
+Constants are like variables that only ever have one value.
 
-Note that by default, edX defines the constants `k`, `c` and `T`. In our experience, these constants lead to confusion when answers that should produce invalid variable errors instead simply eat a student's attempt. You can reintroduce them as necessary.
+## Overriding Default Functions and Constants
+You can override default functions and constants if you really want, although this is discouraged and requires suppressing warnings with `suppress_warnings=True`. The grader
 
+```python
+grader = FormulaGrader(
+    answers='x^2',
+    variables=['x'],
+    user_functions={'sin': lambda x: x*x},
+)
+```
+will raise an error
 
-## Forbidden Strings
+> ConfigError: Warning: 'user_functions' contains entries '['sin']' which will override default values. If you intend to override to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
 
-For some questions, you will want to forbid some specific strings from the answer. For example, if you want students to expand `sin(2*theta)`, then you don't want students to be able to just write `sin(2*theta)` and be graded correct. You can deal with this by forbidding certain strings, as in the following example.
+The error can be suppressed by setting `suppress_warnings=True`.
+
+## Restricting Student Input
+
+For some questions, you will want to restrict the sorts of input that are marked correct. For example, if you want students to expand `sin(2*theta)`, then you don't want students to be able to just write `sin(2*theta)` and be graded correct.
+
+FormulaGrader offers a few ways to restrict what sort of answers will be marked correct.
+
+### Forbidden Strings
+
+You can forbid students from entering certain strings using the `forbidden_strings` key:
 
 ```python
 grader = FormulaGrader(
@@ -241,6 +201,54 @@ grader = FormulaGrader(
 
 If a student tries to use one of these strings, then they receive the `forbidden_message`, without giving away what the forbidden string is. We recommend using this sparingly, as students will find it confusing. The default `forbidden_message` is "Invalid Input: This particular answer is forbidden".
 
+Forbidden strings and student answers are stripped of whitespace before being compared. Thus, if `x + y` is forbidden, then answers containing `x+y` or `x   +   y` will be rejected.
+
+### Blacklists and Whitelists
+
+You can disallow specific functions by adding them to the blacklist of functions as a list of disallowed function names. In the following example, `sin` is disallowed in correct answers.
+
+```python
+grader = FormulaGrader(
+    answers='sqrt(1 - cos(x)^2)',
+    variables=['x'],
+    sample_from={'x': [0, np.pi]},
+    blacklist=['sin']
+)
+```
+
+If you want to exclude everything except for a specific set of functions, instead use a whitelist. In the following example, the only allowed functions in correct answers are sin and cos.
+
+```python
+grader = FormulaGrader(
+    answers='sin(x)/cos(x)',
+    variables=['x'],
+    whitelist=['sin', 'cos']
+)
+```
+
+If you want to exclude all functions, use `whitelist=[None]`:
+
+```python
+grader = FormulaGrader(
+    answers='pi/2-x',
+    variables=['x'],
+    whitelist=[None] # no functions are allowed
+)
+```
+
+You cannot use a whitelist and a blacklist at the same time.
+
+### Required Functions
+
+You can specifically require certain functions to appear in the solution. Any solution that does not include all of these functions will generate an error message. To do this, specify a list of strings of function names that are required.
+
+```python
+grader = FormulaGrader(
+    answers='2*sin(theta)*cos(theta)',
+    variables=['theta'],
+    required_functions=['sin', 'cos']
+)
+```
 
 ## Tolerance
 

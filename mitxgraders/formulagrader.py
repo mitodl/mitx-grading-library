@@ -10,6 +10,7 @@ from numbers import Number
 from collections import namedtuple
 from pprint import PrettyPrinter
 import re
+import itertools
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes)
@@ -17,8 +18,8 @@ from mitxgraders.baseclasses import ItemGrader, InvalidInput, ConfigError
 from mitxgraders.voluptuous import Schema, Required, Any, All, Extra, Invalid, Length
 from mitxgraders.helpers.calc import CalcError, evaluator, parsercache
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
-                                                PercentageString, is_callable_with_args)
-from mitxgraders.helpers.mathfunc import within_tolerance, DEFAULT_FUNCTIONS
+                                                PercentageString, is_callable_with_args, all_unique)
+from mitxgraders.helpers.mathfunc import within_tolerance, DEFAULT_FUNCTIONS, DEFAULT_VARIABLES
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -219,6 +220,86 @@ def numbered_vars_regexp(numbered_vars):
               r"})$") # match closing }, close group, and end of string
     return re.compile(regexp)
 
+def validate_no_collisions(config, keys):
+    """
+    Validates no collisions between iterable config fields specified by keys.
+
+    Usage
+    =====
+
+    Duplicate entries raise a ConfigError:
+    >>> keys = ['variables', 'user_constants', 'numbered_vars']
+    >>> validate_no_collisions({
+    ...     'variables':['a', 'b', 'c', 'x', 'y'],
+    ...     'user_constants':{'x': 5, 'y': 10},
+    ...     'numbered_vars':['phi', 'psi']
+    ... }, keys)
+    Traceback (most recent call last):
+    ConfigError: 'user_constants' and 'variables' contain duplicate entries: ['x', 'y']
+
+    >>> validate_no_collisions({
+    ...     'variables':['a', 'psi', 'phi', 'X', 'Y'],
+    ...     'user_constants':{'x': 5, 'y': 10},
+    ...     'numbered_vars':['phi', 'psi']
+    ... }, keys)
+    Traceback (most recent call last):
+    ConfigError: 'numbered_vars' and 'variables' contain duplicate entries: ['phi', 'psi']
+
+    Without duplicates, return True
+    >>> validate_no_collisions({
+    ...     'variables':['a', 'b', 'c', 'F', 'G'],
+    ...     'user_constants':{'x': 5, 'y': 10},
+    ...     'numbered_vars':['phi', 'psi']
+    ... }, keys)
+    True
+    """
+    dict_of_sets = {k: set(config[k]) for k in keys}
+    msg = "'{iter1}' and '{iter2}' contain duplicate entries: {duplicates}"
+
+    for k1, k2 in itertools.combinations(dict_of_sets, r=2):
+        k1, k2 = sorted([k1, k2])
+        duplicates = dict_of_sets[k1].intersection(dict_of_sets[k2])
+        if duplicates:
+            sorted_dups = list(sorted(duplicates))
+            raise ConfigError(msg.format(iter1=k1, iter2=k2, duplicates=sorted_dups))
+    return True
+
+def warn_if_override(config, key, defaults):
+    """
+    Raise an error if config[key] overlaps with defaults unless config['suppress_warnings'] is True.
+
+    Notes:
+        - config[key] and defaults must both be iterable.
+
+    Usage
+    =====
+
+    >>> config = {'vars': ['a', 'b', 'cat', 'psi', 'pi']}
+    >>> warn_if_override(
+    ... config,
+    ... 'vars',
+    ... {'cat': 1, 'pi': 2}
+    ... ) # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ConfigError: Warning: 'vars' contains entries '['cat', 'pi']' ...
+
+    >>> config = {'vars': ['a', 'b', 'cat', 'psi', 'pi'], 'suppress_warnings': True}
+    >>> warn_if_override(
+    ... config,
+    ... 'vars',
+    ... {'cat': 1, 'pi': 2}
+    ... ) == config
+    True
+
+    """
+    duplicates = set(defaults).intersection(set(config[key]))
+    if duplicates and not config.get('suppress_warnings', False):
+        sorted_dups = list(sorted(duplicates))
+        msg = ("Warning: '{key}' contains entries '{duplicates}' which will override default "
+               "values. If you intend to override to override defaults, you may suppress "
+               "this warning by adding 'suppress_warnings=True' to the grader configuration.")
+        raise ConfigError(msg.format(key=key, duplicates=sorted_dups))
+    return config
 
 class FormulaGrader(ItemGrader):
     """
@@ -316,8 +397,8 @@ class FormulaGrader(ItemGrader):
             Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
             Required('metric_suffixes', default=False): bool,
             Required('samples', default=5): Positive(int),
-            Required('variables', default=[]): [str],
-            Required('numbered_vars', default=[]): [str],
+            Required('variables', default=[]): All([str], all_unique),
+            Required('numbered_vars', default=[]): All([str], all_unique),
             Required('sample_from', default={}): dict,
             Required('failable_evals', default=0): NonNegative(int)
         })
@@ -410,8 +491,14 @@ class FormulaGrader(ItemGrader):
         """
         super(FormulaGrader, self).__init__(config, **kwargs)
 
-        # finish validating blacklist/whitelist
+        # finish validating
         validate_blacklist_whitelist_config(self.config['blacklist'], self.config['whitelist'])
+        validate_no_collisions(self.config, keys=['variables', 'user_constants'])
+        warn_if_override(self.config, 'variables', DEFAULT_VARIABLES)
+        warn_if_override(self.config, 'numbered_vars', DEFAULT_VARIABLES)
+        warn_if_override(self.config, 'user_constants', DEFAULT_VARIABLES)
+        warn_if_override(self.config, 'user_functions', DEFAULT_FUNCTIONS)
+
         self.permitted_functions = get_permitted_functions(self.config['whitelist'],
                                                            self.config['blacklist'],
                                                            self.config['user_functions'])

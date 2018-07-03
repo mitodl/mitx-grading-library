@@ -39,19 +39,9 @@ def test_half_power_of_negative_number():
 
 def test_overriding_functions():
     grader = FormulaGrader(
-        answers='z^2',
-        variables=['z'],
-        user_functions={'re': RandomFunction(), 'im': RandomFunction()},
-        sample_from={
-            'z': ComplexRectangle()
-        }
-    )
-    learner_input = 're(z)^2 - im(z)^2 + 2*i*re(z)*im(z)'
-    assert not grader(None, learner_input)['ok']
-
-    grader = FormulaGrader(
         answers='tan(1)',
-        user_functions={'sin': lambda x: x}
+        user_functions={'sin': lambda x: x},
+        suppress_warnings=True
     )
     assert grader(None, 'tan(1)')['ok']
     assert not grader(None, 'sin(1)/cos(1)')['ok']
@@ -734,7 +724,8 @@ def test_docs():
     grader = FormulaGrader(
         answers="x^2",
         variables=['x'],
-        user_functions={"sin": lambda x: x*x}
+        user_functions={"sin": lambda x: x*x},
+        suppress_warnings=True
     )
     assert grader(None, 'sin(x)')['ok']
 

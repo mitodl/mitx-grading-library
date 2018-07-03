@@ -16,14 +16,16 @@ from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, Real
 from mitxgraders.formulagrader import (
     validate_blacklist_whitelist_config,
     validate_only_permitted_functions_used,
-    get_permitted_functions
+    get_permitted_functions,
+    validate_no_collisions,
+    warn_if_override
 )
 from mitxgraders.baseclasses import AbstractGrader, InvalidInput, ConfigError
 from mitxgraders.voluptuous import Schema, Required, Any, All, Extra, Length
 from mitxgraders.helpers.calc import (CalcError, evaluator)
-from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative,
+from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, all_unique,
                                                 PercentageString, is_callable)
-from mitxgraders.helpers.mathfunc import within_tolerance
+from mitxgraders.helpers.mathfunc import within_tolerance, DEFAULT_FUNCTIONS, DEFAULT_VARIABLES
 
 __all__ = ["IntegralGrader"]
 
@@ -94,7 +96,7 @@ class IntegralGrader(AbstractGrader):
     an author-specified integral.
 
     WARNINGS
-    =======
+    ========
     This grader numerically evaluates the student- and instructor-specified
     integrals using scipy.integrate.quad. This quadrature-based integration
     technique is efficient and flexible. It handles many integrals with
@@ -217,7 +219,7 @@ class IntegralGrader(AbstractGrader):
             ),
             Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
             Required('samples', default=1): Positive(int),  # default changed to 1
-            Required('variables', default=[]): [str],
+            Required('variables', default=[]): All([str], all_unique),
             Required('sample_from', default={}): dict,
             Required('failable_evals', default=0): NonNegative(int)
         })
@@ -272,8 +274,12 @@ class IntegralGrader(AbstractGrader):
 
         # The below are copied from FormulaGrader.__init__
 
-        # finish validating blacklist/whitelist
         validate_blacklist_whitelist_config(self.config['blacklist'], self.config['whitelist'])
+        validate_no_collisions(self.config, keys=['variables', 'user_constants'])
+        warn_if_override(self.config, 'variables', DEFAULT_VARIABLES)
+        warn_if_override(self.config, 'user_constants', DEFAULT_VARIABLES)
+        warn_if_override(self.config, 'user_functions', DEFAULT_FUNCTIONS)
+
         self.permitted_functions = get_permitted_functions(self.config['whitelist'],
                                                            self.config['blacklist'],
                                                            self.config['user_functions'])
