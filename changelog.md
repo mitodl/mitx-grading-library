@@ -1,7 +1,7 @@
 # Change Log
 
 ### Version 1.1.1
-* Added MathJax renderer definitions
+* Added AsciiMath renderer definitions
 * We now check for naming collisions in your configuration
 * Cleaned up voluptuous incorporation
 * Removed .pyc files from the zip file

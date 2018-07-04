@@ -34,7 +34,7 @@ grader2 = FormulaGrader(
   <textline math="1" correct_answer="abs(z)^2"/>
 </customresponse>
 
-<p>Note that "conj", "re" and "im" display correctly as functions (even when you type in "1/conj(x)"). To accomplish this, we use MathJax renderer definitions loaded as a javascript file. See the documentation for details.</p>
+<p>Note that "re" and "im" display correctly as functions, and "conj" displays with a nice overline. To accomplish this, we use AsciiMath renderer definitions loaded as a javascript file. See the documentation for details.</p>
 
 <script type="text/javascript" src="/static/MJxPrep.js"></script>
 

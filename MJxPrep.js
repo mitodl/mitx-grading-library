@@ -51,7 +51,10 @@ else {
             // Grab the AsciiMath object
             AM = MathJax.InputJax.AsciiMath.AM;
 
-            // Add functions, including some edX functions that don't exist in asciimath
+            // All of these new symbols are based on those appearing in the AsciiMath definitions
+            // See https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js
+
+            // Add functions, including some edX functions that don't exist in AsciiMath
             AM.newsymbol({input:"arcsec", tag:"mi", output:"arcsec", tex:null, ttype:AM.TOKEN.UNARY, func:true});
             AM.newsymbol({input:"arccsc", tag:"mi", output:"arccsc", tex:null, ttype:AM.TOKEN.UNARY, func:true});
             AM.newsymbol({input:"arccot", tag:"mi", output:"arccot", tex:null, ttype:AM.TOKEN.UNARY, func:true});
@@ -63,7 +66,7 @@ else {
             AM.newsymbol({input:"arccoth", tag:"mi", output:"arccoth", tex:null, ttype:AM.TOKEN.UNARY, func:true});
             AM.newsymbol({input:"re", tag:"mi", output:"Re", tex:null, ttype:AM.TOKEN.UNARY, func:true});
             AM.newsymbol({input:"im", tag:"mi", output:"Im", tex:null, ttype:AM.TOKEN.UNARY, func:true});
-            AM.newsymbol({input:"conj", tag:"mi", output:"conj", tex:null, ttype:AM.TOKEN.UNARY, func:true});
+            AM.newsymbol({input:"conj", tag:"mover", output:"\u00AF", tex:null, ttype:AM.TOKEN.UNARY, acc:true});
 
             // Add special functions: fact and factorial
             AM.newsymbol({input:"fact", tag:"mo", output:"fact", tex:null, ttype:AM.TOKEN.UNARY, rewriteleftright:["","!"]});
@@ -75,7 +78,7 @@ else {
 
             // No need to update again
             clearInterval(checkExist);
-            console.log("MITx Grading Library: Updated MathJax AsciiMath definitions");
+            console.log("MITx Grading Library: Updated AsciiMath renderer definitions");
         }
     }, 200); // Check for the AsciiMath object every 200ms
 }
