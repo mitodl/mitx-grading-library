@@ -17,7 +17,7 @@ We thank the MIT Office of Digital Learning for their support.
 - [Local Installation](#local-installation)
 - [Usage in edX](#usage-in-edx)
 - [Grader Documentation](#grader-documentation)
-- [FAQ](#FAQ)
+- [FAQ](#faq)
 
 
 ## Demo Course
@@ -103,6 +103,6 @@ Here, the `correct_answer` entries are shown to students when they click "Show A
 
 ## FAQ
 
-* After installing a virtual environment and doing `pip install`, `pytest` returns a number of errors for `no module named error`.
+* What's this `voluptuous` thing?
 
-We're not sure why this happens, but if you deactivate your virtual environment and reactivate it again, the issue seems to go away. We've only seen this happen on a completely fresh install.
+[Voluptuous](https://github.com/alecthomas/voluptuous) is a library that handles configuration validation, while giving (hopefully) meaningful error messages. We use it to automate the checking of the configurations passed into the `mitxgraders` library. They need to be packaged together in the `python_lib.zip` file.

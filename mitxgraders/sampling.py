@@ -25,8 +25,8 @@ from numbers import Number
 import abc
 import random
 import numpy as np
+from voluptuous import Schema, Required
 from mitxgraders.baseclasses import ObjectWithSchema, ConfigError
-from mitxgraders.voluptuous import Schema, Required
 from mitxgraders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
                                                 TupleOfType, is_callable)
 from mitxgraders.helpers.mathfunc import (DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,

@@ -9,8 +9,8 @@ Both work by farming out the individual objects to other graders.
 """
 from __future__ import division
 import numpy as np
+from voluptuous import Required, Any
 from mitxgraders.helpers import munkres
-from mitxgraders.voluptuous import Required, Any
 from mitxgraders.baseclasses import AbstractGrader, ItemGrader, ConfigError, InvalidInput
 from mitxgraders.helpers.validatorfuncs import Positive
 

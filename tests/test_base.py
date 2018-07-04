@@ -2,15 +2,19 @@
 Tests of base class functionality
 """
 from __future__ import division
+import sys
 import math
 import random
+import mock
+from imp import reload
+from pytest import raises, approx
+from voluptuous import Error, Invalid, truth
+import mitxgraders
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, CalcError, __version__
-from mitxgraders.voluptuous import Error, Invalid, truth
-from mitxgraders.helpers.calc import evaluator, UnableToParse, UndefinedVariable
 from mitxgraders.helpers import validatorfuncs
+from mitxgraders.helpers.calc import evaluator, UnableToParse, UndefinedVariable
 from mitxgraders.helpers.mathfunc import (cot, arcsec, arccsc, arccot, sech, csch, coth,
                                           arcsech, arccsch, arccoth, sec, csc)
-from pytest import raises, approx
 
 def test_debug_with_author_message():
     grader = StringGrader(
@@ -328,3 +332,12 @@ def test_varnames():
         assert evaluator("U_123^{ijk}", {}, {}, {})
     with raises(UnableToParse):
         assert evaluator("T_1_{123}^{ijk}", {}, {}, {})
+
+def test_voluptuous_import_error_message():
+    with mock.patch.dict(sys.modules, {'voluptuous': None}):
+        msg = ("External dependency 'voluptuous' not found;"
+               " see https://github.com/mitodl/mitx-grading-library#faq")
+        with raises(ImportError, match=msg):
+            # importing is not good enough to raise the error; need to reload
+            # because conftest.py already imported voluptuous
+            reload(mitxgraders)

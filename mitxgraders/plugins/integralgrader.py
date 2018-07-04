@@ -10,6 +10,7 @@ from functools import wraps
 from numbers import Number
 from scipy import integrate
 from numpy import real, imag
+from voluptuous import Schema, Required, Any, All, Extra, Length
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants)
@@ -21,7 +22,6 @@ from mitxgraders.formulagrader import (
     warn_if_override
 )
 from mitxgraders.baseclasses import AbstractGrader, InvalidInput, ConfigError
-from mitxgraders.voluptuous import Schema, Required, Any, All, Extra, Length
 from mitxgraders.helpers.calc import (CalcError, evaluator)
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, all_unique,
                                                 PercentageString, is_callable)
