@@ -86,7 +86,7 @@ grader = FormulaGrader(
 
 ## Functions
 
-By default, a large array of mathematical functions are available for use. See the full list [here](function_list.md). Note that functions for manipulating complex variables are available. This allows you to grade complex expressions. In the following example, `z*z` is recognized to be different from `abs(z)^2`.
+By default, a large array of mathematical functions are available for use. See the full list [here](function_list.md). Note that functions for manipulating complex variables are available, which allows you to grade complex expressions. In the following example, `z*z` is recognized to be different from `abs(z)^2`.
 
 ```python
 grader = FormulaGrader(
@@ -341,6 +341,7 @@ We have made a number of other improvements over the edX formula graders, includ
 * Similarly, when students use an unknown function, the resulting error message highlights that the unknown quantity was interpreted as a function. If a variable of that name exists, the error message suggests that a multiplication symbol was missing.
 * If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the `debug` flag to True, and a more technical message will usually be displayed.
 * Full sampling details are included when the `debug` flag is set to True.
+* Enhancements to the AsciiMath renderer (the preview that students see) are available using our [MathJax renderer definitions](renderer.md).
 
 
 - [Home](README.md)

@@ -2,7 +2,7 @@
 
   <p>We have significantly expanded the sampling capabilities of our grader compared to edX. For example, we can sample integers, allowing us to use the factorial function (which is also defined in edX!). Here is an example.</p>
 
-  <p> What is the Taylor series expansion of \(\exp(x)\) about \(x = 0\)? (Answer: "x^n/(fact(n))"). Unfortunately, the math preview doesn't recognize fact() as a function properly, necessitating wrapping it in an extra set of parentheses to make it display as expected.</p>
+  <p>What is the Taylor series expansion of \(\exp(x)\) about \(x = 0\)? (Answer: "x^n/fact(n)"). Try typing "fact(n-1)" to see what happens in that case, too.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
@@ -18,8 +18,10 @@ grader = FormulaGrader(
 
 <p style="display:inline">[mathjaxinline]e^x = \sum_{n = 0}^\infty[/mathjaxinline] </p>
 <customresponse cfn="grader" inline="1">
-  <textline math="1" inline="1" correct_answer="x^n/fact(n)"/>
+  <textline math="1" inline="1" correct_answer="x^n/fact(n)" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
 </customresponse>
+
+<p>The math preview doesn't natively recognize fact() as a function. This affects a number of other functions too, including a number of standard edX functions. We've developed a series of renderer definitions as a javascript library to teach the renderer how to make it look pretty. These definitions are loaded through the MathJax preprocessor in the textline tag.</p>
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula2.xml" target="_blank">View source</a>
 

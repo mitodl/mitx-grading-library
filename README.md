@@ -40,7 +40,7 @@ This is useful for testing configurations in python, rather than in edX. However
 
 
 ## Usage in edX
-Download [python_lib.zip](python_lib.zip) and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip.
+Download [python_lib.zip](python_lib.zip) and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip. If you want to use our MathJax renderer definitions, place the [MjxPrep.js](MjxPrep.js) file in your static folder (XML) or upload the file to your course (Studio).
 
 A custom response problem is defined using the `<customresponse>` tag. It needs to be supplied a check function (cfn), which must be a grader that you have defined in the problem. The mitxgraders library provides reusable check functions. The basic usage pattern is:
 
