@@ -74,15 +74,55 @@ def arccoth(val):
     """Inverse hyperbolic cotangent"""
     return np.arctanh(1. / val)
 
-def factorial(n):
-    # for integers, use builtin factorial because special.factorial
-    # behaves unexpectedly at poles:
-    # >>> special.factorial(-1) = 0
-    if isinstance(n, int) or n.is_integer():
-        return math.factorial(n)
+def factorial(z):
+    """
+    Factorial function over complex numbers.
 
-    # special.factorial returns an array
-    return float(special.factorial(n))
+    Usage
+    =====
+
+    Non-negative integer input returns integers:
+    >>> factorial(4)
+    24
+
+    Floats and complex numbers use scipy's gamma function:
+    >>> factorial(0.5)
+    0.8862269254527579
+    >>> math.sqrt(math.pi)/2
+    0.8862269254527579
+    >>> factorial(3.2+4.1j)
+    (1.0703272468182086-0.3028032015966659j)
+    >>> factorial(2.2+4.1j)*(3.2+4.1j) # nearly the same; rounding errors
+    (1.070327246818209-0.3028032015966653j)
+
+    Works with numpy arrays:
+    >>> np.array_equal(
+    ...     factorial(np.array([1, 2, 3, 4])),
+    ...     np.array([1, 2, 6, 24])
+    ... )
+    True
+
+    Throws errors at poles:
+    >>> factorial(-2)
+    Traceback (most recent call last):
+    ValueError: factorial() not defined for negative values
+
+    """
+
+    try:
+        is_integer = isinstance(z, int) or z.is_integer()
+    except AttributeError:
+        is_integer = False
+
+    if is_integer:
+        return math.factorial(z)
+
+    value = special.gamma(z+1)
+    # value is a numpy array; If it's 0d, we can just get its item:
+    try:
+        return value.item()
+    except ValueError:
+        return value
 
 # Variables available by default
 DEFAULT_VARIABLES = {
