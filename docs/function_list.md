@@ -37,7 +37,7 @@ By default, all of the following functions are made available to students.
 - *im()* Imaginary part of a complex expression*
 - *conj()* Complex conjugate of a complex expression*
 
-Expressions marked with a * require our [MathJax renderer definitions](renderer.md) to display properly in edX (even though the majority of them are already defined in edX!). If any of these functions are likely to be used by students, we recommend loading the renderer definitions into the problem, or if using `log10`, `log2`, `fact` or `factorial`, utilizing the preprocessor in the renderer definitions.
+Expressions marked with a * may require our [AsciiMath renderer definitions](renderer.md) to display properly in edX.
 
 - [FormulaGrader and NumericalGrader](formula_grader.md)
 - [Home](README.md)

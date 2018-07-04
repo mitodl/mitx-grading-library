@@ -1,6 +1,19 @@
-# MathJax Renderer Definitions
+# AsciiMath Renderer Definitions
 
-When math input is expected from students, edX offers a math preview that attempts to show their expression in normal mathematical notation. This preview is rendered by MathJax via AsciiMath. While the preview does a reasonably good job, there are many situations where it falls down, even for standard edX functions (for example, try typing in `1/arctanh(x)` in an edX input box!). We have constructed a series of renderer definitions to supplement the standard AsciiMath definitions in order to provide better previews.
+When math input is expected from students, edX offers a math preview that attempts to show their expression in normal mathematical notation. There are two ways to provide this preview:
+
+```XML
+<formulaequationinput/>
+or
+<textline math="1"/>
+```
+
+The `formulaequationinput` tag uses server-side parsing and rendering to display the preview to the student. By and large, the preview from `formulaequationinput` is better than that of `textline`, as it treats functions correctly, and displays a number of LaTeX symbols natively. The downsides to `formulaequationinput` are that it doesn't recognize vectors such as `vecx` or `hatx`, the factorial function just applies as `fact(x)`, and because the processing is done server-side, we are unable to enhance the display at all.
+
+The `textline` tag treats the student input as AsciiMath for the purpose of generating a preview, using MathJax to render it. While the preview does a reasonably good job, there are many situations where it falls down, even for standard edX functions (for example, try typing in `1/arctanh(x)` in textline box!). Because this is done client-side through javascript, it's possible to supplement the AsciiMath definitions to handle new situations. We have constructed a series of renderer definitions to supplement the standard AsciiMath definitions in order to provide better previews.
+
+This article describes how to use our new AsciiMath renderer definitions with a `<textline>` tag.
+
 
 ## How it works
 
@@ -27,6 +40,8 @@ If you use the preprocessor in your problem, you get the symbol definitions as w
 
 * Note that you don't need to use the grading library to take advantage of the symbol definitions and/or the preprocessor; they work just as well for the normal edX `formularesponse` problems!
 
-* The javascript is constructed to only load its definitions once, no matter how many times the file is loaded. It's safe to use the preprocessor in as many textline boxes as you like.
+* The javascript is constructed to only load its definitions once, no matter how many times the file is loaded. It's safe to use the preprocessor in as many `textline` boxes as you like.
 
 * If you have a display issue with AsciiMath, it's likely that you can extend the symbol definitions and preprocessor to make your expressions display nicely for students.
+
+* The [function listing](function_list.md) article provides the complete list of functions that are corrected by the new AsciiMath renderer definitions.

@@ -71,7 +71,7 @@ else {
 
             // Ask MathJax to reprocess all input boxes, as saved answers may have rendered
             // before these definitions went through
-            MathJax.Hub.Queue(["Reprocess", MathJax.Hub]);
+            MathJax.Hub.Queue(["Reprocess", MathJax.Hub, "div.equation"]);
 
             // No need to update again
             clearInterval(checkExist);

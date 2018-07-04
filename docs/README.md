@@ -22,7 +22,7 @@ For information on installation and how to use the library in edX, see [here](..
 
 **Other**
 
-- [MathJax renderer definitions](renderer.md)
+- [AsciiMath renderer definitions](renderer.md)
 
 
 ## Overview
