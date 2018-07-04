@@ -15,6 +15,7 @@ Defines:
 from __future__ import division
 import math
 import numpy as np
+import scipy.special as special
 from mitxgraders.baseclasses import ConfigError
 
 # Normal Trig
@@ -73,6 +74,55 @@ def arccoth(val):
     """Inverse hyperbolic cotangent"""
     return np.arctanh(1. / val)
 
+def factorial(z):
+    """
+    Factorial function over complex numbers.
+
+    Usage
+    =====
+
+    Non-negative integer input returns integers:
+    >>> factorial(4)
+    24
+
+    Floats and complex numbers use scipy's gamma function:
+    >>> factorial(0.5) # doctest: +ELLIPSIS
+    0.8862269...
+    >>> math.sqrt(math.pi)/2
+    0.8862269...
+    >>> factorial(3.2+4.1j)
+    (1.0703272...-0.3028032...j)
+    >>> factorial(2.2+4.1j)*(3.2+4.1j)
+    (1.0703272...-0.3028032...j)
+
+    Works with numpy arrays:
+    >>> np.array_equal(
+    ...     factorial(np.array([1, 2, 3, 4])),
+    ...     np.array([1, 2, 6, 24])
+    ... )
+    True
+
+    Throws errors at poles:
+    >>> factorial(-2)
+    Traceback (most recent call last):
+    ValueError: factorial() not defined for negative values
+
+    """
+
+    try:
+        is_integer = isinstance(z, int) or z.is_integer()
+    except AttributeError:
+        is_integer = False
+
+    if is_integer:
+        return math.factorial(z)
+
+    value = special.gamma(z+1)
+    # value is a numpy array; If it's 0d, we can just get its item:
+    try:
+        return value.item()
+    except ValueError:
+        return value
 
 # Variables available by default
 DEFAULT_VARIABLES = {
@@ -106,8 +156,8 @@ DEFAULT_FUNCTIONS = {
     'arccsc': arccsc,
     'arccot': arccot,
     'abs': np.abs,
-    'fact': math.factorial,
-    'factorial': math.factorial,
+    'fact': factorial,
+    'factorial': factorial,
     'sinh': np.sinh,
     'cosh': np.cosh,
     'tanh': np.tanh,
