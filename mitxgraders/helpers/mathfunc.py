@@ -86,14 +86,14 @@ def factorial(z):
     24
 
     Floats and complex numbers use scipy's gamma function:
-    >>> factorial(0.5)
-    0.8862269254527579
+    >>> factorial(0.5) # doctest: +ELLIPSIS
+    0.8862269...
     >>> math.sqrt(math.pi)/2
-    0.8862269254527579
+    0.8862269...
     >>> factorial(3.2+4.1j)
-    (1.0703272468182086-0.3028032015966659j)
-    >>> factorial(2.2+4.1j)*(3.2+4.1j) # nearly the same; rounding errors
-    (1.070327246818209-0.3028032015966653j)
+    (1.0703272...-0.3028032...j)
+    >>> factorial(2.2+4.1j)*(3.2+4.1j)
+    (1.0703272...-0.3028032...j)
 
     Works with numpy arrays:
     >>> np.array_equal(
