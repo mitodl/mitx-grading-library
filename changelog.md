@@ -4,6 +4,7 @@
 * Added AsciiMath renderer definitions
 * We now check for naming collisions in your configuration
 * Cleaned up voluptuous incorporation
+* Extend domain of factorial function to all reals, except negative integers
 * Removed .pyc files from the zip file
 * Minor bug fixes
 

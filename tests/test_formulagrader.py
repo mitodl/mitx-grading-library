@@ -36,6 +36,20 @@ def test_half_power_of_negative_number():
     )
     assert grader(None, '(-4)^0.5')['ok']
 
+def test_factorial():
+    grader = FormulaGrader(answers='0')
+    expect = "Error evaluating factorial\(\) or fact\(\) in input. " + \
+             "These functions cannot be used at negative integer values."
+
+    grader(None, 'fact(0.5) - sqrt(pi)/2')
+    grader(None, 'fact(-0.5) + sqrt(pi)')
+    grader(None, '0 + fact(3.2) - fact(2.2)*3')
+
+    with raises(CalcError, match=expect):
+        grader(None, "fact(-1)")
+    with raises(CalcError, match=expect):
+        grader(None, "fact(-2)")
+
 def test_overriding_functions():
     grader = FormulaGrader(
         answers='tan(1)',
@@ -89,13 +103,6 @@ def test_fg_invalid_input():
     expect = "Invalid Input: Could not parse '5pp' as a formula"
     with raises(CalcError, match=expect):
         grader(None, "5pp")
-
-    expect = "Error evaluating factorial\(\) or fact\(\) in input. " + \
-             "These functions can only be used on nonnegative integers."
-    with raises(CalcError, match=expect):
-        grader(None, "fact(-1)")
-    with raises(CalcError, match=expect):
-        grader(None, "fact(1.5)")
 
     expect = ("There was an error evaluating csc\(...\). "
               "Its input does not seem to be in its domain.")
@@ -520,8 +527,8 @@ def test_fg_debug_log():
         "    'csch': <function csch at 0x...>,<br/>\n"
         "    'exp': <ufunc 'exp'>,<br/>\n"
         "    'f': <function f at 0x...>,<br/>\n"
-        "    'fact': <built-in function factorial>,<br/>\n"
-        "    'factorial': <built-in function factorial>,<br/>\n"
+        "    'fact': <function factorial at 0x...>,<br/>\n"
+        "    'factorial': <function factorial at 0x...>,<br/>\n"
         "    'im': <function <lambda> at 0x...>,<br/>\n"
         "    'ln': <function log at 0x...>,<br/>\n"
         "    'log10': <function log10 at 0x...>,<br/>\n"

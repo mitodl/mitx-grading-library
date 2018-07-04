@@ -337,7 +337,7 @@ def evaluator(formula, variables, functions, suffixes):
                 # err.message will be: `factorial() only accepts integral values` or
                 # `factorial() not defined for negative values`
                 raise FactorialError("Error evaluating factorial() or fact() in input. " +
-                                     "These functions can only be used on nonnegative integers.")
+                                     "These functions cannot be used at negative integer values.")
             else:
                 # Don't know what this is, or how you want to deal with it
                 # Call it a domain issue.

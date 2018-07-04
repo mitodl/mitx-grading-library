@@ -15,6 +15,7 @@ Defines:
 from __future__ import division
 import math
 import numpy as np
+import scipy.special as special
 from mitxgraders.baseclasses import ConfigError
 
 # Normal Trig
@@ -73,6 +74,15 @@ def arccoth(val):
     """Inverse hyperbolic cotangent"""
     return np.arctanh(1. / val)
 
+def factorial(n):
+    # for integers, use builtin factorial because special.factorial
+    # behaves unexpectedly at poles:
+    # >>> special.factorial(-1) = 0
+    if isinstance(n, int) or n.is_integer():
+        return math.factorial(n)
+
+    # special.factorial returns an array
+    return float(special.factorial(n))
 
 # Variables available by default
 DEFAULT_VARIABLES = {
@@ -106,8 +116,8 @@ DEFAULT_FUNCTIONS = {
     'arccsc': arccsc,
     'arccot': arccot,
     'abs': np.abs,
-    'fact': math.factorial,
-    'factorial': math.factorial,
+    'fact': factorial,
+    'factorial': factorial,
     'sinh': np.sinh,
     'cosh': np.cosh,
     'tanh': np.tanh,
