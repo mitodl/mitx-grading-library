@@ -28,6 +28,8 @@ grader = FormulaGrader(
   <textline math="1" inline="1" correct_answer="H(x)*f''(tau)"/>
 </customresponse>
 
+<p>User-defined functions often don't render quite right when using textline inputs. For example, try typing in "1/H(x)" in the box above. If you make extensive use of user-defined functions, we suggest incorporating those functions into the AsciiMath renderer definitions file we provide. See the documentation for details.</p>
+
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula5.xml" target="_blank">View source</a>
 
 </problem>

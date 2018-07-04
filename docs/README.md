@@ -20,6 +20,10 @@ For information on installation and how to use the library in edX, see [here](..
   - [SingleListGrader](single_list_grader.md)
 - [ListGrader](list_grader.md)
 
+**Other**
+
+- [AsciiMath renderer definitions](renderer.md)
+
 
 ## Overview
 
