@@ -8,10 +8,7 @@ Uses pyparsing to parse. Main function is evaluator().
 Heavily modified from the edX calc.py
 """
 from __future__ import division
-import numbers
-import operator
 import numpy as np
-
 from pyparsing import (
     CaselessLiteral,
     Combine,
@@ -29,13 +26,14 @@ from pyparsing import (
     alphas,
     nums,
     stringEnd,
-    ParseException
+    ParseException,
+    delimitedList
 )
+from mitxgraders.helpers.validatorfuncs import get_number_of_args
 
 class CalcError(Exception):
     """Base class for errors originating in calc.py"""
     pass
-
 
 class UndefinedVariable(CalcError):
     """
@@ -43,13 +41,11 @@ class UndefinedVariable(CalcError):
     """
     pass
 
-
 class UndefinedFunction(CalcError):
     """
     Indicate when a student inputs a function which was not expected.
     """
     pass
-
 
 class UnmatchedParentheses(CalcError):
     """
@@ -57,19 +53,16 @@ class UnmatchedParentheses(CalcError):
     """
     pass
 
-
 class FactorialError(CalcError):
     """
     Indicate when factorial is called on a bad input
     """
     pass
 
-
 class CalcZeroDivisionError(CalcError):
     """
     Indicates division by zero
     """
-
 
 class CalcOverflowError(CalcError):
     """
@@ -81,10 +74,15 @@ class FunctionEvalError(CalcError):
     Indicates that something has gone wrong during function evaluation.
     """
 
-
 class UnableToParse(CalcError):
     """
     Indicate when an expression cannot be parsed
+    """
+    pass
+
+class ArgumentError(CalcError):
+    """
+    Raised when the wrong number of arguments is passed to a function
     """
     pass
 
@@ -109,108 +107,6 @@ def handle_np_floating_errors(err, flag):
 np.seterrcall(handle_np_floating_errors)
 np.seterr(divide='call', over='call', invalid='call')
 
-# The following few functions define evaluation actions, which are run on lists
-# of results from each parse component. They convert the strings and (previously
-# calculated) numbers into the number that component represents.
-
-algebraic = (numbers.Number, np.matrix)
-
-
-def eval_atom(parse_result):
-    """
-    Return the value wrapped by the atom.
-
-    In the case of parenthesis, ignore them.
-    """
-    # Find first number in the list
-    result = next(k for k in parse_result if isinstance(k, algebraic))
-    return result
-
-
-def eval_power(parse_result):
-    """
-    Take a list of numbers and exponentiate them, right to left.
-
-    e.g. [ 2, 3, 2 ] -> 2^3^2 = 2^(3^2) -> 512
-    (not to be interpreted (2^3)^2 = 64)
-    """
-    # `reduce` will go from left to right; reverse the list.
-    parse_result = reversed(
-        [k for k in parse_result
-         if isinstance(k, algebraic)]  # Ignore the '^' marks.
-    )
-
-    # Having reversed it, raise `b` to the power of `a`.
-    def robust_pow(b, a):
-        try:
-            # builtin fails for (-4)**0.5, but works better for matrices
-            return b**a
-        except ValueError:
-            # scimath.power is componentwise power on matrices, hence above try
-            return np.lib.scimath.power(b, a)
-
-    power = reduce(lambda a, b: robust_pow(b, a), parse_result)
-
-    return power
-
-
-def eval_parallel(parse_result):
-    """
-    Compute numbers according to the parallel resistors operator.
-
-    BTW it is commutative. Its formula is given by
-      out = 1 / (1/in1 + 1/in2 + ...)
-    e.g. [ 1, 2 ] -> 2/3
-
-    Return NaN if there is a zero among the inputs.
-    """
-    if len(parse_result) == 1:
-        return parse_result[0]
-    if 0 in parse_result:
-        return float('nan')
-    reciprocals = [1. / e for e in parse_result
-                   if isinstance(e, algebraic)]
-    return 1. / sum(reciprocals)
-
-
-def eval_sum(parse_result):
-    """
-    Add the inputs, keeping in mind their sign.
-
-    [ 1, '+', 2, '-', 3 ] -> 0
-
-    Allow a leading + or -.
-    """
-    total = 0.0
-    current_op = operator.add
-    for token in parse_result:
-        if token == '+':
-            current_op = operator.add
-        elif token == '-':
-            current_op = operator.sub
-        else:
-            total = current_op(total, token)
-    return total
-
-
-def eval_product(parse_result):
-    """
-    Multiply the inputs.
-
-    [ 1, '*', 2, '/', 3 ] -> 0.66
-    """
-    prod = 1.0
-    current_op = operator.mul
-    for token in parse_result:
-        if token == '*':
-            current_op = operator.mul
-        elif token == '/':
-            current_op = operator.truediv
-        else:
-            prod = current_op(prod, token)
-    return prod
-
-
 class ParserCache(object):
     """Stores the parser trees for formula strings for reuse"""
 
@@ -219,7 +115,7 @@ class ParserCache(object):
         self.cache = {}
 
     def get_parser(self, formula, suffixes):
-        """Get a ParseAugmenter object for a given formula"""
+        """Get a FormulaParser object for a given formula"""
         # Check the formula for matching parentheses
         count = 0
         delta = {
@@ -254,7 +150,7 @@ class ParserCache(object):
             return parser
 
         # It's not, so construct it
-        parser = ParseAugmenter(stripformula, suffixes)
+        parser = FormulaParser(stripformula, suffixes)
         try:
             parser.parse_algebra()
         except ParseException:
@@ -265,10 +161,8 @@ class ParserCache(object):
         self.cache[key] = parser
         return parser
 
-
 # The global parser cache
 parsercache = ParserCache()
-
 
 def evaluator(formula, variables, functions, suffixes):
     """
@@ -301,81 +195,33 @@ def evaluator(formula, variables, functions, suffixes):
     # Parse the tree
     math_interpreter = parsercache.get_parser(formula, suffixes)
 
+    # Set the variables and functions
+    math_interpreter.set_vars_funcs(variables, functions)
+
     # Check the variables and functions
-    math_interpreter.check_variables(variables, functions)
+    math_interpreter.check_variables()
 
-    def eval_number(parse_result):
-        """
-        Create a float out of string parts
-        Applies suffixes appropriately
-        e.g. [ '7.13', 'e', '3' ] ->  7130
-        ['5', '%'] -> 0.05
-        """
-        text = "".join(parse_result)
-        if text[-1] in suffixes:
-            return float(text[:-1]) * suffixes[text[-1]]
-        else:
-            return float(text)
-
-    def eval_function(parse_result):
-        name, arg = parse_result
-        try:
-            return functions[name](arg)
-        except ZeroDivisionError:
-            # It would be really nice to tell student the symbolic argument as part of this message,
-            # but making symbolic argument available would require some nontrivial restructing
-            msg = ("There was an error evaluating {name}(...). "
-                   "Its input does not seem to be in its domain.").format(name=name)
-            raise CalcZeroDivisionError(msg)
-        except OverflowError:
-            msg = "There was an error evaluating {name}(...). (Numerical overflow).".format(name=name)
-            raise CalcOverflowError(msg)
-        except Exception as err: # pylint: disable=W0703
-            if isinstance(err, ValueError) and 'factorial' in err.message:
-                # This is thrown when fact() or factorial() is used
-                # that tests on negative and/or non-integer inputs
-                # err.message will be: `factorial() only accepts integral values` or
-                # `factorial() not defined for negative values`
-                raise FactorialError("Error evaluating factorial() or fact() in input. " +
-                                     "These functions cannot be used at negative integer values.")
-            else:
-                # Don't know what this is, or how you want to deal with it
-                # Call it a domain issue.
-                msg = ("There was an error evaluating {name}(...). "
-                       "Its input does not seem to be in its domain.").format(name=name)
-                raise FunctionEvalError(msg)
-
-
-    # Create a recursion to evaluate the tree
-    evaluate_actions = {
-        'number': eval_number,
-        'variable': lambda x: variables[x[0]],
-        'function': eval_function,
-        'atom': eval_atom,
-        'power': eval_power,
-        'parallel': eval_parallel,
-        'product': eval_product,
-        'sum': eval_sum
-    }
-
+    # Attempt to perform the evaluation
     try:
-        # Return the result of the evaluation, as well as the set of functions used
-        return math_interpreter.reduce_tree(evaluate_actions), math_interpreter.functions_used
+        result = math_interpreter.evaluate()
     except ZeroDivisionError:
-        raise CalcZeroDivisionError("Division by zero occurred. Check your input's denominators.")
+        raise CalcZeroDivisionError("Division by zero occurred. "
+                                    "Check your input's denominators.")
     except OverflowError:
-        raise CalcOverflowError("Numerical overflow occurred. Does your input contain very large numbers?")
+        raise CalcOverflowError("Numerical overflow occurred. "
+                                "Does your input contain very large numbers?")
     except Exception:
         # Don't know what this is, or how you want to deal with it
         raise
 
+    # Return the result of the evaluation, as well as the set of functions used
+    return result, math_interpreter.functions_used
 
-class ParseAugmenter(object):
+
+class FormulaParser(object):
     """
-    Holds the data for a particular parse.
-
-    Retains `math_expr` so it needn't be passed around method to method.
-    Eventually holds the parse tree and sets of variables as well.
+    Parses a mathematical expression into a tree that can subsequently be evaluated
+    against given dictionaries of variables and functions.
     """
     def __init__(self, math_expr, suffixes):
         """
@@ -388,6 +234,21 @@ class ParseAugmenter(object):
         self.variables_used = set()
         self.functions_used = set()
         self.suffixes = suffixes
+        self.actions = {
+            'number': self.eval_number,
+            'variable': self.eval_var,
+            'arguments': self.eval_arguments,
+            'function': self.eval_function,
+            'parentheses': self.eval_parens,
+            'atom': self.eval_atom,
+            'power': self.eval_power,
+            'negation': self.eval_negation,
+            'parallel': self.eval_parallel,
+            'product': self.eval_product,
+            'sum': self.eval_sum
+        }
+        self.vars = {}
+        self.functions = {}
 
     def variable_parse_action(self, tokens):
         """
@@ -409,33 +270,49 @@ class ParseAugmenter(object):
         reflect parenthesis and order of operations. Leave all operators in the
         tree and do not parse any strings of numbers into their float versions.
 
-        Adding the groups and result names makes the `repr()` of the result
-        really gross. For debugging, use something like
-          print OBJ.tree.asXML()
+        To visualize the tree for debugging purposes, use
+            FormulaParser.dump_parse_result(parse_result)
         """
-        # 0.33 or 7 or .34 or 16.
+        # Define + and -
+        plus = Literal("+")
+        minus = Literal("-")
+        plus_minus = plus | minus
+
+        # 1 or 1.0 or .1
         number_part = Word(nums)
-        inner_number = (number_part + Optional("." + Optional(number_part))) | ("." + number_part)
-        # pyparsing allows spaces between tokens--`Combine` prevents that.
-        inner_number = Combine(inner_number)
+        inner_number = Combine((number_part + Optional("." + Optional(number_part)))
+                               |
+                               ("." + number_part))
+        # Combine() joints the matching parts together in a single token,
+        # and requires that the matching parts be contiguous
 
-        # Apply suffixes
-        number_suffix = MatchFirst(Literal(k) for k in self.suffixes.keys())
+        # Define our suffixes
+        suffix = MatchFirst(Literal(k) for k in self.suffixes.keys())
 
-        # 0.33k or 17
-        plus_minus = Literal('+') | Literal('-')
+        # Construct a number as a group consisting of a text string (num) and an optional
+        # suffix num can include a decimal number and numerical exponent, and can be
+        # converted to a number using float()
+        # suffix is the suffix string that matches one of our suffixes
+        # Spaces are ignored inside numbers
+        # Group wraps everything up into its own ParseResults object when parsing
         number = Group(
-            Optional(plus_minus) +
-            inner_number +
-            Optional(CaselessLiteral("E") + Optional(plus_minus) + number_part) +
-            Optional(number_suffix)
-        )
-        number = number("number")
+            Combine(
+                inner_number +
+                Optional(CaselessLiteral("E") + Optional(plus_minus) + number_part),
+                adjacent=False
+            )
+            + Optional(suffix)
+        )("number")
+        # Note that calling ("name") on the end of a parser is equivalent to calling
+        # parser.setResultsName, which is used to pulling that result out of a parsed
+        # expression like a dictionary.
 
-        # Predefine recursive variables.
-        expr = Forward()
-
-        # Handle variables passed in. Variables may be either of two forms:
+        # Construct variable and function names
+        front = Word(alphas, alphanums)  # must start with alpha
+        subscripts = Word(alphanums + '_') + ~FollowedBy('{')  # ~ = not
+        lower_indices = Literal("_{") + Optional("-") + Word(alphanums) + Literal("}")
+        upper_indices = Literal("^{") + Optional("-") + Word(alphanums) + Literal("}")
+        # Construct an object name in either of two forms:
         #   1. front + subscripts + tail
         #   2. front + lower_indices + upper_indices + tail
         # where:
@@ -447,91 +324,113 @@ class ParseAugmenter(object):
         #       Of form "_{(-)<alaphnumeric>}"
         #   upper_indices (optional):
         #       Of form "^{(-)<alaphnumeric>}"
-        #   tail:
+        #   tail (optional):
         #       any number of primes
-        front = Word(alphas, alphanums)
-        subscripts = Word(alphanums + '_') + ~FollowedBy('{')
-        lower_indices = Literal("_{") + Optional("-") + Word(alphanums) + Literal("}")
-        upper_indices = Literal("^{") + Optional("-") + Word(alphanums) + Literal("}")
-        tail = ZeroOrMore("'")
-        inner_varname = Combine(
-            front +
-            Optional(
-                subscripts |
-                (Optional(lower_indices) + Optional(upper_indices))
-                ) +
-            tail # optional already by ZeroOrMore
-            )
-        varname = Group(inner_varname)("variable")
-        varname.setParseAction(self.variable_parse_action)
+        name = Combine(front +
+                       Optional(subscripts |
+                                (Optional(lower_indices) + Optional(upper_indices))
+                                ) +
+                       ZeroOrMore("'"))
+        # Define a variable as a pyparsing result that contains one object name
+        variable = Group(name)("variable")
+        variable.setParseAction(self.variable_parse_action)
 
-        # Same thing for functions
-        # Allow primes (apostrophes) at the end of function names, useful for
-        # indicating derivatives. Eg, f'(x), g''(x)
-        function = Group(inner_varname + Suppress("(") + expr + Suppress(")"))("function")
+        # Predefine recursive variable expr
+        expr = Forward()
+
+        # Construct functions as consisting of funcname and arguments as
+        # funcname(arguments)
+        # where arguments is a comma-separated list of arguments, returned as a list
+        # Must have at least 1 argument
+        function = Group(name +
+                         Suppress("(") +
+                         Group(delimitedList(expr))("arguments") +
+                         Suppress(")")
+                         )("function")
         function.setParseAction(self.function_parse_action)
 
-        atom = number | function | varname | "(" + expr + ")"
-        atom = Group(atom)("atom")
+        # Define parentheses
+        parentheses = Group(Suppress("(") +
+                            expr +
+                            Suppress(")"))("parentheses")
 
-        # Do the following in the correct order to preserve order of operation.
-        pow_term = atom + ZeroOrMore("^" + atom)
-        pow_term = Group(pow_term)("power")
+        # Define an atomic unit as an expression that evaluates directly to a number
+        # without the use of binary operations (assuming all children have been evaluated).
+        atom = Group(number | function | variable | parentheses)("atom")
 
-        par_term = pow_term + ZeroOrMore('||' + pow_term)  # 5k || 4k
-        par_term = Group(par_term)("parallel")
+        # The following are in order of operational precedence
+        # Define exponentiation, possibly including negative powers
+        power = Group(atom + ZeroOrMore(Suppress("^") + ZeroOrMore(minus) + atom))("power")
 
-        prod_term = par_term + ZeroOrMore((Literal('*') | Literal('/')) + par_term)  # 7 * 5 / 4
-        prod_term = Group(prod_term)("product")
+        # Define negation (eg, in 5*-3 --> we need to evaluate the -3 first)
+        # Negation in powers is handled separately
+        # This has been arbitrarily assigned a higher precedence than parallel
+        negation = Group(ZeroOrMore(minus) + power)("negation")
 
-        sum_term = Optional(plus_minus) + prod_term + ZeroOrMore(plus_minus + prod_term)  # -5 + 4 - 3
-        sum_term = Group(sum_term)("sum")
+        # Define the parallel operator 1 || 5 == 1/(1/1 + 1/5)
+        pipes = Literal('|') + Literal('|')
+        parallel = Group(negation +
+                         ZeroOrMore(Suppress(pipes) + negation))("parallel")
 
-        # Finish the recursion.
-        expr << sum_term  # pylint: disable=pointless-statement
+        # Define multiplication and division
+        product = Group(parallel +
+                        ZeroOrMore((Literal('*') | Literal('/')) + parallel))("product")
+
+        # Define sums and differences
+        # Note that leading - signs are treated by negation
+        sumdiff = Group(Optional(plus) + product +
+                        ZeroOrMore(plus_minus + product))("sum")
+
+        # Close the recursion
+        expr << sumdiff
+
+        # Save the resulting tree
         self.tree = (expr + stringEnd).parseString(self.math_expr)[0]
 
-    def reduce_tree(self, handle_actions):
-        """
-        Call `handle_actions` recursively on `self.tree` and return result.
+    @staticmethod
+    def dump_parse_result(parse_result):  # pragma: no cover
+        """Pretty-print an XML version of the parse_result for debug purposes"""
+        print(parse_result.asXML())
 
-        `handle_actions` is a dictionary of node names (e.g. 'product', 'sum',
-        etc&) to functions. These functions are of the following form:
-         -input: a list of processed child nodes. If it includes any terminal
-          nodes in the list, they will be given as their processed forms also.
-         -output: whatever to be passed to the level higher, and what to
-          return for the final node.
+    def set_vars_funcs(self, variables=None, functions=None):
+        """Stores the given dictionaries of variables and functions for future use"""
+        self.vars = variables if variables else {}
+        self.functions = functions if functions else {}
+
+    def evaluate(self):
+        """
+        Recursively evaluate `self.tree` and return the result.
         """
         def handle_node(node):
             """
             Return the result representing the node, using recursion.
 
-            Call the appropriate `handle_action` for this node. As its inputs,
+            Call the appropriate action from self.actions for this node. As its inputs,
             feed it the output of `handle_node` for each child node.
             """
             if not isinstance(node, ParseResults):
-                # Then treat it as a terminal node.
+                # Entry is either a (python) number or a string.
+                # Return it directly to the next level up.
                 return node
 
             node_name = node.getName()
-            if node_name not in handle_actions:  # pragma: no cover
+            if node_name not in self.actions:  # pragma: no cover
                 raise Exception(u"Unknown branch name '{}'".format(node_name))
 
-            action = handle_actions[node_name]
+            action = self.actions[node_name]
             handled_kids = [handle_node(k) for k in node]
             return action(handled_kids)
 
         # Find the value of the entire tree.
-        return handle_node(self.tree)
+        result = handle_node(self.tree)
+        return result
 
-    def check_variables(self, valid_variables, valid_functions):
+    def check_variables(self):
         """
         Confirm that all the variables and functions used in the tree are defined.
-        Otherwise, raise an UndefinedVariable or UndefinedFunction
         """
-
         bad_vars = set(var for var in self.variables_used
-                       if var not in valid_variables)
+                       if var not in self.vars)
         if bad_vars:
             message = "Invalid Input: {} not permitted in answer as a variable"
             varnames = ", ".join(sorted(bad_vars))
@@ -539,7 +438,7 @@ class ParseAugmenter(object):
             # Check to see if there is a different case version of the variable
             caselist = set()
             for var2 in bad_vars:
-                for var1 in valid_variables:
+                for var1 in self.vars:
                     if var1.lower() == var2.lower():
                         caselist.add(var1)
             if len(caselist) > 0:
@@ -549,19 +448,19 @@ class ParseAugmenter(object):
             raise UndefinedVariable(message.format(varnames))
 
         bad_funcs = set(func for func in self.functions_used
-                        if func not in valid_functions)
+                        if func not in self.functions)
         if bad_funcs:
             funcnames = ', '.join(sorted(bad_funcs))
             message = "Invalid Input: {} not permitted in answer as a function"
 
             # Check to see if there is a corresponding variable name
-            if any(func in valid_variables for func in bad_funcs):
+            if any(func in self.vars for func in bad_funcs):
                 message += " (did you forget to use * for multiplication?)"
 
             # Check to see if there is a different case version of the function
             caselist = set()
             for func2 in bad_funcs:
-                for func1 in valid_functions:
+                for func1 in self.functions:
                     if func2.lower() == func1.lower():
                         caselist.add(func1)
             if len(caselist) > 0:
@@ -569,3 +468,317 @@ class ParseAugmenter(object):
                 message += " (did you mean " + betternames + "?)"
 
             raise UndefinedFunction(message.format(funcnames))
+
+    # The following functions define evaluation actions, which are run on lists
+    # of results from each parse component. They convert the strings and (previously
+    # calculated) numbers into the number that component represents.
+
+    def eval_number(self, parse_result):
+        """
+        Create a float out of the input, applying a suffix if there is one
+
+        Arguments:
+            parse_result: A list, [string_number, suffix(optional)]
+
+        Usage
+        =====
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.eval_number(['7.13e3'])
+        7130.0
+        >>> parser.eval_number(['5', '%'])
+        0.05
+        """
+        result = float(parse_result[0])
+        if len(parse_result) == 2:
+            result *= self.suffixes[parse_result[1]]
+        return result
+
+    def eval_var(self, parse_result):
+        """
+        Return the value of the given variable.
+
+        Arguments:
+            parse_result: A list, [varname]
+
+        Usage
+        =====
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.set_vars_funcs(variables={"x": 1})
+        >>> parser.eval_var(['x'])
+        1
+        """
+        return self.vars[parse_result[0]]
+
+    def eval_arguments(self, parse_result):
+        """
+        A wrapper that returns parse_result. Used for `arguments`.
+
+        Arguments:
+            parse_result: A list of function arguments
+
+        Usage
+        =====
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.eval_arguments(['a', 'b', 'c'])
+        ['a', 'b', 'c']
+        """
+        return parse_result
+
+    def eval_function(self, parse_result):
+        """
+        Evaluates a function
+
+        Arguments:
+            parse_result: ['funcname', arglist]
+
+        Usage
+        =====
+        >>> import math
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.set_vars_funcs(functions={"sin": math.sin, "cos": math.cos})
+        >>> parser.eval_function(['sin', [0]])
+        0.0
+        >>> parser.eval_function(['cos', [0]])
+        1.0
+        >>> def h(x, y): return x + y
+        >>> parser.set_vars_funcs(functions={"h": h})
+        >>> parser.eval_function(['h', [1, 2]])
+        3
+        >>> parser.eval_function(['h', [1, 2, 3]])
+        Traceback (most recent call last):
+        ArgumentError: Wrong number of arguments passed to h. Expected 2, received 3.
+        >>> parser.eval_function(['h', [1]])
+        Traceback (most recent call last):
+        ArgumentError: Wrong number of arguments passed to h. Expected 2, received 1.
+        """
+        # Obtain the function and arguments
+        name, args = parse_result
+        func = self.functions[name]
+
+        # Check to make sure we've been passed the correct number of arguments
+        num_args = len(args)
+        expected = get_number_of_args(func)
+        if expected != num_args:
+            msg = ("Wrong number of arguments passed to {func}. "
+                   "Expected {num}, received {num2}.")
+            raise ArgumentError(msg.format(func=name, num=expected, num2=num_args))
+
+        # Try to call the function
+        try:
+            return func(*args)
+        except ZeroDivisionError:
+            # It would be really nice to tell student the symbolic argument as part of this message,
+            # but making symbolic argument available would require some nontrivial restructing
+            msg = ("There was an error evaluating {name}(...). "
+                   "Its input does not seem to be in its domain.").format(name=name)
+            raise CalcZeroDivisionError(msg)
+        except OverflowError:
+            msg = ("There was an error evaluating {name}(...). "
+                   "(Numerical overflow).").format(name=name)
+            raise CalcOverflowError(msg)
+        except Exception as err:  # pylint: disable=W0703
+            if isinstance(err, ValueError) and 'factorial' in err.message:
+                # This is thrown when fact() or factorial() is used
+                # that tests on negative integer inputs
+                # err.message will be: `factorial() only accepts integral values` or
+                # `factorial() not defined for negative values`
+                raise FactorialError("Error evaluating factorial() or fact() in input. " +
+                                     "These functions cannot be used at negative integer values.")
+            else:
+                # Don't know what this is, or how you want to deal with it
+                # Call it a domain issue.
+                msg = ("There was an error evaluating {name}(...). "
+                       "Its input does not seem to be in its domain.").format(name=name)
+                raise FunctionEvalError(msg)
+
+    def eval_parens(self, parse_result):
+        """
+        A wrapper that returns the first element of parse_result. Used for `parentheses`.
+
+        Arguments:
+            parse_result: A list containing a single result containing the evaluation
+            of the expression in parentheses
+
+        Usage
+        =====
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.eval_parens([1])
+        1
+        """
+        return parse_result[0]
+
+    def eval_atom(self, parse_result):
+        """
+        A wrapper that returns the value of the wrapped atom. Used for `atom`.
+
+        Arguments:
+            parse_result: A list containing a single result containing the evaluation
+            of the atom
+
+        Usage
+        =====
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.eval_atom([1])
+        1
+        """
+        return parse_result[0]
+
+    def eval_power(self, parse_result):
+        """
+        Take a list of numbers and exponentiate them, right to left.
+
+        Can also have minus signs interspersed, which means to flip the sign of the
+        exponent.
+
+        Arguments:
+            parse_result: A list of numbers and "-" strings, to be read as exponentiated
+            [a, b, c, d] = a^b^c^d
+            [a, "-", c, d] = a^(-(c^d))
+
+        Usage
+        =====
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.eval_power([4,3,2])  # Evaluate 4^3^2
+        262144
+        >>> parser.eval_power([2,"-",2,2])  # Evaluate 2^(-(2^2))
+        0.0625
+        """
+        def robust_pow(base, exponent):
+            """The power function that we want to use"""
+            # This will need to be modified if base can be a matrix
+            try:
+                return base ** exponent
+            except ValueError:
+                return np.lib.scimath.power(base, exponent)
+
+        data = parse_result[:]
+        result = data.pop()
+        while data:
+            # Result contains the current exponent
+            working = data.pop()
+            if working == "-":
+                result *= -1
+            else:
+                # working is base, result is exponent
+                result = robust_pow(working, result)
+
+        return result
+
+    def eval_negation(self, parse_result):
+        """
+        Negate a number an appropriate number of times.
+
+        Arguments:
+            parse_result: A list containing zero or more "-" strings, followed by a number.
+            ["-", "-", "-", a] = -a
+            ["-", "-", a] = a
+
+        Usage
+        =====
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.eval_negation([2])
+        2
+        >>> parser.eval_negation(["-",2])
+        -2
+        >>> parser.eval_negation(["-","-",2])
+        2
+        >>> parser.eval_negation(["-","-","-",2])
+        -2
+        >>> parser.eval_negation(["-","-","-","-",2])
+        2
+        """
+        num = parse_result[-1]
+        return num * (-1)**(len(parse_result) - 1)
+
+    def eval_parallel(self, parse_result):
+        """
+        Compute numbers according to the parallel resistors operator (note commutative).
+
+        Return NaN if there is a zero among the inputs.
+
+        Arguments:
+            parse_result: A list of numbers to combine appropriately
+            [a, b, c, d] = 1/(1/a + 1/b + 1/c + 1/d)
+
+        Usage
+        =====
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.eval_parallel([4,3,2])  # doctest: +ELLIPSIS
+        0.9230769...
+        >>> parser.eval_parallel([1,2])  # doctest: +ELLIPSIS
+        0.6666666...
+        >>> parser.eval_parallel([1,1])
+        0.5
+        >>> parser.eval_parallel([1,0])
+        nan
+        """
+        if len(parse_result) == 1:
+            return parse_result[0]
+        if 0 in parse_result:
+            return float('nan')
+        reciprocals = [1. / num for num in parse_result]
+        return 1. / sum(reciprocals)
+
+    def eval_product(self, parse_result):
+        """
+        Multiply/divide inputs appropriately
+
+        Arguments:
+            parse_result: A list of numbers to combine, separated by "*" and "/"
+            [a, "*", b, "/", c] = a*b/c
+
+        Usage
+        =====
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.eval_product([2,"*",3,"/",4])
+        1.5
+        >>> parser.eval_product([2,"*",3,"+",4])
+        Traceback (most recent call last):
+        CalcError: Undefined symbol + in eval_product
+        """
+        result = parse_result[0]
+        data = parse_result[1:]
+        while data:
+            op = data.pop(0)
+            num = data.pop(0)
+            if op == '*':
+                result *= num
+            elif op == '/':
+                result /= num
+            else:
+                raise CalcError("Undefined symbol {} in eval_product".format(op))
+        return result
+
+    def eval_sum(self, parse_result):
+        """
+        Add/subtract inputs
+
+        Arguments:
+            parse_result: A list of numbers to combine, separated by "+" and "-",
+            possibly with a leading "+" (a leading "-" will have been eaten by negation)
+
+        Usage
+        =====
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser.eval_sum([2,"+",3,"-",4])
+        1
+        >>> parser.eval_sum(["+",2,"+",3,"-",4])
+        1
+        >>> parser.eval_sum(["+",2,"*",3,"-",4])
+        Traceback (most recent call last):
+        CalcError: Undefined symbol * in eval_sum
+        """
+        data = parse_result[:]
+        result = data.pop(0)
+        if result == "+":
+            result = data.pop(0)
+        while data:
+            op = data.pop(0)
+            num = data.pop(0)
+            if op == '+':
+                result += num
+            elif op == '-':
+                result -= num
+            else:
+                raise CalcError("Undefined symbol {} in eval_sum".format(op))
+        return result
