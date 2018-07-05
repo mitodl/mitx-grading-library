@@ -222,7 +222,6 @@ def evaluator(formula, variables, functions, suffixes, allow_vectors=False):
     # Return the result of the evaluation, as well as the set of functions used
     return result, math_interpreter.functions_used
 
-
 class FormulaParser(object):
     """
     Parses a mathematical expression into a tree that can subsequently be evaluated
@@ -245,14 +244,13 @@ class FormulaParser(object):
             'variable': self.eval_var,
             'arguments': self.eval_arguments,
             'function': self.eval_function,
-            'parentheses': self.eval_parens,
             'vector': self.eval_vector,
-            'atom': self.eval_atom,
             'power': self.eval_power,
             'negation': self.eval_negation,
             'parallel': self.eval_parallel,
             'product': self.eval_product,
-            'sum': self.eval_sum
+            'sum': self.eval_sum,
+            'parentheses': lambda tokens: tokens[0] # just get the unique child
         }
         self.vars = {}
         self.functions = {}
@@ -274,6 +272,20 @@ class FormulaParser(object):
         When vector input is used, mark it in `vectors_used`.
         """
         self.vectors_used = True
+
+    @staticmethod
+    def group_if_multiple(name):
+        """
+        Generates a parse action that groups ParseResults with given name if
+        ParseResults has multiple children.
+        """
+        def _parse_action(tokens):
+            """Wrap children in a group if there are multiple"""
+            if len(tokens) > 1:
+                return ParseResults(toklist=[tokens], name=name)
+            return tokens
+
+        return _parse_action
 
     def parse_algebra(self):
         """
@@ -359,13 +371,13 @@ class FormulaParser(object):
                          Suppress("(") +
                          Group(delimitedList(expr))("arguments") +
                          Suppress(")")
-                         )("function")
+                        )("function")
         function.setParseAction(self.function_parse_action)
 
         # Define parentheses
         parentheses = Group(Suppress("(") +
                             expr +
-                            Suppress(")"))("parentheses")
+                            Suppress(")"))('parentheses')
 
         # Define vectors
         vector = Group(Suppress("[") +
@@ -375,30 +387,32 @@ class FormulaParser(object):
 
         # Define an atomic unit as an expression that evaluates directly to a number
         # without the use of binary operations (assuming all children have been evaluated).
-        atom = Group(number | function | variable | parentheses | vector)("atom")
+        atom = number | function | variable | parentheses | vector
 
         # The following are in order of operational precedence
         # Define exponentiation, possibly including negative powers
-        power = Group(atom + ZeroOrMore(Suppress("^") + ZeroOrMore(minus) + atom))("power")
+        power = atom + ZeroOrMore(Suppress("^") + ZeroOrMore(minus) + atom)
+        power.addParseAction(self.group_if_multiple('power'))
 
         # Define negation (eg, in 5*-3 --> we need to evaluate the -3 first)
         # Negation in powers is handled separately
         # This has been arbitrarily assigned a higher precedence than parallel
-        negation = Group(ZeroOrMore(minus) + power)("negation")
+        negation = ZeroOrMore(minus) + power
+        negation.addParseAction(self.group_if_multiple('negation'))
 
         # Define the parallel operator 1 || 5 == 1/(1/1 + 1/5)
         pipes = Literal('|') + Literal('|')
-        parallel = Group(negation +
-                         ZeroOrMore(Suppress(pipes) + negation))("parallel")
+        parallel = negation + ZeroOrMore(Suppress(pipes) + negation)
+        parallel.addParseAction(self.group_if_multiple('parallel'))
 
         # Define multiplication and division
-        product = Group(parallel +
-                        ZeroOrMore((Literal('*') | Literal('/')) + parallel))("product")
+        product = parallel + ZeroOrMore((Literal('*') | Literal('/')) + parallel)
+        product.addParseAction(self.group_if_multiple('product'))
 
         # Define sums and differences
         # Note that leading - signs are treated by negation
-        sumdiff = Group(Optional(plus) + product +
-                        ZeroOrMore(plus_minus + product))("sum")
+        sumdiff = Optional(plus) + product + ZeroOrMore(plus_minus + product)
+        sumdiff.addParseAction(self.group_if_multiple('sum'))
 
         # Close the recursion
         expr << sumdiff
@@ -610,22 +624,6 @@ class FormulaParser(object):
                        "Its input does not seem to be in its domain.").format(name=name)
                 raise FunctionEvalError(msg)
 
-    def eval_parens(self, parse_result):
-        """
-        A wrapper that returns the first element of parse_result. Used for `parentheses`.
-
-        Arguments:
-            parse_result: A list containing a single result containing the evaluation
-            of the expression in parentheses
-
-        Usage
-        =====
-        >>> parser = FormulaParser("1", {"%": 0.01})
-        >>> parser.eval_parens([1])
-        1
-        """
-        return parse_result[0]
-
     def eval_vector(self, parse_result):
         """
         Takes in a list of evaluated expressions and returns it as a numpy array.
@@ -646,22 +644,6 @@ class FormulaParser(object):
         """
         # Note: some checks and error handling will be necessary here!
         return np.array(parse_result)
-
-    def eval_atom(self, parse_result):
-        """
-        A wrapper that returns the value of the wrapped atom. Used for `atom`.
-
-        Arguments:
-            parse_result: A list containing a single result containing the evaluation
-            of the atom
-
-        Usage
-        =====
-        >>> parser = FormulaParser("1", {"%": 0.01})
-        >>> parser.eval_atom([1])
-        1
-        """
-        return parse_result[0]
 
     def eval_power(self, parse_result):
         """
@@ -752,8 +734,6 @@ class FormulaParser(object):
         >>> parser.eval_parallel([1,0])
         nan
         """
-        if len(parse_result) == 1:
-            return parse_result[0]
         if 0 in parse_result:
             return float('nan')
         reciprocals = [1. / num for num in parse_result]
