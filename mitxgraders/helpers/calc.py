@@ -678,13 +678,13 @@ class FormulaParser(object):
         >>> parser = FormulaParser("1", {"%": 0.01})
         >>> parser.eval_negation([2])
         2
-        >>> parser.eval_power(["-",2])
+        >>> parser.eval_negation(["-",2])
         -2
-        >>> parser.eval_power(["-","-",2])
+        >>> parser.eval_negation(["-","-",2])
         2
-        >>> parser.eval_power(["-","-","-",2])
+        >>> parser.eval_negation(["-","-","-",2])
         -2
-        >>> parser.eval_power(["-","-","-","-",2])
+        >>> parser.eval_negation(["-","-","-","-",2])
         2
         """
         num = parse_result[-1]
@@ -732,6 +732,9 @@ class FormulaParser(object):
         >>> parser = FormulaParser("1", {"%": 0.01})
         >>> parser.eval_product([2,"*",3,"/",4])
         1.5
+        >>> parser.eval_product([2,"*",3,"+",4])
+        Traceback (most recent call last):
+        CalcError: Undefined symbol + in eval_product
         """
         result = parse_result[0]
         data = parse_result[1:]
@@ -742,7 +745,7 @@ class FormulaParser(object):
                 result *= num
             elif op == '/':
                 result /= num
-            else:  # pragma: no cover
+            else:
                 raise CalcError("Undefined symbol {} in eval_product".format(op))
         return result
 
@@ -761,6 +764,9 @@ class FormulaParser(object):
         1
         >>> parser.eval_sum(["+",2,"+",3,"-",4])
         1
+        >>> parser.eval_sum(["+",2,"*",3,"-",4])
+        Traceback (most recent call last):
+        CalcError: Undefined symbol * in eval_sum
         """
         data = parse_result[:]
         result = data.pop(0)
@@ -773,6 +779,6 @@ class FormulaParser(object):
                 result += num
             elif op == '-':
                 result -= num
-            else:  # pragma: no cover
+            else:
                 raise CalcError("Undefined symbol {} in eval_sum".format(op))
         return result
