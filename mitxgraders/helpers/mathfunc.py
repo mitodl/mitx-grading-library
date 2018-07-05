@@ -16,7 +16,6 @@ from __future__ import division
 import math
 import numpy as np
 import scipy.special as special
-from mitxgraders.baseclasses import ConfigError
 
 # Normal Trig
 def sec(arg):
