@@ -164,7 +164,7 @@ class ParserCache(object):
 # The global parser cache
 parsercache = ParserCache()
 
-def evaluator(formula, variables, functions, suffixes):
+def evaluator(formula, variables, functions, suffixes, allow_vectors=False):
     """
     Evaluate an expression; that is, take a string of math and return a float.
 
@@ -201,6 +201,11 @@ def evaluator(formula, variables, functions, suffixes):
     # Check the variables and functions
     math_interpreter.check_variables()
 
+    # Are vectors allowed inputs in this problem?
+    if math_interpreter.vectors_used and not allow_vectors:
+        msg = "Vector and matrix expressions have been forbidden in this entry"
+        raise UnableToParse(msg)
+
     # Attempt to perform the evaluation
     try:
         result = math_interpreter.evaluate()
@@ -233,6 +238,7 @@ class FormulaParser(object):
         self.tree = None
         self.variables_used = set()
         self.functions_used = set()
+        self.vectors_used = False
         self.suffixes = suffixes
         self.actions = {
             'number': self.eval_number,
@@ -240,6 +246,7 @@ class FormulaParser(object):
             'arguments': self.eval_arguments,
             'function': self.eval_function,
             'parentheses': self.eval_parens,
+            'vector': self.eval_vector,
             'atom': self.eval_atom,
             'power': self.eval_power,
             'negation': self.eval_negation,
@@ -261,6 +268,12 @@ class FormulaParser(object):
         When a function is recognized, store it in `functions_used`.
         """
         self.functions_used.add(tokens[0][0])
+
+    def vector_parse_action(self, tokens):
+        """
+        When vector input is used, mark it in `vectors_used`.
+        """
+        self.vectors_used = True
 
     def parse_algebra(self):
         """
@@ -354,9 +367,15 @@ class FormulaParser(object):
                             expr +
                             Suppress(")"))("parentheses")
 
+        # Define vectors
+        vector = Group(Suppress("[") +
+                       delimitedList(expr) +
+                       Suppress("]"))("vector")
+        vector.setParseAction(self.vector_parse_action)
+
         # Define an atomic unit as an expression that evaluates directly to a number
         # without the use of binary operations (assuming all children have been evaluated).
-        atom = Group(number | function | variable | parentheses)("atom")
+        atom = Group(number | function | variable | parentheses | vector)("atom")
 
         # The following are in order of operational precedence
         # Define exponentiation, possibly including negative powers
@@ -606,6 +625,27 @@ class FormulaParser(object):
         1
         """
         return parse_result[0]
+
+    def eval_vector(self, parse_result):
+        """
+        Takes in a list of evaluated expressions and returns it as a numpy array.
+
+        If passed a list of numpy arrays, generates a matrix/tensor/etc.
+
+        Arguments:
+            parse_result: A list containing each element of the vector
+
+        Usage
+        =====
+        >>> import numpy as np
+        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> np.all(parser.eval_vector([1,2,3]) == np.array([1, 2, 3]))
+        True
+        >>> np.all(parser.eval_vector([[1,2],[3,4]]) == np.array([[1, 2], [3, 4]]))
+        True
+        """
+        # Note: some checks and error handling will be necessary here!
+        return np.array(parse_result)
 
     def eval_atom(self, parse_result):
         """
