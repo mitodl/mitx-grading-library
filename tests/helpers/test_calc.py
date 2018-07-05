@@ -4,6 +4,7 @@ Tests of calc.py
 from __future__ import division
 import math
 import random
+import numpy as np
 from pytest import raises, approx
 from mitxgraders import CalcError
 from mitxgraders.helpers.calc import evaluator, UnableToParse, UndefinedVariable, ArgumentError
@@ -113,3 +114,15 @@ def test_calc_functions_multiple_arguments():
         evaluator("h(1)", {}, {"h": h3}, {})
     with raises(ArgumentError):
         evaluator("h(1,2)", {}, {"h": h3}, {})
+
+def test_vectors():
+    """Test that vectors/matrices can be inputted into calc.py"""
+    result = evaluator("[1, 2, 3]", {}, {}, {}, True)[0]
+    assert np.all(result == np.array([1, 2, 3]))
+
+    result = evaluator("[[1, 2], [3, 4]]", {}, {}, {}, True)[0]
+    assert np.all(result == np.array([[1, 2], [3, 4]]))
+
+    msg = "Vector and matrix expressions have been forbidden in this entry"
+    with raises(UnableToParse, match=msg):
+        evaluator("[[1, 2], [3, 4]]", {}, {}, {})
