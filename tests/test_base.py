@@ -10,11 +10,13 @@ from imp import reload
 from pytest import raises, approx
 from voluptuous import Error, Invalid, truth
 import mitxgraders
-from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, CalcError, __version__
+from mitxgraders import (ListGrader, StringGrader, ConfigError, FormulaGrader,
+                         CalcError, RandomFunction, __version__)
 from mitxgraders.helpers import validatorfuncs
-from mitxgraders.helpers.calc import evaluator, UnableToParse, UndefinedVariable
+from mitxgraders.helpers.calc import evaluator, UnableToParse, UndefinedVariable, ArgumentError
 from mitxgraders.helpers.mathfunc import (cot, arcsec, arccsc, arccot, sech, csch, coth,
                                           arcsech, arccsch, arccoth, sec, csc)
+from mitxgraders.helpers.validatorfuncs import get_number_of_args
 
 def test_debug_with_author_message():
     grader = StringGrader(
@@ -240,6 +242,8 @@ def test_readme():
         subgraders=FormulaGrader()
     )
 
+    del grader
+
 def test_calcpy():
     """Tests of calc.py that aren't covered elsewhere"""
 
@@ -264,7 +268,8 @@ def test_calcpy():
     assert result[1] == set()
 
     # Test incorrect case variables
-    with raises(UndefinedVariable, match=r"Invalid Input: X not permitted in answer as a variable \(did you mean x\?\)"):
+    msg = r"Invalid Input: X not permitted in answer as a variable \(did you mean x\?\)"
+    with raises(UndefinedVariable, match=msg):
         evaluator("X", {"x": 1}, {}, {})
 
 def test_validators():
@@ -318,15 +323,15 @@ def test_math():
 def test_varnames():
     """Test variable names in calc.py"""
     # Tensor variable names
-    assert evaluator("U^{ijk}", {"U^{ijk}":2}, {}, {})[0] == 2
-    assert evaluator("U_{ijk}/2", {"U_{ijk}":2}, {}, {})[0] == 1
-    assert evaluator("U_{ijk}^{123}", {"U_{ijk}^{123}":2}, {}, {})[0] == 2
-    assert evaluator("U_{ijk}^{123}'''''", {"U_{ijk}^{123}'''''":2}, {}, {})[0] == 2
-    assert evaluator("U_{ijk}^2", {"U_{ijk}":2}, {}, {})[0] == 4
-    assert evaluator("U^{ijk}^2", {"U^{ijk}":2}, {}, {})[0] == 4
-    assert evaluator("U_{ijk}^{123}^2", {"U_{ijk}^{123}":2}, {}, {})[0] == 4
+    assert evaluator("U^{ijk}", {"U^{ijk}": 2}, {}, {})[0] == 2
+    assert evaluator("U_{ijk}/2", {"U_{ijk}": 2}, {}, {})[0] == 1
+    assert evaluator("U_{ijk}^{123}", {"U_{ijk}^{123}": 2}, {}, {})[0] == 2
+    assert evaluator("U_{ijk}^{123}'''''", {"U_{ijk}^{123}'''''": 2}, {}, {})[0] == 2
+    assert evaluator("U_{ijk}^2", {"U_{ijk}": 2}, {}, {})[0] == 4
+    assert evaluator("U^{ijk}^2", {"U^{ijk}": 2}, {}, {})[0] == 4
+    assert evaluator("U_{ijk}^{123}^2", {"U_{ijk}^{123}": 2}, {}, {})[0] == 4
     # Regular variable names
-    assert evaluator("U_cat/2 + Th3_dog__7a_", {"U_cat":2, "Th3_dog__7a_":4}, {}, {})[0] == 5
+    assert evaluator("U_cat/2 + Th3_dog__7a_", {"U_cat": 2, "Th3_dog__7a_": 4}, {}, {})[0] == 5
     # tensor subscripts need braces
     with raises(UnableToParse):
         assert evaluator("U_123^{ijk}", {}, {}, {})
@@ -341,3 +346,34 @@ def test_voluptuous_import_error_message():
             # importing is not good enough to raise the error; need to reload
             # because conftest.py already imported voluptuous
             reload(mitxgraders)
+
+def test_argument_number_of_RandomFunction():
+    """Tests to make sure we can extract the number of inputs expected for a random function"""
+    func = RandomFunction(input_dim=3).gen_sample()
+    assert get_number_of_args(func) == 3
+
+def test_calc_functions_multiple_arguments():
+    """Tests calc.py handling functions with multiple arguments correctly"""
+    def h1(x): return x
+
+    def h2(x, y): return x + y
+
+    def h3(x, y, z): return x + y + z
+
+    assert evaluator("h(2)", {}, {"h": h1}, {})[0] == 2.0
+    assert evaluator("h(1, 2)", {}, {"h": h2}, {})[0] == 3.0
+    assert evaluator("h(1, 2, 3)", {}, {"h": h3}, {})[0] == 6.0
+    with raises(ArgumentError):
+        evaluator("h(2, 1)", {}, {"h": h1}, {})
+    with raises(UnableToParse):
+        evaluator("h()", {}, {"h": h1}, {})
+    with raises(ArgumentError):
+        evaluator("h(1)", {}, {"h": h2}, {})
+    with raises(ArgumentError):
+        evaluator("h(1,2,3)", {}, {"h": h2}, {})
+    with raises(UnableToParse):
+        evaluator("h()", {}, {"h": h3}, {})
+    with raises(ArgumentError):
+        evaluator("h(1)", {}, {"h": h3}, {})
+    with raises(ArgumentError):
+        evaluator("h(1,2)", {}, {"h": h3}, {})

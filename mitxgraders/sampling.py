@@ -318,6 +318,9 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
             # Return the result
             return fullsum if output_dim > 1 else fullsum[0]
 
+        # Tag the function with the number of required arguments
+        f.nin = input_dim
+
         return f
 
 

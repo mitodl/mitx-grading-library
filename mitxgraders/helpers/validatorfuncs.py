@@ -4,7 +4,7 @@ validatorfuncs.py
 Stand-alone validator functions for use in voluptuous Schema
 """
 from numbers import Number
-from inspect import getargspec
+from inspect import getargspec, isbuiltin
 from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
 
 def Positive(thetype):
@@ -116,6 +116,26 @@ def is_callable(obj):
     """Returns true if obj is callable"""
     return callable(obj)
 
+def describe_builtin(obj):
+    """ Describe a builtin function """
+    # Built-in functions cannot be inspected by
+    # inspect.getargspec. We have to try and parse
+    # the __doc__ attribute of the function.
+    docstr = obj.__doc__
+    if docstr:
+        items = docstr.split('\n')
+        if items:
+            func_descr = items[0]
+            s = func_descr.replace(obj.__name__, '')
+            idx1 = s.find('(')
+            idx2 = s.find(')', idx1)
+            if idx1 != -1 and idx2 != -1 and (idx2 > idx1+1):
+                argstring = s[idx1+1:idx2]
+                # This gets the argument string
+                # Count the number of commas!
+                return argstring.count(",") + 1
+    return 0  # pragma: no cover
+
 def get_number_of_args(callable_obj):
     """
     Get number of arguments of function or callable object.
@@ -148,16 +168,35 @@ def get_number_of_args(callable_obj):
     >>> bar = Bar()
     >>> get_number_of_args(bar) # bound, is automatically passed self as argument
     2
-    """
 
-    try:
-        # assume object is a function
+    Works on built-in functions (assuming their docstring is correct)
+    >>> import math
+    >>> get_number_of_args(math.sin)
+    1
+
+    Works on numpy ufuncs
+    >>> import numpy as np
+    >>> get_number_of_args(np.sin)
+    1
+
+    Works on RandomFunctions (tested in unit tests due to circular imports)
+    """
+    if isbuiltin(callable_obj):
+        # Built-in function
         func = callable_obj
-        num_args = len(getargspec(func)[0])
-    except TypeError:
-        # otherwise it is a callable object
-        func = callable_obj.__call__
-        num_args = len(getargspec(func)[0])
+        return describe_builtin(func)
+    elif hasattr(callable_obj, "nin"):
+        # Matches RandomFunction or numpy ufunc
+        return callable_obj.nin
+    else:
+        try:
+            # Assume object is a function
+            func = callable_obj
+            num_args = len(getargspec(func)[0])
+        except TypeError:
+            # Callable object
+            func = callable_obj.__call__
+            num_args = len(getargspec(func)[0])
 
     # If func is a bound method, remove one argument
     # (in Python 2.7, unbound methods have __self__ = None)
