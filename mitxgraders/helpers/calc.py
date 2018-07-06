@@ -30,6 +30,9 @@ from pyparsing import (
     delimitedList
 )
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
+from mitxgraders.helpers.mathfunc import (DEFAULT_FUNCTIONS,
+                                          DEFAULT_SUFFIXES,
+                                          DEFAULT_VARIABLES)
 
 class CalcError(Exception):
     """Base class for errors originating in calc.py"""
@@ -164,7 +167,11 @@ class ParserCache(object):
 # The global parser cache
 parsercache = ParserCache()
 
-def evaluator(formula, variables, functions, suffixes, allow_vectors=False):
+def evaluator(formula,
+              variables=DEFAULT_VARIABLES,
+              functions=DEFAULT_FUNCTIONS,
+              suffixes=DEFAULT_SUFFIXES,
+              allow_vectors=False):
     """
     Evaluate an expression; that is, take a string of math and return a float.
 
@@ -241,8 +248,8 @@ class FormulaParser(object):
         self.suffixes = suffixes
         self.actions = {
             'number': self.eval_number,
-            'variable': self.eval_var,
-            'arguments': self.eval_arguments,
+            'variable': lambda tokens: self.vars[tokens[0]],
+            'arguments': lambda tokens: tokens,
             'function': self.eval_function,
             'vector': self.eval_vector,
             'power': self.eval_power,
@@ -250,7 +257,7 @@ class FormulaParser(object):
             'parallel': self.eval_parallel,
             'product': self.eval_product,
             'sum': self.eval_sum,
-            'parentheses': lambda tokens: tokens[0] # just get the unique child
+            'parentheses': lambda tokens: tokens[0]  # just get the unique child
         }
         self.vars = {}
         self.functions = {}
@@ -325,8 +332,8 @@ class FormulaParser(object):
                 inner_number +
                 Optional(CaselessLiteral("E") + Optional(plus_minus) + number_part),
                 adjacent=False
-            )
-            + Optional(suffix)
+            )("num")
+            + Optional(suffix)("suffix")
         )("number")
         # Note that calling ("name") on the end of a parser is equivalent to calling
         # parser.setResultsName, which is used to pulling that result out of a parsed
@@ -357,7 +364,7 @@ class FormulaParser(object):
                                 ) +
                        ZeroOrMore("'"))
         # Define a variable as a pyparsing result that contains one object name
-        variable = Group(name)("variable")
+        variable = Group(name("varname"))("variable")
         variable.setParseAction(self.variable_parse_action)
 
         # Predefine recursive variable expr
@@ -367,11 +374,11 @@ class FormulaParser(object):
         # funcname(arguments)
         # where arguments is a comma-separated list of arguments, returned as a list
         # Must have at least 1 argument
-        function = Group(name +
+        function = Group(name("funcname") +
                          Suppress("(") +
                          Group(delimitedList(expr))("arguments") +
                          Suppress(")")
-                        )("function")
+                         )("function")
         function.setParseAction(self.function_parse_action)
 
         # Define parentheses
@@ -391,13 +398,13 @@ class FormulaParser(object):
 
         # The following are in order of operational precedence
         # Define exponentiation, possibly including negative powers
-        power = atom + ZeroOrMore(Suppress("^") + ZeroOrMore(minus) + atom)
+        power = atom + ZeroOrMore(Suppress("^") + Optional(minus)("op") + atom)
         power.addParseAction(self.group_if_multiple('power'))
 
         # Define negation (eg, in 5*-3 --> we need to evaluate the -3 first)
         # Negation in powers is handled separately
         # This has been arbitrarily assigned a higher precedence than parallel
-        negation = ZeroOrMore(minus) + power
+        negation = Optional(minus)("op") + power
         negation.addParseAction(self.group_if_multiple('negation'))
 
         # Define the parallel operator 1 || 5 == 1/(1/1 + 1/5)
@@ -406,12 +413,12 @@ class FormulaParser(object):
         parallel.addParseAction(self.group_if_multiple('parallel'))
 
         # Define multiplication and division
-        product = parallel + ZeroOrMore((Literal('*') | Literal('/')) + parallel)
+        product = parallel + ZeroOrMore((Literal('*') | Literal('/'))("op") + parallel)
         product.addParseAction(self.group_if_multiple('product'))
 
         # Define sums and differences
         # Note that leading - signs are treated by negation
-        sumdiff = Optional(plus) + product + ZeroOrMore(plus_minus + product)
+        sumdiff = Optional(plus) + product + ZeroOrMore(plus_minus("op") + product)
         sumdiff.addParseAction(self.group_if_multiple('sum'))
 
         # Close the recursion
@@ -420,10 +427,9 @@ class FormulaParser(object):
         # Save the resulting tree
         self.tree = (expr + stringEnd).parseString(self.math_expr)[0]
 
-    @staticmethod
-    def dump_parse_result(parse_result):  # pragma: no cover
+    def dump_parse_result(self):  # pragma: no cover
         """Pretty-print an XML version of the parse_result for debug purposes"""
-        print(parse_result.asXML())
+        print(self.tree.asXML())
 
     def set_vars_funcs(self, variables=None, functions=None):
         """Stores the given dictionaries of variables and functions for future use"""
@@ -525,37 +531,6 @@ class FormulaParser(object):
         if len(parse_result) == 2:
             result *= self.suffixes[parse_result[1]]
         return result
-
-    def eval_var(self, parse_result):
-        """
-        Return the value of the given variable.
-
-        Arguments:
-            parse_result: A list, [varname]
-
-        Usage
-        =====
-        >>> parser = FormulaParser("1", {"%": 0.01})
-        >>> parser.set_vars_funcs(variables={"x": 1})
-        >>> parser.eval_var(['x'])
-        1
-        """
-        return self.vars[parse_result[0]]
-
-    def eval_arguments(self, parse_result):
-        """
-        A wrapper that returns parse_result. Used for `arguments`.
-
-        Arguments:
-            parse_result: A list of function arguments
-
-        Usage
-        =====
-        >>> parser = FormulaParser("1", {"%": 0.01})
-        >>> parser.eval_arguments(['a', 'b', 'c'])
-        ['a', 'b', 'c']
-        """
-        return parse_result
 
     def eval_function(self, parse_result):
         """

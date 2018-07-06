@@ -4,6 +4,7 @@ Tests of calc.py
 from __future__ import division
 import math
 import random
+import re
 import numpy as np
 from pytest import raises, approx
 from mitxgraders import CalcError
@@ -126,3 +127,20 @@ def test_vectors():
     msg = "Vector and matrix expressions have been forbidden in this entry"
     with raises(UnableToParse, match=msg):
         evaluator("[[1, 2], [3, 4]]", {}, {}, {})
+
+def test_negation():
+    """Test that appropriate numbers of +/- signs are accepted"""
+    assert evaluator("1+-1")[0] == 0
+    assert evaluator("1--1")[0] == 2
+    assert evaluator("2*-1")[0] == -2
+    assert evaluator("2/-4")[0] == -0.5
+    assert evaluator("-1+-1")[0] == -2
+    assert evaluator("+1+-1")[0] == 0
+    assert evaluator("2^-2")[0] == 0.25
+    assert evaluator("+-1")[0] == -1
+
+    msg = "Invalid Input: Could not parse '{}' as a formula"
+    badformulas = ["1---1", "2^--2", "1-+2", "1++2", "1+++2", "--2", "---2", "-+2", "--+2"]
+    for formula in badformulas:
+        with raises(UnableToParse, match=re.escape(msg.format(formula))):
+            evaluator(formula)
