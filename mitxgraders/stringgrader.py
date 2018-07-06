@@ -33,7 +33,7 @@ class StringGrader(ItemGrader):
             Required('case_sensitive', default=True): bool
         })
 
-    def check_response(self, answer, student_input):
+    def check_response(self, answer, student_input, **kwargs):
         """
         Grades a student response against a given answer
 
