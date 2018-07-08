@@ -73,6 +73,29 @@ def arccoth(val):
     """Inverse hyperbolic cotangent"""
     return np.arctanh(1. / val)
 
+def real(z):
+    """
+    Returns the real part of z.
+    >>> real(2+3j)
+    2.0
+
+    Note: We convert to float because numpy returns scalar arrays:
+    >>> isinstance(np.real(2+3j), np.ndarray)
+    True
+    """
+    return float(np.real(z))
+
+def imag(z):
+    """
+    Returns the imaginary part of z.
+    >>> imag(2+3j)
+    3.0
+
+    >>> isinstance(np.imag(2+3j), np.ndarray)
+    True
+    """
+    return float(np.imag(z))
+
 def factorial(z):
     """
     Factorial function over complex numbers.
@@ -170,8 +193,8 @@ DEFAULT_FUNCTIONS = {
     'arccsch': arccsch,
     'arccoth': arccoth,
     # lambdas because sometimes np.real/imag returns an array,
-    're': lambda x: float(np.real(x)),
-    'im': lambda x: float(np.imag(x)),
+    're': real,
+    'im': imag,
     'conj': np.conj,
 }
 
@@ -183,6 +206,28 @@ METRIC_SUFFIXES = {
     'k': 1e3, 'M': 1e6, 'G': 1e9, 'T': 1e12,
     'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12
 }
+
+def robust_pow(base, exponent):
+    """
+    Calculates __pow__, and tries other approachs if that doesn't work.
+
+    Usage:
+    ======
+
+    >>> robust_pow(5, 2)
+    25
+    >>> robust_pow(0.5, -1)
+    2.0
+
+    If base is negative and power is fractional, complex results are returned:
+    >>> almost_j = robust_pow(-1, 0.5)
+    >>> np.allclose(almost_j, 1j)
+    True
+    """
+    try:
+        return base ** exponent
+    except ValueError:
+        return np.lib.scimath.power(base, exponent)
 
 def within_tolerance(x, y, tolerance):
     """

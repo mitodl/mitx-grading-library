@@ -25,13 +25,14 @@ from numbers import Number
 import abc
 import random
 import numpy as np
-from voluptuous import Schema, Required
+from voluptuous import Schema, Required, All, Length
 from mitxgraders.baseclasses import ObjectWithSchema, ConfigError
 from mitxgraders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
                                                 TupleOfType, is_callable)
 from mitxgraders.helpers.mathfunc import (DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
                                           DEFAULT_VARIABLES, METRIC_SUFFIXES)
 from mitxgraders.helpers.calc import CalcError, evaluator
+from mitxgraders.helpers.math_array import MathArray
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -232,6 +233,108 @@ class DiscreteSet(VariableSamplingSet):  # pylint: disable=too-few-public-method
         return random.choice(self.config)
 
 
+class RealMathArrays(VariableSamplingSet):
+    """
+    Represents a collection of real matrices with specified norm from which to
+    draw random samples.
+
+    Config:
+    =======
+        shape ([int]): the array shape
+        norm ([start, stop]): Real interval from which to sample the array's norm
+            defaults to [1, 5]
+
+    Usage
+    ========
+    Sample tensors with shape [4, 2, 5]:
+    >>> real_tensors = RealMathArrays(shape=[4, 2, 5])
+    >>> sample = real_tensors.gen_sample()
+    >>> sample.shape
+    (4, 2, 5)
+
+    Samples are of class MathArray:
+    >>> isinstance(sample, MathArray)
+    True
+
+    Specify a range for the tensor's norm:
+    >>> real_tensors = RealMathArrays(shape=[4, 2, 5], norm=[10, 20])
+    >>> sample = real_tensors.gen_sample()
+    >>> 10 < np.linalg.norm(sample) < 20
+    True
+    """
+
+
+    schema_config = Schema({
+        Required('shape'): All([Positive(int)], Length(min=1)),
+        Required('norm', default=[1, 5]): NumberRange()
+    })
+
+    def __init__(self, config=None, **kwargs):
+        """
+        Configure the class as normal, then set up norm as a RealInterval
+        """
+        super(RealMathArrays, self).__init__(config, **kwargs)
+        self.norm = RealInterval(self.config['norm'])
+
+    def gen_sample(self):
+        """
+        Generates a random matrix of shape and norm determined by config.
+        """
+        desired_norm = self.norm.gen_sample()
+        # construct an array with entries in [-0.5, 0.5)
+        array = np.random.random_sample(self.config['shape']) - 0.5
+        actual_norm = np.linalg.norm(array)
+        # convert the array to a matrix with desired norm
+        return MathArray(array) * desired_norm/actual_norm
+
+
+class RealVectors(RealMathArrays):
+    """
+    Represents a collection of real vectors.
+
+    Config:
+    =======
+        Same as RealMathArrays, but shape must have length 1.
+
+    Usage:
+    ======
+
+    By default, vectors have 3 components:
+    >>> vectors = RealVectors()
+    >>> vectors.gen_sample().shape
+    (3,)
+    """
+
+    schema_config = RealMathArrays.schema_config.extend({
+        Required('shape', default=[3]): All(
+            [int], Length(min=1, max=1),
+            msg='Expected a list of length 1 (e.g., [3])')
+    })
+
+class RealMatrices(RealMathArrays):
+    """
+    Represents a collection of real matrices.
+
+    Config:
+    =======
+        Same as RealMathArrays, but shape must have length 2.
+
+    Usage:
+    ======
+
+    By default, matrices have two rows and two columns:
+    >>> matrices = RealMatrices()
+    >>> matrices.gen_sample().shape
+    (2, 2)
+    """
+
+    schema_config = RealMathArrays.schema_config.extend({
+        Required('shape', default=[2, 2]): All(
+            [int], Length(min=2, max=2),
+            msg='Expected a list of length 2 (e.g., [4, 3])')
+    })
+
+
 class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-methods
     """
     Generates a random well-behaved function on demand.
@@ -316,7 +419,7 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
             fullsum += self.config["center"]
 
             # Return the result
-            return fullsum if output_dim > 1 else fullsum[0]
+            return MathArray(fullsum) if output_dim > 1 else fullsum[0]
 
         # Tag the function with the number of required arguments
         f.nin = input_dim

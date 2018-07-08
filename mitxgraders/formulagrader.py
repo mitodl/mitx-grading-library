@@ -15,7 +15,7 @@ from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes)
-from mitxgraders.baseclasses import ItemGrader, InvalidInput, ConfigError
+from mitxgraders.baseclasses import ItemGrader, InvalidInput, ConfigError, StudentFacingError
 from mitxgraders.helpers.calc import CalcError, evaluator, parsercache
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
                                                 PercentageString, is_callable_with_args, all_unique)
@@ -534,7 +534,7 @@ class FormulaGrader(ItemGrader):
             if result['ok'] is True or result['ok'] == 'partial':
                 self.post_eval_validation(student_input, used_funcs)
             return result
-        except (CalcError, InvalidInput):
+        except (StudentFacingError, InvalidInput):
             # These errors have been vetted already
             raise
         except Exception:  # pragma: no cover
