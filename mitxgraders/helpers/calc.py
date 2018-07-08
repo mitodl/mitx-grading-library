@@ -576,6 +576,8 @@ class FormulaParser(object):
         # Try to call the function
         try:
             return func(*args)
+        except StudentFacingError:
+            raise
         except ZeroDivisionError:
             # It would be really nice to tell student the symbolic argument as part of this message,
             # but making symbolic argument available would require some nontrivial restructing

@@ -2,6 +2,7 @@ from __future__ import division
 from pytest import raises
 from mitxgraders.helpers.calc import evaluator, UnableToParse
 from mitxgraders.helpers.math_array import MathArray, IdentityMultiple, equal_as_arrays
+from mitxgraders.helpers.mathfunc import DomainException
 
 def test_array_input():
     """Test that vectors/matrices can be inputted into calc.py"""
@@ -49,6 +50,17 @@ def test_math_arrays():
     expr = '(z*[[1, 5], [4, -2]]^n + 10*A/x)*v'
     result = evaluator(expr, variables, max_array_dim=2)[0]
     assert equal_as_arrays(result, (z*A**n + 10*A/x)*v)
+
+def test_scalar_funcs_raise_errors_with_arrays():
+    A = MathArray([
+        [1, 5],
+        [4, -2]
+    ])
+    variables = {'A': A}
+    match = "Function 'sin\(...\)' only accepts scalar inputs, but was given a non-scalar input."
+    with raises(DomainException, match=match):
+        evaluator('sin(A)', variables, max_array_dim=2)
+
 
 def test_identity_multiple():
     I5 = IdentityMultiple(5)

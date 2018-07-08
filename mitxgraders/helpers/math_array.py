@@ -20,7 +20,7 @@ def is_number_zero(value):
     """
     return isinstance(value, Number) and value == 0
 
-def is_scalar_zero(value):
+def is_scalar_array_zero(value):
     return isinstance(value, MathArray) and value.ndim == 0 and value.item() == 0
 
 def is_square(array):
@@ -93,7 +93,7 @@ class MathArray(np.ndarray):
             return '{self.shape_name} of shape {self.shape}'.format(self=self)
 
     def __add__(self, other):
-        if is_number_zero(other) or is_scalar_zero(other):
+        if is_number_zero(other) or is_scalar_array_zero(other):
             return self
 
         elif isinstance(other, Number):

@@ -14,8 +14,80 @@ Defines:
 """
 from __future__ import division
 import math
+from numbers import Number
 import numpy as np
 import scipy.special as special
+from mitxgraders.baseclasses import StudentFacingError
+from mitxgraders.helpers.validatorfuncs import get_number_of_args
+
+class DomainException(StudentFacingError):
+    """
+    Raised when a function has domain error.
+    """
+
+def is_scalar(arg):
+    """
+    Tests if arg is Number or scalar numpy array.
+
+    >>> map(is_scalar, [3, 4 + 2j, 4.2, np.array(5)])
+    [True, True, True, True]
+    >>> is_scalar(np.array([4, 7]))
+    False
+
+    """
+    if isinstance(arg, Number):
+        return True
+    elif isinstance(arg, np.ndarray) and arg.ndim == 0:
+        return True
+
+    return False
+
+# QUESTION @Jolyon If you can think of a better way to raise errors when
+# sin(A), cos(A), etc is handed, I'm all-ears!
+def scalar_domain(display_name):
+    """
+    Returns a function decorator that causes function to raises a DomainException
+    if function is called is called with a non-scalar argument. DomainException
+    refers to function by its given display_name.
+
+    >>> @scalar_domain('plus3')
+    ... def f(x):
+    ...     return x + 3
+    >>> f(4)
+    7
+    >>> f([5, 2])
+    Traceback (most recent call last):
+    DomainException: Function 'plus3(...)' only accepts scalar inputs, but was given a non-scalar input.
+
+    For now, scalar_domain() only accepts unary functions:
+    >>> @scalar_domain('add')
+    ... def f(x, y):
+    ...     return x + y
+    Traceback (most recent call last):
+    ValueError: Decorator 'scalar_domain' can only be used with unary functions.
+
+    Comment: The n-argument case seems intractable because it breaks get_number_of_args,
+    which is used in calc.py. But we could hard-code the n=1, n=2, n=3 cases.
+    Anything larger probably wouldn't come up in practice.
+    """
+
+    def _decorator(func):
+        if get_number_of_args(func) > 1:
+            raise ValueError("Decorator 'scalar_domain' can only be used with unary functions.")
+
+        # can't use @wraps, doesn't work with callable classes like numpy ufuncs
+        def _func(arg):
+            if not is_scalar(arg):
+                raise DomainException("Function '{0}(...)' only accepts scalar inputs, but "
+                                      "was given a non-scalar input.".format(display_name))
+
+            return func(arg)
+
+        _func.__name__ = func.__name__
+
+        return _func
+
+    return _decorator
 
 # Normal Trig
 def sec(arg):
@@ -159,7 +231,8 @@ DEFAULT_VARIABLES = {
 #   np.sqrt(-4+0j) = 2j
 #   np.sqrt(-4) = nan, but
 #   np.lib.scimath.sqrt(-4) = 2j
-DEFAULT_FUNCTIONS = {
+
+UNSAFE_SCALAR_FUNCTIONS = {
     'sin': np.sin,
     'cos': np.cos,
     'tan': np.tan,
@@ -191,12 +264,26 @@ DEFAULT_FUNCTIONS = {
     'arctanh': np.lib.scimath.arctanh,
     'arcsech': arcsech,
     'arccsch': arccsch,
-    'arccoth': arccoth,
-    # lambdas because sometimes np.real/imag returns an array,
+    'arccoth': arccoth
+}
+
+SCALAR_FUNCTIONS = {key: scalar_domain(key)(UNSAFE_SCALAR_FUNCTIONS[key])
+                    for key in UNSAFE_SCALAR_FUNCTIONS}
+
+ARRAY_FUNCTIONS = {
     're': real,
     'im': imag,
     'conj': np.conj,
 }
+
+def merge_dicts(*dict_args):
+    """Merge an arbitrary number of dictionaries."""
+    merged = {}
+    for dict_arg in dict_args:
+        merged.update(dict_arg)
+    return merged
+
+DEFAULT_FUNCTIONS = merge_dicts(SCALAR_FUNCTIONS, ARRAY_FUNCTIONS)
 
 DEFAULT_SUFFIXES = {
     '%': 0.01
