@@ -184,6 +184,28 @@ METRIC_SUFFIXES = {
     'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12
 }
 
+def robust_pow(base, exponent):
+    """
+    Calculates __pow__, and tries other approachs if that doesn't work.
+
+    Usage:
+    ======
+
+    >>> robust_pow(5, 2)
+    25
+    >>> robust_pow(0.5, -1)
+    2.0
+
+    If base is negative and power is fractional, complex results are returned:
+    >>> almost_j = robust_pow(-1, 0.5)
+    >>> np.allclose(almost_j, 1j)
+    True
+    """
+    try:
+        return base ** exponent
+    except ValueError:
+        return np.lib.scimath.power(base, exponent)
+
 def within_tolerance(x, y, tolerance):
     """
     Check that |x-y| <= tolerance with appropriate norm.
