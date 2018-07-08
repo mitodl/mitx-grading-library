@@ -25,14 +25,13 @@ from numbers import Number
 import abc
 import random
 import numpy as np
-from voluptuous import Schema, Required, All, Length
+from voluptuous import Schema, Required
 from mitxgraders.baseclasses import ObjectWithSchema, ConfigError
 from mitxgraders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
                                                 TupleOfType, is_callable)
 from mitxgraders.helpers.mathfunc import (DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
                                           DEFAULT_VARIABLES, METRIC_SUFFIXES)
 from mitxgraders.helpers.calc import CalcError, evaluator
-from mitxgraders.helpers.math_array import MathArray
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -231,67 +230,6 @@ class DiscreteSet(VariableSamplingSet):  # pylint: disable=too-few-public-method
     def gen_sample(self):
         """Return a random entry from the given set"""
         return random.choice(self.config)
-
-
-
-class RealMatrices(VariableSamplingSet):
-    """
-    Represents a collection of real matrices with specified norm from which to
-    draw random samples.
-
-    Config:
-    =======
-        shape ([int, int]): the matrix shape, [rows, columns], defaults tp [2, 2]
-        norm ([start, stop]): Real interval from which to sample the matrix's norm
-
-    Usage
-    ========
-    By default, sample 2x2 matrices with norm between 1 and 3:
-    >>> real_matrices = RealMatrices()
-    >>> sample = real_matrices.gen_sample()
-    >>> sample.shape
-    (2, 2)
-
-    Samples are of class MathArray:
-    >>> isinstance(sample, MathArray)
-    True
-
-    Sample matrices with a specific shape:
-    >>> real_matrices = RealMatrices(shape=[2, 3])
-    >>> sample = real_matrices.gen_sample()
-    >>> sample.shape
-    (2, 3)
-
-    Specify a range for the matrix's norm:
-    >>> real_matrices = RealMatrices(shape=[2, 3], norm=[10, 20])
-    >>> sample = real_matrices.gen_sample()
-    >>> 10 < np.linalg.norm(sample) < 20
-    True
-    """
-
-
-    schema_config = Schema({
-        Required('shape', default=[2, 2]): All([Positive(int)], Length(min=2, max=2)),
-        Required('norm', default=[1, 3]): NumberRange()
-    })
-
-    def __init__(self, config=None, **kwargs):
-        """
-        Configure the class as normal, then set up norm as a RealInterval
-        """
-        super(RealMatrices, self).__init__(config, **kwargs)
-        self.norm = RealInterval(self.config['norm'])
-
-    def gen_sample(self):
-        """
-        Generates a random matrix of shape and norm determined by config.
-        """
-        desired_norm = self.norm.gen_sample()
-        # construct an array with entries in [-0.5, 0.5)
-        array = np.random.random_sample(self.config['shape']) - 0.5
-        actual_norm = np.linalg.norm(array)
-        # convert the array to a matrix with desired norm
-        return MathArray(array) * desired_norm/actual_norm
 
 
 class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-methods

@@ -26,10 +26,6 @@ class InvalidInput(Exception):
     """Raised whenever user input is invalid"""
     pass
 
-class StudentFacingError(Exception):
-    """Base class for errors whose messages are intended for students to view."""
-    # QUESTION: How much does this overlap with InvalidInput?
-    pass
 
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""
