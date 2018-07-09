@@ -93,10 +93,15 @@ def test_addition_with_shape_mismath():
 
     # dimension mismatch
     u = MathArray([1, 2])
+    v = MathArray([1, 2, 3])
     match = ('Cannot add/subtract a vector of length 2 with a matrix of '
              'shape \(rows: 2, cols: 2\).')
     with raises(MathArrayError, match=match):
         u + B
+
+    match = ('Cannot add/subtract a vector of length 2 with a vector of length 3.')
+    with raises(MathArrayError, match=match):
+        u + v
 
 def test_addition_with_zero():
     A = MathArray([[5,  2, 1], [-2, 4, -3]])
