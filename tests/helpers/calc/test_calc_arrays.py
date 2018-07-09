@@ -2,7 +2,7 @@ from __future__ import division
 from pytest import raises
 from mitxgraders.helpers.calc import evaluator, UnableToParse
 from mitxgraders.helpers.math_array import MathArray, IdentityMultiple, equal_as_arrays
-from mitxgraders.helpers.mathfunc import DomainException
+from mitxgraders.helpers.mathfunc import DomainError
 
 def test_array_input():
     """Test that vectors/matrices can be inputted into calc.py"""
@@ -58,7 +58,7 @@ def test_scalar_funcs_raise_errors_with_arrays():
     ])
     variables = {'A': A}
     match = "Function 'sin\(...\)' only accepts scalar inputs, but was given a non-scalar input."
-    with raises(DomainException, match=match):
+    with raises(DomainError, match=match):
         evaluator('sin(A)', variables, max_array_dim=2)
 
 

@@ -41,6 +41,8 @@ __all__ = [
     "DiscreteSet",
     "ComplexRectangle",
     "ComplexSector",
+    "RealVectors",
+    "RealMatrices",
     "SpecificFunctions",
     "RandomFunction",
     "DependentSampler"

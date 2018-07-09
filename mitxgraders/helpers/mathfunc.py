@@ -20,7 +20,7 @@ import scipy.special as special
 from mitxgraders.baseclasses import StudentFacingError
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
 
-class DomainException(StudentFacingError):
+class DomainError(StudentFacingError):
     """
     Raised when a function has domain error.
     """
@@ -46,8 +46,8 @@ def is_scalar(arg):
 # sin(A), cos(A), etc is handed, I'm all-ears!
 def scalar_domain(display_name):
     """
-    Returns a function decorator that causes function to raises a DomainException
-    if function is called is called with a non-scalar argument. DomainException
+    Returns a function decorator that causes function to raises a DomainError
+    if function is called is called with a non-scalar argument. DomainError
     refers to function by its given display_name.
 
     >>> @scalar_domain('plus3')
@@ -57,7 +57,7 @@ def scalar_domain(display_name):
     7
     >>> f([5, 2])
     Traceback (most recent call last):
-    DomainException: Function 'plus3(...)' only accepts scalar inputs, but was given a non-scalar input.
+    DomainError: Function 'plus3(...)' only accepts scalar inputs, but was given a non-scalar input.
 
     For now, scalar_domain() only accepts unary functions:
     >>> @scalar_domain('add')
@@ -78,7 +78,7 @@ def scalar_domain(display_name):
         # can't use @wraps, doesn't work with callable classes like numpy ufuncs
         def _func(arg):
             if not is_scalar(arg):
-                raise DomainException("Function '{0}(...)' only accepts scalar inputs, but "
+                raise DomainError("Function '{0}(...)' only accepts scalar inputs, but "
                                       "was given a non-scalar input.".format(display_name))
 
             return func(arg)
@@ -348,6 +348,14 @@ def within_tolerance(x, y, tolerance):
     0.223607
     >>> within_tolerance(A, B, 0.25)
     True
+
+    If x - y raises a StudentFacingError, then subtraction of these types
+    is intentionally not supported and (x, y) are not within_tolerance:
+    >>> class Foo():
+    ...     def __sub__(self, other): raise StudentFacingError()
+    ...     def __rsub__(self, other): raise StudentFacingError()
+    >>> within_tolerance(0, Foo(), '1%')
+    False
     """
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
@@ -355,4 +363,11 @@ def within_tolerance(x, y, tolerance):
         # Construct percentage tolerance
         tolerance = tolerance.strip()
         tolerance = np.linalg.norm(x) * float(tolerance[:-1]) * 0.01
-    return np.linalg.norm(x-y) <= tolerance
+
+    try:
+        difference = x - y
+    except StudentFacingError:
+        # Apparently, the answer and the student_input cannot be compared.
+        return False
+
+    return np.linalg.norm(difference) <= tolerance

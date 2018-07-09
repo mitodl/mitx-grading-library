@@ -20,6 +20,7 @@ from mitxgraders.helpers.calc import CalcError, evaluator, parsercache
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
                                                 PercentageString, is_callable_with_args, all_unique)
 from mitxgraders.helpers.mathfunc import within_tolerance, DEFAULT_FUNCTIONS, DEFAULT_VARIABLES
+from mitxgraders.helpers.math_array import IdentityMultiple, MathArray
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -383,7 +384,7 @@ class FormulaGrader(ItemGrader):
         return schema.extend({
             Required('user_functions', default={}):
                 {Extra: Any(is_callable, [is_callable], FunctionSamplingSet)},
-            Required('user_constants', default={}): {Extra: Number},
+            Required('user_constants', default={}): {Extra: Any(Number, MathArray, IdentityMultiple)},
             # Blacklist/Whitelist have additional validation that can't happen here, because
             # their validation is correlated with each other
             Required('blacklist', default=[]): [str],
@@ -400,7 +401,8 @@ class FormulaGrader(ItemGrader):
             Required('variables', default=[]): All([str], all_unique),
             Required('numbered_vars', default=[]): All([str], all_unique),
             Required('sample_from', default={}): dict,
-            Required('failable_evals', default=0): NonNegative(int)
+            Required('failable_evals', default=0): NonNegative(int),
+            Required('max_array_dim', default=0): NonNegative(int)
         })
 
     Utils = namedtuple('Utils', ['tolerance', 'within_tolerance'])
@@ -616,14 +618,16 @@ class FormulaGrader(ItemGrader):
                 evaluator(formula=param,
                           variables=varlist,
                           functions=funclist,
-                          suffixes=self.suffixes)[0]
+                          suffixes=self.suffixes,
+                          max_array_dim=self.config['max_array_dim'])[0]
                 for param in answer['expect']['comparer_params']
                 ]
 
             student_eval, used_funcs = evaluator(student_input,
                                                  variables=varlist,
                                                  functions=funclist,
-                                                 suffixes=self.suffixes)
+                                                 suffixes=self.suffixes,
+                                                 max_array_dim=self.config['max_array_dim'])
 
             # Check if expressions agree
             comparer_result = comparer(comparer_params_eval, student_eval, self.comparer_utils)
