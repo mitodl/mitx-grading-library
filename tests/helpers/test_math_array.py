@@ -279,6 +279,10 @@ def test_multiplication_with_unexpected_types_raises_TypeError():
     with raises(TypeError, match=match):
         A*B
 
+    match = "Cannot multiply object of type <type 'list'> with a matrix."
+    with raises(TypeError, match=match):
+        B*A
+
 ##########     Test Division     ##########
 def test_division_by_scalar():
     A = MathArray([4, 8])

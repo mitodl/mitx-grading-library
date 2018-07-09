@@ -186,8 +186,13 @@ class MathArray(np.ndarray):
 
     def __rmul__(self, other):
         if isinstance(other, IdentityMultiple):
-            other = other.value
-        return super(MathArray, self).__rmul__(other)
+            return super(MathArray, self).__rmul__(other.value)
+        elif isinstance(other, Number):
+            return super(MathArray, self).__rmul__(other)
+
+        raise TypeError("Cannot multiply object of type {type} with a {self.shape_name}."
+                        .format(type=type(other), self=self))
+
 
     def __truediv__(self, other):
         super_DIV = super(MathArray, self).__truediv__
