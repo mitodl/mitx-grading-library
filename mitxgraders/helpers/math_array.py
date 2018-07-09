@@ -93,18 +93,20 @@ class MathArray(np.ndarray):
             return '{self.shape_name} of shape {self.shape}'.format(self=self)
 
     def __add__(self, other):
+        super_ADD = super(MathArray, self).__add__
+
         if is_number_zero(other) or is_scalar_array_zero(other):
-            return self
+            return super_ADD(other)
 
         elif isinstance(other, Number):
             if self.ndim == 0:
-                return super(MathArray, self).__add__(other)
+                return super_ADD(other)
             raise MathArrayError("Cannot add/subtract scalars to a {self.shape_name}."
                                  .format(self=self))
 
         elif isinstance(other, IdentityMultiple):
             if is_square(self):
-                return self.__add__(other.as_matrix(self.shape[0]))
+                return super_ADD(other.as_matrix(self.shape[0]))
             elif self.ndim == 2:
                 raise MathArrayError("Cannot add/subtract multiples of the identity "
                                      "to a non-square matrix.")
@@ -114,14 +116,14 @@ class MathArray(np.ndarray):
 
         elif isinstance(other, MathArray):
             if self.shape == other.shape:
-                return super(MathArray, self).__add__(other)
+                return super_ADD(other)
 
             msg = ("Cannot add/subtract a {self.description} with a {other.description}.").format(
                 self=self, other=other)
             raise MathArrayError(msg)
 
-        raise TypeError("Cannot add/subtract object of {type} to a {self.description}.".format(
-            type=type(other), self=self))
+        raise TypeError("Cannot add/subtract a {self.shape_name} with object of {type}."
+                        .format(type=type(other), self=self))
 
     def __radd__(self, other):
         return self.__add__(other)
@@ -133,21 +135,24 @@ class MathArray(np.ndarray):
         return (-self).__add__(other) # pylint: disable=invalid-unary-operand-type
 
     def __mul__(self, other):
+        super_MUL = super(MathArray, self).__mul__
         if isinstance(other, Number):
-            return super(MathArray, self).__mul__(other)
+            return super_MUL(other)
 
         elif isinstance(other, IdentityMultiple):
-            return super(MathArray, self).__mul__(other.value)
+            return super_MUL(other.value)
 
         elif isinstance(other, MathArray):
             if self.ndim == 0:
-                return super(MathArray, other).__mul__(self.item())
+                return super_MUL(other)
             elif other.ndim == 0:
-                return super(MathArray, self).__mul__(other.item())
+                return super_MUL(other.item())
             elif self.ndim > 2 or other.ndim > 2:
                 raise MathArrayError("Multiplication of tensor arrays is not currently supported.")
             try:
+                # can't mutate self during the multiplication
                 return np.dot(self, other)
+
             except ValueError:
                 # vector-specific message mentions dot product
                 if self.ndim == 1 and other.ndim == 1:
@@ -159,13 +164,32 @@ class MathArray(np.ndarray):
                     self=self, other=other)
                 raise MathArrayError(msg)
 
-        raise TypeError("Cannot multiply object of {type} with a {self.description}.".format(
-            type=type(other), self=self))
+        raise TypeError("Cannot multiply a {self.shape_name} with object of {type}."
+                        .format(type=type(other), self=self))
 
     def __rmul__(self, other):
         if isinstance(other, IdentityMultiple):
             other = other.value
         return super(MathArray, self).__rmul__(other)
+
+    def __truediv__(self, other):
+        super_DIV = super(MathArray, self).__truediv__
+        if isinstance(other, Number):
+            return super_DIV(other)
+        elif isinstance(other, MathArray):
+            if other.ndim == 0:
+                return super_DIV(other.item())
+            else:
+                raise MathArrayError('Cannot divide a {self.shape_name} by a {other.shape_name}'
+                                     .format(self=self, other=other))
+
+        raise TypeError("Cannot divide {self.shape_name} by object of {type}.".format(
+            type=type(other), self=self))
+
+    def __rtruediv__(self, other):
+        if isinstance(self, MathArray) and self.ndim > 0:
+            raise MathArrayError("Cannot divide by a {self.shape_name}".format(self=self))
+        return super(MathArray, self).__rtruediv__(other)
 
     def __pow__(self, other):
         """
@@ -186,22 +210,30 @@ class MathArray(np.ndarray):
         elif not is_square(self):
             raise MathArrayError("Cannot raise a non-square matrix to powers.")
 
-        # Henceforth, self is a square matrix:
-        elif isinstance(other, int):
-            return np.linalg.matrix_power(self, other)
-
-        elif isinstance(other, float) and other.is_integer():
-            return np.linalg.matrix_power(self, int(other))
-
-        elif isinstance(other, Number):
-            raise MathArrayError("Cannot raise a matrix to non-integer powers.")
-
+        # Henceforth, self is a square matrix.
+        if isinstance(other, Number):
+            exponent = other
         elif isinstance(other, MathArray):
-            raise MathArrayError("Cannot raise a matrix to {other.shape_name} powers.".format(
-                other=other))
+            if other.ndim == 0:
+                exponent = other.item()
+            else:
+                raise MathArrayError("Cannot raise a matrix to {other.shape_name} powers.".format(
+                    other=other))
+        else:
+            raise TypeError("Cannot raise matrix to power of type {type}.".format(
+                type=type(other)))
 
-        raise TypeError("Cannot raise matrix to power of type {type}.".format(
-            type=type(other)))
+        # Henceforth:
+        # - self is a square matrix, AND
+        # - exponent is a number
+        if isinstance(exponent, int):
+            return np.linalg.matrix_power(self, exponent)
+
+        elif isinstance(exponent, float) and exponent.is_integer():
+            return np.linalg.matrix_power(self, int(exponent))
+
+        elif isinstance(exponent, Number):
+            raise MathArrayError("Cannot raise a matrix to non-integer powers.")
 
     def __rpow__(self, other):
         if self.ndim == 0 and isinstance(other, Number):
@@ -211,12 +243,24 @@ class MathArray(np.ndarray):
             raise MathArrayError("Cannot raise a scalar to power of a {self.shape_name}."
                                  .format(self=self))
         raise TypeError("Cannot raise {type} to power of {self.shape_name}."
-                            .format(type=type(other), self=self))
+                        .format(type=type(other), self=self))
 
-    def __rtruediv__(self, other):
-        if isinstance(self, MathArray) and self.ndim >0:
-            raise MathArrayError("Cannot divide by a {self.shape_name}".format(self=self))
-        return super(MathArray, self).__rtruediv__(other)
+    # in-place operations
+
+    def __iadd__(self, other):
+        return self.__add__(other)
+
+    def __isub__(self, other):
+        return self.__sub__(other)
+
+    def __imul__(self, other):
+        return self.__mul__(other)
+
+    def __itruediv__(self, other):
+        return self.__truediv__(other)
+
+    def __ipow__(self, other):
+        return self.__pow__(other)
 
 
 def equal_as_arrays(A, B):

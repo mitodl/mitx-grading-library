@@ -111,7 +111,8 @@ def test_addition_with_other_types():
         A + 1.0
     with raises(MathArrayError, match=match):
         A + (1 + 2j)
-    with raises(TypeError, match="Cannot add/subtract object of <type 'list'> to a matrix."):
+    with raises(TypeError, match="Cannot add/subtract a matrix with object of "
+                "<type 'list'>"):
         A + [[1, 2], [4, 5]]
 
 ##########     Test Subtraction     ##########
@@ -162,7 +163,8 @@ def test_subtraction_with_other_types():
         A - 1.0
     with raises(MathArrayError, match=match):
         A - (1 + 2j)
-    with raises(TypeError, match="Cannot add/subtract object of <type 'list'> to a matrix."):
+    with raises(TypeError, match="Cannot add/subtract a matrix with object of "
+                "<type 'list'>"):
         A - [[1, 2], [4, 5]]
 
 ##########     Test Multiplication     ##########
@@ -273,25 +275,38 @@ def test_tensor_multiplication_not_supported():
 def test_multiplication_with_unexpected_types_raises_TypeError():
     A = random_math_array([4, 2])
     B = [1, 2, 3]
-    match = "Cannot multiply object of <type 'list'> with a matrix of shape \(rows: 4, cols: 2\)."
+    match = "Cannot multiply a matrix with object of <type 'list'>"
     with raises(TypeError, match=match):
         A*B
 
 ##########     Test Division     ##########
-def test_division():
+def test_division_by_scalar():
     A = MathArray([4, 8])
     assert equal_as_arrays(A/2, MathArray([2, 4]))
+    assert equal_as_arrays(A/MathArray(2), MathArray([2, 4]))
 
     assert 4/MathArray(2) == MathArray(2)
+
+def test_division_by_array_raises_error():
+    A = MathArray([4, 8])
 
     match = "Cannot divide by a vector"
     with raises(MathArrayError, match=match):
         2/A
 
+    match = "Cannot divide a vector by a vector"
+    with raises(MathArrayError, match=match):
+        A/A
+
+    match = "Cannot divide vector by object of <type 'list'>"
+    with raises(TypeError, match=match):
+        A/[1, 2, 3]
+
 ##########     Test Powers     ##########
-def test_matrix_power_works_with_floats_if_integral():
+def test_matrix_power_works_with_floats_and_scalars_if_integral():
     A = random_math_array([3, 3])
     assert equal_as_arrays(A**2, A**2.0)
+    assert equal_as_arrays(A**2, A**MathArray(2.0))
 
 def test_power_error_messages():
     A = random_math_array([3, 3])
@@ -356,6 +371,52 @@ def test_scalar_special_cases():
     match = 'Cannot raise a scalar to power of a vector.'
     with raises(MathArrayError, match=match):
         MathArray(2)**MathArray([1, 2, 3])
+
+##########     Test in-place operations     ##########
+def test_in_place_addition():
+
+    amounts = [0, IdMult(4), random_math_array([2, 2])]
+    for amount in amounts:
+        A = random_math_array([2, 2])
+        A_copy = A.copy()
+        B = A
+        A += amount
+        assert equal_as_arrays(A, A_copy + amount)
+
+def test_in_place_subtraction():
+
+    amounts = [0, IdMult(4), random_math_array([2, 2])]
+    for amount in amounts:
+        A = random_math_array([2, 2])
+        A_copy = A.copy()
+        A -= amount
+        assert equal_as_arrays(A, A_copy - amount)
+
+def test_in_place_multiplication():
+
+    amounts = [5, IdMult(4), random_math_array(tuple()), random_math_array([2, 2])]
+    for amount in amounts:
+        A = random_math_array([2, 2])
+        A_copy = A.copy()
+        A *= amount
+        assert equal_as_arrays(A, A_copy * amount)
+
+def test_in_place_division():
+
+    amounts = [5, MathArray(5)]
+    for amount in amounts:
+        A = random_math_array([2, 2])
+        A_copy = A.copy()
+        A /= amount
+        assert equal_as_arrays(A, A_copy / amount)
+
+def test_in_place_powers():
+    amounts = [2, -3.0, MathArray(5)]
+    for amount in amounts:
+        A = random_math_array([2, 2])
+        A_copy = A.copy()
+        A **= amount
+        assert equal_as_arrays(A, A_copy ** amount)
 
 ##########     Test Binary Operations with IdentityMultiple     ##########
 
