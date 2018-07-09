@@ -103,31 +103,24 @@ def test_evaluation_does_not_mutate_variables():
     """
     This test should not be considered as related to vector/matrix/tensor algebra.
 
-    We're just trying to verify that variable variables aren't accidentally
-    mutated during evaluation.
+    We're just trying to verify that variables aren't accidentally mutated
+    during evaluation.
 
     Numpy arrays just happen to be a convenient mutatable object that implements
     all the necessary operations.
     """
 
-    A = np.array(6)
-    B = A
-    A += 2
-    assert A is B and A == 8 # np.array's += really mutates!
-
-    variables = { 'X': np.array(8) }
-
-    # If addition mutates, would be (8+4) + 12
-    assert evaluator('(X+4) + X', variables)[0] == 8 + 4 + 8
-
-    # If subtraction mutates, would be (8-4) + 4
-    assert evaluator('(X-4) + X', variables)[0] == 8 - 4 + 8
-
-    # If multiplication mutates, would be (8*2) + 16
-    assert evaluator('(X*2) + X', variables)[0] == 2*8 + 8
-
-    # If division mutates, would be 8/2 + 4
-    assert evaluator('(X/2) + X', variables)[0] == 8/2 + 8
-
-    # If powers mutate, this would be 8**2 + 64
-    assert evaluator('X^2 + X', variables)[0] == 8**2 + 8
+    A = np.array([
+        [
+            [1, 2, 3],
+            [4, 5, 6]
+        ],
+        [
+            [7, 8, 9],
+            [10, 11, 12]
+        ]
+    ])
+    A_copy = A.copy()
+    variables = {'A': A}
+    evaluator('A/2', variables)
+    assert np.all(A == A_copy)

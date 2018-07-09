@@ -8,7 +8,7 @@ Uses pyparsing to parse. Main function is evaluator().
 Heavily modified from the edX calc.py
 """
 from __future__ import division
-from numbers import Number
+import copy
 import numpy as np
 from pyparsing import (
     CaselessLiteral,
@@ -257,7 +257,7 @@ class FormulaParser(object):
         self.suffixes = suffixes
         self.actions = {
             'number': self.eval_number,
-            'variable': lambda tokens: self.vars[tokens[0]],
+            'variable': self.eval_variable,
             'arguments': lambda tokens: tokens,
             'function': self.eval_function,
             'array': self.eval_array,
@@ -531,8 +531,18 @@ class FormulaParser(object):
         """
         result = float(parse_result[0])
         if len(parse_result) == 2:
-            result = result * self.suffixes[parse_result[1]]
+            result *=  self.suffixes[parse_result[1]]
         return result
+
+    def eval_variable(self, parse_result):
+        """
+        Returns a copy of the variable in self.vars
+
+        NOTE: The variable's class must implement a __copy__ method.
+            (numpy ndarrays do implement this method)
+        """
+        variable = self.vars[parse_result[0]]
+        return copy.copy(variable)
 
     def eval_function(self, parse_result):
         """
@@ -772,9 +782,9 @@ class FormulaParser(object):
             op = data.pop(0)
             num = data.pop(0)
             if op == '*':
-                result = result * num
+                result *= num
             elif op == '/':
-                result = result / num
+                result /= num
             else:
                 raise CalcError("Undefined symbol {} in eval_product".format(op))
         return result
@@ -806,9 +816,9 @@ class FormulaParser(object):
             op = data.pop(0)
             num = data.pop(0)
             if op == '+':
-                result = result + num
+                result += num
             elif op == '-':
-                result = result - num
+                result -= num
             else:
                 raise CalcError("Undefined symbol {} in eval_sum".format(op))
         return result
