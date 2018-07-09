@@ -209,7 +209,7 @@ class MathArray(np.ndarray):
             type=type(other), self=self))
 
     def __rtruediv__(self, other):
-        if isinstance(self, MathArray) and self.ndim > 0:
+        if self.ndim > 0:
             raise MathArrayError("Cannot divide by a {self.shape_name}".format(self=self))
         return super(MathArray, self).__rtruediv__(other)
 
