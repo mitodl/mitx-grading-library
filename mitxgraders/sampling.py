@@ -237,8 +237,10 @@ class DiscreteSet(VariableSamplingSet):  # pylint: disable=too-few-public-method
 
 class RealMathArrays(VariableSamplingSet):
     """
-    Represents a collection of real matrices with specified norm from which to
+    Represents a collection of real arrays with specified norm from which to
     draw random samples.
+
+    The norm used is standard Euclidean norm: root-sum of all entries in the array.
 
     Config:
     =======
@@ -312,6 +314,7 @@ class RealVectors(RealMathArrays):
             [int], Length(min=1, max=1),
             msg='Expected a list of length 1 (e.g., [3])')
     })
+
 
 class RealMatrices(RealMathArrays):
     """
