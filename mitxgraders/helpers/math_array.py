@@ -443,3 +443,16 @@ class IdentityMultiple(object):
 
     def __ipow__(self, other):
         return self.__pow__(other)
+
+    def __copy__(self):
+        """
+        Used by copy.copy:
+        >>> import copy
+        >>> A = IdentityMultiple(4)
+        >>> B = copy.copy(A)
+        >>> A == B
+        True
+        >>> A is B
+        False
+        """
+        return IdentityMultiple(self.value)
