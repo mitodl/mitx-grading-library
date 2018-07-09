@@ -651,21 +651,35 @@ class FormulaParser(object):
         MathArray([[ 1.+0.j,  0.+2.j,  3.+0.j],
                [ 4.+0.j,  5.+0.j,  6.+0.j]])
 
-        All entries need to have the same shape:
+        We try to detect shape errors:
         >>> parser.eval_array([                      # doctest: +ELLIPSIS
         ...     parser.eval_array([1, 2, 3]),
         ...     4
         ... ])
         Traceback (most recent call last):
         UnableToParse: Unable to parse vector/matrix. If you're trying ...
+        >>> parser.eval_array([                      # doctest: +ELLIPSIS
+        ...     2.0,
+        ...     parser.eval_array([1, 2, 3]),
+        ...     4
+        ... ])
+        Traceback (most recent call last):
+        UnableToParse: Unable to parse vector/matrix. If you're trying ...
         """
-        array = MathArray(parse_result)
+
+        shape_message = ("Unable to parse vector/matrix. If you're trying to "
+                         "enter a matrix, this is most likely caused by an "
+                         "unequal number of elements in each row.")
+
+        try:
+            array = MathArray(parse_result)
+        except ValueError:
+            # This happens, for example, with np.array([1, 2, [3]])
+            raise UnableToParse(shape_message)
+
         if array.dtype == 'object':
             # This happens, for example, with np.array([[1], 2, 3])
-            msg = ("Unable to parse vector/matrix. If you're trying to enter a matrix, "
-                   "make sure that each row has the same number of elements.For example, "
-                   "[[1, 2, 3], [4, 5, 6]].")
-            raise UnableToParse(msg)
+            raise UnableToParse(shape_message)
 
         if array.ndim > self.max_array_dim_used:
             self.max_array_dim_used = array.ndim
