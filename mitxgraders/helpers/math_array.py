@@ -338,6 +338,20 @@ class IdentityMultiple(object):
 
     Since I(0)==0, sums and differences might be scalar 0:
     >>> assert I(a) - I(a) == 0
+
+    In-place operations work, too:
+    >>> A = IdentityMultiple(8)
+    >>> A += IdentityMultiple(2); A
+    10*Identity
+    >>> A -= IdentityMultiple(2); A
+    8*Identity
+    >>> A /= 2; A
+    4.0*Identity
+    >>> A *= 2; A
+    8.0*Identity
+    >>> A **= 2; A
+    64.0*Identity
+
     """
     def __new__(cls, value):
         if is_number_zero(value):
@@ -413,3 +427,19 @@ class IdentityMultiple(object):
         if isinstance(other, Number):
             return IdentityMultiple(self.value**other)
         return other.__rpow__(self)
+
+    # In-place operations:
+    def __iadd__(self, other):
+        return self.__add__(other)
+
+    def __isub__(self, other):
+        return self.__sub__(other)
+
+    def __imul__(self, other):
+        return self.__mul__(other)
+
+    def __itruediv__(self, other):
+        return self.__truediv__(other)
+
+    def __ipow__(self, other):
+        return self.__pow__(other)
