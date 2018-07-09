@@ -21,6 +21,20 @@ def is_number_zero(value):
     return isinstance(value, Number) and value == 0
 
 def is_scalar_array_zero(value):
+    """
+    Tests if value is a scalar MathArray with value 0.
+
+    >>> zero = MathArray(0)
+    >>> is_scalar_array_zero(zero)
+    True
+    >>> five = MathArray(5) # scalar MathArray, but not zero
+    >>> is_scalar_array_zero(MathArray(5))
+    False
+    >>> is_scalar_array_zero(MathArray([0, 0, 0])) # vector zero, not scalar
+    False
+    >>> is_scalar_array_zero(0) # number zero, not MathArray
+    False
+    """
     return isinstance(value, MathArray) and value.ndim == 0 and value.item() == 0
 
 def is_square(array):
@@ -49,7 +63,7 @@ class MathArray(np.ndarray):
             If shapes are correct:
             - vector * vector = number
             - matrix * vector = vector
-            - vector * vector = vector
+            - vector * matrix = vector
             - matrix * matrix = matrix
             Any multiplication involving tensors and arrays of dimension >1 is not supported.
         - powers are only allowed for square matrices and integer-like exponents.
@@ -67,6 +81,9 @@ class MathArray(np.ndarray):
         to be used, hence we need our own. This is a quirk of subclassing
         ndarray. See https://docs.scipy.org/doc/numpy/user/basics.subclassing.html
         for more info.
+
+        No need for __array_finalize__ since we do not add any any properties
+        (except computed properties like shape_name).
         """
         obj = np.asarray(input_array).view(cls)
         return obj
