@@ -538,6 +538,8 @@ class FormulaParser(object):
         """
         Returns a copy of the variable in self.vars
 
+        We return a copy so that nothing in self.vars is mutated.
+
         NOTE: The variable's class must implement a __copy__ method.
             (numpy ndarrays do implement this method)
         """

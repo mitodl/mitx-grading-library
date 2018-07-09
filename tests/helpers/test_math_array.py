@@ -35,6 +35,10 @@ def test_array_class_is_correct():
     from_slice = MathArray([[1, 2, 3], [4, 5, 6]])[:, 2:3]
     assert isinstance(from_slice, MathArray)
 
+def test_copying():
+    A = MathArray([1, 2, 3])
+    assert equal_as_arrays(A, A.copy())
+
 def test_descriptions():
     scalar = MathArray(5)
     assert scalar.shape_name == 'scalar'
@@ -398,7 +402,6 @@ def test_in_place_addition():
     for amount in amounts:
         A = random_math_array([2, 2])
         A_copy = A.copy()
-        B = A
         A += amount
         assert equal_as_arrays(A, A_copy + amount)
 
