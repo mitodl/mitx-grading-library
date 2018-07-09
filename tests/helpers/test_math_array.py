@@ -7,7 +7,8 @@ from mitxgraders.helpers.math_array import (
     MathArray,
     IdentityMultiple as IdMult,
     MathArrayError,
-    equal_as_arrays
+    equal_as_arrays,
+    approx_equal_as_arrays
 )
 
 def random_math_array(shape):
@@ -311,6 +312,20 @@ def test_matrix_power_works_with_floats_and_scalars_if_integral():
     A = random_math_array([3, 3])
     assert equal_as_arrays(A**2, A**2.0)
     assert equal_as_arrays(A**2, A**MathArray(2.0))
+
+def test_nonpositive_matrix_powers():
+    A = MathArray([
+        [1, 5],
+        [-4, 3]
+    ])
+    I2 = MathArray([
+        [1, 0],
+        [0, 1]
+    ])
+
+    assert equal_as_arrays(A**0, I2)
+    # Slight numerical errors in the inversion
+    assert approx_equal_as_arrays(A**-2 * A**3, A, tol=1e-15)
 
 def test_power_error_messages():
     A = random_math_array([3, 3])

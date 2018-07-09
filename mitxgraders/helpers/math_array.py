@@ -286,9 +286,24 @@ class MathArray(np.ndarray):
 
 
 def equal_as_arrays(A, B):
+    """
+    Test that A and B are both MathArrays and have equal entries.
+
+    >>> equal_as_arrays(MathArray([1, 2, 3]), MathArray([1, 2, 3]))
+    True
+    >>> equal_as_arrays(MathArray([1, 2, 3]), np.array([1, 2, 3]))
+    False
+    >>> equal_as_arrays(MathArray([0, 0, 0]), MathArray(0))
+    False
+    """
     math_arrays = isinstance(A, MathArray) and isinstance(B, MathArray)
     values_equal = np.array_equal(A, B)
-    return math_arrays and values_equal and A.shape == B.shape
+    return math_arrays and values_equal
+
+def approx_equal_as_arrays(A, B, tol=1e-12):
+    math_arrays = isinstance(A, MathArray) and isinstance(B, MathArray)
+    diff_norm = np.linalg.norm(A - B)
+    return math_arrays and (diff_norm < tol)
 
 
 class IdentityMultiple(object):
