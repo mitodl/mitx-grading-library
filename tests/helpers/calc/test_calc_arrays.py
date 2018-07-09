@@ -40,8 +40,8 @@ def test_math_arrays():
     x = 4.2
     z = 2 + 3j
     variables = {
-        'A': A.copy(),
-        'v': v.copy(),
+        'A': A,
+        'v': v,
         'n': n,
         'x': x,
         'z': z
