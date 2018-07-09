@@ -42,8 +42,6 @@ def is_scalar(arg):
 
     return False
 
-# QUESTION @Jolyon If you can think of a better way to raise errors when
-# sin(A), cos(A), etc is handed, I'm all-ears!
 def scalar_domain(display_name):
     """
     Returns a function decorator that causes function to raises a DomainError
@@ -66,9 +64,10 @@ def scalar_domain(display_name):
     Traceback (most recent call last):
     ValueError: Decorator 'scalar_domain' can only be used with unary functions.
 
-    Comment: The n-argument case seems intractable because it breaks get_number_of_args,
-    which is used in calc.py. But we could hard-code the n=1, n=2, n=3 cases.
-    Anything larger probably wouldn't come up in practice.
+    Comment: The n-argument case seems intractable because the _decorated_func
+    will be passed to get_number_of_args^[1], and so cannot have variadic signature *args.
+    But we could hard-code the n=1, n=2, n=3 cases.
+    [1]: In calc.py, eval_func calls is_callable_with, which uses get_number_of_args
     """
 
     def _decorator(func):
@@ -76,16 +75,16 @@ def scalar_domain(display_name):
             raise ValueError("Decorator 'scalar_domain' can only be used with unary functions.")
 
         # can't use @wraps, doesn't work with callable classes like numpy ufuncs
-        def _func(arg):
+        def _decorated_func(arg):
             if not is_scalar(arg):
                 raise DomainError("Function '{0}(...)' only accepts scalar inputs, but "
-                                      "was given a non-scalar input.".format(display_name))
+                                  "was given a non-scalar input.".format(display_name))
 
             return func(arg)
 
-        _func.__name__ = func.__name__
+        _decorated_func.__name__ = func.__name__
 
-        return _func
+        return _decorated_func
 
     return _decorator
 
@@ -145,17 +144,39 @@ def arccoth(val):
     """Inverse hyperbolic cotangent"""
     return np.arctanh(1. / val)
 
+def content_if_0d_array(obj):
+    """
+    If obj is a 0d numpy array, return its contents. Otherwise, return item.
+
+    Usage:
+    ======
+
+    >>> content_if_0d_array(5) == 5
+    True
+    >>> content_if_0d_array(np.array(5)) == 5
+    True
+    >>> content_if_0d_array(np.array([1, 2, 3]))
+    array([1, 2, 3])
+    """
+    return obj.item() if isinstance(obj, np.ndarray) and obj.ndim == 0 else obj
+
 def real(z):
     """
     Returns the real part of z.
     >>> real(2+3j)
     2.0
 
-    Note: We convert to float because numpy returns scalar arrays:
-    >>> isinstance(np.real(2+3j), np.ndarray)
+    If the input is a number, a number is returned:
+    >>> isinstance(real(2+3j), Number)
     True
+
+    Can be used with arrays, too:
+    >>> real(np.array([1+10j, 2+20j, 3+30j]))
+    array([ 1.,  2.,  3.])
     """
-    return float(np.real(z))
+    # np.real seems to return 0d arrays for numerical inputs. For example,
+    # np.real(2+3j) is a 0d array.
+    return content_if_0d_array(np.real(z))
 
 def imag(z):
     """
@@ -163,10 +184,15 @@ def imag(z):
     >>> imag(2+3j)
     3.0
 
-    >>> isinstance(np.imag(2+3j), np.ndarray)
+    If the input is a number, a number is returned:
+    >>> isinstance(imag(2+3j), Number)
     True
+
+    Can be used with arrays, too:
+    >>> imag(np.array([1+10j, 2+20j, 3+30j]))
+    array([ 10.,  20.,  30.])
     """
-    return float(np.imag(z))
+    return content_if_0d_array(np.imag(z))
 
 def factorial(z):
     """
@@ -226,19 +252,18 @@ DEFAULT_VARIABLES = {
     'pi': np.pi
 }
 
-# Functions available by default
-# We use scimath variants which give complex results when needed. For example:
-#   np.sqrt(-4+0j) = 2j
-#   np.sqrt(-4) = nan, but
-#   np.lib.scimath.sqrt(-4) = 2j
-
-UNSAFE_SCALAR_FUNCTIONS = {
+# These act element-wise on numpy arrays
+ELEMENTWISE_FUNCTIONS = {
     'sin': np.sin,
     'cos': np.cos,
     'tan': np.tan,
     'sec': sec,
     'csc': csc,
     'cot': cot,
+    # We use scimath variants which give complex results when needed. For example:
+    #   np.sqrt(-4+0j) = 2j
+    #   np.sqrt(-4) = nan, but
+    #   np.lib.scimath.sqrt(-4) = 2j
     'sqrt': np.lib.scimath.sqrt,
     'log10': np.lib.scimath.log10,
     'log2': np.lib.scimath.log2,
@@ -267,13 +292,14 @@ UNSAFE_SCALAR_FUNCTIONS = {
     'arccoth': arccoth
 }
 
-SCALAR_FUNCTIONS = {key: scalar_domain(key)(UNSAFE_SCALAR_FUNCTIONS[key])
-                    for key in UNSAFE_SCALAR_FUNCTIONS}
+SCALAR_FUNCTIONS = {key: scalar_domain(key)(ELEMENTWISE_FUNCTIONS[key])
+                    for key in ELEMENTWISE_FUNCTIONS}
 
 ARRAY_FUNCTIONS = {
     're': real,
     'im': imag,
     'conj': np.conj,
+    'norm': np.linalg.norm
 }
 
 def merge_dicts(*dict_args):
