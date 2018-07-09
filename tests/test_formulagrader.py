@@ -491,7 +491,7 @@ def test_fg_debug_log():
         sample_from={
             'z': ComplexRectangle()
         },
-        blacklist=['sin', 'cos'],
+        blacklist=['sin', 'cos', 'tan'],
         user_functions={
             'f': RandomFunction(),
             'square': lambda x: x**2
@@ -543,10 +543,11 @@ def test_fg_debug_log():
     "    'sinh': <function sinh at 0x...>,<br/>\n"
     "    'sqrt': <function sqrt at 0x...>,<br/>\n"
     "    'square': <function <lambda> at 0x...>,<br/>\n"
-    "    'tan': <function tan at 0x...>,<br/>\n"
     "    'tanh': <function tanh at 0x...>}}<br/>\n"
     "Functions available during evaluation and disallowed in answer:<br/>\n"
-    "{{   'cos': <function cos at 0x...>, 'sin': <function sin at 0x...>}}<br/>\n"
+    "{{   'cos': <function cos at 0x...>,<br/>\n"
+    "    'sin': <function sin at 0x...>,<br/>\n"
+    "    'tan': <function tan at 0x...>}}<br/>\n"
     "<br/>\n"
     "<br/>\n"
     "==========================================<br/>\n"
