@@ -8,13 +8,9 @@ from mitxgraders.helpers.math_array import (
     IdentityMultiple as IdMult,
     MathArrayError,
     equal_as_arrays,
-    approx_equal_as_arrays
+    approx_equal_as_arrays,
+    random_math_array
 )
-
-def random_math_array(shape):
-    a, b = -10, 10
-    elements = a + (b-a)*np.random.random_sample(shape)
-    return MathArray(elements)
 
 def test_random_math_array():
     matrix = random_math_array([3, 7])

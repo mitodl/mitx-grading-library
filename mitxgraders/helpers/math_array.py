@@ -20,7 +20,11 @@ def is_number_zero(value):
     """
     return isinstance(value, Number) and value == 0
 
-def is_scalar_array_zero(value):
+def is_scalar_matharray(obj):
+    """Test than obj is a 0-dimensional MathArray (scalar)"""
+    return isinstance(obj, MathArray) and obj.ndim == 0
+
+def is_scalar_array_zero(obj):
     """
     Tests if value is a scalar MathArray with value 0.
 
@@ -35,7 +39,8 @@ def is_scalar_array_zero(value):
     >>> is_scalar_array_zero(0) # number zero, not MathArray
     False
     """
-    return isinstance(value, MathArray) and value.ndim == 0 and value.item() == 0
+    return is_scalar_matharray(obj) and obj.item() == 0
+
 
 def is_square(array):
     return array.ndim == 2 and array.shape[0] == array.shape[1]
@@ -85,29 +90,39 @@ class MathArray(np.ndarray):
         No need for __array_finalize__ since we do not add any any properties
         (except computed properties like shape_name).
         """
-        obj = np.asarray(input_array).view(cls)
-        return obj
 
-    @property
-    def shape_name(self):
+        return np.asarray(input_array).view(cls)
+
+    @staticmethod
+    def get_shape_name(ndim):
         names = {
             0: 'scalar',
             1: 'vector',
             2: 'matrix',
         }
-        return names.get(self.ndim, 'tensor')
+        return names.get(ndim, 'tensor')
+
+    @property
+    def shape_name(self):
+        return self.get_shape_name(self.ndim)
+
+    @staticmethod
+    def get_description(shape):
+        ndim = len(shape)
+        shape_name = MathArray.get_shape_name(ndim)
+        if ndim == 0:
+            return shape_name
+        elif ndim == 1:
+            return '{shape_name} of length {shape[0]}'.format(shape_name=shape_name, shape=shape)
+        elif ndim == 2:
+            return ('{shape_name} of shape (rows: {shape[0]}, cols: '
+                    '{shape[1]})').format(shape_name=shape_name, shape=shape)
+        else:
+            return '{shape_name} of shape {shape}'.format(shape_name=shape_name, shape=shape)
 
     @property
     def description(self):
-        if self.ndim == 0:
-            return self.shape_name
-        elif self.ndim == 1:
-            return '{self.shape_name} of length {self.shape[0]}'.format(self=self)
-        elif self.ndim == 2:
-            return ('{self.shape_name} of shape (rows: {self.shape[0]}, cols: '
-                    '{self.shape[1]})').format(self=self)
-        else:
-            return '{self.shape_name} of shape {self.shape}'.format(self=self)
+        return self.get_description(self.shape)
 
     def __add__(self, other):
         super_ADD = super(MathArray, self).__add__
@@ -305,6 +320,10 @@ def approx_equal_as_arrays(A, B, tol=1e-12):
     diff_norm = np.linalg.norm(A - B)
     return math_arrays and (diff_norm < tol)
 
+def random_math_array(shape):
+    a, b = -10, 10
+    elements = a + (b-a)*np.random.random_sample(shape)
+    return MathArray(elements)
 
 class IdentityMultiple(object):
     """
