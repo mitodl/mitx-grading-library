@@ -34,9 +34,8 @@ from mitxgraders.baseclasses import StudentFacingError
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
 from mitxgraders.helpers.mathfunc import (DEFAULT_FUNCTIONS,
                                           DEFAULT_SUFFIXES,
-                                          DEFAULT_VARIABLES,
-                                          robust_pow)
-from mitxgraders.helpers.math_array import MathArray
+                                          DEFAULT_VARIABLES)
+from mitxgraders.helpers.math_array import MathArray, robust_pow
 
 class CalcError(StudentFacingError):
     """Base class for errors originating in calc.py"""

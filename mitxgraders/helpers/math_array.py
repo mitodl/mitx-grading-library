@@ -2,7 +2,6 @@ from __future__ import division # necessary for one of the doctests
 import numpy as np
 from numbers import Number
 from mitxgraders.baseclasses import StudentFacingError
-from mitxgraders.helpers.mathfunc import robust_pow
 
 class MathArrayError(StudentFacingError):
     """
@@ -41,9 +40,31 @@ def is_scalar_array_zero(obj):
     """
     return is_scalar_matharray(obj) and obj.item() == 0
 
-
 def is_square(array):
     return array.ndim == 2 and array.shape[0] == array.shape[1]
+
+# This is used in calc.py's eval_power function also.
+def robust_pow(base, exponent):
+    """
+    Calculates __pow__, and tries other approachs if that doesn't work.
+
+    Usage:
+    ======
+
+    >>> robust_pow(5, 2)
+    25
+    >>> robust_pow(0.5, -1)
+    2.0
+
+    If base is negative and power is fractional, complex results are returned:
+    >>> almost_j = robust_pow(-1, 0.5)
+    >>> np.allclose(almost_j, 1j)
+    True
+    """
+    try:
+        return base ** exponent
+    except ValueError:
+        return np.lib.scimath.power(base, exponent)
 
 class MathArray(np.ndarray):
     """
