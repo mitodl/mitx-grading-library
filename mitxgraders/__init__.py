@@ -26,6 +26,7 @@ from mitxgraders.listgrader import *
 from mitxgraders.formulagrader import *
 from mitxgraders.sampling import *
 from mitxgraders.baseclasses import ConfigError, InvalidInput
+from mitxgraders.helpers import *
 
 def import_plugins():
     """Imports all plugins into the global namespace"""
