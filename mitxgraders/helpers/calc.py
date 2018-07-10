@@ -554,35 +554,56 @@ class FormulaParser(object):
 
         Usage
         =====
+        Instantiate a parser and some functions:
         >>> import math
-        >>> parser = FormulaParser("1", {"%": 0.01})
+        >>> parser = FormulaParser("1", {})
         >>> parser.set_vars_funcs(functions={"sin": math.sin, "cos": math.cos})
+
+        Single variable functions work:
         >>> parser.eval_function(['sin', [0]])
         0.0
         >>> parser.eval_function(['cos', [0]])
         1.0
+
+        So do multivariable functions:
         >>> def h(x, y): return x + y
         >>> parser.set_vars_funcs(functions={"h": h})
         >>> parser.eval_function(['h', [1, 2]])
         3
+
+        Validation:
+        ==============================
+        By default, eval_function inspects its function's arguments to first
+        validate that the correct number of arguments are passed:
+
+        >>> def h(x, y): return x + y
+        >>> parser.set_vars_funcs(functions={"h": h})
         >>> parser.eval_function(['h', [1, 2, 3]])
         Traceback (most recent call last):
         ArgumentError: Wrong number of arguments passed to h. Expected 2, received 3.
-        >>> parser.eval_function(['h', [1]])
+
+        However, if the function to be evaluated has a truthy 'validated'
+        property, we assume it does its own validation and we do not check the
+        number of arguments.
+
+        >>> from mitxgraders.baseclasses import StudentFacingError
+        >>> def g(*args):
+        ...     if len(args) != 2:
+        ...         raise StudentFacingError('I need two inputs!')
+        ...     return args[0]*args[1]
+        >>> g.validated = True
+        >>> parser.set_vars_funcs(functions={"g": g})
+        >>> parser.eval_function(['g', [1]])
         Traceback (most recent call last):
-        ArgumentError: Wrong number of arguments passed to h. Expected 2, received 1.
+        StudentFacingError: I need two inputs!
         """
         # Obtain the function and arguments
         name, args = parse_result
         func = self.functions[name]
 
-        # Check to make sure we've been passed the correct number of arguments
-        num_args = len(args)
-        expected = get_number_of_args(func)
-        if expected != num_args:
-            msg = ("Wrong number of arguments passed to {func}. "
-                   "Expected {num}, received {num2}.")
-            raise ArgumentError(msg.format(func=name, num=expected, num2=num_args))
+        # If function does not do its own validation, try and validate here.
+        if not getattr(func, 'validated', False):
+            FormulaParser.validate_function_call(func, name, args)
 
         # Try to call the function
         try:
@@ -613,6 +634,19 @@ class FormulaParser(object):
                 msg = ("There was an error evaluating {name}(...). "
                        "Its input does not seem to be in its domain.").format(name=name)
                 raise FunctionEvalError(msg)
+
+    @staticmethod
+    def validate_function_call(func, name, args):
+        """
+        Checks that func has been called with the correct number of arguments.
+        """
+        num_args = len(args)
+        expected = get_number_of_args(func)
+        if expected != num_args:
+            msg = ("Wrong number of arguments passed to {func}. "
+                   "Expected {num}, received {num2}.")
+            raise ArgumentError(msg.format(func=name, num=expected, num2=num_args))
+        return True
 
     def eval_array(self, parse_result):
         """

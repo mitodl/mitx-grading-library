@@ -231,7 +231,7 @@ class SpecifyDomain(ObjectWithSchema):
                 message = "\n\t".join(lines)
                 raise DomainError(message)
 
-            _func.__name__ = func_name
+            _func.__name__ = func.__name__
             _func.validated = True
             return _func
 
