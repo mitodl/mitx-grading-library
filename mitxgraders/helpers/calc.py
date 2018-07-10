@@ -8,6 +8,7 @@ Uses pyparsing to parse. Main function is evaluator().
 Heavily modified from the edX calc.py
 """
 from __future__ import division
+import copy
 import numpy as np
 from pyparsing import (
     CaselessLiteral,
@@ -29,12 +30,15 @@ from pyparsing import (
     ParseException,
     delimitedList
 )
+from mitxgraders.baseclasses import StudentFacingError
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
 from mitxgraders.helpers.mathfunc import (DEFAULT_FUNCTIONS,
                                           DEFAULT_SUFFIXES,
-                                          DEFAULT_VARIABLES)
+                                          DEFAULT_VARIABLES,
+                                          robust_pow)
+from mitxgraders.helpers.math_array import MathArray
 
-class CalcError(Exception):
+class CalcError(StudentFacingError):
     """Base class for errors originating in calc.py"""
     pass
 
@@ -171,7 +175,7 @@ def evaluator(formula,
               variables=DEFAULT_VARIABLES,
               functions=DEFAULT_FUNCTIONS,
               suffixes=DEFAULT_SUFFIXES,
-              allow_vectors=False):
+              max_array_dim=0):
     """
     Evaluate an expression; that is, take a string of math and return a float.
 
@@ -208,11 +212,6 @@ def evaluator(formula,
     # Check the variables and functions
     math_interpreter.check_variables()
 
-    # Are vectors allowed inputs in this problem?
-    if math_interpreter.vectors_used and not allow_vectors:
-        msg = "Vector and matrix expressions have been forbidden in this entry"
-        raise UnableToParse(msg)
-
     # Attempt to perform the evaluation
     try:
         result = math_interpreter.evaluate()
@@ -225,6 +224,16 @@ def evaluator(formula,
     except Exception:
         # Don't know what this is, or how you want to deal with it
         raise
+
+    # Were vectors/matrices/tensors used when they shouldn't have been?
+    if math_interpreter.max_array_dim_used > max_array_dim:
+        if max_array_dim == 0:
+            msg = "Vector and matrix expressions have been forbidden in this entry."
+        elif max_array_dim == 1:
+            msg = "Matrix expressions have been forbidden in this entry."
+        else:
+            msg = "Tensor expressions have been forbidden in this entry."
+        raise UnableToParse(msg)
 
     # Return the result of the evaluation, as well as the set of functions used
     return result, math_interpreter.functions_used
@@ -244,14 +253,14 @@ class FormulaParser(object):
         self.tree = None
         self.variables_used = set()
         self.functions_used = set()
-        self.vectors_used = False
+        self.max_array_dim_used = 0
         self.suffixes = suffixes
         self.actions = {
             'number': self.eval_number,
-            'variable': lambda tokens: self.vars[tokens[0]],
+            'variable': self.eval_variable,
             'arguments': lambda tokens: tokens,
             'function': self.eval_function,
-            'vector': self.eval_vector,
+            'array': self.eval_array,
             'power': self.eval_power,
             'negation': self.eval_negation,
             'parallel': self.eval_parallel,
@@ -273,12 +282,6 @@ class FormulaParser(object):
         When a function is recognized, store it in `functions_used`.
         """
         self.functions_used.add(tokens[0][0])
-
-    def vector_parse_action(self, tokens):
-        """
-        When vector input is used, mark it in `vectors_used`.
-        """
-        self.vectors_used = True
 
     @staticmethod
     def group_if_multiple(name):
@@ -386,15 +389,14 @@ class FormulaParser(object):
                             expr +
                             Suppress(")"))('parentheses')
 
-        # Define vectors
-        vector = Group(Suppress("[") +
+        # Define arrays
+        array = Group(Suppress("[") +
                        delimitedList(expr) +
-                       Suppress("]"))("vector")
-        vector.setParseAction(self.vector_parse_action)
+                       Suppress("]"))("array")
 
         # Define an atomic unit as an expression that evaluates directly to a number
         # without the use of binary operations (assuming all children have been evaluated).
-        atom = number | function | variable | parentheses | vector
+        atom = number | function | variable | parentheses | array
 
         # The following are in order of operational precedence
         # Define exponentiation, possibly including negative powers
@@ -529,8 +531,20 @@ class FormulaParser(object):
         """
         result = float(parse_result[0])
         if len(parse_result) == 2:
-            result *= self.suffixes[parse_result[1]]
+            result *=  self.suffixes[parse_result[1]]
         return result
+
+    def eval_variable(self, parse_result):
+        """
+        Returns a copy of the variable in self.vars
+
+        We return a copy so that nothing in self.vars is mutated.
+
+        NOTE: The variable's class must implement a __copy__ method.
+            (numpy ndarrays do implement this method)
+        """
+        variable = self.vars[parse_result[0]]
+        return copy.copy(variable)
 
     def eval_function(self, parse_result):
         """
@@ -574,6 +588,8 @@ class FormulaParser(object):
         # Try to call the function
         try:
             return func(*args)
+        except StudentFacingError:
+            raise
         except ZeroDivisionError:
             # It would be really nice to tell student the symbolic argument as part of this message,
             # but making symbolic argument available would require some nontrivial restructing
@@ -599,26 +615,78 @@ class FormulaParser(object):
                        "Its input does not seem to be in its domain.").format(name=name)
                 raise FunctionEvalError(msg)
 
-    def eval_vector(self, parse_result):
+    def eval_array(self, parse_result):
         """
-        Takes in a list of evaluated expressions and returns it as a numpy array.
+        Takes in a list of evaluated expressions and returns it as a MathArray.
 
         If passed a list of numpy arrays, generates a matrix/tensor/etc.
 
         Arguments:
-            parse_result: A list containing each element of the vector
+            parse_result: A list containing each element of the array
 
         Usage
         =====
-        >>> import numpy as np
-        >>> parser = FormulaParser("1", {"%": 0.01})
-        >>> np.all(parser.eval_vector([1,2,3]) == np.array([1, 2, 3]))
-        True
-        >>> np.all(parser.eval_vector([[1,2],[3,4]]) == np.array([[1, 2], [3, 4]]))
-        True
+        Returns MathArray instances:
+        >>> parser = FormulaParser("1", {}) # fake parser instance
+        >>> parser.eval_array([1, 2, 3])
+        MathArray([1, 2, 3])
+        >>> parser.eval_array([
+        ...     [1, 2],
+        ...     [3, 4]
+        ... ])
+        MathArray([[1, 2],
+               [3, 4]])
+
+        In practice, this is called recursively:
+        >>> parser.eval_array([
+        ...     parser.eval_array([1, 2, 3]),
+        ...     parser.eval_array([4, 5, 6])
+        ... ])
+        MathArray([[1, 2, 3],
+               [4, 5, 6]])
+
+        One complex entry will convert everything to complex:
+        >>> parser.eval_array([
+        ...     parser.eval_array([1, 2j, 3]),
+        ...     parser.eval_array([4, 5, 6])
+        ... ])
+        MathArray([[ 1.+0.j,  0.+2.j,  3.+0.j],
+               [ 4.+0.j,  5.+0.j,  6.+0.j]])
+
+        We try to detect shape errors:
+        >>> parser.eval_array([                      # doctest: +ELLIPSIS
+        ...     parser.eval_array([1, 2, 3]),
+        ...     4
+        ... ])
+        Traceback (most recent call last):
+        UnableToParse: Unable to parse vector/matrix. If you're trying ...
+        >>> parser.eval_array([                      # doctest: +ELLIPSIS
+        ...     2.0,
+        ...     parser.eval_array([1, 2, 3]),
+        ...     4
+        ... ])
+        Traceback (most recent call last):
+        UnableToParse: Unable to parse vector/matrix. If you're trying ...
         """
-        # Note: some checks and error handling will be necessary here!
-        return np.array(parse_result)
+
+        shape_message = ("Unable to parse vector/matrix. If you're trying to "
+                         "enter a matrix, this is most likely caused by an "
+                         "unequal number of elements in each row.")
+
+        try:
+            array = MathArray(parse_result)
+        except ValueError:
+            # This happens, for example, with np.array([1, 2, [3]])
+            raise UnableToParse(shape_message)
+
+        if array.dtype == 'object':
+            # This happens, for example, with np.array([[1], 2, 3])
+            raise UnableToParse(shape_message)
+
+        if array.ndim > self.max_array_dim_used:
+            self.max_array_dim_used = array.ndim
+
+        return array
 
     def eval_power(self, parse_result):
         """
@@ -640,13 +708,6 @@ class FormulaParser(object):
         >>> parser.eval_power([2,"-",2,2])  # Evaluate 2^(-(2^2))
         0.0625
         """
-        def robust_pow(base, exponent):
-            """The power function that we want to use"""
-            # This will need to be modified if base can be a matrix
-            try:
-                return base ** exponent
-            except ValueError:
-                return np.lib.scimath.power(base, exponent)
 
         data = parse_result[:]
         result = data.pop()
@@ -654,7 +715,7 @@ class FormulaParser(object):
             # Result contains the current exponent
             working = data.pop()
             if working == "-":
-                result *= -1
+                result = -result
             else:
                 # working is base, result is exponent
                 result = robust_pow(working, result)

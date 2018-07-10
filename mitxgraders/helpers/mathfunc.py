@@ -14,8 +14,79 @@ Defines:
 """
 from __future__ import division
 import math
+from numbers import Number
 import numpy as np
 import scipy.special as special
+from mitxgraders.baseclasses import StudentFacingError
+from mitxgraders.helpers.validatorfuncs import get_number_of_args
+
+class DomainError(StudentFacingError):
+    """
+    Raised when a function has domain error.
+    """
+
+def is_scalar(arg):
+    """
+    Tests if arg is Number or scalar numpy array.
+
+    >>> map(is_scalar, [3, 4 + 2j, 4.2, np.array(5)])
+    [True, True, True, True]
+    >>> is_scalar(np.array([4, 7]))
+    False
+
+    """
+    if isinstance(arg, Number):
+        return True
+    elif isinstance(arg, np.ndarray) and arg.ndim == 0:
+        return True
+
+    return False
+
+def scalar_domain(display_name):
+    """
+    Returns a function decorator that causes function to raises a DomainError
+    if function is called is called with a non-scalar argument. DomainError
+    refers to function by its given display_name.
+
+    >>> @scalar_domain('plus3')
+    ... def f(x):
+    ...     return x + 3
+    >>> f(4)
+    7
+    >>> f([5, 2])
+    Traceback (most recent call last):
+    DomainError: Function 'plus3(...)' only accepts scalar inputs, but was given a non-scalar input.
+
+    For now, scalar_domain() only accepts unary functions:
+    >>> @scalar_domain('add')
+    ... def f(x, y):
+    ...     return x + y
+    Traceback (most recent call last):
+    ValueError: Decorator 'scalar_domain' can only be used with unary functions.
+
+    Comment: The n-argument case seems intractable because the _decorated_func
+    will be passed to get_number_of_args^[1], and so cannot have variadic signature *args.
+    But we could hard-code the n=1, n=2, n=3 cases.
+    [1]: In calc.py, eval_func calls is_callable_with, which uses get_number_of_args
+    """
+
+    def _decorator(func):
+        if get_number_of_args(func) > 1:
+            raise ValueError("Decorator 'scalar_domain' can only be used with unary functions.")
+
+        # can't use @wraps, doesn't work with callable classes like numpy ufuncs
+        def _decorated_func(arg):
+            if not is_scalar(arg):
+                raise DomainError("Function '{0}(...)' only accepts scalar inputs, but "
+                                  "was given a non-scalar input.".format(display_name))
+
+            return func(arg)
+
+        _decorated_func.__name__ = func.__name__
+
+        return _decorated_func
+
+    return _decorator
 
 # Normal Trig
 def sec(arg):
@@ -72,6 +143,56 @@ def arccsch(val):
 def arccoth(val):
     """Inverse hyperbolic cotangent"""
     return np.arctanh(1. / val)
+
+def content_if_0d_array(obj):
+    """
+    If obj is a 0d numpy array, return its contents. Otherwise, return item.
+
+    Usage:
+    ======
+
+    >>> content_if_0d_array(5) == 5
+    True
+    >>> content_if_0d_array(np.array(5)) == 5
+    True
+    >>> content_if_0d_array(np.array([1, 2, 3]))
+    array([1, 2, 3])
+    """
+    return obj.item() if isinstance(obj, np.ndarray) and obj.ndim == 0 else obj
+
+def real(z):
+    """
+    Returns the real part of z.
+    >>> real(2+3j)
+    2.0
+
+    If the input is a number, a number is returned:
+    >>> isinstance(real(2+3j), Number)
+    True
+
+    Can be used with arrays, too:
+    >>> real(np.array([1+10j, 2+20j, 3+30j]))
+    array([ 1.,  2.,  3.])
+    """
+    # np.real seems to return 0d arrays for numerical inputs. For example,
+    # np.real(2+3j) is a 0d array.
+    return content_if_0d_array(np.real(z))
+
+def imag(z):
+    """
+    Returns the imaginary part of z.
+    >>> imag(2+3j)
+    3.0
+
+    If the input is a number, a number is returned:
+    >>> isinstance(imag(2+3j), Number)
+    True
+
+    Can be used with arrays, too:
+    >>> imag(np.array([1+10j, 2+20j, 3+30j]))
+    array([ 10.,  20.,  30.])
+    """
+    return content_if_0d_array(np.imag(z))
 
 def factorial(z):
     """
@@ -131,18 +252,18 @@ DEFAULT_VARIABLES = {
     'pi': np.pi
 }
 
-# Functions available by default
-# We use scimath variants which give complex results when needed. For example:
-#   np.sqrt(-4+0j) = 2j
-#   np.sqrt(-4) = nan, but
-#   np.lib.scimath.sqrt(-4) = 2j
-DEFAULT_FUNCTIONS = {
+# These act element-wise on numpy arrays
+ELEMENTWISE_FUNCTIONS = {
     'sin': np.sin,
     'cos': np.cos,
     'tan': np.tan,
     'sec': sec,
     'csc': csc,
     'cot': cot,
+    # We use scimath variants which give complex results when needed. For example:
+    #   np.sqrt(-4+0j) = 2j
+    #   np.sqrt(-4) = nan, but
+    #   np.lib.scimath.sqrt(-4) = 2j
     'sqrt': np.lib.scimath.sqrt,
     'log10': np.lib.scimath.log10,
     'log2': np.lib.scimath.log2,
@@ -168,12 +289,27 @@ DEFAULT_FUNCTIONS = {
     'arctanh': np.lib.scimath.arctanh,
     'arcsech': arcsech,
     'arccsch': arccsch,
-    'arccoth': arccoth,
-    # lambdas because sometimes np.real/imag returns an array,
-    're': lambda x: float(np.real(x)),
-    'im': lambda x: float(np.imag(x)),
-    'conj': np.conj,
+    'arccoth': arccoth
 }
+
+SCALAR_FUNCTIONS = {key: scalar_domain(key)(ELEMENTWISE_FUNCTIONS[key])
+                    for key in ELEMENTWISE_FUNCTIONS}
+
+ARRAY_FUNCTIONS = {
+    're': real,
+    'im': imag,
+    'conj': np.conj,
+    'norm': np.linalg.norm
+}
+
+def merge_dicts(*dict_args):
+    """Merge an arbitrary number of dictionaries."""
+    merged = {}
+    for dict_arg in dict_args:
+        merged.update(dict_arg)
+    return merged
+
+DEFAULT_FUNCTIONS = merge_dicts(SCALAR_FUNCTIONS, ARRAY_FUNCTIONS)
 
 DEFAULT_SUFFIXES = {
     '%': 0.01
@@ -183,6 +319,28 @@ METRIC_SUFFIXES = {
     'k': 1e3, 'M': 1e6, 'G': 1e9, 'T': 1e12,
     'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12
 }
+
+def robust_pow(base, exponent):
+    """
+    Calculates __pow__, and tries other approachs if that doesn't work.
+
+    Usage:
+    ======
+
+    >>> robust_pow(5, 2)
+    25
+    >>> robust_pow(0.5, -1)
+    2.0
+
+    If base is negative and power is fractional, complex results are returned:
+    >>> almost_j = robust_pow(-1, 0.5)
+    >>> np.allclose(almost_j, 1j)
+    True
+    """
+    try:
+        return base ** exponent
+    except ValueError:
+        return np.lib.scimath.power(base, exponent)
 
 def within_tolerance(x, y, tolerance):
     """
@@ -216,6 +374,14 @@ def within_tolerance(x, y, tolerance):
     0.223607
     >>> within_tolerance(A, B, 0.25)
     True
+
+    If x - y raises a StudentFacingError, then subtraction of these types
+    is intentionally not supported and (x, y) are not within_tolerance:
+    >>> class Foo():
+    ...     def __sub__(self, other): raise StudentFacingError()
+    ...     def __rsub__(self, other): raise StudentFacingError()
+    >>> within_tolerance(0, Foo(), '1%')
+    False
     """
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
@@ -223,4 +389,11 @@ def within_tolerance(x, y, tolerance):
         # Construct percentage tolerance
         tolerance = tolerance.strip()
         tolerance = np.linalg.norm(x) * float(tolerance[:-1]) * 0.01
-    return np.linalg.norm(x-y) <= tolerance
+
+    try:
+        difference = x - y
+    except StudentFacingError:
+        # Apparently, the answer and the student_input cannot be compared.
+        return False
+
+    return np.linalg.norm(difference) <= tolerance

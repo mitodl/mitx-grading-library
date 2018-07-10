@@ -2,15 +2,11 @@
 Tests of calc.py
 """
 from __future__ import division
-import math
-import random
 import re
 import numpy as np
 from pytest import raises, approx
 from mitxgraders import CalcError
 from mitxgraders.helpers.calc import evaluator, UnableToParse, UndefinedVariable, ArgumentError
-from mitxgraders.helpers.mathfunc import (cot, arcsec, arccsc, arccot, sech, csch, coth,
-                                          arcsech, arccsch, arccoth, sec, csc)
 
 def test_calcpy():
     """Tests of calc.py that aren't covered elsewhere"""
@@ -41,36 +37,6 @@ def test_calcpy():
     msg = r"Invalid Input: X not permitted in answer as a variable \(did you mean x\?\)"
     with raises(UndefinedVariable, match=msg):
         evaluator("X", {"x": 1}, {}, {})
-
-def test_math():
-    """Test the math functions that we've implemented"""
-    x = random.uniform(0, 1)
-    assert cot(x) == approx(1/math.tan(x))
-    assert sec(x) == approx(1/math.cos(x))
-    assert csc(x) == approx(1/math.sin(x))
-    assert sech(x) == approx(1/math.cosh(x))
-    assert csch(x) == approx(1/math.sinh(x))
-    assert coth(x) == approx(1/math.tanh(x))
-    assert arcsec(sec(x)) == approx(x)
-    assert arccsc(csc(x)) == approx(x)
-    assert arccot(cot(x)) == approx(x)
-    assert arcsech(sech(x)) == approx(x)
-    assert arccsch(csch(x)) == approx(x)
-    assert arccoth(coth(x)) == approx(x)
-
-    x = random.uniform(-1, 0)
-    assert cot(x) == approx(1/math.tan(x))
-    assert sec(x) == approx(1/math.cos(x))
-    assert csc(x) == approx(1/math.sin(x))
-    assert sech(x) == approx(1/math.cosh(x))
-    assert csch(x) == approx(1/math.sinh(x))
-    assert coth(x) == approx(1/math.tanh(x))
-    assert -arcsec(sec(x)) == approx(x)
-    assert arccsc(csc(x)) == approx(x)
-    assert arccot(cot(x)) == approx(x)
-    assert -arcsech(sech(x)) == approx(x)
-    assert arccsch(csch(x)) == approx(x)
-    assert arccoth(coth(x)) == approx(x)
 
 def test_varnames():
     """Test variable names in calc.py"""
@@ -116,18 +82,6 @@ def test_calc_functions_multiple_arguments():
     with raises(ArgumentError):
         evaluator("h(1,2)", {}, {"h": h3}, {})
 
-def test_vectors():
-    """Test that vectors/matrices can be inputted into calc.py"""
-    result = evaluator("[1, 2, 3]", {}, {}, {}, True)[0]
-    assert np.all(result == np.array([1, 2, 3]))
-
-    result = evaluator("[[1, 2], [3, 4]]", {}, {}, {}, True)[0]
-    assert np.all(result == np.array([[1, 2], [3, 4]]))
-
-    msg = "Vector and matrix expressions have been forbidden in this entry"
-    with raises(UnableToParse, match=msg):
-        evaluator("[[1, 2], [3, 4]]", {}, {}, {})
-
 def test_negation():
     """Test that appropriate numbers of +/- signs are accepted"""
     assert evaluator("1+-1")[0] == 0
@@ -144,3 +98,29 @@ def test_negation():
     for formula in badformulas:
         with raises(UnableToParse, match=re.escape(msg.format(formula))):
             evaluator(formula)
+
+def test_evaluation_does_not_mutate_variables():
+    """
+    This test should not be considered as related to vector/matrix/tensor algebra.
+
+    We're just trying to verify that variables aren't accidentally mutated
+    during evaluation.
+
+    Numpy arrays just happen to be a convenient mutatable object that implements
+    all the necessary operations.
+    """
+
+    A = np.array([
+        [
+            [1, 2, 3],
+            [4, 5, 6]
+        ],
+        [
+            [7, 8, 9],
+            [10, 11, 12]
+        ]
+    ])
+    A_copy = A.copy()
+    variables = {'A': A}
+    evaluator('A/2', variables)
+    assert np.all(A == A_copy)

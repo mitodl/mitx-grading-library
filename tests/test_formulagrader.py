@@ -14,6 +14,8 @@ from mitxgraders import (
     DiscreteSet,
     ComplexRectangle,
     ComplexSector,
+    RealMatrices,
+    RealVectors,
     SpecificFunctions,
     RandomFunction,
     CalcError,
@@ -23,6 +25,8 @@ from mitxgraders import (
 from mitxgraders.sampling import set_seed
 from mitxgraders.version import __version__ as VERSION
 from mitxgraders.helpers.calc import UndefinedVariable, UndefinedFunction
+from mitxgraders.helpers.math_array import IdentityMultiple, MathArrayError
+from mitxgraders.helpers.mathfunc import DomainError
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
@@ -487,7 +491,7 @@ def test_fg_debug_log():
         sample_from={
             'z': ComplexRectangle()
         },
-        blacklist=['sin', 'cos'],
+        blacklist=['sin', 'cos', 'tan'],
         user_functions={
             'f': RandomFunction(),
             'square': lambda x: x**2
@@ -498,89 +502,140 @@ def test_fg_debug_log():
     result = grader(None, 'z + x*x + f(y)')
 
     message = (
-        "<pre>MITx Grading Library Version {version}<br/>\n"
-        "Student Response:<br/>\n"
-        "z + x*x + f(y)<br/>\n"
-        "<br/>\n"
-        "==============================================================<br/>\n"
-        "FormulaGrader Debug Info<br/>\n"
-        "==============================================================<br/>\n"
-        "Functions available during evaluation and allowed in answer:<br/>\n"
-        "{{   'abs': <ufunc 'absolute'>,<br/>\n"
-        "    'arccos': <function arccos at 0x...>,<br/>\n"
-        "    'arccosh': <ufunc 'arccosh'>,<br/>\n"
-        "    'arccot': <function arccot at 0x...>,<br/>\n"
-        "    'arccoth': <function arccoth at 0x...>,<br/>\n"
-        "    'arccsc': <function arccsc at 0x...>,<br/>\n"
-        "    'arccsch': <function arccsch at 0x...>,<br/>\n"
-        "    'arcsec': <function arcsec at 0x...>,<br/>\n"
-        "    'arcsech': <function arcsech at 0x...>,<br/>\n"
-        "    'arcsin': <function arcsin at 0x...>,<br/>\n"
-        "    'arcsinh': <ufunc 'arcsinh'>,<br/>\n"
-        "    'arctan': <ufunc 'arctan'>,<br/>\n"
-        "    'arctanh': <function arctanh at 0x...>,<br/>\n"
-        "    'conj': <ufunc 'conjugate'>,<br/>\n"
-        "    'cosh': <ufunc 'cosh'>,<br/>\n"
-        "    'cot': <function cot at 0x...>,<br/>\n"
-        "    'coth': <function coth at 0x...>,<br/>\n"
-        "    'csc': <function csc at 0x...>,<br/>\n"
-        "    'csch': <function csch at 0x...>,<br/>\n"
-        "    'exp': <ufunc 'exp'>,<br/>\n"
-        "    'f': <function f at 0x...>,<br/>\n"
-        "    'fact': <function factorial at 0x...>,<br/>\n"
-        "    'factorial': <function factorial at 0x...>,<br/>\n"
-        "    'im': <function <lambda> at 0x...>,<br/>\n"
-        "    'ln': <function log at 0x...>,<br/>\n"
-        "    'log10': <function log10 at 0x...>,<br/>\n"
-        "    'log2': <function log2 at 0x...>,<br/>\n"
-        "    're': <function <lambda> at 0x...>,<br/>\n"
-        "    'sec': <function sec at 0x...>,<br/>\n"
-        "    'sech': <function sech at 0x...>,<br/>\n"
-        "    'sinh': <ufunc 'sinh'>,<br/>\n"
-        "    'sqrt': <function sqrt at 0x...>,<br/>\n"
-        "    'square': <function <lambda> at 0x...>,<br/>\n"
-        "    'tan': <ufunc 'tan'>,<br/>\n"
-        "    'tanh': <ufunc 'tanh'>}}<br/>\n"
-        "Functions available during evaluation and disallowed in answer:<br/>\n"
-        "{{   'cos': <ufunc 'cos'>, 'sin': <ufunc 'sin'>}}<br/>\n"
-        "<br/>\n"
-        "<br/>\n"
-        "==========================================<br/>\n"
-        "Evaluation Data for Sample Number 1 of 2<br/>\n"
-        "==========================================<br/>\n"
-        "Variables:<br/>\n"
-        "{{   'e': 2.718281828459045,<br/>\n"
-        "    'i': 1j,<br/>\n"
-        "    'j': 1j,<br/>\n"
-        "    'pi': 3.141592653589793,<br/>\n"
-        "    'x': 3.195254015709299,<br/>\n"
-        "    'y': 3.860757465489678,<br/>\n"
-        "    'z': (2.205526752143288+2.0897663659937935j)}}<br/>\n"
-        "Student Eval: (14.7111745179+2.08976636599j)<br/>\n"
-        "Compare to:  [(14.711174517877566+2.0897663659937935j)]<br/>\n"
-        "Comparer Function: <function default_equality_comparer at 0x...><br/>\n"
-        "Comparison Satisfied: True<br/>\n"
-        "<br/>\n"
-        "<br/>\n"
-        "==========================================<br/>\n"
-        "Evaluation Data for Sample Number 2 of 2<br/>\n"
-        "==========================================<br/>\n"
-        "Variables:<br/>\n"
-        "{{   'e': 2.718281828459045,<br/>\n"
-        "    'i': 1j,<br/>\n"
-        "    'j': 1j,<br/>\n"
-        "    'pi': 3.141592653589793,<br/>\n"
-        "    'x': 2.694619197355619,<br/>\n"
-        "    'y': 3.5835764522666245,<br/>\n"
-        "    'z': (1.875174422525385+2.7835460015641598j)}}<br/>\n"
-        "Student Eval: (11.9397106851+2.78354600156j)<br/>\n"
-        "Compare to:  [(11.939710685061661+2.7835460015641598j)]<br/>\n"
-        "Comparer Function: <function default_equality_comparer at 0x...><br/>\n"
-        "Comparison Satisfied: True<br/>\n"
-        "</pre>"
+    "<pre>MITx Grading Library Version {version}<br/>\n"
+    "Student Response:<br/>\n"
+    "z + x*x + f(y)<br/>\n"
+    "<br/>\n"
+    "==============================================================<br/>\n"
+    "FormulaGrader Debug Info<br/>\n"
+    "==============================================================<br/>\n"
+    "Functions available during evaluation and allowed in answer:<br/>\n"
+    "{{   'abs': <function absolute at 0x...>,<br/>\n"
+    "    'arccos': <function arccos at 0x...>,<br/>\n"
+    "    'arccosh': <function arccosh at 0x...>,<br/>\n"
+    "    'arccot': <function arccot at 0x...>,<br/>\n"
+    "    'arccoth': <function arccoth at 0x...>,<br/>\n"
+    "    'arccsc': <function arccsc at 0x...>,<br/>\n"
+    "    'arccsch': <function arccsch at 0x...>,<br/>\n"
+    "    'arcsec': <function arcsec at 0x...>,<br/>\n"
+    "    'arcsech': <function arcsech at 0x...>,<br/>\n"
+    "    'arcsin': <function arcsin at 0x...>,<br/>\n"
+    "    'arcsinh': <function arcsinh at 0x...>,<br/>\n"
+    "    'arctan': <function arctan at 0x...>,<br/>\n"
+    "    'arctanh': <function arctanh at 0x...>,<br/>\n"
+    "    'conj': <ufunc 'conjugate'>,<br/>\n"
+    "    'cosh': <function cosh at 0x...>,<br/>\n"
+    "    'cot': <function cot at 0x...>,<br/>\n"
+    "    'coth': <function coth at 0x...>,<br/>\n"
+    "    'csc': <function csc at 0x...>,<br/>\n"
+    "    'csch': <function csch at 0x...>,<br/>\n"
+    "    'exp': <function exp at 0x...>,<br/>\n"
+    "    'f': <function f at 0x...>,<br/>\n"
+    "    'fact': <function factorial at 0x...>,<br/>\n"
+    "    'factorial': <function factorial at 0x...>,<br/>\n"
+    "    'im': <function imag at 0x...>,<br/>\n"
+    "    'ln': <function log at 0x...>,<br/>\n"
+    "    'log10': <function log10 at 0x...>,<br/>\n"
+    "    'log2': <function log2 at 0x...>,<br/>\n"
+    "    'norm': <function norm at 0x...>,<br/>\n"
+    "    're': <function real at 0x...>,<br/>\n"
+    "    'sec': <function sec at 0x...>,<br/>\n"
+    "    'sech': <function sech at 0x...>,<br/>\n"
+    "    'sinh': <function sinh at 0x...>,<br/>\n"
+    "    'sqrt': <function sqrt at 0x...>,<br/>\n"
+    "    'square': <function <lambda> at 0x...>,<br/>\n"
+    "    'tanh': <function tanh at 0x...>}}<br/>\n"
+    "Functions available during evaluation and disallowed in answer:<br/>\n"
+    "{{   'cos': <function cos at 0x...>,<br/>\n"
+    "    'sin': <function sin at 0x...>,<br/>\n"
+    "    'tan': <function tan at 0x...>}}<br/>\n"
+    "<br/>\n"
+    "<br/>\n"
+    "==========================================<br/>\n"
+    "Evaluation Data for Sample Number 1 of 2<br/>\n"
+    "==========================================<br/>\n"
+    "Variables:<br/>\n"
+    "{{   'e': 2.718281828459045,<br/>\n"
+    "    'i': 1j,<br/>\n"
+    "    'j': 1j,<br/>\n"
+    "    'pi': 3.141592653589793,<br/>\n"
+    "    'x': 3.195254015709299,<br/>\n"
+    "    'y': 3.860757465489678,<br/>\n"
+    "    'z': (2.205526752143288+2.0897663659937935j)}}<br/>\n"
+    "Student Eval: (14.7111745179+2.08976636599j)<br/>\n"
+    "Compare to:  [(14.711174517877566+2.0897663659937935j)]<br/>\n"
+    "Comparer Function: <function default_equality_comparer at 0x...><br/>\n"
+    "Comparison Satisfied: True<br/>\n"
+    "<br/>\n"
+    "<br/>\n"
+    "==========================================<br/>\n"
+    "Evaluation Data for Sample Number 2 of 2<br/>\n"
+    "==========================================<br/>\n"
+    "Variables:<br/>\n"
+    "{{   'e': 2.718281828459045,<br/>\n"
+    "    'i': 1j,<br/>\n"
+    "    'j': 1j,<br/>\n"
+    "    'pi': 3.141592653589793,<br/>\n"
+    "    'x': 2.694619197355619,<br/>\n"
+    "    'y': 3.5835764522666245,<br/>\n"
+    "    'z': (1.875174422525385+2.7835460015641598j)}}<br/>\n"
+    "Student Eval: (11.9397106851+2.78354600156j)<br/>\n"
+    "Compare to:  [(11.939710685061661+2.7835460015641598j)]<br/>\n"
+    "Comparer Function: <function default_equality_comparer at 0x...><br/>\n"
+    "Comparison Satisfied: True<br/>\n"
+    "</pre>"
     ).format(version=VERSION)
     assert result['msg'] == message
 
+def test_fg_with_arrays():
+    grader = FormulaGrader(
+        answers='x*A*B*u + z*C^3*v/(u*C*v)',
+        variables=['A', 'B', 'C', 'u', 'v', 'z', 'x'],
+        sample_from={
+            'A': RealMatrices(shape=[2,3]),
+            'B': RealMatrices(shape=[3, 2]),
+            'C': RealMatrices(shape=[2, 2]),
+            'u': RealVectors(shape=[2]),
+            'v': RealVectors(shape=[2]),
+            'z': ComplexRectangle()
+        },
+        user_constants={
+            'I': IdentityMultiple(1)
+        },
+        user_functions={
+            'trans': lambda x: np.transpose(x)
+        }, debug=True
+    )
+
+    correct_0 = 'x*A*B*u + z*C^3*v/(u*C*v)'
+    correct_1 = 'z*C^3*v/(u*C*v) + x*A*B*u'
+    correct_2 = '(1/16)* z*(2*I)*(2*C)^3*v/(u*C*v) + x*A*B*u'
+    correct_3 = '(1/16)* z*(2*I)*(2*C)^3*v/(v*trans(C)*u) + x*A*B*u/2 + 0.5*x*A*B*u'
+
+    assert grader(None, correct_0)['ok']
+    assert grader(None, correct_1)['ok']
+    assert grader(None, correct_2)['ok']
+    assert grader(None, correct_3)['ok']
+
+    match = "Cannot multiply a matrix of shape \(rows: 3, cols: 2\) with a matrix of shape \(rows: 3, cols: 2\)"
+    with raises(MathArrayError, match=match):
+        grader(None, 'B*B')
+
+    match = "Cannot raise a non-square matrix to powers."
+    with raises(MathArrayError, match=match):
+        grader(None, 'B^2')
+
+    match = "Cannot add/subtract scalars to a matrix."
+    with raises(MathArrayError, match=match):
+        grader(None, 'B + 5')
+
+    match = "Cannot add/subtract multiples of the identity to a non-square matrix."
+    with raises(MathArrayError, match=match):
+        grader(None, 'B + 5*I')
+
+    match = "Function 'sin\(...\)' only accepts scalar inputs, but was given a non-scalar input"
+    with raises(DomainError, match=match):
+        grader(None, 'sin(B)')
 
 def test_ng_config():
     """Test that the NumericalGrader config bars unwanted entries"""
