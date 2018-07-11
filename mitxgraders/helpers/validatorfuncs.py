@@ -116,8 +116,16 @@ def is_callable(obj):
     """Returns true if obj is callable"""
     return callable(obj)
 
-def describe_builtin(obj):
-    """ Describe a builtin function """
+def get_builtin_positional_args(obj):
+    """
+    Get the number of position arguments on a built-in function by inspecting
+    its docstring. (Built-in functions cannot be inspected by inspect.getargspec.)
+
+    >>> pow.__doc__     # doctest: +ELLIPSIS
+    'pow(x, y[, z]) -> number...
+    >>> get_builtin_positional_args(pow)
+    2
+    """
     # Built-in functions cannot be inspected by
     # inspect.getargspec. We have to try and parse
     # the __doc__ attribute of the function.
@@ -128,7 +136,8 @@ def describe_builtin(obj):
             func_descr = items[0]
             s = func_descr.replace(obj.__name__, '')
             idx1 = s.find('(')
-            idx2 = s.find(')', idx1)
+            idx_default = s.find('[')
+            idx2 = s.find(')') if idx_default == -1 else idx_default
             if idx1 != -1 and idx2 != -1 and (idx2 > idx1+1):
                 argstring = s[idx1+1:idx2]
                 # This gets the argument string
@@ -138,13 +147,19 @@ def describe_builtin(obj):
 
 def get_number_of_args(callable_obj):
     """
-    Get number of arguments of function or callable object.
+    Get number of positional arguments of function or callable object.
 
     Examples
     ========
 
     Works for simple functions:
     >>> def f(x, y):
+    ...     return x + y
+    >>> get_number_of_args(f)
+    2
+
+    Positional arguments only:
+    >>> def f(x, y, z=5):
     ...     return x + y
     >>> get_number_of_args(f)
     2
@@ -184,7 +199,7 @@ def get_number_of_args(callable_obj):
     if isbuiltin(callable_obj):
         # Built-in function
         func = callable_obj
-        return describe_builtin(func)
+        return get_builtin_positional_args(func)
     elif hasattr(callable_obj, "nin"):
         # Matches RandomFunction or numpy ufunc
         return callable_obj.nin
@@ -192,11 +207,18 @@ def get_number_of_args(callable_obj):
         try:
             # Assume object is a function
             func = callable_obj
-            num_args = len(getargspec(func)[0])
+            # see https://docs.python.org/2/library/inspect.html#inspect.getargspec
+            # defaults might be None, or something weird for Mock functions
+            args, _, _, defaults = getargspec(func)
         except TypeError:
             # Callable object
             func = callable_obj.__call__
-            num_args = len(getargspec(func)[0])
+            args, _, _, defaults = getargspec(func)
+
+    try:
+        num_args = len(args) - len(defaults)
+    except TypeError:
+        num_args = len(args)
 
     # If func is a bound method, remove one argument
     # (in Python 2.7, unbound methods have __self__ = None)
