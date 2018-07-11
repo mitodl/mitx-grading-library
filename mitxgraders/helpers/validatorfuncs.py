@@ -208,7 +208,7 @@ def get_number_of_args(callable_obj):
             # Assume object is a function
             func = callable_obj
             # see https://docs.python.org/2/library/inspect.html#inspect.getargspec
-            # defaults might be none, or something weird for Mock functions
+            # defaults might be None, or something weird for Mock functions
             args, _, _, defaults = getargspec(func)
         except TypeError:
             # Callable object
