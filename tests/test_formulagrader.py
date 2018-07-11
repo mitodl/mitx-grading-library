@@ -633,9 +633,12 @@ def test_fg_with_arrays():
     with raises(MathArrayError, match=match):
         grader(None, 'B + 5*I')
 
-    match = "Function 'sin\(...\)' only accepts scalar inputs, but was given a non-scalar input"
+    match = ("There was an error evaluating function sin\(...\)"
+             "\n1st input has an error: received a matrix of shape "
+             "\(rows: 3, cols: 2\), expected a scalar")
     with raises(DomainError, match=match):
         grader(None, 'sin(B)')
+
 
 def test_ng_config():
     """Test that the NumericalGrader config bars unwanted entries"""

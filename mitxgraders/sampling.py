@@ -25,10 +25,10 @@ from numbers import Number
 import abc
 import random
 import numpy as np
-from voluptuous import Schema, Required, All, Length
+from voluptuous import Schema, Required, All, Length, Coerce, Any
 from mitxgraders.baseclasses import ObjectWithSchema, ConfigError
 from mitxgraders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
-                                                TupleOfType, is_callable)
+                                                TupleOfType, is_callable, is_shape_specification)
 from mitxgraders.helpers.mathfunc import (DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
                                           DEFAULT_VARIABLES, METRIC_SUFFIXES)
 from mitxgraders.helpers.calc import CalcError, evaluator
@@ -244,7 +244,7 @@ class RealMathArrays(VariableSamplingSet):
 
     Config:
     =======
-        shape ([int]): the array shape
+        shape (int|(int)|[int]): the array shape
         norm ([start, stop]): Real interval from which to sample the array's norm
             defaults to [1, 5]
 
@@ -269,7 +269,7 @@ class RealMathArrays(VariableSamplingSet):
 
 
     schema_config = Schema({
-        Required('shape'): All([Positive(int)], Length(min=1)),
+        Required('shape'): is_shape_specification(min_dim=1),
         Required('norm', default=[1, 5]): NumberRange()
     })
 
@@ -298,7 +298,9 @@ class RealVectors(RealMathArrays):
 
     Config:
     =======
-        Same as RealMathArrays, but shape must have length 1.
+        Same as RealMathArrays, but:
+            - shape can be a plain integer indicating number of components
+            - if shape is tuple/list, must have length 1
 
     Usage:
     ======
@@ -310,9 +312,7 @@ class RealVectors(RealMathArrays):
     """
 
     schema_config = RealMathArrays.schema_config.extend({
-        Required('shape', default=[3]): All(
-            [int], Length(min=1, max=1),
-            msg='Expected a list of length 1 (e.g., [3])')
+        Required('shape', default=(3,)): is_shape_specification(min_dim=1, max_dim=1)
     })
 
 
@@ -334,9 +334,7 @@ class RealMatrices(RealMathArrays):
     """
 
     schema_config = RealMathArrays.schema_config.extend({
-        Required('shape', default=[2, 2]): All(
-            [int], Length(min=2, max=2),
-            msg='Expected a list of length 2 (e.g., [4, 3])')
+        Required('shape', default=(2, 2)): is_shape_specification(min_dim=2, max_dim=2)
     })
 
 

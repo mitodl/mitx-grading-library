@@ -51,17 +51,6 @@ def test_math_arrays():
     result = evaluator(expr, variables, max_array_dim=2)[0]
     assert equal_as_arrays(result, (z*A**n + 10*A/x)*v)
 
-def test_scalar_funcs_raise_errors_with_arrays():
-    A = MathArray([
-        [1, 5],
-        [4, -2]
-    ])
-    variables = {'A': A}
-    match = "Function 'sin\(...\)' only accepts scalar inputs, but was given a non-scalar input."
-    with raises(DomainError, match=match):
-        evaluator('sin(A)', variables, max_array_dim=2)
-
-
 def test_identity_multiple():
     I5 = IdentityMultiple(5)
     n = 3

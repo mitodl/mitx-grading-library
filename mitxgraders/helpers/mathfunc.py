@@ -18,75 +18,7 @@ from numbers import Number
 import numpy as np
 import scipy.special as special
 from mitxgraders.baseclasses import StudentFacingError
-from mitxgraders.helpers.validatorfuncs import get_number_of_args
-
-class DomainError(StudentFacingError):
-    """
-    Raised when a function has domain error.
-    """
-
-def is_scalar(arg):
-    """
-    Tests if arg is Number or scalar numpy array.
-
-    >>> map(is_scalar, [3, 4 + 2j, 4.2, np.array(5)])
-    [True, True, True, True]
-    >>> is_scalar(np.array([4, 7]))
-    False
-
-    """
-    if isinstance(arg, Number):
-        return True
-    elif isinstance(arg, np.ndarray) and arg.ndim == 0:
-        return True
-
-    return False
-
-def scalar_domain(display_name):
-    """
-    Returns a function decorator that causes function to raises a DomainError
-    if function is called is called with a non-scalar argument. DomainError
-    refers to function by its given display_name.
-
-    >>> @scalar_domain('plus3')
-    ... def f(x):
-    ...     return x + 3
-    >>> f(4)
-    7
-    >>> f([5, 2])
-    Traceback (most recent call last):
-    DomainError: Function 'plus3(...)' only accepts scalar inputs, but was given a non-scalar input.
-
-    For now, scalar_domain() only accepts unary functions:
-    >>> @scalar_domain('add')
-    ... def f(x, y):
-    ...     return x + y
-    Traceback (most recent call last):
-    ValueError: Decorator 'scalar_domain' can only be used with unary functions.
-
-    Comment: The n-argument case seems intractable because the _decorated_func
-    will be passed to get_number_of_args^[1], and so cannot have variadic signature *args.
-    But we could hard-code the n=1, n=2, n=3 cases.
-    [1]: In calc.py, eval_func calls is_callable_with, which uses get_number_of_args
-    """
-
-    def _decorator(func):
-        if get_number_of_args(func) > 1:
-            raise ValueError("Decorator 'scalar_domain' can only be used with unary functions.")
-
-        # can't use @wraps, doesn't work with callable classes like numpy ufuncs
-        def _decorated_func(arg):
-            if not is_scalar(arg):
-                raise DomainError("Function '{0}(...)' only accepts scalar inputs, but "
-                                  "was given a non-scalar input.".format(display_name))
-
-            return func(arg)
-
-        _decorated_func.__name__ = func.__name__
-
-        return _decorated_func
-
-    return _decorator
+from mitxgraders.helpers.specify_domain import DomainError, SpecifyDomain
 
 # Normal Trig
 def sec(arg):
@@ -292,7 +224,10 @@ ELEMENTWISE_FUNCTIONS = {
     'arccoth': arccoth
 }
 
-SCALAR_FUNCTIONS = {key: scalar_domain(key)(ELEMENTWISE_FUNCTIONS[key])
+def has_one_scalar_input(display_name):
+    return SpecifyDomain.make_decorator((1,), display_name=display_name)
+
+SCALAR_FUNCTIONS = {key: has_one_scalar_input(key)(ELEMENTWISE_FUNCTIONS[key])
                     for key in ELEMENTWISE_FUNCTIONS}
 
 ARRAY_FUNCTIONS = {
@@ -319,28 +254,6 @@ METRIC_SUFFIXES = {
     'k': 1e3, 'M': 1e6, 'G': 1e9, 'T': 1e12,
     'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12
 }
-
-def robust_pow(base, exponent):
-    """
-    Calculates __pow__, and tries other approachs if that doesn't work.
-
-    Usage:
-    ======
-
-    >>> robust_pow(5, 2)
-    25
-    >>> robust_pow(0.5, -1)
-    2.0
-
-    If base is negative and power is fractional, complex results are returned:
-    >>> almost_j = robust_pow(-1, 0.5)
-    >>> np.allclose(almost_j, 1j)
-    True
-    """
-    try:
-        return base ** exponent
-    except ValueError:
-        return np.lib.scimath.power(base, exponent)
 
 def within_tolerance(x, y, tolerance):
     """
