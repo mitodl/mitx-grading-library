@@ -117,7 +117,7 @@ def has_shape(shape):
 SCHEMA_SHAPE = Schema(Any(
     All(Positive(int), lambda x: tuple([x])),
     All([Positive(int)], Coerce(tuple)),
-    msg='Expected shape specification to be a positive integer or list of positive integers'
+    msg='Expected shape specification to be a positive integer or a list of positive integers'
 ))
 
 class SpecifyDomain(ObjectWithSchema):
@@ -132,7 +132,7 @@ class SpecifyDomain(ObjectWithSchema):
     - input_shapes (list): A list of shapes for the function inputs, where:
         1: means input is scalar
         k, positive integer: means input is a k-component vector
-        [k1, k2, ...], list of positive integers: means input is an array of shape [k1, k2, ...]
+        [k1, k2, ...], list of positive integers: means input is an array of shape (k1, k2, ...)
     - display_name (?str): Function name to be used in error messages
       defaults to None, meaning that the function's __name__ attribute is used.
 
@@ -160,11 +160,23 @@ class SpecifyDomain(ObjectWithSchema):
     >>> cross(a, b)                                 # doctest: +ELLIPSIS
     Traceback (most recent call last):
     DomainError: There was an error evaluating function cross(...)
-    ...1st input is ok: received a vector of length 3 as expected
-    ...2nd input has an error: received a vector of length 2, expected a vector of length 3
+    1st input is ok: received a vector of length 3 as expected
+    2nd input has an error: received a vector of length 2, expected a vector of length 3
     >>> cross(a)
     Traceback (most recent call last):
     DomainError: There was an error evaluating function cross(...): expected 2 inputs, but received 1.
+
+    To specify that an input should be a an array of specific size, use a list
+    for that shape value. Here, [3, 2] specifies a 3 by 2 matrix:
+    >>> @SpecifyDomain(input_shapes=[1, [3, 2], 2])
+    ... def f(x, y, z):
+    ...     pass # implement complicated stuff here
+    >>> f(1, 2, 3)                                      # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    DomainError: There was an error evaluating function f(...)
+    1st input is ok: received a scalar as expected
+    2nd input has an error: received a scalar, expected a matrix of shape (rows: 3, cols: 2)
+    3rd input has an error: received a scalar, expected a vector of length 2
     """
 
     schema_config = Schema({
@@ -228,7 +240,7 @@ class SpecifyDomain(ObjectWithSchema):
                         lines.append('{0} input is ok: received a {1} as expected'
                             .format(ordinal, expected))
 
-                message = "\n\t".join(lines)
+                message = "\n".join(lines)
                 raise DomainError(message)
 
             _func.__name__ = func.__name__

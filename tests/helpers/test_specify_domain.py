@@ -21,7 +21,8 @@ def get_somefunc(display_name=None):
 
 def get_somefunc_from_static_method(display_name=None):
     """
-    Uses SpecifyDomain.make_decorator to decorate the function
+    Uses SpecifyDomain.make_decorator to decorate the function.
+    Unlike author-facing SpecifyDomain, make_decorator's shapes must ALL be tuples.
     """
     shapes = [
         (1,), # scalar
@@ -63,11 +64,11 @@ def test_incorrect_arguments_raise_errors():
     z = random_math_array([2])
 
     match = ("There was an error evaluating function {0}\(...\)"
-             "\n\t1st input is ok: received a scalar as expected"
-             "\n\t2nd input has an error: received a matrix of shape \(rows: 2, cols: 2\), "
+             "\n1st input is ok: received a scalar as expected"
+             "\n2nd input has an error: received a matrix of shape \(rows: 2, cols: 2\), "
              "expected a matrix of shape \(rows: 2, cols: 3\)"
-             "\n\t3rd input has an error: received a scalar, expected a vector of length 3"
-             "\n\t4th input is ok: received a vector of length 2 as expected")
+             "\n3rd input has an error: received a scalar, expected a vector of length 3"
+             "\n4th input is ok: received a vector of length 2 as expected")
     with raises(DomainError, match=match.format('somefunc')):
         f(w, x, y, z)
     with raises(DomainError, match=match.format('somefunc')):
@@ -95,9 +96,9 @@ def test_author_facing_decorator_raises_errors_with_invalid_config():
         def f():
             pass
 
-    match = ("Expected shape specification to be a positive integer or list of "
-             "positive integers @ data\['input_shapes'\]\[1\]. Got 0")
+    match = ("Expected shape specification to be a positive integer or a list "
+             "of positive integers @ data\['input_shapes'\]\[1\]. Got 0")
     with raises(Error, match=match):
-        @SpecifyDomain(input_shapes=[5,0,[1, 2]])
+        @SpecifyDomain(input_shapes=[5, 0, [1, 2]])
         def g():
             pass
