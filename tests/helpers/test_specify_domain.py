@@ -96,8 +96,9 @@ def test_author_facing_decorator_raises_errors_with_invalid_config():
         def f():
             pass
 
-    match = ("Expected shape specification to be a positive integer or a list "
-             "of positive integers @ data\['input_shapes'\]\[1\]. Got 0")
+    match = ("expected shape specification to be a positive integer, or a "
+            "list/tuple of positive integers \(min length 1, max length None\) @ "
+            "data\['input_shapes'\]\[1\]. Got 0")
     with raises(Error, match=match):
         @SpecifyDomain(input_shapes=[5, 0, [1, 2]])
         def g():

@@ -5,7 +5,7 @@ Stand-alone validator functions for use in voluptuous Schema
 """
 from numbers import Number
 from inspect import getargspec, isbuiltin
-from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth
+from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth, Coerce
 
 def Positive(thetype):
     """Demand a positive number type"""
@@ -258,3 +258,31 @@ def TupleOfType(given_type, validator=None):
             schema = Schema(All((given_type,), Length(min=1)))
         return schema(config_input)
     return func
+
+def is_shape_specification(min_dim=1, max_dim=None):
+    """
+    Validates shape specification for arrays.
+
+    Valid inputs are standardized to tuples:
+    >>> vec_or_mat = Schema(is_shape_specification(min_dim=1, max_dim=2))
+    >>> map(vec_or_mat, [3, (3,), [3], (4, 2), [4, 2] ])
+    [(3,), (3,), (3,), (4, 2), (4, 2)]
+
+    Invalid inputs raise a useful error:
+    >>> vec_or_mat(0)                               # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    MultipleInvalid: expected shape specification to be a positive integer,...
+    """
+
+    msg = ('expected shape specification to be a positive integer, or a '
+           'list/tuple of positive integers (min length {0}, max length {1})'
+           .format(min_dim, max_dim))
+    return All(
+        Any(
+            All(Positive(int), lambda x: (x, )),
+            (Positive(int), ),
+            All([Positive(int)], Coerce(tuple)),
+            msg=msg
+        ),
+        Length(min=min_dim, max=max_dim),
+    )

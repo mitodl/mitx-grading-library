@@ -6,7 +6,7 @@ of a function. Currently only supports specifying the shape of inputs.
 """
 from numbers import Number
 from voluptuous import Schema, Invalid, All, Any, Required, Coerce
-from mitxgraders.helpers.validatorfuncs import Positive
+from mitxgraders.helpers.validatorfuncs import is_shape_specification
 from mitxgraders.baseclasses import StudentFacingError, ObjectWithSchema
 from mitxgraders.helpers.math_array import MathArray, is_scalar_matharray
 
@@ -113,13 +113,6 @@ def has_shape(shape):
         return number_validator
     return make_shape_validator(shape)
 
-# how authors specify domain shape
-SCHEMA_SHAPE = Schema(Any(
-    All(Positive(int), lambda x: tuple([x])),
-    All([Positive(int)], Coerce(tuple)),
-    msg='Expected shape specification to be a positive integer or a list of positive integers'
-))
-
 class SpecifyDomain(ObjectWithSchema):
     """
     An author-facing, configurable decorator that validates the inputs
@@ -133,6 +126,7 @@ class SpecifyDomain(ObjectWithSchema):
         1: means input is scalar
         k, positive integer: means input is a k-component vector
         [k1, k2, ...], list of positive integers: means input is an array of shape (k1, k2, ...)
+        (k1, k2, ...), tuple of positive integers: means input is an array of shape (k1, k2, ...)
     - display_name (?str): Function name to be used in error messages
       defaults to None, meaning that the function's __name__ attribute is used.
 
@@ -166,8 +160,8 @@ class SpecifyDomain(ObjectWithSchema):
     Traceback (most recent call last):
     DomainError: There was an error evaluating function cross(...): expected 2 inputs, but received 1.
 
-    To specify that an input should be a an array of specific size, use a list
-    for that shape value. Here, [3, 2] specifies a 3 by 2 matrix:
+    To specify that an input should be a an array of specific size, use a list or tuple
+    for that shape value. Here, [3, 2] specifies a 3 by 2 matrix; (3, 2) would work also:
     >>> @SpecifyDomain(input_shapes=[1, [3, 2], 2])
     ... def f(x, y, z):
     ...     pass # implement complicated stuff here
@@ -180,7 +174,7 @@ class SpecifyDomain(ObjectWithSchema):
     """
 
     schema_config = Schema({
-        Required('input_shapes'): [SCHEMA_SHAPE],
+        Required('input_shapes'): [Schema(is_shape_specification())],
         Required('display_name', default=None): str
     })
 
