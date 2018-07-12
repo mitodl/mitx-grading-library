@@ -27,6 +27,8 @@ from mitxgraders.version import __version__ as VERSION
 from mitxgraders.helpers.calc import UndefinedVariable, UndefinedFunction
 from mitxgraders.helpers.math_array import IdentityMultiple, MathArrayError
 from mitxgraders.helpers.mathfunc import DomainError
+from mitxgraders import ListGrader
+from mitxgraders.baseclasses import MissingInput
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
@@ -639,6 +641,38 @@ def test_fg_with_arrays():
     with raises(DomainError, match=match):
         grader(None, 'sin(B)')
 
+def test_fg_evaluates_siblings_appropriately():
+    grader=ListGrader(
+        answers=['sibling_3 + 1', 'sibling_1^2', 'x'],
+        subgraders=FormulaGrader(variables=['x']),
+        ordered=True
+    )
+    # All correct!
+    result = grader(None, ['x + 1', 'x^2 + 2*x + 1', 'x'])
+    expected = {
+        'input_list': [
+            {'grade_decimal': 1, 'msg': '', 'ok': True},
+            {'grade_decimal': 1, 'msg': '', 'ok': True},
+            {'grade_decimal': 1, 'msg': '', 'ok': True}],
+        'overall_message': ''
+    }
+    assert result == expected
+
+    # First input wrong, but other two consistent
+    result = grader(None, ['x + 2', 'x^2 + 4*x + 4', 'x'])
+    expected = {
+        'input_list': [
+            {'grade_decimal': 0, 'msg': '', 'ok': False},
+            {'grade_decimal': 1, 'msg': '', 'ok': True},
+            {'grade_decimal': 1, 'msg': '', 'ok': True}],
+        'overall_message': ''
+    }
+    assert result == expected
+
+    # Cannot grade, missing a required input
+    match='Cannot grade answer, a required input is missing.'
+    with raises(MissingInput, match=match):
+        result = grader(None, ['', 'x^2 + 2*x + 1', 'x'])
 
 def test_ng_config():
     """Test that the NumericalGrader config bars unwanted entries"""

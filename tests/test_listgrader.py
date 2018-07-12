@@ -3,6 +3,7 @@ Tests for ListGrader
 """
 from __future__ import division
 import pprint
+import mock
 from pytest import raises
 from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader, NumericalGrader,
                          CalcError, SingleListGrader)
@@ -512,6 +513,59 @@ def test_nested_grouping_ordered():
     assert grader(None, ['1', '3', '2', '0']) == expect(0, 1, 0, 0)
     assert grader(None, ['0', '2', '3', '1']) == expect(1, 0, 0, 0)
 
+def test_siblings_passed_to_subgrader_check_if_ordered_and_single_subgrader():
+    subgrader=FormulaGrader()
+    grader = ListGrader(
+        answers=['1', '2', '3'],
+        subgraders=subgrader,
+        ordered=True
+    )
+
+    with mock.patch.object(subgrader, 'check', wraps=subgrader.check) as subgrader_check:
+        grader(None, ['10', '20', '30'])
+        # subgrader check has been called three times
+        assert len(subgrader_check.call_args_list) == 3
+        # subgrader check has been passed the correct siblings
+        siblings = [
+            {'input': '10', 'grader': subgrader},
+            {'input': '20', 'grader': subgrader},
+            {'input': '30', 'grader': subgrader}
+        ]
+        for _, kwargs in subgrader_check.call_args_list:
+            assert kwargs['siblings'] == siblings
+
+def test_siblings_passed_to_subgrader_check_if_ordered_and_subgrader_list():
+    sg0 = FormulaGrader()
+    sg1 = NumericalGrader()
+    sg2 = StringGrader()
+    grader = ListGrader(
+        answers=['1', '2', '3'],
+        subgraders=[sg0, sg1, sg2],
+        ordered=True
+    )
+    student_input = ['10', '20', '30']
+    siblings = [
+        {'input': '10', 'grader': sg0},
+        {'input': '20', 'grader': sg1},
+        {'input': '30', 'grader': sg2}
+    ]
+
+    # There must be a better way to spy on multiple things...
+    with mock.patch.object(sg0, 'check', wraps=sg0.check) as check0:
+        with mock.patch.object(sg1, 'check', wraps=sg1.check) as check1:
+            with mock.patch.object(sg2, 'check', wraps=sg2.check) as check2:
+                grader(None, ['10', '20', '30'])
+                # subgrader check has been called three times
+                assert len(check0.call_args_list) == 1
+                assert len(check1.call_args_list) == 1
+                assert len(check2.call_args_list) == 1
+                # subgrader check has been passed the correct siblings
+                for _, kwargs in check0.call_args_list:
+                    assert kwargs['siblings'] == siblings
+                for _, kwargs in check1.call_args_list:
+                    assert kwargs['siblings'] == siblings
+                for _, kwargs in check2.call_args_list:
+                    assert kwargs['siblings'] == siblings
 
 def test_grouping_unordered_different_lengths():
     """Test that an error is raised if unordered groupings use different numbers of inputs"""

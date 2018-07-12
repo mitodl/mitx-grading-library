@@ -600,7 +600,7 @@ class FormulaGrader(ItemGrader):
         formula_siblings = [(i, sibling['input']) for i, sibling in enumerate(siblings)
                             if isinstance(sibling['grader'], FormulaGrader)]
         return {
-            "input_{}".format(i+1): sibling_input
+            "sibling_{}".format(i+1): sibling_input
             for i, sibling_input in formula_siblings
         }
 
