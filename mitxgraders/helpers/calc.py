@@ -10,6 +10,7 @@ Heavily modified from the edX calc.py
 from __future__ import division
 import copy
 import numpy as np
+from collections import namedtuple
 from pyparsing import (
     CaselessLiteral,
     Combine,
@@ -170,6 +171,8 @@ class ParserCache(object):
 # The global parser cache
 parsercache = ParserCache()
 
+ScopeUsage = namedtuple('ScopeUSage', ['variables', 'functions', 'suffixes'])
+
 def evaluator(formula,
               variables=DEFAULT_VARIABLES,
               functions=DEFAULT_FUNCTIONS,
@@ -178,29 +181,53 @@ def evaluator(formula,
     """
     Evaluate an expression; that is, take a string of math and return a float.
 
-    -Variables are passed as a dictionary from string to value. They must be
-     python numbers.
-    -Unary functions are passed as a dictionary from string to function.
-    -Everything is case sensitive (note, this is different to edX!)
+    Arguments
+    =========
+    - formula (str): The formula to be evaluated
+    Pass a scope consisting of variables, functions, and suffixes:
+    - variables (dict): maps strings to variable values
+    - functions (dict): maps strings to functions
+    - suffixes (dict): maps strings to suffix values
+    Also:
+    - max_array_dim: Maximum dimension of MathArrays
+
+    NOTE: Everything is case sensitive (this is different to edX!)
 
     Usage
     =====
-    >>> evaluator("1+1", {}, {}, {})
-    (2.0, set([]))
-    >>> evaluator("1+x", {"x": 5}, {}, {})
-    (6.0, set([]))
-    >>> evaluator("square(2)", {}, {"square": lambda x: x*x}, {})
-    (4.0, set(['square']))
-    >>> evaluator("", {}, {}, {})
-    (nan, set([]))
+    Evaluates the formula and records usage of functions/variables/suffixes:
+    >>> result = evaluator("1+1", {}, {}, {})
+    >>> expected = ( 2.0 , ScopeUsage(
+    ...     variables=set(),
+    ...     functions=set(),
+    ...     suffixes=set()
+    ... ))
+    >>> result == expected
+    True
+    >>> result = evaluator("square(x) + 5k",
+    ...     variables={'x':5, 'y': 10},
+    ...     functions={'square': lambda x: x**2, 'cube': lambda x: x**3},
+    ...     suffixes={'%': 0.01, 'k': 1000  })
+    >>> expected = ( 5025.0 , ScopeUsage(
+    ...     variables=set(['x']),
+    ...     functions=set(['square']),
+    ...     suffixes=set(['k'])
+    ... ))
+    >>> result == expected
+    True
+
+    Empty submissions evaluate to nan:
+    >>> evaluator("", {}, {}, {})[0]
+    nan
     """
+    empty_usage = ScopeUsage(set(), set(), set())
     if formula is None:
         # No need to go further.
-        return float('nan'), set()
+        return float('nan'), empty_usage
     formula = formula.strip()
     if formula == "":
         # No need to go further.
-        return float('nan'), set()
+        return float('nan'), empty_usage
 
     # Parse the tree
     math_interpreter = parsercache.get_parser(formula, suffixes)
@@ -235,7 +262,10 @@ def evaluator(formula,
         raise UnableToParse(msg)
 
     # Return the result of the evaluation, as well as the set of functions used
-    return result, math_interpreter.functions_used
+    usage = ScopeUsage(variables=math_interpreter.variables_used,
+                      functions=math_interpreter.functions_used,
+                      suffixes=math_interpreter.suffixes_used)
+    return result, usage
 
 class FormulaParser(object):
     """
@@ -252,6 +282,7 @@ class FormulaParser(object):
         self.tree = None
         self.variables_used = set()
         self.functions_used = set()
+        self.suffixes_used = set()
         self.max_array_dim_used = 0
         self.suffixes = suffixes
         self.actions = {
@@ -281,6 +312,12 @@ class FormulaParser(object):
         When a function is recognized, store it in `functions_used`.
         """
         self.functions_used.add(tokens[0][0])
+
+    def suffix_parse_action(self, tokens):
+        """
+        When a suffix is recognized, store it in `suffixes_used`.
+        """
+        self.suffixes_used.add(tokens[0][0])
 
     @staticmethod
     def group_if_multiple(name):
@@ -322,6 +359,7 @@ class FormulaParser(object):
 
         # Define our suffixes
         suffix = MatchFirst(Literal(k) for k in self.suffixes.keys())
+        suffix.setParseAction(self.suffix_parse_action)
 
         # Construct a number as a group consisting of a text string (num) and an optional
         # suffix num can include a decimal number and numerical exponent, and can be

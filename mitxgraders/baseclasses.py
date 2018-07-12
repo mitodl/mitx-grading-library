@@ -21,15 +21,18 @@ class ConfigError(Exception):
     """Raised whenever a configuration error occurs"""
     pass
 
-
 class InvalidInput(Exception):
     """Raised whenever user input is invalid"""
     pass
 
 class StudentFacingError(Exception):
     """Base class for errors whose messages are intended for students to view."""
-    # QUESTION: How much does this overlap with InvalidInput?
     pass
+
+class MissingInput(StudentFacingError):
+    """
+    Raised when a required input has been left blank.
+    """
 
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""
@@ -92,13 +95,15 @@ class AbstractGrader(ObjectWithSchema):
         })
 
     @abc.abstractmethod
-    def check(self, answers, student_input):
+    def check(self, answers, student_input, **kwargs):
         """
         Check student_input for correctness and provide feedback.
 
         Arguments:
             answers: The expected result(s) and grading information
             student_input: The student's input passed by edX
+            **kwargs: Anything else that has been passed in. For example, sibling
+                graders when a grader is used as a subgrader in a ListGrader.
         """
 
     def __call__(self, expect, student_input):
@@ -298,7 +303,7 @@ class ItemGrader(AbstractGrader):
         """
         return Schema(str)(expect)
 
-    def check(self, answers, student_input):
+    def check(self, answers, student_input, **kwargs):
         """
         Compares student input to each answer in answers, using check_response.
         Computes the best outcome for the student.
@@ -306,6 +311,8 @@ class ItemGrader(AbstractGrader):
         Arguments:
             answer: A tuple of answers to compare to, or None to use internal config
             student_input (str): The student's input passed by edX
+            **kwargs: Anything else that has been passed in. For example, sibling
+                graders when a grader is used as a subgrader in a ListGrader.
         """
         # If no answers provided, use the internal configuration
         answers = self.config['answers'] if answers is None else answers
@@ -324,7 +331,7 @@ class ItemGrader(AbstractGrader):
             raise ConfigError(msg.format(type(student_input)))
 
         # Compute the results for each answer
-        results = [self.check_response(answer, student_input) for answer in answers]
+        results = [self.check_response(answer, student_input, **kwargs) for answer in answers]
 
         # Now find the best result for the student
         best_score = max([r['grade_decimal'] for r in results])
@@ -338,7 +345,7 @@ class ItemGrader(AbstractGrader):
         return best_result_with_longest_msg
 
     @abc.abstractmethod
-    def check_response(self, answer, student_input):
+    def check_response(self, answer, student_input, **kwargs):
         """
         Compares student_input against a single answer.
         Differs from check, which must compare against all possible answers.
@@ -347,4 +354,6 @@ class ItemGrader(AbstractGrader):
         Arguments:
             answer (schema_answer): The answer to compare to
             student_input (str): The student's input passed by edX
+            **kwargs: Anything else that has been passed in. For example, sibling
+                graders when a grader is used as a subgrader in a ListGrader.
         """

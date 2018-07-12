@@ -20,18 +20,19 @@ def test_calcpy():
         evaluator("1+f(2)", {}, {"f": badfunc}, {})
 
     # Test formula with None
-    result = evaluator(None, {}, {}, {})
-    assert result[0] == approx(float('nan'), nan_ok=True)
-    assert result[1] == set()
+    value, used = evaluator(None, {}, {}, {})
+    assert value == approx(float('nan'), nan_ok=True)
+    assert (used.functions, used.variables, used.suffixes) == (set(), set(), set())
+
 
     # Test formulae with parallel operator
-    result = evaluator("1 || 1 || 1", {}, {}, {})
-    assert result[0] == 1/3
-    assert result[1] == set()
+    value, used = evaluator("1 || 1 || 1", {}, {}, {})
+    assert value == 1/3
+    assert (used.functions, used.variables, used.suffixes) == (set(), set(), set())
 
-    result = evaluator("1 || 1 || 0", {}, {}, {})
-    assert result[0] == approx(float('nan'), nan_ok=True)
-    assert result[1] == set()
+    value, used = evaluator("1 || 1 || 0", {}, {}, {})
+    assert value == approx(float('nan'), nan_ok=True)
+    assert (used.functions, used.variables, used.suffixes) == (set(), set(), set())
 
     # Test incorrect case variables
     msg = r"Invalid Input: X not permitted in answer as a variable \(did you mean x\?\)"

@@ -31,7 +31,7 @@ def find_optimal_order(check, answers, student_list):
     Arguments:
         answers (list): A list [answers_0, answers_1, ...]
             wherein each answers_i is a valid ItemGrader.config['answers']
-        student_input_list (list): a list of student inputs
+        student_list (list): a list of student inputs
 
     Returns:
         An optimally-grader input_list whose dictionaries match student_list in order.
@@ -41,6 +41,7 @@ def find_optimal_order(check, answers, student_list):
         to solve https://en.wikipedia.org/wiki/Assignment_problem
     """
     result_matrix = [[check(a, i) for a in answers] for i in student_list]
+
 
     def calculate_cost(result):
         """
@@ -226,7 +227,7 @@ class ListGrader(AbstractGrader):
 
         # Step 3: Validate the grouping
         if self.config['grouping']:
-            # Create the grouping dictionary
+            # Create the grouping map
             self.grouping = self.create_grouping_map(self.config['grouping'])
             self.validate_grouping()
         else:
@@ -345,7 +346,7 @@ class ListGrader(AbstractGrader):
                           "instead of ListGrader"
                     raise ConfigError(msg.format(group_idx, num_items, type(subgrader).__name__))
 
-    def check(self, answers, student_input):
+    def check(self, answers, student_input, **kwargs):
         """Checks student_input against answers, which may be provided"""
         # If no answers provided, use the internal configuration
         answers = self.config['answers'] if answers is None else answers
@@ -373,7 +374,7 @@ class ListGrader(AbstractGrader):
         Group inputs in student_list according to grouping
 
         Arguments:
-            grouping (dict): an array whose entries are lists of indices in original list
+            grouping (list): an array whose entries are lists of indices in original list
             thelist (list): the list to be groupified
 
         Usage
@@ -446,6 +447,27 @@ class ListGrader(AbstractGrader):
                 msg = "The number of answers ({}) and the number of inputs ({}) are different"
                 raise ConfigError(msg.format(len(answers), len(student_list)))
 
+    def get_ordered_input_list(self, answers, grouped_inputs):
+        """
+        Pass answers and inputs to the appropriate grader, along with sibling
+        information.
+        """
+        # If 'subgraders' is a single grader, create a list of references to it.
+        graders = (self.config['subgraders'] if self.subgrader_list
+                   else [self.config['subgraders'] for _ in answers])
+        compare = zip(graders, answers, grouped_inputs)
+        siblings = [
+            {'grader': grader, 'input': theinput}
+            for grader, _, theinput in compare
+            ]
+
+        input_list = [
+            grader.check(answer, theinput, siblings=siblings)
+            for (grader, answer, theinput) in compare
+        ]
+
+        return input_list
+
     def perform_check(self, answers, student_list):
         """
         Compare the list of responses from a student against a specific list of answers.
@@ -454,23 +476,13 @@ class ListGrader(AbstractGrader):
 
         # Group the inputs in preparation for grading
         grouped_inputs = self.groupify_list(self.grouping, student_list)
-
         if self.config['ordered']:
-            # If ordered, pass answers and inputs to the appropriate grader.
-            compare = zip(answers, grouped_inputs)
-            if self.subgrader_list:
-                input_list = [
-                    self.config['subgraders'][index].check(*pair)
-                    for index, pair in enumerate(compare)
-                ]
-            else:
-                input_list = [
-                    self.config['subgraders'].check(*pair)
-                    for pair in compare
-                ]
+            input_list = self.get_ordered_input_list(answers, grouped_inputs)
         else:
             # If unordered, then there is a single subgrader. Find optimal grading.
-            input_list = find_optimal_order(self.config['subgraders'].check, answers, grouped_inputs)
+            input_list = find_optimal_order(self.config['subgraders'].check,
+                                            answers,
+                                            grouped_inputs)
 
         # We need to restore the original order of inputs.
         # At this point, input_list contains items each of which is either:
@@ -483,8 +495,8 @@ class ListGrader(AbstractGrader):
         ]
         ungrouped = self.ungroupify_list(self.grouping, nested)
 
-        # TODO We're discarding any overall_messages at this point. We should combine them
-        # to form the resulting overall_message
+        # TODO We're discarding any overall_messages at this point. We should
+        # combine them to form the resulting overall_message
 
         return {'input_list': ungrouped, 'overall_message': ''}
 
@@ -540,7 +552,6 @@ class ListGrader(AbstractGrader):
         # Everything is exactly the same, possibly excepting messages.
         # Just return the first result in our remaining list.
         return culled_results[np.where(in_the_running)[0][0]]
-
 
 class SingleListGrader(ItemGrader):
     """
@@ -657,7 +668,7 @@ class SingleListGrader(ItemGrader):
 
         return answers_tuple
 
-    def check_response(self, answer, student_input):
+    def check_response(self, answer, student_input, **kwargs):
         """Check student_input against a given answer list"""
         answers = answer  # Rename from the ItemGrader name
         student_list = student_input.split(self.config['delimiter'])

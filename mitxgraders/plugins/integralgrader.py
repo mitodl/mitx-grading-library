@@ -336,7 +336,7 @@ class IntegralGrader(AbstractGrader):
 
         return structured_input
 
-    def check(self, answers, student_input):
+    def check(self, answers, student_input, **kwargs):
         """Validates and cleans student_input, then checks response and handles errors"""
         answers = self.config['answers'] if answers is None else answers
         structured_input = self.structure_and_validate_input(student_input)
@@ -464,22 +464,22 @@ class IntegralGrader(AbstractGrader):
                              varscope, funcscope):
         """Evals lower/upper limits and gets the functions used in lower/upper/integrand"""
 
-        lower, lower_funcs = evaluator(lower_str,
+        lower, lower_used = evaluator(lower_str,
                                        variables=varscope,
                                        functions=funcscope,
                                        suffixes={})
-        upper, upper_funcs = evaluator(upper_str,
+        upper, upper_used = evaluator(upper_str,
                                        variables=varscope,
                                        functions=funcscope,
                                        suffixes={})
 
         varscope[integration_var] = (upper + lower)/2
-        _, integrand_funcs = evaluator(integrand_str,
+        _, integrand_used = evaluator(integrand_str,
                                        variables=varscope,
                                        functions=funcscope,
                                        suffixes={})
 
-        used_funcs = lower_funcs.union(upper_funcs).union(integrand_funcs)
+        used_funcs = lower_used.functions.union(upper_used.functions).union(integrand_used.functions)
 
         return lower, upper, used_funcs
 
@@ -518,7 +518,7 @@ class IntegralGrader(AbstractGrader):
             errmsg = "Integrand has evaluated to complex number but must evaluate to a real."
             integrand = check_output_is_real(raw_integrand, IntegrationError, errmsg)
             result_re = integrate.quad(integrand, lower, upper, **self.config['integrator_options'])
-            result_im = (None, None, {'neval':None})
+            result_im = (None, None, {'neval': None})
 
         # Restore the integration variable's initial value now that we are done integrating
         if int_var_initial is not None:
