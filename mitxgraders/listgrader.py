@@ -345,7 +345,7 @@ class ListGrader(AbstractGrader):
                           "instead of ListGrader"
                     raise ConfigError(msg.format(group_idx, num_items, type(subgrader).__name__))
 
-    def check(self, answers, student_input):
+    def check(self, answers, student_input, **kwargs):
         """Checks student_input against answers, which may be provided"""
         # If no answers provided, use the internal configuration
         answers = self.config['answers'] if answers is None else answers
@@ -459,10 +459,33 @@ class ListGrader(AbstractGrader):
             # If ordered, pass answers and inputs to the appropriate grader.
             compare = zip(answers, grouped_inputs)
             if self.subgrader_list:
-                input_list = [
-                    self.config['subgraders'][index].check(*pair)
-                    for index, pair in enumerate(compare)
-                ]
+                # This is the only situation in which you can have correlated graders
+                # where one grader depends on another input, because:
+                # * Must have ordered graders, so inputs can be numbered and routed
+                #   appropriately
+                # * Must have individual graders, because if one grader expects extra
+                #   inputs, all of them must, and then there are circular references
+                # Also, this must be the lowest level of ListGrader, so there can be no
+                # grouping present.
+                # TODO: Validate that correlated graders are correctly set up on load
+
+                # Detect if corelated graders are being employed
+                correlated = False
+                if not self.grouping:
+                    for subgrader in self.config['subgraders']:
+                        if len(subgrader.config["dependent_input"]) > 0:
+                            correlated = True
+                            break
+
+                # Perform the grading
+                if correlated:
+                    input_list = ListGrader.correlated_check(self.config['subgraders'],
+                                                             compare)
+                else:
+                    input_list = [
+                        self.config['subgraders'][index].check(*pair)
+                        for index, pair in enumerate(compare)
+                    ]
             else:
                 input_list = [
                     self.config['subgraders'].check(*pair)
@@ -470,7 +493,9 @@ class ListGrader(AbstractGrader):
                 ]
         else:
             # If unordered, then there is a single subgrader. Find optimal grading.
-            input_list = find_optimal_order(self.config['subgraders'].check, answers, grouped_inputs)
+            input_list = find_optimal_order(self.config['subgraders'].check,
+                                            answers,
+                                            grouped_inputs)
 
         # We need to restore the original order of inputs.
         # At this point, input_list contains items each of which is either:
@@ -540,6 +565,57 @@ class ListGrader(AbstractGrader):
         # Everything is exactly the same, possibly excepting messages.
         # Just return the first result in our remaining list.
         return culled_results[np.where(in_the_running)[0][0]]
+
+    @staticmethod
+    def correlated_check(subgraders, compare_list):
+        """
+        Grade a list that utilizes correlated graders using dependent_input
+        Returns a list of check results from each input, or raises a
+        ConfigError if circular references are detected.
+        """
+        # Store the index of graders we have not yet evaluated
+        unevaluated = set(range(len(subgraders)))
+        results = [None for subgrader in subgraders]
+
+        # Check all inputs, following chains as necessary
+        while unevaluated:
+            remove = []
+            # Try each unevaluated grader
+            for idx in unevaluated:
+                grader = subgraders[idx]
+                # Check to see if dependencies have been evaluated yet
+                dependencies = {}
+                for num in grader.config["dependent_input"]:
+                    # Note that our lists are 0-based, while we expect
+                    # 1-based information from dependent_input
+                    if num-1 in unevaluated:
+                        break
+                    else:
+                        # Pull out that input
+                        dependencies[num] = compare_list[num-1][1]
+                else:
+                    if dependencies:
+                        # All dependencies have been evaluated
+                        # Pass them through a kwarg
+                        results[idx] = grader.check(*compare_list[idx],
+                                                    dependencies=dependencies)
+                    else:
+                        # No dependencies present
+                        results[idx] = grader.check(*compare_list[idx])
+                    remove.append(idx)
+
+            if remove:
+                # Take out the indices we just evaluated
+                for idx in remove:
+                    unevaluated.remove(idx)
+            else:
+                # No progress made
+                bad_indices = sorted([x + 1 for x in unevaluated])
+                bad_symbols = ", ".join(map(str, bad_indices))
+                raise ConfigError("Circularly dependent dependent_inputs detected: " +
+                                  bad_symbols)
+
+        return results
 
 
 class SingleListGrader(ItemGrader):
@@ -657,7 +733,7 @@ class SingleListGrader(ItemGrader):
 
         return answers_tuple
 
-    def check_response(self, answer, student_input):
+    def check_response(self, answer, student_input, **kwargs):
         """Check student_input against a given answer list"""
         answers = answer  # Rename from the ItemGrader name
         student_list = student_input.split(self.config['delimiter'])

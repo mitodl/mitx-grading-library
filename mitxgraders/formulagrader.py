@@ -215,10 +215,10 @@ def numbered_vars_regexp(numbered_vars):
     True
     """
     head_list = '|'.join(map(re.escape, numbered_vars))
-    regexp = (r"^((" + head_list + ")" # Start and match any head (capture full string, head)
-              r"_{" # match _{
-              r"(?:[-]?[1-9]\d*|0)" # match number pattern
-              r"})$") # match closing }, close group, and end of string
+    regexp = (r"^((" + head_list + ")"  # Start and match any head (capture full string, head)
+              r"_{"  # match _{
+              r"(?:[-]?[1-9]\d*|0)"  # match number pattern
+              r"})$")  # match closing }, close group, and end of string
     return re.compile(regexp)
 
 def validate_no_collisions(config, keys):
@@ -478,7 +478,7 @@ class FormulaGrader(ItemGrader):
         "Variables:\n"
         "{variables}\n"
         "Student Eval: {student_eval}\n"
-        "Compare to:  {compare_parms_eval}\n" # compare_parms_eval is list, so start 1 char earlier
+        "Compare to:  {compare_parms_eval}\n"  # compare_parms_eval is list, so start 1 char earlier
         "Comparer Function: {comparer}\n"
         "Comparison Satisfied: {comparer_result}\n"
         ""
@@ -527,12 +527,12 @@ class FormulaGrader(ItemGrader):
         self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
         # Note that voluptuous ensures that there are no orphaned entries in sample_from
 
-    def check_response(self, answer, student_input):
+    def check_response(self, answer, student_input, **kwargs):
         """Check the student response against a given answer"""
 
         # Now perform the computations
         try:
-            result, used_funcs = self.raw_check(answer, student_input)
+            result, used_funcs = self.raw_check(answer, student_input, **kwargs)
             if result['ok'] is True or result['ok'] == 'partial':
                 self.post_eval_validation(student_input, used_funcs)
             return result
@@ -586,8 +586,20 @@ class FormulaGrader(ItemGrader):
 
         return variable_list, sample_from_dict
 
-    def raw_check(self, answer, student_input):
+    def raw_check(self, answer, student_input, **kwargs):
         """Perform the numerical check of student_input vs answer"""
+        # Check that all dependencies are present
+        if self.config["dependent_input"]:
+            if "dependencies" not in kwargs:  # pragma: no cover
+                raise ConfigError("Expected dependencies in kwargs, not found")
+            dependencies = kwargs["dependencies"]
+            for i in self.config["dependent_input"]:
+                if i not in dependencies:  # pragma: no cover
+                    raise ConfigError("Expected dependency {} to be present, "
+                                      "but not found".format(i))
+        else:
+            dependencies = {}
+
         # Generate samples
         variable_list, sample_from_dict = self.generate_variable_list(answer,
                                                                       student_input)
@@ -613,6 +625,18 @@ class FormulaGrader(ItemGrader):
             funclist.update(func_samples[i])
             varlist.update(var_samples[i])
 
+            # Compute any dependencies
+            dependencies_eval = {
+                "input_{}".format(idx): evaluator(formula=expr,
+                                                  variables=varlist,
+                                                  functions=funclist,
+                                                  suffixes=self.suffixes)[0]
+                for idx, expr in dependencies.items()
+            }
+            # This makes a dictionary of new variables "input_n" that can be used
+            # in computing expressions. Go and put them in the variables.
+            varlist.update(dependencies_eval)
+
             # Compute expressions
             comparer_params_eval = [
                 evaluator(formula=param,
@@ -623,6 +647,11 @@ class FormulaGrader(ItemGrader):
                 for param in answer['expect']['comparer_params']
                 ]
 
+            # Before performing student evaluation, scrub the dependencies
+            # so that students can't use them
+            for idx in self.config['dependent_input']:
+                del varlist["input_{}".format(idx)]
+
             student_eval, used_funcs = evaluator(student_input,
                                                  variables=varlist,
                                                  functions=funclist,
@@ -632,6 +661,8 @@ class FormulaGrader(ItemGrader):
             # Check if expressions agree
             comparer_result = comparer(comparer_params_eval, student_eval, self.comparer_utils)
             if self.config['debug']:
+                # Put the dependencies back in for the debug output
+                varlist.update(dependencies_eval)
                 self.log_sample_info(i, varlist, funclist, student_eval,
                                      comparer, comparer_params_eval, comparer_result)
 
@@ -662,7 +693,7 @@ class FormulaGrader(ItemGrader):
             )
             self.log(re.sub(r"0x[0-9a-fA-F]+", "0x...", header))
         self.log(self.debug_appendix_sample_template.format(
-            sample_num=index + 1, # to account for 0 index
+            sample_num=index + 1,  # to account for 0 index
             samples_total=self.config['samples'],
             variables=pp.pformat(varlist),
             student_eval=student_eval,
