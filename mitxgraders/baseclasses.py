@@ -16,12 +16,10 @@ import abc
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
-from mitxgraders.helpers.validatorfuncs import all_unique
 
 class ConfigError(Exception):
     """Raised whenever a configuration error occurs"""
     pass
-
 
 class InvalidInput(Exception):
     """Raised whenever user input is invalid"""
@@ -29,8 +27,12 @@ class InvalidInput(Exception):
 
 class StudentFacingError(Exception):
     """Base class for errors whose messages are intended for students to view."""
-    # QUESTION: How much does this overlap with InvalidInput?
     pass
+
+class MissingInput(StudentFacingError):
+    """
+    Raised when a required input has been left blank.
+    """
 
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""
@@ -100,8 +102,8 @@ class AbstractGrader(ObjectWithSchema):
         Arguments:
             answers: The expected result(s) and grading information
             student_input: The student's input passed by edX
-            **kwargs: Anything else that has been passed in to the grader
-                      (used for passing dependent_inputs)
+            **kwargs: Anything else that has been passed in For example, sibling
+                graders when a grader is used as a subgrader ing a ListGrader.
         """
 
     def __call__(self, expect, student_input):
@@ -230,9 +232,7 @@ class ItemGrader(AbstractGrader):
         schema = super(ItemGrader, self).schema_config
         return schema.extend({
             Required('answers', default=tuple()): self.schema_answers,
-            Required('wrong_msg', default=""): str,
-            # dependent_input is used by ListGrader for correlated grading
-            Required('dependent_input', default=[]): All([int], all_unique)
+            Required('wrong_msg', default=""): str
         })
 
     def schema_answers(self, answer_tuple):
@@ -311,8 +311,8 @@ class ItemGrader(AbstractGrader):
         Arguments:
             answer: A tuple of answers to compare to, or None to use internal config
             student_input (str): The student's input passed by edX
-            **kwargs: Anything else that has been passed in to the grader
-                      (used for passing dependent_inputs)
+            **kwargs: Anything else that has been passed in For example, sibling
+                graders when a grader is used as a subgrader ing a ListGrader.
         """
         # If no answers provided, use the internal configuration
         answers = self.config['answers'] if answers is None else answers
@@ -354,6 +354,6 @@ class ItemGrader(AbstractGrader):
         Arguments:
             answer (schema_answer): The answer to compare to
             student_input (str): The student's input passed by edX
-            **kwargs: Anything else that has been passed in (used by ListGrader to
-                      facilitate dependent_input)
+            **kwargs: Anything else that has been passed in For example, sibling
+                graders when a grader is used as a subgrader ing a ListGrader.
         """

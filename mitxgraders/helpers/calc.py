@@ -10,6 +10,7 @@ Heavily modified from the edX calc.py
 from __future__ import division
 import copy
 import numpy as np
+from collections import namedtuple
 from pyparsing import (
     CaselessLiteral,
     Combine,
@@ -169,6 +170,8 @@ class ParserCache(object):
 
 # The global parser cache
 parsercache = ParserCache()
+
+ScopeUsage = namedtuple('ScopeUSage', ['functions', 'variables', 'suffixes'])
 
 def evaluator(formula,
               variables=DEFAULT_VARIABLES,

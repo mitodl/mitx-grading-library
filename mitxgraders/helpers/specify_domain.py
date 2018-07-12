@@ -5,7 +5,7 @@ Defines class SpecifyDomain, an author-facing decorator for specifying the domai
 of a function. Currently only supports specifying the shape of inputs.
 """
 from numbers import Number
-from voluptuous import Schema, Invalid, All, Any, Required, Coerce
+from voluptuous import Schema, Invalid, Required
 from mitxgraders.helpers.validatorfuncs import is_shape_specification
 from mitxgraders.baseclasses import StudentFacingError, ObjectWithSchema
 from mitxgraders.helpers.math_array import MathArray, is_scalar_matharray

@@ -11,11 +11,13 @@ from collections import namedtuple
 from pprint import PrettyPrinter
 import re
 import itertools
+import numpy as np
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes)
-from mitxgraders.baseclasses import ItemGrader, InvalidInput, ConfigError, StudentFacingError
+from mitxgraders.baseclasses import (ItemGrader, InvalidInput, ConfigError,
+                                     StudentFacingError, MissingInput)
 from mitxgraders.helpers.calc import CalcError, evaluator, parsercache
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
                                                 PercentageString, is_callable_with_args, all_unique)
@@ -586,20 +588,27 @@ class FormulaGrader(ItemGrader):
 
         return variable_list, sample_from_dict
 
+    @staticmethod
+    def get_sibling_formulas(siblings):
+        """
+        Returns a dict sibling formula inputs.
+
+        Note: siblings are present when a grader is used inside a ListGrader.
+        """
+        if siblings is None:
+            return {}
+        formula_siblings = [(i, sibling['input']) for i, sibling in enumerate(siblings)
+                            if isinstance(sibling['grader'], FormulaGrader)]
+        return {
+            "input_{}".format(i+1): sibling_input
+            for i, sibling_input in formula_siblings
+        }
+
+
     def raw_check(self, answer, student_input, **kwargs):
         """Perform the numerical check of student_input vs answer"""
-        # Check that all dependencies are present
-        if self.config["dependent_input"]:
-            if "dependencies" not in kwargs:  # pragma: no cover
-                raise ConfigError("Expected dependencies in kwargs, not found")
-            dependencies = kwargs["dependencies"]
-            for i in self.config["dependent_input"]:
-                if i not in dependencies:  # pragma: no cover
-                    raise ConfigError("Expected dependency {} to be present, "
-                                      "but not found".format(i))
-        else:
-            dependencies = {}
 
+        sibling_formulas = self.get_sibling_formulas(kwargs.get('siblings', None))
         # Generate samples
         variable_list, sample_from_dict = self.generate_variable_list(answer,
                                                                       student_input)
@@ -625,44 +634,38 @@ class FormulaGrader(ItemGrader):
             funclist.update(func_samples[i])
             varlist.update(var_samples[i])
 
-            # Compute any dependencies
-            dependencies_eval = {
-                "input_{}".format(idx): evaluator(formula=expr,
-                                                  variables=varlist,
-                                                  functions=funclist,
-                                                  suffixes=self.suffixes)[0]
-                for idx, expr in dependencies.items()
-            }
-            # This makes a dictionary of new variables "input_n" that can be used
-            # in computing expressions. Go and put them in the variables.
-            varlist.update(dependencies_eval)
-
-            # Compute expressions
-            comparer_params_eval = [
-                evaluator(formula=param,
-                          variables=varlist,
-                          functions=funclist,
-                          suffixes=self.suffixes,
-                          max_array_dim=self.config['max_array_dim'])[0]
-                for param in answer['expect']['comparer_params']
-                ]
-
-            # Before performing student evaluation, scrub the dependencies
-            # so that students can't use them
-            for idx in self.config['dependent_input']:
-                del varlist["input_{}".format(idx)]
-
-            student_eval, used_funcs = evaluator(student_input,
+            scoped_eval = lambda expr: evaluator(expr,
                                                  variables=varlist,
                                                  functions=funclist,
                                                  suffixes=self.suffixes,
                                                  max_array_dim=self.config['max_array_dim'])
 
+            # Compute the sibling values, and add them to varlist
+            siblings_eval = {
+                key: scoped_eval(sibling_formulas[key])[0]
+                for key in sibling_formulas
+            }
+            varlist.update(siblings_eval)
+
+            # Compute expressions
+            comparer_params_eval = [scoped_eval(param)[0] for param
+                                   in answer['expect']['comparer_params']]
+
+            if np.any(np.isnan(comparer_params_eval)):
+                raise MissingInput('Cannot grade answer, a required input is missing.')
+
+            # Before performing student evaluation, scrub the dependencies
+            # so that students can't use them
+            for key in siblings_eval:
+                del varlist[key]
+
+            student_eval, used_funcs = scoped_eval(student_input)
+
             # Check if expressions agree
             comparer_result = comparer(comparer_params_eval, student_eval, self.comparer_utils)
             if self.config['debug']:
                 # Put the dependencies back in for the debug output
-                varlist.update(dependencies_eval)
+                varlist.update(siblings_eval)
                 self.log_sample_info(i, varlist, funclist, student_eval,
                                      comparer, comparer_params_eval, comparer_result)
 
