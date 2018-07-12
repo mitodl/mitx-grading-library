@@ -648,18 +648,15 @@ class FormulaGrader(ItemGrader):
             varlist.update(siblings_eval)
 
             # Compute expressions
-            comparer_params_eval = [scoped_eval(param)[0] for param
-                                   in answer['expect']['comparer_params']]
-
-            if np.any(np.isnan(comparer_params_eval)):
-                raise MissingInput('Cannot grade answer, a required input is missing.')
+            comparer_params_eval = self.eval_and_validate_comparer_params(
+                scoped_eval, answer['expect']['comparer_params'], siblings_eval)
 
             # Before performing student evaluation, scrub the dependencies
             # so that students can't use them
             for key in siblings_eval:
                 del varlist[key]
 
-            student_eval, used_funcs = scoped_eval(student_input)
+            student_eval, used = scoped_eval(student_input)
 
             # Check if expressions agree
             comparer_result = comparer(comparer_params_eval, student_eval, self.comparer_utils)
@@ -672,14 +669,41 @@ class FormulaGrader(ItemGrader):
             if not comparer_result:
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
-                    return {'ok': False, 'grade_decimal': 0, 'msg': ''}, used_funcs
+                    return {'ok': False, 'grade_decimal': 0, 'msg': ''}, used.functions
 
         # This response appears to agree with the expected answer
         return {
             'ok': answer['ok'],
             'grade_decimal': answer['grade_decimal'],
             'msg': answer['msg']
-        }, used_funcs
+        }, used.functions
+
+    @staticmethod
+    def eval_and_validate_comparer_params(scoped_eval, comparer_params, siblings_eval):
+        """
+        Evaluate the comparer_params, and make sure they contain no references
+        to empty siblings.
+
+        Arguments
+        =========
+        - scoped_eval (func): a unuary function to evaluate math expressions.
+        Basically, calc.py's evaluator but with variables/functions/suffixes
+        already passed in.
+        - comparer_params ([str]): unevaluated expressions
+        - siblings_eval (dict): evaluated expressions
+        """
+
+        results = [scoped_eval(param) for param in comparer_params]
+        # results is a list of (value, ScopeUsage) pairs
+        comparer_params_eval = [value for value, _ in results]
+        used_variables = set().union(*[used.variables for _, used in results])
+
+        for variable in used_variables:
+            if variable in siblings_eval and np.isnan(siblings_eval[variable]):
+                raise MissingInput('Cannot grade answer, a required input is missing.')
+
+        return comparer_params_eval
+
 
     def log_sample_info(self, index, varlist, funclist, student_eval,
                         comparer, comparer_params_eval, comparer_result):
