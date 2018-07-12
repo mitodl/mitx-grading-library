@@ -6,7 +6,9 @@ import re
 import numpy as np
 from pytest import raises, approx
 from mitxgraders import CalcError
-from mitxgraders.helpers.calc import evaluator, UnableToParse, UndefinedVariable, ArgumentError
+from mitxgraders.baseclasses import StudentFacingError
+from mitxgraders.helpers.calc import (evaluator, UnableToParse, UndefinedVariable,
+                                     ArgumentError, UnbalancedBrackets)
 
 def test_calcpy():
     """Tests of calc.py that aren't covered elsewhere"""
@@ -56,6 +58,29 @@ def test_varnames():
         assert evaluator("U_123^{ijk}", {}, {}, {})
     with raises(UnableToParse):
         assert evaluator("T_1_{123}^{ijk}", {}, {}, {})
+
+def test_bracket_balancing():
+    assert issubclass(UnbalancedBrackets, StudentFacingError)
+
+    expect = ("Invalid Input: parentheses are unmatched. 1 parentheses "
+              "were opened but never closed.")
+    with raises(UnbalancedBrackets, match=expect):
+        evaluator("5*(3")
+
+    expect = ("Invalid Input: A closing parenthesis was found after segment "
+              "'5\*\(3\)', but there is no matching opening parenthesis before it.")
+    with raises(UnbalancedBrackets, match=expect):
+        evaluator("5*(3))")
+
+    expect = ("Invalid Input: square brackets are unmatched. 1 square brackets "
+              "were opened but never closed.")
+    with raises(UnbalancedBrackets, match=expect):
+        evaluator("[1,2,3")
+
+    expect = ("Invalid Input: A closing square bracket was found after segment "
+              "'1,2,3', but there is no matching opening square bracket before it.")
+    with raises(UnbalancedBrackets, match=expect):
+        evaluator("1,2,3]")
 
 def test_calc_functions_multiple_arguments():
     """Tests calc.py handling functions with multiple arguments correctly"""

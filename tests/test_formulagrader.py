@@ -97,15 +97,6 @@ def test_fg_invalid_input():
     with raises(CalcError, match=expect):
         grader(None, "R")
 
-    expect = 'Invalid Input: Parentheses are unmatched. 1 parentheses were opened but never closed.'
-    with raises(CalcError, match=expect):
-        grader(None, "5*(3")
-
-    expect = 'Invalid Input: A closing parenthesis was found after segment 5\*\(3\), but ' + \
-             'there is no matching opening parenthesis before it.'
-    with raises(CalcError, match=expect):
-        grader(None, "5*(3))")
-
     expect = "Invalid Input: Could not parse '5pp' as a formula"
     with raises(CalcError, match=expect):
         grader(None, "5pp")

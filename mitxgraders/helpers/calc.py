@@ -54,7 +54,7 @@ class UndefinedFunction(CalcError):
     """
     pass
 
-class UnmatchedParentheses(CalcError):
+class UnbalancedBrackets(CalcError):
     """
     Indicate when a student's input has unmatched parentheses.
     """
@@ -114,6 +114,49 @@ def handle_np_floating_errors(err, flag):
 np.seterrcall(handle_np_floating_errors)
 np.seterr(divide='call', over='call', invalid='call')
 
+def diagnose_unmatched_brackets(thestring, opener='(', closer=')'):
+    """
+    Counts the number of unclosed brackets in thestring.
+
+    Arguments:
+        - thestring (str): the string to be tested
+        - opener (str): the opening-bracket symbol
+        - closer (str): the closing-bracket symbol
+
+    Returns:
+        - If some brackets are closed before ever being opened, returns a pair
+        (-1, segment) where segment is thestring up until the first unopened
+        closing bracket.
+        - Otherwise, returns a pair (count, segment) where count is the number
+        of brackets that were opened but never closed and segment is all of
+        thestring.
+
+    >>> thestring = 'kit)(ten)'
+    >>> diagnose_unmatched_brackets(thestring)
+    (-1, 'kit')
+    >>> thestring = '(pup)(py + (dog'
+    >>> diagnose_unmatched_brackets(thestring)
+    (2, '(pup)(py + (dog')
+
+    Optionally, specify different opener/closers:
+    >>> thestring = '<dir< ac>< <'
+    >>> diagnose_unmatched_brackets(thestring, opener='<', closer='>')
+    (3, '<dir< ac>< <')
+    """
+    count = 0
+    delta = {
+        opener: +1,
+        closer: -1
+    }
+
+    for index, char in enumerate(thestring):
+        if char in delta:
+            count += delta[char]
+            if count < 0:
+                return count, thestring[0:index]
+
+    return count, thestring
+
 class ParserCache(object):
     """Stores the parser trees for formula strings for reuse"""
 
@@ -121,25 +164,37 @@ class ParserCache(object):
         """Initializes the cache"""
         self.cache = {}
 
+    @staticmethod
+    def raise_error_if_unbalanced_brackets(formula):
+        unopened = ("Invalid Input: A closing {bracket} was found "
+                    "after segment '{segment}', but there is no matching opening "
+                    "{bracket} before it.")
+        unclosed = ("Invalid Input: {brackets} are unmatched. {count} "
+                    "{brackets} were opened but never closed.")
+
+        # Test parens:
+        p_count, segment = diagnose_unmatched_brackets(formula, opener='(', closer=')')
+        if p_count < 0:
+            msg = unopened.format(bracket='parenthesis', segment=segment)
+            raise UnbalancedBrackets(msg)
+        elif p_count > 0:
+            msg = unclosed.format(brackets='parentheses', count=p_count)
+            raise UnbalancedBrackets(msg)
+
+        # Test square brackets
+        b_count, segment = diagnose_unmatched_brackets(formula, opener='[', closer=']')
+        if b_count < 0:
+            msg = unopened.format(bracket='square bracket', segment=segment)
+            raise UnbalancedBrackets(msg)
+        elif b_count > 0:
+            msg = unclosed.format(brackets='square brackets', count=b_count)
+            raise UnbalancedBrackets(msg)
+
+
     def get_parser(self, formula, suffixes):
         """Get a FormulaParser object for a given formula"""
         # Check the formula for matching parentheses
-        count = 0
-        delta = {
-            '(': +1,
-            ')': -1
-        }
-        for index, char in enumerate(formula):
-            if char in delta:
-                count += delta[char]
-                if count < 0:
-                    msg = "Invalid Input: A closing parenthesis was found after segment " + \
-                          "{}, but there is no matching opening parenthesis before it."
-                    raise UnmatchedParentheses(msg.format(formula[0:index]))
-        if count > 0:
-            msg = "Invalid Input: Parentheses are unmatched. " + \
-                  "{} parentheses were opened but never closed."
-            raise UnmatchedParentheses(msg.format(count))
+        ParserCache.raise_error_if_unbalanced_brackets(formula)
 
         # Strip out any whitespace, so that two otherwise-equivalent formulas are treated
         # the same
