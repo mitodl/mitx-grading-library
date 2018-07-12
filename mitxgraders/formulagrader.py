@@ -589,6 +589,11 @@ class FormulaGrader(ItemGrader):
         return variable_list, sample_from_dict
 
     @staticmethod
+    def sibling_varname(index):
+        """Generate name for sibling variables"""
+        return 'sibling_{}'.format(index + 1)
+
+    @staticmethod
     def get_sibling_formulas(siblings):
         """
         Returns a dict sibling formula inputs.
@@ -600,7 +605,7 @@ class FormulaGrader(ItemGrader):
         formula_siblings = [(i, sibling['input']) for i, sibling in enumerate(siblings)
                             if isinstance(sibling['grader'], FormulaGrader)]
         return {
-            "sibling_{}".format(i+1): sibling_input
+            FormulaGrader.sibling_varname(i): sibling_input
             for i, sibling_input in formula_siblings
         }
 
