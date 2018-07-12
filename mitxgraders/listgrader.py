@@ -452,7 +452,7 @@ class ListGrader(AbstractGrader):
         Pass answers and inputs to the appropriate grader, along with sibling
         information.
         """
-        # If 'subgradres' is a single grader, create a list of references to it.
+        # If 'subgraders' is a single grader, create a list of references to it.
         graders = (self.config['subgraders'] if self.subgrader_list
                    else [self.config['subgraders'] for _ in answers])
         compare = zip(graders, answers, grouped_inputs)

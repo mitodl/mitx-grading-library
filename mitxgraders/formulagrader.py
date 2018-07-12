@@ -656,7 +656,7 @@ class FormulaGrader(ItemGrader):
             comparer_params_eval = self.eval_and_validate_comparer_params(
                 scoped_eval, answer['expect']['comparer_params'], siblings_eval)
 
-            # Before performing student evaluation, scrub the dependencies
+            # Before performing student evaluation, scrub the siblings
             # so that students can't use them
             for key in siblings_eval:
                 del varlist[key]
@@ -666,7 +666,7 @@ class FormulaGrader(ItemGrader):
             # Check if expressions agree
             comparer_result = comparer(comparer_params_eval, student_eval, self.comparer_utils)
             if self.config['debug']:
-                # Put the dependencies back in for the debug output
+                # Put the siblings back in for the debug output
                 varlist.update(siblings_eval)
                 self.log_sample_info(i, varlist, funclist, student_eval,
                                      comparer, comparer_params_eval, comparer_result)
@@ -691,7 +691,7 @@ class FormulaGrader(ItemGrader):
 
         Arguments
         =========
-        - scoped_eval (func): a unuary function to evaluate math expressions.
+        - scoped_eval (func): a unary function to evaluate math expressions.
         Basically, calc.py's evaluator but with variables/functions/suffixes
         already passed in.
         - comparer_params ([str]): unevaluated expressions

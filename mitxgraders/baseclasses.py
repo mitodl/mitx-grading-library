@@ -102,8 +102,8 @@ class AbstractGrader(ObjectWithSchema):
         Arguments:
             answers: The expected result(s) and grading information
             student_input: The student's input passed by edX
-            **kwargs: Anything else that has been passed in For example, sibling
-                graders when a grader is used as a subgrader ing a ListGrader.
+            **kwargs: Anything else that has been passed in. For example, sibling
+                graders when a grader is used as a subgrader in a ListGrader.
         """
 
     def __call__(self, expect, student_input):
@@ -311,8 +311,8 @@ class ItemGrader(AbstractGrader):
         Arguments:
             answer: A tuple of answers to compare to, or None to use internal config
             student_input (str): The student's input passed by edX
-            **kwargs: Anything else that has been passed in For example, sibling
-                graders when a grader is used as a subgrader ing a ListGrader.
+            **kwargs: Anything else that has been passed in. For example, sibling
+                graders when a grader is used as a subgrader in a ListGrader.
         """
         # If no answers provided, use the internal configuration
         answers = self.config['answers'] if answers is None else answers
@@ -354,6 +354,6 @@ class ItemGrader(AbstractGrader):
         Arguments:
             answer (schema_answer): The answer to compare to
             student_input (str): The student's input passed by edX
-            **kwargs: Anything else that has been passed in For example, sibling
-                graders when a grader is used as a subgrader ing a ListGrader.
+            **kwargs: Anything else that has been passed in. For example, sibling
+                graders when a grader is used as a subgrader in a ListGrader.
         """
