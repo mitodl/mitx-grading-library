@@ -59,28 +59,43 @@ def test_varnames():
     with raises(UnableToParse):
         assert evaluator("T_1_{123}^{ijk}", {}, {}, {})
 
-def test_bracket_balancing():
+def test_bracket_balancing_open_without_close_raises_error():
     assert issubclass(UnbalancedBrackets, StudentFacingError)
 
-    expect = ("Invalid Input: parentheses are unmatched. 1 parentheses "
-              "were opened but never closed.")
-    with raises(UnbalancedBrackets, match=expect):
-        evaluator("5*(3")
+    # parens only
+    match = ("Invalid Input: 2 parentheses were opened without being closed, "
+             "highlighted below.\n"
+             "<code>5 + <mark>(</mark>(1) + <mark>(</mark></code>")
+    with raises(UnbalancedBrackets, match=re.escape(match)):
+        evaluator("5 + ((1) + (")
 
-    expect = ("Invalid Input: A closing parenthesis was found after segment "
-              "'5\*\(3\)', but there is no matching opening parenthesis before it.")
-    with raises(UnbalancedBrackets, match=expect):
-        evaluator("5*(3))")
+    # brackets only
+    match = ("Invalid Input: 1 square brackets were opened without being "
+             "closed, highlighted below.\n"
+             "<code>5 + <mark>[</mark>1, (1 + 2),</code>")
+    with raises(UnbalancedBrackets, match=re.escape(match)):
+        evaluator("5 + [1, (1 + 2), ")
 
-    expect = ("Invalid Input: square brackets are unmatched. 1 square brackets "
-              "were opened but never closed.")
-    with raises(UnbalancedBrackets, match=expect):
-        evaluator("[1,2,3")
+    # parens and brackets
+    match = ("Invalid Input: 1 parentheses and 1 square brackets were opened "
+             "without being closed, highlighted below.\n"
+             "<code>5 + <mark>(</mark>(1) + <mark>[</mark></code>")
+    with raises(UnbalancedBrackets, match=re.escape(match)):
+        evaluator("5 + ((1) + [")
 
-    expect = ("Invalid Input: A closing square bracket was found after segment "
-              "'1,2,3', but there is no matching opening square bracket before it.")
-    with raises(UnbalancedBrackets, match=expect):
-        evaluator("1,2,3]")
+def test_brackets_close_without_open_raises_error():
+    match = ("Invalid Input: a parenthesis was closed without ever being "
+             "opened, highlighted below.\n"
+             "<code>5 + <mark>)</mark>1) + 1</code>")
+    with raises(UnbalancedBrackets, match=re.escape(match)):
+        evaluator("5 + )1) + 1")
+
+def test_brackets_closed_by_wrong_type_raise_error():
+    match = ("Invalid Input: a parenthesis was opened and then closed by a "
+             "square bracket, highlighted below.\n"
+             "<code>5 + <mark>(</mark>1+2<mark>]</mark> + 3</code>")
+    with raises(UnbalancedBrackets, match=re.escape(match)):
+        evaluator("5 + (1+2] + 3")
 
 def test_calc_functions_multiple_arguments():
     """Tests calc.py handling functions with multiple arguments correctly"""

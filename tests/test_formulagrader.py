@@ -626,8 +626,8 @@ def test_fg_with_arrays():
     with raises(MathArrayError, match=match):
         grader(None, 'B + 5*I')
 
-    match = ("There was an error evaluating function sin\(...\)"
-             "\n1st input has an error: received a matrix of shape "
+    match = ("There was an error evaluating function sin\(...\)<br/>"
+             "1st input has an error: received a matrix of shape "
              "\(rows: 3, cols: 2\), expected a scalar")
     with raises(DomainError, match=match):
         grader(None, 'sin(B)')
