@@ -11,7 +11,8 @@ from __future__ import division
 import numpy as np
 from voluptuous import Required, Any
 from mitxgraders.helpers import munkres
-from mitxgraders.baseclasses import AbstractGrader, ItemGrader, ConfigError, InvalidInput
+from mitxgraders.baseclasses import AbstractGrader, ItemGrader
+from mitxgraders.exceptions import ConfigError, InvalidInput
 from mitxgraders.helpers.validatorfuncs import Positive
 
 # Set the objects to be imported from this grader

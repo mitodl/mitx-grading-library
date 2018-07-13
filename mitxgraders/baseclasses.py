@@ -16,23 +16,7 @@ import abc
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
-
-class ConfigError(Exception):
-    """Raised whenever a configuration error occurs"""
-    pass
-
-class InvalidInput(Exception):
-    """Raised whenever user input is invalid"""
-    pass
-
-class StudentFacingError(Exception):
-    """Base class for errors whose messages are intended for students to view."""
-    pass
-
-class MissingInput(StudentFacingError):
-    """
-    Raised when a required input has been left blank.
-    """
+from mitxgraders.exceptions import ConfigError
 
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""

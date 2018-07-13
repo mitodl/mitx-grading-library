@@ -1,5 +1,5 @@
 """
-mathfunc.py
+mathfuncs.py
 
 Contains mathematical functions for use in interpreting formulas.
 
@@ -14,11 +14,10 @@ Defines:
 """
 from __future__ import division
 import math
-from numbers import Number
 import numpy as np
 import scipy.special as special
-from mitxgraders.baseclasses import StudentFacingError
-from mitxgraders.helpers.specify_domain import DomainError, SpecifyDomain
+from mitxgraders.helpers.mitmath.specify_domain import SpecifyDomain
+from mitxgraders.exceptions import StudentFacingError
 
 # Normal Trig
 def sec(arg):
@@ -99,7 +98,7 @@ def real(z):
     2.0
 
     If the input is a number, a number is returned:
-    >>> isinstance(real(2+3j), Number)
+    >>> isinstance(real(2+3j), float)
     True
 
     Can be used with arrays, too:
@@ -117,7 +116,7 @@ def imag(z):
     3.0
 
     If the input is a number, a number is returned:
-    >>> isinstance(imag(2+3j), Number)
+    >>> isinstance(imag(2+3j), float)
     True
 
     Can be used with arrays, too:

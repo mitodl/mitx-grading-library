@@ -21,11 +21,12 @@ from mitxgraders.formulagrader import (
     validate_no_collisions,
     warn_if_override
 )
-from mitxgraders.baseclasses import AbstractGrader, InvalidInput, ConfigError
-from mitxgraders.helpers.calc import (CalcError, evaluator)
+from mitxgraders.baseclasses import AbstractGrader
+from mitxgraders.exceptions import InvalidInput, ConfigError, StudentFacingError
+from mitxgraders.helpers.mitmath import (within_tolerance, evaluator,
+                                      DEFAULT_VARIABLES, DEFAULT_FUNCTIONS)
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, all_unique,
                                                 PercentageString, is_callable)
-from mitxgraders.helpers.mathfunc import within_tolerance, DEFAULT_FUNCTIONS, DEFAULT_VARIABLES
 
 __all__ = ["IntegralGrader"]
 
@@ -352,7 +353,7 @@ class IntegralGrader(AbstractGrader):
             if result['ok'] is True or result['ok'] == 'partial':
                 self.post_eval_validation(used_funcs)
             return result
-        except (CalcError, InvalidInput, ConfigError):
+        except (StudentFacingError, InvalidInput, ConfigError):
             # These errors have been vetted already
             raise
         except IntegrationError as e:

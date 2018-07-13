@@ -3,8 +3,8 @@ Tests of base class functionality
 """
 from __future__ import division
 import sys
-import mock
 from imp import reload
+import mock
 from pytest import raises
 from voluptuous import Error
 import mitxgraders

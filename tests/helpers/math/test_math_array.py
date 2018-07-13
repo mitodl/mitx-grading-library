@@ -3,7 +3,7 @@ from pytest import raises
 import random
 import numpy as np
 from numbers import Number
-from mitxgraders.helpers.math_array import (
+from mitxgraders.helpers.mitmath.math_array import (
     MathArray,
     IdentityMultiple as IdMult,
     MathArrayError,

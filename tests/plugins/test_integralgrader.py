@@ -1,8 +1,8 @@
-from mitxgraders.plugins.integralgrader import IntegralGrader, IntegrationError
-from mitxgraders.baseclasses import InvalidInput, ConfigError
 from pytest import raises
 from mitxgraders.version import __version__
-from mitxgraders import CalcError
+from mitxgraders.helpers.mitmath import CalcError
+from mitxgraders.plugins.integralgrader import IntegralGrader, IntegrationError
+from mitxgraders.exceptions import InvalidInput, ConfigError
 
 # Configuration Error Test
 def test_wrong_number_of_inputs_raises_error():

@@ -1,5 +1,5 @@
 """
-calc.py
+parsing.py
 
 Parser and evaluator for mathematical expressions.
 
@@ -9,8 +9,8 @@ Heavily modified from the edX calc.py
 """
 from __future__ import division
 import copy
-import numpy as np
 from collections import namedtuple
+import numpy as np
 from pyparsing import (
     CaselessLiteral,
     Combine,
@@ -31,68 +31,27 @@ from pyparsing import (
     ParseException,
     delimitedList
 )
-from mitxgraders.baseclasses import StudentFacingError
+from mitxgraders.exceptions import StudentFacingError
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
-from mitxgraders.helpers.mathfunc import (DEFAULT_FUNCTIONS,
-                                          DEFAULT_SUFFIXES,
-                                          DEFAULT_VARIABLES)
-from mitxgraders.helpers.math_array import MathArray, robust_pow
-
-class CalcError(StudentFacingError):
-    """Base class for errors originating in calc.py"""
-    pass
-
-class UndefinedVariable(CalcError):
-    """
-    Indicate when a student inputs a variable which was not expected.
-    """
-    pass
-
-class UndefinedFunction(CalcError):
-    """
-    Indicate when a student inputs a function which was not expected.
-    """
-    pass
-
-class UnbalancedBrackets(CalcError):
-    """
-    Indicate when a student's input has unbalanced brackets.
-    """
-    pass
-
-class FactorialError(CalcError):
-    """
-    Indicate when factorial is called on a bad input
-    """
-    pass
-
-class CalcZeroDivisionError(CalcError):
-    """
-    Indicates division by zero
-    """
-
-class CalcOverflowError(CalcError):
-    """
-    Indicates numerical overflow
-    """
-
-class FunctionEvalError(CalcError):
-    """
-    Indicates that something has gone wrong during function evaluation.
-    """
-
-class UnableToParse(CalcError):
-    """
-    Indicate when an expression cannot be parsed
-    """
-    pass
-
-class ArgumentError(CalcError):
-    """
-    Raised when the wrong number of arguments is passed to a function
-    """
-    pass
-
+from mitxgraders.helpers.mitmath.mathfuncs import (
+    DEFAULT_VARIABLES,
+    DEFAULT_FUNCTIONS,
+    DEFAULT_SUFFIXES
+)
+from mitxgraders.helpers.mitmath.math_array import MathArray
+from mitxgraders.helpers.mitmath.robust_pow import robust_pow
+from mitxgraders.helpers.mitmath.exceptions import (
+    CalcError,
+    CalcOverflowError,
+    CalcZeroDivisionError,
+    FunctionEvalError,
+    UnableToParse,
+    ArgumentError,
+    UnbalancedBrackets,
+    FactorialError,
+    UndefinedVariable,
+    UndefinedFunction
+)
 
 # Numpy's default behavior is to raise warnings on div by zero and overflow. Let's change that.
 # https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.seterr.html
@@ -742,7 +701,7 @@ class FormulaParser(object):
         property, we assume it does its own validation and we do not check the
         number of arguments.
 
-        >>> from mitxgraders.baseclasses import StudentFacingError
+        >>> from mitxgraders.exceptions import StudentFacingError
         >>> def g(*args):
         ...     if len(args) != 2:
         ...         raise StudentFacingError('I need two inputs!')
@@ -778,6 +737,7 @@ class FormulaParser(object):
             raise CalcOverflowError(msg)
         except Exception as err:  # pylint: disable=W0703
             if isinstance(err, ValueError) and 'factorial' in err.message:
+                # TODO move this into factorial function
                 # This is thrown when fact() or factorial() is used
                 # that tests on negative integer inputs
                 # err.message will be: `factorial() only accepts integral values` or
@@ -801,6 +761,7 @@ class FormulaParser(object):
         if expected != num_args:
             msg = ("Wrong number of arguments passed to {func}. "
                    "Expected {num}, received {num2}.")
+            # TODO DomainError instead?
             raise ArgumentError(msg.format(func=name, num=expected, num2=num_args))
         return True
 
@@ -991,6 +952,7 @@ class FormulaParser(object):
             elif op == '/':
                 result /= num
             else:
+                # TODO: change undefined to unexpected
                 raise CalcError("Undefined symbol {} in eval_product".format(op))
         return result
 
@@ -1025,5 +987,6 @@ class FormulaParser(object):
             elif op == '-':
                 result -= num
             else:
+                # TODO: Change undefined to unexpected
                 raise CalcError("Undefined symbol {} in eval_sum".format(op))
         return result

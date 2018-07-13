@@ -5,8 +5,9 @@ from __future__ import division
 import pprint
 import mock
 from pytest import raises
-from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader, NumericalGrader,
-                         CalcError, SingleListGrader)
+from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader,
+                         NumericalGrader, SingleListGrader)
+from mitxgraders.helpers.mitmath import CalcError
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint

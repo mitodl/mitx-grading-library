@@ -18,17 +18,19 @@ from mitxgraders import (
     RealVectors,
     SpecificFunctions,
     RandomFunction,
-    CalcError,
     ConfigError,
     InvalidInput,
 )
 from mitxgraders.sampling import set_seed
 from mitxgraders.version import __version__ as VERSION
-from mitxgraders.helpers.calc import UndefinedVariable, UndefinedFunction
-from mitxgraders.helpers.math_array import IdentityMultiple, MathArrayError
-from mitxgraders.helpers.mathfunc import DomainError
+from mitxgraders.helpers.mitmath.exceptions import (
+    CalcError,
+    UndefinedVariable, UndefinedFunction,
+    DomainError, MathArrayError
+)
+from mitxgraders.helpers.mitmath import IdentityMultiple
 from mitxgraders import ListGrader
-from mitxgraders.baseclasses import MissingInput
+from mitxgraders.exceptions import MissingInput
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(

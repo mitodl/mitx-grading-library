@@ -1,8 +1,13 @@
 import random
 import math
-from pytest import raises, approx
-from mitxgraders.helpers.mathfunc import (cot, arcsec, arccsc, arccot, sech, csch, coth,
-                                          arcsech, arccsch, arccoth, sec, csc)
+from pytest import approx
+from mitxgraders.helpers.mitmath.mathfuncs import (
+    cot, arccot,
+    csc, arccsc,
+    sec, arcsec,
+    coth, arccoth,
+    csch, arccsch,
+    sech, arcsech)
 
 def test_math_functions():
     """Test the math functions that we've implemented"""

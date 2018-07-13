@@ -25,7 +25,7 @@ from mitxgraders.stringgrader import *
 from mitxgraders.listgrader import *
 from mitxgraders.formulagrader import *
 from mitxgraders.sampling import *
-from mitxgraders.baseclasses import ConfigError, InvalidInput
+from mitxgraders.exceptions import ConfigError, InvalidInput
 from mitxgraders.helpers import *
 
 def import_plugins():

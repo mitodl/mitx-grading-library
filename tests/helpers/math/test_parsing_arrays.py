@@ -1,8 +1,8 @@
 from __future__ import division
 from pytest import raises
-from mitxgraders.helpers.calc import evaluator, UnableToParse
-from mitxgraders.helpers.math_array import MathArray, IdentityMultiple, equal_as_arrays
-from mitxgraders.helpers.mathfunc import DomainError
+from mitxgraders.helpers.mitmath import evaluator, MathArray, IdentityMultiple
+from mitxgraders.helpers.mitmath.math_array import equal_as_arrays
+from mitxgraders.helpers.mitmath.exceptions import UnableToParse
 
 def test_array_input():
     """Test that vectors/matrices can be inputted into calc.py"""

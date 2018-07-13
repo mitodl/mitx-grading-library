@@ -1,19 +1,20 @@
-from pytest import fixture, raises
+from pytest import raises
 import numpy as np
-from voluptuous import Invalid, Error
-from mitxgraders.helpers.specify_domain import SpecifyDomain, DomainError
-from mitxgraders.helpers.math_array import equal_as_arrays, random_math_array
+from voluptuous import Error
+from mitxgraders.helpers.mitmath import specify_domain
+from mitxgraders.helpers.mitmath.exceptions import DomainError
+from mitxgraders.helpers.mitmath.math_array import equal_as_arrays, random_math_array
 
 def get_somefunc(display_name=None):
 
     if display_name:
         # Takes: scalar, [2, 3] matrix, 3-component vector, 2-component vector
-        @SpecifyDomain(input_shapes=[1, [2, 3], 3, 2], display_name=display_name)
+        @specify_domain(input_shapes=[1, [2, 3], 3, 2], display_name=display_name)
         def somefunc(w, x, y, z):
             return w*x*y + z
     else:
         # Takes: scalar, [2, 3] matrix, 3-component vector, 2-component vector
-        @SpecifyDomain(input_shapes=[1, [2, 3], 3, 2])
+        @specify_domain(input_shapes=[1, [2, 3], 3, 2])
         def somefunc(w, x, y, z):
             return w*x*y + z
 
@@ -21,8 +22,8 @@ def get_somefunc(display_name=None):
 
 def get_somefunc_from_static_method(display_name=None):
     """
-    Uses SpecifyDomain.make_decorator to decorate the function.
-    Unlike author-facing SpecifyDomain, make_decorator's shapes must ALL be tuples.
+    Uses specify_domain.make_decorator to decorate the function.
+    Unlike author-facing specify_domain, make_decorator's shapes must ALL be tuples.
     """
     shapes = [
         (1,), # scalar
@@ -33,12 +34,12 @@ def get_somefunc_from_static_method(display_name=None):
     if display_name:
         # Takes: scalar, [2, 3] matrix, 3-component vector, 2-component vector
 
-        @SpecifyDomain.make_decorator(*shapes, display_name=display_name)
+        @specify_domain.make_decorator(*shapes, display_name=display_name)
         def somefunc(w, x, y, z):
             return w*x*y + z
     else:
         # Takes: scalar, [2, 3] matrix, 3-component vector, 2-component vector
-        @SpecifyDomain.make_decorator(*shapes)
+        @specify_domain.make_decorator(*shapes)
         def somefunc(w, x, y, z):
             return w*x*y + z
 
@@ -92,7 +93,7 @@ def test_author_facing_decorator_raises_errors_with_invalid_config():
 
     match = "required key not provided @ data\['input_shapes'\]. Got None"
     with raises(Error, match=match):
-        @SpecifyDomain()
+        @specify_domain()
         def f():
             pass
 
@@ -100,6 +101,6 @@ def test_author_facing_decorator_raises_errors_with_invalid_config():
             "list/tuple of positive integers \(min length 1, max length None\) @ "
             "data\['input_shapes'\]\[1\]. Got 0")
     with raises(Error, match=match):
-        @SpecifyDomain(input_shapes=[5, 0, [1, 2]])
+        @specify_domain(input_shapes=[5, 0, [1, 2]])
         def g():
             pass
