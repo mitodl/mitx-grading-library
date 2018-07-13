@@ -5,10 +5,6 @@ Contains base classes for the library:
 * ObjectWithSchema
 * AbstractGrader
 * ItemGrader
-
-Also contains some error classes:
-* ConfigError
-* InvalidInput
 """
 from __future__ import division
 import numbers

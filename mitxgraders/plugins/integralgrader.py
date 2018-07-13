@@ -22,11 +22,12 @@ from mitxgraders.formulagrader import (
     warn_if_override
 )
 from mitxgraders.baseclasses import AbstractGrader
-from mitxgraders.exceptions import InvalidInput, ConfigError, StudentFacingError
-from mitxgraders.helpers.mitmath import (within_tolerance, evaluator,
-                                      DEFAULT_VARIABLES, DEFAULT_FUNCTIONS)
-from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, all_unique,
-                                                PercentageString, is_callable)
+from mitxgraders.exceptions import (
+    InvalidInput, ConfigError, StudentFacingError, MissingInput)
+from mitxgraders.helpers.mitmath import (
+    within_tolerance, evaluator, DEFAULT_VARIABLES, DEFAULT_FUNCTIONS)
+from mitxgraders.helpers.validatorfuncs import (
+    Positive, NonNegative, all_unique, PercentageString, is_callable)
 
 __all__ = ["IntegralGrader"]
 
@@ -344,7 +345,7 @@ class IntegralGrader(AbstractGrader):
         for key in structured_input:
             if structured_input[key] == '':
                 msg = "Please enter a value for {key}, it cannot be empty."
-                raise InvalidInput(msg.format(key=key))
+                raise MissingInput(msg.format(key=key))
         self.validate_user_integration_variable(structured_input['integration_variable'])
 
         # Now perform the computations
@@ -353,7 +354,7 @@ class IntegralGrader(AbstractGrader):
             if result['ok'] is True or result['ok'] == 'partial':
                 self.post_eval_validation(used_funcs)
             return result
-        except (StudentFacingError, InvalidInput, ConfigError):
+        except (StudentFacingError, ConfigError):
             # These errors have been vetted already
             raise
         except IntegrationError as e:

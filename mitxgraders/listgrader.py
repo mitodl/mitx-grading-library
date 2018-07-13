@@ -12,7 +12,7 @@ import numpy as np
 from voluptuous import Required, Any
 from mitxgraders.helpers import munkres
 from mitxgraders.baseclasses import AbstractGrader, ItemGrader
-from mitxgraders.exceptions import ConfigError, InvalidInput
+from mitxgraders.exceptions import ConfigError, MissingInput
 from mitxgraders.helpers.validatorfuncs import Positive
 
 # Set the objects to be imported from this grader
@@ -677,7 +677,7 @@ class SingleListGrader(ItemGrader):
         if self.config['length_error'] and len(answers) != len(student_list):
             msg = 'List length error: Expected {} terms in the list, but received {}. ' + \
                   'Separate items with character "{}"'
-            raise InvalidInput(msg.format(len(answers),
+            raise MissingInput(msg.format(len(answers),
                                           len(student_list),
                                           self.config['delimiter']))
 

@@ -540,7 +540,7 @@ class FormulaGrader(ItemGrader):
             if result['ok'] is True or result['ok'] == 'partial':
                 self.post_eval_validation(student_input, used_funcs)
             return result
-        except (StudentFacingError, InvalidInput):
+        except (StudentFacingError):
             # These errors have been vetted already
             raise
         except Exception:  # pragma: no cover

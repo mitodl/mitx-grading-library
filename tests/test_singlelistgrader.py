@@ -4,7 +4,8 @@ Tests for SingleListGrader
 from __future__ import division
 import pprint
 from pytest import approx, raises
-from mitxgraders import ConfigError, StringGrader, SingleListGrader, InvalidInput
+from mitxgraders import ConfigError, StringGrader, SingleListGrader
+from mitxgraders.exceptions import MissingInput
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint
@@ -166,12 +167,12 @@ def test_wrong_length_string_submission():
     )
     expect = 'List length error: Expected 2 terms in the list, but received 3. ' + \
              'Separate items with character ","'
-    with raises(InvalidInput, match=expect):
+    with raises(MissingInput, match=expect):
         grader(None, 'cat,dog,dragon')
 
     expect = 'List length error: Expected 2 terms in the list, but received 1. ' + \
              'Separate items with character ","'
-    with raises(InvalidInput, match=expect):
+    with raises(MissingInput, match=expect):
         grader(None, 'cat')
 
 def test_multiple_list_answers():
@@ -281,9 +282,9 @@ def test_docs():
         subgrader=StringGrader(),
         length_error=True
     )
-    with raises(InvalidInput):
+    with raises(MissingInput):
         grader(None, "cat")
-    with raises(InvalidInput):
+    with raises(MissingInput):
         grader(None, "cat, dog, moose")
 
     grader = SingleListGrader(
