@@ -187,8 +187,8 @@ class BracketValidator(object):
 
         indices = [current.index]
         highlight = BracketValidator.highlight_formula(formula, indices)
-        formattted = msg.format(current=current, highlight=highlight)
-        raise UnbalancedBrackets(formattted)
+        formatted = msg.format(current=current, highlight=highlight)
+        raise UnbalancedBrackets(formatted)
 
     @staticmethod
     def raise_wrong_closing_bracket(formula, current, previous):
@@ -203,8 +203,8 @@ class BracketValidator(object):
 
         indices = [previous.index, current.index]
         highlight = BracketValidator.highlight_formula(formula, indices)
-        formattted = msg.format(current=current, previous=previous, highlight=highlight)
-        raise UnbalancedBrackets(formattted)
+        formatted = msg.format(current=current, previous=previous, highlight=highlight)
+        raise UnbalancedBrackets(formatted)
 
     @staticmethod
     def raise_open_without_close(formula, stack):
@@ -212,8 +212,6 @@ class BracketValidator(object):
         Called when un-closed opening brackets remain at the end of scan, for
         example: "(1 + 2) + ( 3 + (".
         - stack is the remaining stack
-
-        NOTE!: Unlike other handlers, this contains awkward hard-coded names.
         """
         p_count = sum([entry.bracket.char == '(' for entry in stack])
         b_count = sum([entry.bracket.char == '[' for entry in stack])
