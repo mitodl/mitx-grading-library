@@ -54,9 +54,9 @@ class UndefinedFunction(CalcError):
     """
     pass
 
-class UnmatchedParentheses(CalcError):
+class UnbalancedBrackets(CalcError):
     """
-    Indicate when a student's input has unmatched parentheses.
+    Indicate when a student's input has unbalanced brackets.
     """
     pass
 
@@ -114,6 +114,139 @@ def handle_np_floating_errors(err, flag):
 np.seterrcall(handle_np_floating_errors)
 np.seterr(divide='call', over='call', invalid='call')
 
+class BracketValidator(object):
+    """
+    Validates that the square brackets and parentheses in a given expression
+    are balanced.
+
+    Usage
+    =====
+
+    >>> BV = BracketValidator
+    >>> expr = '1 + ( ( x + 1 )^2 + ( + [2'
+    >>> BV.validate(expr)                           # doctest: +NORMALIZE_WHITESPACE
+    Traceback (most recent call last):
+    UnbalancedBrackets: Invalid Input: 2 parentheses and 1 square brackets were
+    opened without being closed, highlighted below.
+    <code>1 + <mark>(</mark> ( x + 1 )^2 + <mark>(</mark> + <mark>[</mark>2</code>
+
+    NOTE: This class only contains class variables and static methods.
+    It could just as well be a separate file/module.
+    """
+
+    # Stores bracket metadata
+    Bracket = namedtuple('Bracket', ['char', 'partner', 'is_closer', 'name'])
+
+    # The brackets that we care about
+    bracket_registry = {
+        '(': Bracket(char='(', partner=')', is_closer=False, name='parenthesis'),
+        ')': Bracket(char=')', partner='(', is_closer=True, name='parenthesis'),
+        '[': Bracket(char='[', partner=']', is_closer=False, name='square bracket'),
+        ']': Bracket(char=']', partner='[', is_closer=True, name='square bracket')
+    }
+
+    # Stores information about a bracket instance
+    StackEntry = namedtuple('StackEntry', ['index', 'bracket'])
+
+    @staticmethod
+    def validate(formula):
+        """
+        Scan through a formula, validating it for unbalanced parentheses.
+        """
+        BV = BracketValidator
+        stack = []
+        for index, char in enumerate(formula):
+            if char not in BV.bracket_registry:
+                continue
+            bracket = BV.bracket_registry[char]
+            current = BV.StackEntry(index=index, bracket=bracket)
+            if bracket.is_closer:
+                try:
+                    previous = stack.pop()
+                except IndexError: # happens if stack is empty
+                    BV.raise_close_without_open(formula, current)
+                if bracket.partner != previous.bracket.char:
+                    BV.raise_wrong_closing_bracket(formula, current, previous)
+            else:
+                stack.append(BV.StackEntry(index=index, bracket=bracket))
+
+        if stack:
+            BV.raise_open_without_close(formula, stack)
+
+        return formula
+
+    @staticmethod
+    def raise_close_without_open(formula, current):
+        """
+        Called when scan encounters a closing bracket without matching opener,
+        for example: "1, 2, 3]".
+        - current is the offending StackEntry
+        """
+        msg = ("Invalid Input: a {current.bracket.name} was closed without ever "
+               "being opened, highlighted below.\n{highlight}")
+
+        indices = [current.index]
+        highlight = BracketValidator.highlight_formula(formula, indices)
+        formatted = msg.format(current=current, highlight=highlight)
+        raise UnbalancedBrackets(formatted)
+
+    @staticmethod
+    def raise_wrong_closing_bracket(formula, current, previous):
+        """
+        Called when scan encounters a closing bracket that does not match the
+        previous opening bracket, for example: "[(1, 2, 3])"
+        - current and previous are the offending StackEntry pairs
+        """
+        msg = ("Invalid Input: a {previous.bracket.name} was opened and then "
+               "closed by a {current.bracket.name}, highlighted below.\n"
+               "{highlight}")
+
+        indices = [previous.index, current.index]
+        highlight = BracketValidator.highlight_formula(formula, indices)
+        formatted = msg.format(current=current, previous=previous, highlight=highlight)
+        raise UnbalancedBrackets(formatted)
+
+    @staticmethod
+    def raise_open_without_close(formula, stack):
+        """
+        Called when un-closed opening brackets remain at the end of scan, for
+        example: "(1 + 2) + ( 3 + (".
+        - stack is the remaining stack
+        """
+        p_count = sum([entry.bracket.char == '(' for entry in stack])
+        b_count = sum([entry.bracket.char == '[' for entry in stack])
+
+        if p_count and b_count:
+            msg = ("Invalid Input: {p_count} parentheses and {b_count} "
+                   "square brackets were opened without being closed, "
+                   "highlighted below.\n{highlight}")
+        elif p_count:
+            msg = ("Invalid Input: {p_count} parentheses were opened without "
+                   "being closed, highlighted below.\n{highlight}")
+        else:
+            msg = ("Invalid Input: {b_count} square brackets were opened "
+                   "without being closed, highlighted below.\n{highlight}")
+
+        indices = [entry.index for entry in stack]
+        highlight = BracketValidator.highlight_formula(formula, indices)
+        formatted = msg.format(p_count=p_count, b_count=b_count, highlight=highlight)
+        raise UnbalancedBrackets(formatted)
+
+    @staticmethod
+    def highlight_formula(formula, unsorted_indices):
+        indices = sorted(unsorted_indices, reverse=True)
+        for index in indices:
+            formula = BracketValidator.highlight_index(formula, index)
+        #
+        return "<code>{}</code>".format(formula)
+
+    @staticmethod
+    def highlight_index(formula, index):
+        char = formula[index]
+        # <mark> is an HTML tag for marking text as important.
+        # edX renders it like a highlighter, with yellowish background.
+        return formula[:index] + '<mark>{}</mark>'.format(char) + formula[index+1:]
+
 class ParserCache(object):
     """Stores the parser trees for formula strings for reuse"""
 
@@ -124,22 +257,7 @@ class ParserCache(object):
     def get_parser(self, formula, suffixes):
         """Get a FormulaParser object for a given formula"""
         # Check the formula for matching parentheses
-        count = 0
-        delta = {
-            '(': +1,
-            ')': -1
-        }
-        for index, char in enumerate(formula):
-            if char in delta:
-                count += delta[char]
-                if count < 0:
-                    msg = "Invalid Input: A closing parenthesis was found after segment " + \
-                          "{}, but there is no matching opening parenthesis before it."
-                    raise UnmatchedParentheses(msg.format(formula[0:index]))
-        if count > 0:
-            msg = "Invalid Input: Parentheses are unmatched. " + \
-                  "{} parentheses were opened but never closed."
-            raise UnmatchedParentheses(msg.format(count))
+        BracketValidator.validate(formula)
 
         # Strip out any whitespace, so that two otherwise-equivalent formulas are treated
         # the same

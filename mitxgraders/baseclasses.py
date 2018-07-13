@@ -145,7 +145,12 @@ class AbstractGrader(ObjectWithSchema):
             self.log("Student Response:\n" + str(student_input))
 
         # Compute the result of the check
-        result = self.check(None, student_input)
+        try:
+            result = self.check(None, student_input)
+        except Exception as error:
+            # we want to re-raise the error with a new message but the same
+            # class type, hence calling __class__
+            raise error.__class__(error.message.replace('\n', '<br/>'))
 
         # Append the debug log to the result if requested
         if self.config['debug']:
