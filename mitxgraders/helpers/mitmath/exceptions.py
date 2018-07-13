@@ -22,12 +22,6 @@ class UnbalancedBrackets(CalcError):
     """
     pass
 
-class FactorialError(CalcError):
-    """
-    Indicate when factorial is called on a bad input
-    """
-    pass
-
 class CalcZeroDivisionError(CalcError):
     """
     Indicates division by zero

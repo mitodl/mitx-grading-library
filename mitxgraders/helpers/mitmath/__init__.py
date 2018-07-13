@@ -1,4 +1,4 @@
-from mitxgraders.helpers.mitmath.parsing import evaluator
+from mitxgraders.helpers.mitmath.calc import evaluator
 from mitxgraders.helpers.mitmath.mathfuncs import (
     DEFAULT_VARIABLES,
     DEFAULT_FUNCTIONS,

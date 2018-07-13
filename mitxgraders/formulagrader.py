@@ -22,7 +22,7 @@ from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.helpers.mitmath import (evaluator, within_tolerance, MathArray,
                                       IdentityMultiple, DEFAULT_VARIABLES,
                                       DEFAULT_FUNCTIONS)
-from mitxgraders.helpers.mitmath.parsing import parsercache
+from mitxgraders.helpers.mitmath.calc import parsercache
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
                                                 PercentageString, all_unique,
                                                 is_callable_with_args)

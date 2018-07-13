@@ -48,7 +48,6 @@ from mitxgraders.helpers.mitmath.exceptions import (
     UnableToParse,
     ArgumentError,
     UnbalancedBrackets,
-    FactorialError,
     UndefinedVariable,
     UndefinedFunction
 )
@@ -736,20 +735,11 @@ class FormulaParser(object):
                    "(Numerical overflow).").format(name=name)
             raise CalcOverflowError(msg)
         except Exception as err:  # pylint: disable=W0703
-            if isinstance(err, ValueError) and 'factorial' in err.message:
-                # TODO move this into factorial function
-                # This is thrown when fact() or factorial() is used
-                # that tests on negative integer inputs
-                # err.message will be: `factorial() only accepts integral values` or
-                # `factorial() not defined for negative values`
-                raise FactorialError("Error evaluating factorial() or fact() in input. " +
-                                     "These functions cannot be used at negative integer values.")
-            else:
-                # Don't know what this is, or how you want to deal with it
-                # Call it a domain issue.
-                msg = ("There was an error evaluating {name}(...). "
-                       "Its input does not seem to be in its domain.").format(name=name)
-                raise FunctionEvalError(msg)
+            # Don't know what this is, or how you want to deal with it
+            # Call it a domain issue.
+            msg = ("There was an error evaluating {name}(...). "
+                   "Its input does not seem to be in its domain.").format(name=name)
+            raise FunctionEvalError(msg)
 
     @staticmethod
     def validate_function_call(func, name, args):
@@ -761,7 +751,6 @@ class FormulaParser(object):
         if expected != num_args:
             msg = ("Wrong number of arguments passed to {func}. "
                    "Expected {num}, received {num2}.")
-            # TODO DomainError instead?
             raise ArgumentError(msg.format(func=name, num=expected, num2=num_args))
         return True
 
@@ -940,7 +929,7 @@ class FormulaParser(object):
         1.5
         >>> parser.eval_product([2,"*",3,"+",4])
         Traceback (most recent call last):
-        CalcError: Undefined symbol + in eval_product
+        CalcError: Unexpected symbol + in eval_product
         """
         result = parse_result[0]
         data = parse_result[1:]
@@ -952,8 +941,7 @@ class FormulaParser(object):
             elif op == '/':
                 result /= num
             else:
-                # TODO: change undefined to unexpected
-                raise CalcError("Undefined symbol {} in eval_product".format(op))
+                raise CalcError("Unexpected symbol {} in eval_product".format(op))
         return result
 
     def eval_sum(self, parse_result):
@@ -973,7 +961,7 @@ class FormulaParser(object):
         1
         >>> parser.eval_sum(["+",2,"*",3,"-",4])
         Traceback (most recent call last):
-        CalcError: Undefined symbol * in eval_sum
+        CalcError: Unexpected symbol * in eval_sum
         """
         data = parse_result[:]
         result = data.pop(0)
@@ -987,6 +975,5 @@ class FormulaParser(object):
             elif op == '-':
                 result -= num
             else:
-                # TODO: Change undefined to unexpected
-                raise CalcError("Undefined symbol {} in eval_sum".format(op))
+                raise CalcError("Unexpected symbol {} in eval_sum".format(op))
         return result

@@ -18,6 +18,7 @@ import numpy as np
 import scipy.special as special
 from mitxgraders.helpers.mitmath.specify_domain import SpecifyDomain
 from mitxgraders.exceptions import StudentFacingError
+from mitxgraders.helpers.mitmath.exceptions import FunctionEvalError
 
 # Normal Trig
 def sec(arg):
@@ -154,10 +155,9 @@ def factorial(z):
     True
 
     Throws errors at poles:
-    >>> factorial(-2)
+    >>> factorial(-2)                           # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    ValueError: factorial() not defined for negative values
-
+    FunctionEvalError: Error evaluating factorial() or fact() in input...
     """
 
     try:
@@ -166,7 +166,12 @@ def factorial(z):
         is_integer = False
 
     if is_integer:
-        return math.factorial(z)
+        if z >= 0:
+            return math.factorial(z)
+        else:
+            msg = ("Error evaluating factorial() or fact() in input. These "
+                   "functions cannot be used at negative integer values.")
+            raise FunctionEvalError(msg)
 
     value = special.gamma(z+1)
     # value is a numpy array; If it's 0d, we can just get its item:
