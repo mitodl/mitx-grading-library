@@ -148,6 +148,8 @@ class AbstractGrader(ObjectWithSchema):
         try:
             result = self.check(None, student_input)
         except Exception as error:
+            # we want to re-raise the error with a new message but the same
+            # class type, hence calling __class__
             raise error.__class__(error.message.replace('\n', '<br/>'))
 
         # Append the debug log to the result if requested
