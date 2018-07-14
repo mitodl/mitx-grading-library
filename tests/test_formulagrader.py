@@ -120,7 +120,7 @@ def test_fg_invalid_input():
     with raises(CalcError, match=expect):
         grader(None, '1/0')
 
-    expect = "Numerical overflow occurred. Does your input contain very large numbers?"
+    expect = "Numerical overflow occurred. Does your input generate very large numbers?"
     with raises(CalcError, match=expect):
         grader(None, '2^10000')
 

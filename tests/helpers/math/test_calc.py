@@ -10,7 +10,7 @@ from mitxgraders.helpers.mitmath import evaluator
 from mitxgraders.helpers.mitmath.exceptions import (
     CalcError, UnableToParse,
     UnbalancedBrackets, UndefinedVariable,
-    ArgumentError
+    ArgumentError, CalcOverflowError
 )
 
 def test_calcpy():
@@ -168,3 +168,13 @@ def test_evaluation_does_not_mutate_variables():
     variables = {'A': A}
     evaluator('A/2', variables)
     assert np.all(A == A_copy)
+
+
+def test_inf_overflow():
+    """Test that infinity is treated as an overflow when requested"""
+    # This is ok
+    evaluator("fact(500.5)", allow_inf=True)
+    # This gives an error
+    msg = "Numerical overflow occurred. Does your expression generate very large numbers\?"
+    with raises(CalcOverflowError, match=msg):
+        evaluator("fact(500.5)")
