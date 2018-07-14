@@ -10,7 +10,7 @@ from mitxgraders.helpers.mitmath import evaluator
 from mitxgraders.helpers.mitmath.exceptions import (
     CalcError, UnableToParse,
     UnbalancedBrackets, UndefinedVariable,
-    ArgumentError, CalcOverflowError
+    ArgumentError, CalcOverflowError, CalcZeroDivisionError
 )
 
 def test_calcpy():
@@ -28,7 +28,6 @@ def test_calcpy():
     value, used = evaluator(None, {}, {}, {})
     assert value == approx(float('nan'), nan_ok=True)
     assert (used.functions, used.variables, used.suffixes) == (set(), set(), set())
-
 
     # Test formulae with parallel operator
     value, used = evaluator("1 || 1 || 1", {}, {}, {})
@@ -169,7 +168,6 @@ def test_evaluation_does_not_mutate_variables():
     evaluator('A/2', variables)
     assert np.all(A == A_copy)
 
-
 def test_inf_overflow():
     """Test that infinity is treated as an overflow when requested"""
     # This is ok
@@ -178,3 +176,11 @@ def test_inf_overflow():
     msg = "Numerical overflow occurred. Does your expression generate very large numbers\?"
     with raises(CalcOverflowError, match=msg):
         evaluator("fact(500.5)")
+
+def test_div_by_zero():
+    """Test that division by zero is caught"""
+    msg = "Division by zero occurred. Check your input's denominators."
+    with raises(CalcZeroDivisionError, match=msg):
+        evaluator("1/0")
+    with raises(CalcZeroDivisionError, match=msg):
+        evaluator("0^-1")

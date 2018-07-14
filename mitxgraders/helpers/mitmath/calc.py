@@ -596,12 +596,16 @@ class FormulaParser(object):
 
             return result
 
-        # Find the value of the entire tree.
+        # Find the value of the entire tree
+        # Catch math errors that may arise
         try:
             result = handle_node(self.tree)
         except OverflowError:
             raise CalcOverflowError("Numerical overflow occurred. "
                                     "Does your input generate very large numbers?")
+        except ZeroDivisionError:
+            raise CalcZeroDivisionError("Division by zero occurred. "
+                                        "Check your input's denominators.")
 
         return result
 
@@ -965,11 +969,7 @@ class FormulaParser(object):
             if op == '*':
                 result *= num
             elif op == '/':
-                try:
-                    result /= num
-                except ZeroDivisionError:
-                    raise CalcZeroDivisionError("Division by zero occurred. "
-                                                "Check your input's denominators.")
+                result /= num
             else:
                 raise CalcError("Unexpected symbol {} in eval_product".format(op))
         return result
