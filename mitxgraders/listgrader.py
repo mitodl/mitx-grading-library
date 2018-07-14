@@ -360,6 +360,13 @@ class ListGrader(AbstractGrader):
         if not answers:
             raise ConfigError("Expected at least one answer in answers")
 
+        # Pass our debuglog to the subgraders, so that any that have debug=True can use it
+        if self.subgrader_list:
+            for subgrader in self.config['subgraders']:
+                subgrader.debuglog = self.debuglog
+        else:
+            self.config['subgraders'].debuglog = self.debuglog
+
         # Go and grade the responses
         if isinstance(student_input, list):
             # Compute the results for each answer
