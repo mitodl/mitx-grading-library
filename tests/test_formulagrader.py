@@ -598,7 +598,7 @@ def test_fg_with_arrays():
         },
         user_functions={
             'trans': lambda x: np.transpose(x)
-        }, debug=True
+        }
     )
 
     correct_0 = 'x*A*B*u + z*C^3*v/(u*C*v)'

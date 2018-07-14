@@ -534,23 +534,10 @@ class FormulaGrader(ItemGrader):
     def check_response(self, answer, student_input, **kwargs):
         """Check the student response against a given answer"""
 
-        # Now perform the computations
-        try:
-            result, used_funcs = self.raw_check(answer, student_input, **kwargs)
-            if result['ok'] is True or result['ok'] == 'partial':
-                self.post_eval_validation(student_input, used_funcs)
-            return result
-        except (StudentFacingError):
-            # These errors have been vetted already
-            raise
-        except Exception:  # pragma: no cover
-            # If debug mode is on, give the full stack trace
-            if self.config["debug"]:
-                raise
-            else:
-                # Otherwise, give a generic error message
-                msg = "Invalid Input: Could not parse '{}' as a formula"
-                raise InvalidInput(msg.format(student_input))
+        result, used_funcs = self.raw_check(answer, student_input, **kwargs)
+        if result['ok'] is True or result['ok'] == 'partial':
+            self.post_eval_validation(student_input, used_funcs)
+        return result
 
     def generate_variable_list(self, answer, student_input):
         """

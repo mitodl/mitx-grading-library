@@ -9,6 +9,8 @@ from pytest import raises
 from voluptuous import Error
 import mitxgraders
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, __version__
+from mitxgraders.baseclasses import AbstractGrader
+from mitxgraders.exceptions import MITxError, StudentFacingError
 
 def test_debug_with_author_message():
     grader = StringGrader(
@@ -244,3 +246,31 @@ def test_voluptuous_import_error_message():
             # importing is not good enough to raise the error; need to reload
             # because conftest.py already imported voluptuous
             reload(mitxgraders)
+
+def test_error_handing():
+    class MockGrader(AbstractGrader):
+
+        @property
+        def schema_config(self):
+            return super(MockGrader, self).schema_config.extend({
+                'error': Exception
+            })
+
+        def check(self, answers, student_input):
+            """student_input should be an exception"""
+            raise self.config['error']
+
+    # MITxErrors are caught, with some simple format replacements
+    with raises(MITxError, match='Rats!<br/>Bats!'):
+        grader = MockGrader(error=MITxError('Rats!\nBats!'))
+        grader(None, 'Cats!')
+
+    # other errors produce a generic output...
+    with raises(StudentFacingError, match="Invalid Input: Could not check input 'Cats!'"):
+        grader = MockGrader(error=ValueError('Rats!\nBats!'))
+        grader(None, 'Cats!')
+
+    # ...except in debug mode
+    with raises(ValueError, match="Rats!\nBats!"):
+        grader = MockGrader(debug=True, error=ValueError('Rats!\nBats!'))
+        grader(None, 'Cats!')

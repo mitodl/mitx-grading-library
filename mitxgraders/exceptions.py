@@ -1,17 +1,26 @@
 """
 exceptions.py
-
 Contains generic grader-related exceptions
 """
 
 class MITxError(Exception):
-    """Base class for all exceptions in mitxgraders"""
+    """
+    Base class for all exceptions in mitxgraders, has a privileged role
+    in grading.
+
+    if an MITxError is raised when a grader tries to check a student's input,
+    its message will be displayed directly to the student. If any other error
+    occurs, it will be caught and a a generic error message is shown.
+
+    (Except when debug=True, in which case all errors are simply
+    re-raised.)
+    """
     pass
 
 class ConfigError(MITxError):
     """
-    Raised whenever a configuration error occurs; author-facing, not intended
-    for students.
+    Raised whenever a configuration error occurs. This is intended for
+    author-facing messages.
     """
     pass
 

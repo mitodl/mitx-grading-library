@@ -12,7 +12,7 @@ import abc
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
-from mitxgraders.exceptions import ConfigError
+from mitxgraders.exceptions import ConfigError, MITxError, StudentFacingError
 
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""
@@ -128,9 +128,17 @@ class AbstractGrader(ObjectWithSchema):
         try:
             result = self.check(None, student_input)
         except Exception as error:
-            # we want to re-raise the error with a new message but the same
-            # class type, hence calling __class__
-            raise error.__class__(error.message.replace('\n', '<br/>'))
+            if self.config['debug']:
+                raise
+            elif isinstance(error, MITxError):
+                # we want to re-raise the error with a modified message but the
+                # same class type, hence calling __class__
+                raise error.__class__(error.message.replace('\n', '<br/>'))
+            else:
+                # Otherwise, give a generic error message
+                msg = "Invalid Input: Could not check input '{}'"
+                raise StudentFacingError(msg.format(student_input))
+
 
         # Append the debug log to the result if requested
         if self.config['debug']:
@@ -195,7 +203,7 @@ class ItemGrader(AbstractGrader):
             ok: Can be set to True, False, 'partial' or 'computed' (default). Ignored if
                 'grade_decimal' is not 1.
             msg: Message to return to the student if they provide this answer (default "")
-    Internally, an answer string will be coverted into a dictionary with 'ok'=True.
+    Internally, an answer string will be converted into a dictionary with 'ok'=True.
 
     Configuration options:
         answers (varies): A single answer in one of the above forms, or a tuple of answers
@@ -222,7 +230,8 @@ class ItemGrader(AbstractGrader):
 
     def schema_answers(self, answer_tuple):
         """
-        Defines the schema to validate an answer tuple against (eg, config['answers']).
+        Defines the schema to validate an answer tuple against, used by
+        config['answers'] above.
 
         This will transform the input to a tuple as necessary, and then call
         validate_single_answer to validate individual answers.
@@ -305,10 +314,13 @@ class ItemGrader(AbstractGrader):
         # answers should now be a tuple of answers
         # Check that there is at least one answer to compare to
         if not isinstance(answers, tuple):  # pragma: no cover
-            msg = "Expected answers to be a tuple of answers, instead received {}"
+            msg = ("There is a problem with the author's problem configuration: "
+                   "Expected answers to be a tuple of answers, instead received {}")
             raise ConfigError(msg.format(type(answers)))
         if not answers:
-            raise ConfigError("Expected at least one answer in answers")
+            msg = ("There is a problem with the author's problem configuration: "
+                   "Expected at least one answer in answers")
+            raise ConfigError(msg)
 
         # Make sure the input is in the expected format
         if not isinstance(student_input, basestring):
