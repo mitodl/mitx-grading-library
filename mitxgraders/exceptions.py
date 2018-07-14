@@ -4,12 +4,21 @@ exceptions.py
 Contains generic grader-related exceptions
 """
 
-class ConfigError(Exception):
-    """Raised whenever a configuration error occurs"""
+class MITxError(Exception):
+    """Base class for all exceptions in mitxgraders"""
     pass
 
-class StudentFacingError(Exception):
-    """Base class for errors whose messages are intended for students to view."""
+class ConfigError(MITxError):
+    """
+    Raised whenever a configuration error occurs; author-facing, not intended
+    for students.
+    """
+    pass
+
+class StudentFacingError(MITxError):
+    """
+    Base class for errors whose messages are intended for students to view.
+    """
     pass
 
 class InvalidInput(StudentFacingError):
