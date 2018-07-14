@@ -1,5 +1,6 @@
 from __future__ import division
 from pytest import raises
+import numpy as np
 from mitxgraders.helpers.mitmath import evaluator, MathArray, IdentityMultiple
 from mitxgraders.helpers.mitmath.math_array import equal_as_arrays
 from mitxgraders.helpers.mitmath.exceptions import UnableToParse
@@ -66,3 +67,5 @@ def test_identity_multiple():
     expr = 'z*I5^n + 10*I5/x'
     result = evaluator(expr, variables, max_array_dim=2)[0]
     assert result == z*I5**n + 10*I5/x
+
+    assert np.isnan(IdentityMultiple(float('nan')))

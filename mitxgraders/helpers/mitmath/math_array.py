@@ -412,6 +412,8 @@ class IdentityMultiple(object):
     def __new__(cls, value):
         if is_number_zero(value):
             return 0
+        if np.isnan(value):
+            return np.nan
         return super(IdentityMultiple, cls).__new__(cls, value)
 
     def as_matrix(self, n):
