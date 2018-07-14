@@ -16,12 +16,11 @@ from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes)
-from mitxgraders.exceptions import (InvalidInput, ConfigError, StudentFacingError,
-                                    MissingInput)
+from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.helpers.mitmath import (evaluator, within_tolerance, MathArray,
-                                      IdentityMultiple, DEFAULT_VARIABLES,
-                                      DEFAULT_FUNCTIONS)
+                                         IdentityMultiple, DEFAULT_VARIABLES,
+                                         DEFAULT_FUNCTIONS)
 from mitxgraders.helpers.mitmath.calc import parsercache
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
                                                 PercentageString, all_unique,
@@ -598,7 +597,6 @@ class FormulaGrader(ItemGrader):
             for i, sibling_input in formula_siblings
         }
 
-
     def raw_check(self, answer, student_input, **kwargs):
         """Perform the numerical check of student_input vs answer"""
 
@@ -697,7 +695,6 @@ class FormulaGrader(ItemGrader):
                 raise MissingInput('Cannot grade answer, a required input is missing.')
 
         return comparer_params_eval
-
 
     def log_sample_info(self, index, varlist, funclist, student_eval,
                         comparer, comparer_params_eval, comparer_result):

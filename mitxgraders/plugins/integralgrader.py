@@ -458,19 +458,22 @@ class IntegralGrader(AbstractGrader):
         """Evals lower/upper limits and gets the functions used in lower/upper/integrand"""
 
         lower, lower_used = evaluator(lower_str,
-                                       variables=varscope,
-                                       functions=funcscope,
-                                       suffixes={})
+                                      variables=varscope,
+                                      functions=funcscope,
+                                      suffixes={},
+                                      allow_inf=True)
         upper, upper_used = evaluator(upper_str,
-                                       variables=varscope,
-                                       functions=funcscope,
-                                       suffixes={})
+                                      variables=varscope,
+                                      functions=funcscope,
+                                      suffixes={},
+                                      allow_inf=True)
 
         varscope[integration_var] = (upper + lower)/2
         _, integrand_used = evaluator(integrand_str,
-                                       variables=varscope,
-                                       functions=funcscope,
-                                       suffixes={})
+                                      variables=varscope,
+                                      functions=funcscope,
+                                      suffixes={},
+                                      allow_inf=True)
 
         used_funcs = lower_used.functions.union(upper_used.functions).union(integrand_used.functions)
 

@@ -38,7 +38,7 @@ from mitxgraders.helpers.mitmath.mathfuncs import (
     DEFAULT_FUNCTIONS,
     DEFAULT_SUFFIXES
 )
-from mitxgraders.helpers.mitmath.math_array import MathArray
+from mitxgraders.helpers.mitmath.math_array import MathArray, IdentityMultiple
 from mitxgraders.helpers.mitmath.robust_pow import robust_pow
 from mitxgraders.helpers.mitmath.exceptions import (
     CalcError,
@@ -121,7 +121,7 @@ class BracketValidator(object):
             if bracket.is_closer:
                 try:
                     previous = stack.pop()
-                except IndexError: # happens if stack is empty
+                except IndexError:  # happens if stack is empty
                     BV.raise_close_without_open(formula, current)
                 if bracket.partner != previous.bracket.char:
                     BV.raise_wrong_closing_bracket(formula, current, previous)
@@ -253,7 +253,8 @@ def evaluator(formula,
               variables=DEFAULT_VARIABLES,
               functions=DEFAULT_FUNCTIONS,
               suffixes=DEFAULT_SUFFIXES,
-              max_array_dim=0):
+              max_array_dim=0,
+              allow_inf=False):
     """
     Evaluate an expression; that is, take a string of math and return a float.
 
@@ -266,6 +267,7 @@ def evaluator(formula,
     - suffixes (dict): maps strings to suffix values
     Also:
     - max_array_dim: Maximum dimension of MathArrays
+    - allow_inf: Whether to raise an error if the evaluator encounters an infinity
 
     NOTE: Everything is case sensitive (this is different to edX!)
 
@@ -293,8 +295,17 @@ def evaluator(formula,
     True
 
     Empty submissions evaluate to nan:
-    >>> evaluator("", {}, {}, {})[0]
+    >>> evaluator("")[0]
     nan
+
+    Submissions that generate infinities will raise an error:
+    >>> evaluator("inf", variables={'inf': float('inf')})[0]  # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    CalcOverflowError: Numerical overflow occurred. Does your expression generate ...
+
+    Unless you specify that infinity is ok:
+    >>> evaluator("inf", variables={'inf': float('inf')}, allow_inf=True)[0]
+    inf
     """
     empty_usage = ScopeUsage(set(), set(), set())
     if formula is None:
@@ -314,18 +325,8 @@ def evaluator(formula,
     # Check the variables and functions
     math_interpreter.check_variables()
 
-    # Attempt to perform the evaluation
-    try:
-        result = math_interpreter.evaluate()
-    except ZeroDivisionError:
-        raise CalcZeroDivisionError("Division by zero occurred. "
-                                    "Check your input's denominators.")
-    except OverflowError:
-        raise CalcOverflowError("Numerical overflow occurred. "
-                                "Does your input contain very large numbers?")
-    except Exception:
-        # Don't know what this is, or how you want to deal with it
-        raise
+    # Perform the evaluation
+    result = math_interpreter.evaluate(allow_inf)
 
     # Were vectors/matrices/tensors used when they shouldn't have been?
     if math_interpreter.max_array_dim_used > max_array_dim:
@@ -339,8 +340,8 @@ def evaluator(formula,
 
     # Return the result of the evaluation, as well as the set of functions used
     usage = ScopeUsage(variables=math_interpreter.variables_used,
-                      functions=math_interpreter.functions_used,
-                      suffixes=math_interpreter.suffixes_used)
+                       functions=math_interpreter.functions_used,
+                       suffixes=math_interpreter.suffixes_used)
     return result, usage
 
 class FormulaParser(object):
@@ -504,8 +505,8 @@ class FormulaParser(object):
 
         # Define arrays
         array = Group(Suppress("[") +
-                       delimitedList(expr) +
-                       Suppress("]"))("array")
+                      delimitedList(expr) +
+                      Suppress("]"))("array")
 
         # Define an atomic unit as an expression that evaluates directly to a number
         # without the use of binary operations (assuming all children have been evaluated).
@@ -551,7 +552,7 @@ class FormulaParser(object):
         self.vars = variables if variables else {}
         self.functions = functions if functions else {}
 
-    def evaluate(self):
+    def evaluate(self, allow_inf):
         """
         Recursively evaluate `self.tree` and return the result.
         """
@@ -573,10 +574,39 @@ class FormulaParser(object):
 
             action = self.actions[node_name]
             handled_kids = [handle_node(k) for k in node]
-            return action(handled_kids)
 
-        # Find the value of the entire tree.
-        result = handle_node(self.tree)
+            # Check for nan
+            if any(np.isnan(item) for item in handled_kids if isinstance(item, float)):
+                return float('nan')
+
+            # Compute the result of this node
+            result = action(handled_kids)
+
+            # All actions convert the input to a number, array or IdentityMultiple
+            # Check if there were any infinities or nan
+            check = result
+            # IdentityMultiple needs to extract the value
+            if isinstance(result, IdentityMultiple):
+                check = result.value
+            if not allow_inf and np.any(np.isinf(check)):
+                raise CalcOverflowError("Numerical overflow occurred. Does your expression "
+                                        "generate very large numbers?")
+            if np.any(np.isnan(check)):
+                return float('nan')
+
+            return result
+
+        # Find the value of the entire tree
+        # Catch math errors that may arise
+        try:
+            result = handle_node(self.tree)
+        except OverflowError:
+            raise CalcOverflowError("Numerical overflow occurred. "
+                                    "Does your input generate very large numbers?")
+        except ZeroDivisionError:
+            raise CalcZeroDivisionError("Division by zero occurred. "
+                                        "Check your input's denominators.")
+
         return result
 
     def check_variables(self):
@@ -644,7 +674,7 @@ class FormulaParser(object):
         """
         result = float(parse_result[0])
         if len(parse_result) == 2:
-            result *=  self.suffixes[parse_result[1]]
+            result *= self.suffixes[parse_result[1]]
         return result
 
     def eval_variable(self, parse_result):

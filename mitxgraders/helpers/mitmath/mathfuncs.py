@@ -128,14 +128,16 @@ def imag(z):
 
 def factorial(z):
     """
-    Factorial function over complex numbers.
+    Factorial function over complex numbers, using the gamma function.
+    Note that math.factorial will return long ints, which are problematic when running
+    into overflow issues. The gamma function just returns inf.
 
     Usage
     =====
 
-    Non-negative integer input returns integers:
+    Non-negative integer input returns floats:
     >>> factorial(4)
-    24
+    24.0
 
     Floats and complex numbers use scipy's gamma function:
     >>> factorial(0.5) # doctest: +ELLIPSIS
@@ -165,13 +167,10 @@ def factorial(z):
     except AttributeError:
         is_integer = False
 
-    if is_integer:
-        if z >= 0:
-            return math.factorial(z)
-        else:
-            msg = ("Error evaluating factorial() or fact() in input. These "
-                   "functions cannot be used at negative integer values.")
-            raise FunctionEvalError(msg)
+    if is_integer and z < 0:
+        msg = ("Error evaluating factorial() or fact() in input. These "
+               "functions cannot be used at negative integer values.")
+        raise FunctionEvalError(msg)
 
     value = special.gamma(z+1)
     # value is a numpy array; If it's 0d, we can just get its item:
