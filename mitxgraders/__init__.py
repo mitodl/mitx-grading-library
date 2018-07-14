@@ -1,5 +1,5 @@
 """
-MITx Gradling Library
+MITx Grading Library
 https://github.com/mitodl/mitx-grading-library
 Copyright (c) 2017 Jolyon Bloomfield and Chris Chudzicki
 All Rights Reserved
