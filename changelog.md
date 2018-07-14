@@ -1,5 +1,11 @@
 # Change Log
 
+### Version 1.1.2
+* This version includes an internal change to the way that errors are handled during check.
+  * If you only use builtin graders (FormulaGrader, ListGrader...) or public plugins (IntegralGrader) you should not notice any difference.
+  * If you have previously written your own grading class, this change could affect what errors messages are displayed to students. In particular, only exceptions inheriting from `MITxError` will display their messages to students; other errors will be replaced with a generic error message.
+
+
 ### Version 1.1.1
 * Added AsciiMath renderer definitions
 * We now check for naming collisions in your configuration
