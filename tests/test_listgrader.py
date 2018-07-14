@@ -832,9 +832,22 @@ def test_errors():
         grader(None, ["Hello"])
 
     # Bad input
-    with raises(ConfigError, match="Expected answer to have type <type list>, but received <type 'tuple'>"):
+    msg = "Expected answer to have type <type list>, but received <type 'tuple'>"
+    with raises(ConfigError, match=msg):
         grader = ListGrader(
             answers=["hello", "there"],
             subgraders=StringGrader()
         )
         grader(None, ("hello", "there"))
+
+def test_nested_debug():
+    """Ensure that nested debug flags work properly"""
+    grader = ListGrader(
+        answers=["1", "2"],
+        subgraders=FormulaGrader(debug=True),
+        debug=True
+    )
+
+    result = grader(None, ["1", "2"])['overall_message']
+
+    assert result.count("FormulaGrader Debug Info<br/>") == 4

@@ -115,6 +115,9 @@ class AbstractGrader(ObjectWithSchema):
         # Initialize the debug log
         # The debug log always exists and is written to, so that it can be accessed
         # programmatically. It is only output with the grading when config["debug"] is True
+        # When subgraders are used, they need to be given access to this debuglog.
+        # Note that debug=True must be set on parents to obtain debug output from children
+        # when nested graders (lists) are used.
         self.debuglog = []
         # Add the version to the debug log
         self.log("MITx Grading Library Version " + __version__)
@@ -143,7 +146,6 @@ class AbstractGrader(ObjectWithSchema):
                     msg = "Invalid Input: Could not check input '{}'"
                     formatted = msg.format(student_input)
                 raise StudentFacingError(formatted)
-
 
         # Append the debug log to the result if requested
         if self.config['debug']:
