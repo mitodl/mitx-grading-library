@@ -136,8 +136,13 @@ class AbstractGrader(ObjectWithSchema):
                 raise error.__class__(error.message.replace('\n', '<br/>'))
             else:
                 # Otherwise, give a generic error message
-                msg = "Invalid Input: Could not check input '{}'"
-                raise StudentFacingError(msg.format(student_input))
+                if isinstance(student_input, list):
+                    msg = "Invalid Input: Could not check inputs '{}'"
+                    formatted = msg.format("', '".join(student_input))
+                else:
+                    msg = "Invalid Input: Could not check input '{}'"
+                    formatted = msg.format(student_input)
+                raise StudentFacingError(formatted)
 
 
         # Append the debug log to the result if requested

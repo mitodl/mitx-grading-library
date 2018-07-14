@@ -274,3 +274,9 @@ def test_error_handing():
     with raises(ValueError, match="Rats!\nBats!"):
         grader = MockGrader(debug=True, error=ValueError('Rats!\nBats!'))
         grader(None, 'Cats!')
+
+    # Check generic multiput error.
+    match = "Invalid Input: Could not check inputs 'Cats!', 'Gnats!'"
+    with raises(StudentFacingError, match=match):
+        grader = MockGrader(error=ValueError('Rats!\nBats!'))
+        grader(None, ['Cats!', 'Gnats!'])
