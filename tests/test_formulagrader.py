@@ -18,17 +18,18 @@ from mitxgraders import (
     RealVectors,
     SpecificFunctions,
     RandomFunction,
-    CalcError,
     ConfigError,
-    InvalidInput,
 )
+from mitxgraders.exceptions import MissingInput, InvalidInput
 from mitxgraders.sampling import set_seed
 from mitxgraders.version import __version__ as VERSION
-from mitxgraders.helpers.calc import UndefinedVariable, UndefinedFunction
-from mitxgraders.helpers.math_array import IdentityMultiple, MathArrayError
-from mitxgraders.helpers.mathfunc import DomainError
+from mitxgraders.helpers.mitmath.exceptions import (
+    CalcError,
+    UndefinedVariable, UndefinedFunction,
+    DomainError, MathArrayError
+)
+from mitxgraders.helpers.mitmath import IdentityMultiple
 from mitxgraders import ListGrader
-from mitxgraders.baseclasses import MissingInput
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
@@ -597,7 +598,7 @@ def test_fg_with_arrays():
         },
         user_functions={
             'trans': lambda x: np.transpose(x)
-        }, debug=True
+        }
     )
 
     correct_0 = 'x*A*B*u + z*C^3*v/(u*C*v)'

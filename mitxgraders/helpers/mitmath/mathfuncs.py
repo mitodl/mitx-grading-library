@@ -1,5 +1,5 @@
 """
-mathfunc.py
+mathfuncs.py
 
 Contains mathematical functions for use in interpreting formulas.
 
@@ -14,11 +14,11 @@ Defines:
 """
 from __future__ import division
 import math
-from numbers import Number
 import numpy as np
 import scipy.special as special
-from mitxgraders.baseclasses import StudentFacingError
-from mitxgraders.helpers.specify_domain import DomainError, SpecifyDomain
+from mitxgraders.helpers.mitmath.specify_domain import SpecifyDomain
+from mitxgraders.exceptions import StudentFacingError
+from mitxgraders.helpers.mitmath.exceptions import FunctionEvalError
 
 # Normal Trig
 def sec(arg):
@@ -99,7 +99,7 @@ def real(z):
     2.0
 
     If the input is a number, a number is returned:
-    >>> isinstance(real(2+3j), Number)
+    >>> isinstance(real(2+3j), float)
     True
 
     Can be used with arrays, too:
@@ -117,7 +117,7 @@ def imag(z):
     3.0
 
     If the input is a number, a number is returned:
-    >>> isinstance(imag(2+3j), Number)
+    >>> isinstance(imag(2+3j), float)
     True
 
     Can be used with arrays, too:
@@ -155,10 +155,9 @@ def factorial(z):
     True
 
     Throws errors at poles:
-    >>> factorial(-2)
+    >>> factorial(-2)                           # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    ValueError: factorial() not defined for negative values
-
+    FunctionEvalError: Error evaluating factorial() or fact() in input...
     """
 
     try:
@@ -167,7 +166,12 @@ def factorial(z):
         is_integer = False
 
     if is_integer:
-        return math.factorial(z)
+        if z >= 0:
+            return math.factorial(z)
+        else:
+            msg = ("Error evaluating factorial() or fact() in input. These "
+                   "functions cannot be used at negative integer values.")
+            raise FunctionEvalError(msg)
 
     value = special.gamma(z+1)
     # value is a numpy array; If it's 0d, we can just get its item:

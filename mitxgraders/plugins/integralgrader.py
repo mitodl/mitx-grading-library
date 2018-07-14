@@ -21,11 +21,13 @@ from mitxgraders.formulagrader import (
     validate_no_collisions,
     warn_if_override
 )
-from mitxgraders.baseclasses import AbstractGrader, InvalidInput, ConfigError
-from mitxgraders.helpers.calc import (CalcError, evaluator)
-from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, all_unique,
-                                                PercentageString, is_callable)
-from mitxgraders.helpers.mathfunc import within_tolerance, DEFAULT_FUNCTIONS, DEFAULT_VARIABLES
+from mitxgraders.baseclasses import AbstractGrader
+from mitxgraders.exceptions import (
+    InvalidInput, ConfigError, StudentFacingError, MissingInput)
+from mitxgraders.helpers.mitmath import (
+    within_tolerance, evaluator, DEFAULT_VARIABLES, DEFAULT_FUNCTIONS)
+from mitxgraders.helpers.validatorfuncs import (
+    Positive, NonNegative, all_unique, PercentageString, is_callable)
 
 __all__ = ["IntegralGrader"]
 
@@ -74,7 +76,7 @@ def transform_list_to_dict(thelist, thedefaults, key_to_index_map):
         for key in key_to_index_map
     }
 
-class IntegrationError(Exception):
+class IntegrationError(StudentFacingError):
     """Represents an error associated with integration"""
     pass
 
@@ -322,13 +324,15 @@ class IntegralGrader(AbstractGrader):
         used_inputs = [key for key in self.true_input_positions
                        if self.true_input_positions[key] is not None]
         if len(used_inputs) != len(student_input):
+            # This is a ConfigError because it should only be trigged if author
+            # included wrong number of inputs in the <customresponse> problem.
             sorted_inputs = sorted(used_inputs, key=lambda x: self.true_input_positions[x])
             msg = ("Expected {expected} student inputs but found {found}. "
                    "Inputs should  appear in order {order}.")
             raise ConfigError(msg.format(expected=len(used_inputs),
                                          found=len(student_input),
                                          order=sorted_inputs)
-                              )
+                             )
 
         structured_input = transform_list_to_dict(student_input,
                                                   self.config['answers'],
@@ -343,7 +347,7 @@ class IntegralGrader(AbstractGrader):
         for key in structured_input:
             if structured_input[key] == '':
                 msg = "Please enter a value for {key}, it cannot be empty."
-                raise InvalidInput(msg.format(key=key))
+                raise MissingInput(msg.format(key=key))
         self.validate_user_integration_variable(structured_input['integration_variable'])
 
         # Now perform the computations
@@ -352,20 +356,9 @@ class IntegralGrader(AbstractGrader):
             if result['ok'] is True or result['ok'] == 'partial':
                 self.post_eval_validation(used_funcs)
             return result
-        except (CalcError, InvalidInput, ConfigError):
-            # These errors have been vetted already
-            raise
         except IntegrationError as e:
             msg = "There appears to be an error with the integral you entered: {}"
             raise IntegrationError(msg.format(e.message))
-        except Exception:  # pragma: no cover
-            # If debug mode is on, give the full stack trace
-            if self.config["debug"]:
-                raise
-            else:
-                # Otherwise, give a generic error message
-                msg = "Invalid Input: Could not parse your input"
-                raise InvalidInput(msg)
 
     def raw_check(self, answer, cleaned_input):
         """Perform the numerical check of student_input vs answer"""

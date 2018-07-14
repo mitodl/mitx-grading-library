@@ -5,10 +5,13 @@ from __future__ import division
 import re
 import numpy as np
 from pytest import raises, approx
-from mitxgraders import CalcError
-from mitxgraders.baseclasses import StudentFacingError
-from mitxgraders.helpers.calc import (evaluator, UnableToParse, UndefinedVariable,
-                                     ArgumentError, UnbalancedBrackets)
+from mitxgraders.exceptions import StudentFacingError
+from mitxgraders.helpers.mitmath import evaluator
+from mitxgraders.helpers.mitmath.exceptions import (
+    CalcError, UnableToParse,
+    UnbalancedBrackets, UndefinedVariable,
+    ArgumentError
+)
 
 def test_calcpy():
     """Tests of calc.py that aren't covered elsewhere"""

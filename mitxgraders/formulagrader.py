@@ -16,19 +16,21 @@ from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes)
-from mitxgraders.baseclasses import (ItemGrader, InvalidInput, ConfigError,
-                                     StudentFacingError, MissingInput)
-from mitxgraders.helpers.calc import CalcError, evaluator, parsercache
+from mitxgraders.exceptions import (InvalidInput, ConfigError, StudentFacingError,
+                                    MissingInput)
+from mitxgraders.baseclasses import ItemGrader
+from mitxgraders.helpers.mitmath import (evaluator, within_tolerance, MathArray,
+                                      IdentityMultiple, DEFAULT_VARIABLES,
+                                      DEFAULT_FUNCTIONS)
+from mitxgraders.helpers.mitmath.calc import parsercache
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
-                                                PercentageString, is_callable_with_args, all_unique)
-from mitxgraders.helpers.mathfunc import within_tolerance, DEFAULT_FUNCTIONS, DEFAULT_VARIABLES
-from mitxgraders.helpers.math_array import IdentityMultiple, MathArray
+                                                PercentageString, all_unique,
+                                                is_callable_with_args)
 
 # Set the objects to be imported from this grader
 __all__ = [
     "NumericalGrader",
     "FormulaGrader",
-    "CalcError"
 ]
 
 # Some of these validators are useful to other classes, e.g., IntegralGrader
@@ -532,23 +534,10 @@ class FormulaGrader(ItemGrader):
     def check_response(self, answer, student_input, **kwargs):
         """Check the student response against a given answer"""
 
-        # Now perform the computations
-        try:
-            result, used_funcs = self.raw_check(answer, student_input, **kwargs)
-            if result['ok'] is True or result['ok'] == 'partial':
-                self.post_eval_validation(student_input, used_funcs)
-            return result
-        except (StudentFacingError, InvalidInput):
-            # These errors have been vetted already
-            raise
-        except Exception:  # pragma: no cover
-            # If debug mode is on, give the full stack trace
-            if self.config["debug"]:
-                raise
-            else:
-                # Otherwise, give a generic error message
-                msg = "Invalid Input: Could not parse '{}' as a formula"
-                raise InvalidInput(msg.format(student_input))
+        result, used_funcs = self.raw_check(answer, student_input, **kwargs)
+        if result['ok'] is True or result['ok'] == 'partial':
+            self.post_eval_validation(student_input, used_funcs)
+        return result
 
     def generate_variable_list(self, answer, student_input):
         """

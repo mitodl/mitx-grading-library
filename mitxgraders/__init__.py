@@ -1,5 +1,5 @@
 """
-MITx Gradling Library
+MITx Grading Library
 https://github.com/mitodl/mitx-grading-library
 Copyright (c) 2017 Jolyon Bloomfield and Chris Chudzicki
 All Rights Reserved
@@ -25,8 +25,7 @@ from mitxgraders.stringgrader import *
 from mitxgraders.listgrader import *
 from mitxgraders.formulagrader import *
 from mitxgraders.sampling import *
-from mitxgraders.baseclasses import ConfigError, InvalidInput
-from mitxgraders.helpers import *
+from mitxgraders.exceptions import ConfigError, StudentFacingError
 
 def import_plugins():
     """Imports all plugins into the global namespace"""

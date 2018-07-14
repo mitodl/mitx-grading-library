@@ -7,8 +7,9 @@ of a function. Currently only supports specifying the shape of inputs.
 from numbers import Number
 from voluptuous import Schema, Invalid, Required
 from mitxgraders.helpers.validatorfuncs import is_shape_specification
-from mitxgraders.baseclasses import StudentFacingError, ObjectWithSchema
-from mitxgraders.helpers.math_array import MathArray, is_scalar_matharray
+from mitxgraders.baseclasses import ObjectWithSchema
+from mitxgraders.helpers.mitmath.exceptions import DomainError
+from mitxgraders.helpers.mitmath.math_array import MathArray, is_scalar_matharray
 
 def low_ordinal(n):
     """
@@ -44,11 +45,6 @@ def get_description(obj):
         return obj.description
     else:
         return obj.__class__.__name__
-
-class DomainError(StudentFacingError):
-    """
-    Raised when a function has domain error.
-    """
 
 def number_validator(obj):
     """

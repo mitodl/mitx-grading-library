@@ -1,8 +1,8 @@
-from mitxgraders.plugins.integralgrader import IntegralGrader, IntegrationError
-from mitxgraders.baseclasses import InvalidInput, ConfigError
 from pytest import raises
 from mitxgraders.version import __version__
-from mitxgraders import CalcError
+from mitxgraders.helpers.mitmath import CalcError
+from mitxgraders.plugins.integralgrader import IntegralGrader, IntegrationError
+from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 
 # Configuration Error Test
 def test_wrong_number_of_inputs_raises_error():
@@ -110,7 +110,7 @@ def test_empty_input_raises_error():
     )
     student_input = ['a', 'b', 'x^2', '']
     msg = ("Please enter a value for integration_variable, it cannot be empty.")
-    with raises(InvalidInput, match=msg):
+    with raises(MissingInput, match=msg):
         grader(None, student_input)
 
 # Integral Evaluation tests

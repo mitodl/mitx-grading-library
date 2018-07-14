@@ -26,13 +26,13 @@ import abc
 import random
 import numpy as np
 from voluptuous import Schema, Required, All, Length, Coerce, Any
-from mitxgraders.baseclasses import ObjectWithSchema, ConfigError
+from mitxgraders.baseclasses import ObjectWithSchema
+from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
                                                 TupleOfType, is_callable, is_shape_specification)
-from mitxgraders.helpers.mathfunc import (DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
-                                          DEFAULT_VARIABLES, METRIC_SUFFIXES)
-from mitxgraders.helpers.calc import CalcError, evaluator
-from mitxgraders.helpers.math_array import MathArray
+from mitxgraders.helpers.mitmath import (DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
+                                      DEFAULT_VARIABLES, METRIC_SUFFIXES,
+                                      CalcError, evaluator, MathArray)
 
 # Set the objects to be imported from this grader
 __all__ = [

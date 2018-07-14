@@ -1,12 +1,14 @@
-from __future__ import division # necessary for one of the doctests
-import numpy as np
-from numbers import Number
-from mitxgraders.baseclasses import StudentFacingError
+"""
+math_array.py
 
-class MathArrayError(StudentFacingError):
-    """
-    Thrown by MathArray when anticipated errors are made.
-    """
+Contains a subclass of numpy.ndarray with matrix-like operations.
+"""
+
+from __future__ import division # necessary for one of the doctests
+from numbers import Number
+import numpy as np
+from mitxgraders.helpers.mitmath.exceptions import MathArrayError
+from mitxgraders.helpers.mitmath.robust_pow import robust_pow
 
 def is_number_zero(value):
     """
@@ -42,29 +44,6 @@ def is_scalar_array_zero(obj):
 
 def is_square(array):
     return array.ndim == 2 and array.shape[0] == array.shape[1]
-
-# This is used in calc.py's eval_power function also.
-def robust_pow(base, exponent):
-    """
-    Calculates __pow__, and tries other approachs if that doesn't work.
-
-    Usage:
-    ======
-
-    >>> robust_pow(5, 2)
-    25
-    >>> robust_pow(0.5, -1)
-    2.0
-
-    If base is negative and power is fractional, complex results are returned:
-    >>> almost_j = robust_pow(-1, 0.5)
-    >>> np.allclose(almost_j, 1j)
-    True
-    """
-    try:
-        return base ** exponent
-    except ValueError:
-        return np.lib.scimath.power(base, exponent)
 
 class MathArray(np.ndarray):
     """
