@@ -19,8 +19,8 @@ from mitxgraders import (
     SpecificFunctions,
     RandomFunction,
     ConfigError,
-    InvalidInput,
 )
+from mitxgraders.exceptions import MissingInput, InvalidInput
 from mitxgraders.sampling import set_seed
 from mitxgraders.version import __version__ as VERSION
 from mitxgraders.helpers.mitmath.exceptions import (
@@ -30,7 +30,6 @@ from mitxgraders.helpers.mitmath.exceptions import (
 )
 from mitxgraders.helpers.mitmath import IdentityMultiple
 from mitxgraders import ListGrader
-from mitxgraders.exceptions import MissingInput
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
