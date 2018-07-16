@@ -20,7 +20,7 @@ from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.helpers.mitmath import (evaluator, within_tolerance, MathArray,
                                          IdentityMultiple, DEFAULT_VARIABLES,
-                                         DEFAULT_FUNCTIONS)
+                                         DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
 from mitxgraders.helpers.mitmath.calc import parsercache
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NonNegative, is_callable, PercentageString, all_unique,
@@ -413,6 +413,7 @@ class FormulaGrader(ItemGrader):
 
     default_functions = DEFAULT_FUNCTIONS.copy()
     default_variables = DEFAULT_VARIABLES.copy()
+    default_suffixes = DEFAULT_SUFFIXES.copy()
 
     @property
     def schema_config(self):
@@ -559,7 +560,7 @@ class FormulaGrader(ItemGrader):
         self.functions, self.random_funcs = construct_functions(self.default_functions,
                                                                 self.config["user_functions"])
         self.constants = construct_constants(self.default_variables, self.config["user_constants"])
-        self.suffixes = construct_suffixes(self.config["metric_suffixes"])
+        self.suffixes = construct_suffixes(self.default_suffixes, self.config["metric_suffixes"])
 
         # Construct the schema for sample_from
         # First, accept all VariableSamplingSets

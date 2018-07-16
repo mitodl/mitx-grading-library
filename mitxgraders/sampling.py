@@ -32,7 +32,7 @@ from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
     has_keys_of_type, is_shape_specification)
 from mitxgraders.helpers.mitmath import (
-    DEFAULT_SUFFIXES, METRIC_SUFFIXES, CalcError, evaluator, MathArray)
+    METRIC_SUFFIXES, CalcError, evaluator, MathArray)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -647,20 +647,21 @@ def construct_constants(default_variables, user_consts):
 
     return constants
 
-def construct_suffixes(metric=False):
+def construct_suffixes(default_suffixes, metric=False):
     """
-    Returns the dictionary of available suffixes.
-    Setting metric=True adds in the metric suffixes.
+    Returns a copy of default_suffixes. If metric=True, metric suffixes
+    are merged into the copy.
 
     Usage
     =====
-    >>> construct_suffixes()
+    >>> default_suffixes={'%': 0.01}
+    >>> construct_suffixes(default_suffixes)
     {'%': 0.01}
-    >>> suff = construct_suffixes(True)
+    >>> suff = construct_suffixes(default_suffixes, metric=True)
     >>> suff['G'] == 1e9
     True
     """
-    suffixes = DEFAULT_SUFFIXES.copy()
+    suffixes = default_suffixes.copy()
     if metric:
         suffixes.update(METRIC_SUFFIXES)
     return suffixes
