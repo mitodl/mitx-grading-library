@@ -22,9 +22,9 @@ from mitxgraders.helpers.mitmath import (evaluator, within_tolerance, MathArray,
                                          IdentityMultiple, DEFAULT_VARIABLES,
                                          DEFAULT_FUNCTIONS)
 from mitxgraders.helpers.mitmath.calc import parsercache
-from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, is_callable,
-                                                PercentageString, all_unique,
-                                                is_callable_with_args)
+from mitxgraders.helpers.validatorfuncs import (
+    Positive, NonNegative, is_callable, PercentageString, all_unique,
+    is_callable_with_args, has_keys_of_type)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -412,6 +412,7 @@ class FormulaGrader(ItemGrader):
     """
 
     default_functions = DEFAULT_FUNCTIONS.copy()
+    default_variables = DEFAULT_VARIABLES.copy()
 
     @property
     def schema_config(self):
@@ -422,7 +423,7 @@ class FormulaGrader(ItemGrader):
         forbidden_default = "Invalid Input: This particular answer is forbidden"
         return schema.extend({
             Required('user_functions', default={}): schema_user_functions,
-            Required('user_constants', default={}): {Extra: Any(Number, MathArray, IdentityMultiple)},
+            Required('user_constants', default={}): self.schema_user_consts,
             # Blacklist/Whitelist have additional validation that can't happen here, because
             # their validation is correlated with each other
             Required('blacklist', default=[]): [str],
@@ -442,6 +443,11 @@ class FormulaGrader(ItemGrader):
             Required('failable_evals', default=0): NonNegative(int),
             Required('max_array_dim', default=0): NonNegative(int)
         })
+
+    schema_user_consts = All(
+        has_keys_of_type(str),
+        {Extra: Any(Number, MathArray, IdentityMultiple)},
+    )
 
     Utils = namedtuple('Utils', ['tolerance', 'within_tolerance'])
 
@@ -536,9 +542,9 @@ class FormulaGrader(ItemGrader):
                                             self.config['blacklist'],
                                             self.config['whitelist'])
         validate_no_collisions(self.config, keys=['variables', 'user_constants'])
-        warn_if_override(self.config, 'variables', DEFAULT_VARIABLES)
-        warn_if_override(self.config, 'numbered_vars', DEFAULT_VARIABLES)
-        warn_if_override(self.config, 'user_constants', DEFAULT_VARIABLES)
+        warn_if_override(self.config, 'variables', self.default_variables)
+        warn_if_override(self.config, 'numbered_vars', self.default_variables)
+        warn_if_override(self.config, 'user_constants', self.default_variables)
         warn_if_override(self.config, 'user_functions', self.default_functions)
 
         self.permitted_functions = get_permitted_functions(self.default_functions,
@@ -552,7 +558,7 @@ class FormulaGrader(ItemGrader):
         # Set up the various lists we use
         self.functions, self.random_funcs = construct_functions(self.default_functions,
                                                                 self.config["user_functions"])
-        self.constants = construct_constants(self.config["user_constants"])
+        self.constants = construct_constants(self.default_variables, self.config["user_constants"])
         self.suffixes = construct_suffixes(self.config["metric_suffixes"])
 
         # Construct the schema for sample_from

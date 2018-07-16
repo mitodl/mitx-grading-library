@@ -13,7 +13,7 @@ from numpy import real, imag
 from voluptuous import Schema, Required, Any, All, Extra, Length
 from mitxgraders.sampling import (VariableSamplingSet, schema_user_functions, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
-                                  construct_constants)
+                                  construct_constants, has_keys_of_type)
 from mitxgraders.formulagrader import (
     validate_blacklist_whitelist_config,
     validate_only_permitted_functions_used,
@@ -179,6 +179,7 @@ class IntegralGrader(AbstractGrader):
     """
 
     default_functions = DEFAULT_FUNCTIONS.copy()
+    default_variables = DEFAULT_VARIABLES.copy()
 
     @property
     def schema_config(self):
@@ -226,6 +227,11 @@ class IntegralGrader(AbstractGrader):
             Required('sample_from', default={}): dict,
             Required('failable_evals', default=0): NonNegative(int)
         })
+
+    schema_user_consts = All(
+        has_keys_of_type(str),
+        {Extra: Any(Number)},
+    )
 
     debug_appendix_template = (
         "\n"
@@ -281,8 +287,8 @@ class IntegralGrader(AbstractGrader):
                                             self.config['whitelist'])
 
         validate_no_collisions(self.config, keys=['variables', 'user_constants'])
-        warn_if_override(self.config, 'variables', DEFAULT_VARIABLES)
-        warn_if_override(self.config, 'user_constants', DEFAULT_VARIABLES)
+        warn_if_override(self.config, 'variables', self.default_variables)
+        warn_if_override(self.config, 'user_constants', self.default_variables)
         warn_if_override(self.config, 'user_functions', self.default_functions)
 
         self.permitted_functions = get_permitted_functions(self.default_functions,
@@ -292,7 +298,7 @@ class IntegralGrader(AbstractGrader):
 
         self.functions, self.random_funcs = construct_functions(self.default_functions,
                                                                 self.config["user_functions"])
-        self.constants = construct_constants(self.config["user_constants"])
+        self.constants = construct_constants(self.default_variables, self.config["user_constants"])
         # TODO I would like to move this into construct_constants at some point,
         # perhaps giving construct_constants and optional argument specifying additional defaults
         if 'infty' not in self.constants:

@@ -230,8 +230,9 @@ def test_fg_userconstants():
     )
     assert grader(None, "hello")['ok']
 
-    expect = "1 is not a valid name for a constant \(must be a string\)"
-    with raises(ConfigError, match=expect):
+    expect = ("1 is not a valid key, must be of <type 'str'> for dictionary "
+              "value @ data\['user_constants'\]. Got {1: 5}")
+    with raises(Error, match=expect):
         FormulaGrader(
             answers="1",
             user_constants={1: 5}

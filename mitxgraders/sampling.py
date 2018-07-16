@@ -32,8 +32,7 @@ from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
     has_keys_of_type, is_shape_specification)
 from mitxgraders.helpers.mitmath import (
-    DEFAULT_SUFFIXES, DEFAULT_VARIABLES, METRIC_SUFFIXES, CalcError,
-    evaluator, MathArray)
+    DEFAULT_SUFFIXES, METRIC_SUFFIXES, CalcError, evaluator, MathArray)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -623,25 +622,27 @@ def construct_functions(default_functions, user_funcs):
 
     return funcs, random_funcs
 
-def construct_constants(user_consts):
+def construct_constants(default_variables, user_consts):
     """
-    Returns the dictionary of available constants
-    user_consts is a dictionary of "name": value pairs of constants to add to the defaults
+    Create a new dict that is the merge of user_consts into default_variables
 
     Usage
     =====
-    >>> construct_constants({})
+    >>> default_variables = {
+    ...     'i': 1j,
+    ...     'pi': 3.141592653589793,
+    ...     'e': 2.718281828459045,
+    ...     'j': 1j
+    ... }
+    >>> construct_constants(default_variables, {})
     {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'j': 1j}
-    >>> construct_constants({"T": 1.5})
+    >>> construct_constants(default_variables, {"T": 1.5})
     {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'T': 1.5, 'j': 1j}
     """
-    constants = DEFAULT_VARIABLES.copy()
+    constants = default_variables.copy()
 
     # Add in any user constants
     for var in user_consts:
-        if not isinstance(var, str):
-            msg = str(var) + " is not a valid name for a constant (must be a string)"
-            raise ConfigError(msg)
         constants[var] = user_consts[var]
 
     return constants
