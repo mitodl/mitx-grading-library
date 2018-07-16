@@ -11,7 +11,7 @@ from numbers import Number
 from scipy import integrate
 from numpy import real, imag
 from voluptuous import Schema, Required, Any, All, Extra, Length
-from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
+from mitxgraders.sampling import (VariableSamplingSet, schema_user_functions, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants)
 from mitxgraders.formulagrader import (
@@ -211,8 +211,7 @@ class IntegralGrader(AbstractGrader):
             },
             Required('complex_integrand', default=False): bool,
             # Most of the below are copied from FormulaGrader
-            Required('user_functions', default={}):
-                {Extra: Any(is_callable, [is_callable], FunctionSamplingSet)},
+            Required('user_functions', default={}): schema_user_functions,
             Required('user_constants', default={}): {Extra: Number},
             # Blacklist/Whitelist have additional validation that can't happen here, because
             # their validation is correlated with each other

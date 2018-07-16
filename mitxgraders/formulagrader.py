@@ -15,7 +15,7 @@ import numpy as np
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
-                                  construct_constants, construct_suffixes)
+                                  construct_constants, construct_suffixes, schema_user_functions)
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.helpers.mitmath import (evaluator, within_tolerance, MathArray,
@@ -421,8 +421,7 @@ class FormulaGrader(ItemGrader):
         # Append options
         forbidden_default = "Invalid Input: This particular answer is forbidden"
         return schema.extend({
-            Required('user_functions', default={}):
-                {Extra: Any(is_callable, [is_callable], FunctionSamplingSet)},
+            Required('user_functions', default={}): schema_user_functions,
             Required('user_constants', default={}): {Extra: Any(Number, MathArray, IdentityMultiple)},
             # Blacklist/Whitelist have additional validation that can't happen here, because
             # their validation is correlated with each other

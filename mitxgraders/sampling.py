@@ -25,11 +25,12 @@ from numbers import Number
 import abc
 import random
 import numpy as np
-from voluptuous import Schema, Required, All, Length, Coerce, Any
+from voluptuous import Schema, Required, All, Length, Coerce, Any, Extra
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
-from mitxgraders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
-                                                TupleOfType, is_callable, is_shape_specification)
+from mitxgraders.helpers.validatorfuncs import (
+    Positive, NumberRange, ListOfType, TupleOfType, is_callable,
+    has_keys_of_type, is_shape_specification)
 from mitxgraders.helpers.mitmath import (DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
                                       DEFAULT_VARIABLES, METRIC_SUFFIXES,
                                       CalcError, evaluator, MathArray)
@@ -560,13 +561,21 @@ def gen_symbols_samples(symbols, samples, sample_from):
         sample_list.append(sample_dict)
     return sample_list
 
+schema_user_functions = All(
+    has_keys_of_type(str),
+    {Extra: Any(is_callable,
+                All([is_callable], Coerce(SpecificFunctions)),
+                FunctionSamplingSet)},
+)
+
 def construct_functions(user_funcs):
     """
     Returns the dictionary of available functions
 
     Arguments:
-        user_funcs (dict): Dictionary of "name": function pairs specifying user-defined
-            functions to include.
+        default_funcs: a dict mapping function names (strings) to functions
+        user_funcs: a dict mapping function names (strings) to functions OR
+            FunctionSamplingSet instances
 
     Usage
     =====
@@ -591,14 +600,8 @@ def construct_functions(user_funcs):
     functions = DEFAULT_FUNCTIONS.copy()
     random_funcs = {}
     for f in user_funcs:
-        if not isinstance(f, str):
-            msg = str(f) + " is not a valid name for a function (must be a string)"
-            raise ConfigError(msg)
         # Check if we have a random function or a normal function
-        if isinstance(user_funcs[f], list):
-            # A list of functions; convert to a SpecificFunctions class
-            random_funcs[f] = SpecificFunctions(user_funcs[f])
-        elif isinstance(user_funcs[f], FunctionSamplingSet):
+        if isinstance(user_funcs[f], FunctionSamplingSet):
             random_funcs[f] = user_funcs[f]
         else:
             # f is a normal function

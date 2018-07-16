@@ -111,6 +111,45 @@ def all_unique(iterable):
 
     return iterable
 
+def has_keys_of_type(thetype):
+    """
+    Create a voluptuous validator to check that dict keys are all of thetype.
+
+    Arguments
+        thetype (type): specifies dict key types
+
+    Usage:
+    ======
+
+    Returns argument if valid:
+    >>> valid = {'0': 'a', '1': 'b', 'cat': [1, 2]}
+    >>> validator = has_keys_of_type(str)
+    >>> validator(valid) == valid
+    True
+
+    Raises error if argument has invalid keys:
+    >>> invalid_keys = {'0': 'a', 1: 'b', 'cat': [1, 2]}
+    >>> validator(invalid_keys)
+    Traceback (most recent call last):
+    Invalid: 1 is not a valid key, must be of <type 'str'>
+
+    or if argument is not a dictionary:
+    >>> not_dict = 5
+    >>> validator(not_dict)
+    Traceback (most recent call last):
+    Invalid: expected a dictionary with keys of <type 'str'>
+    """
+    def validator(thedict):
+        if not isinstance(thedict, dict):
+            raise Invalid('expected a dictionary with keys of {}'.format(thetype))
+        for key in thedict:
+            if not isinstance(key, thetype):
+                raise Invalid("{key} is not a valid key, must be of {thetype}"
+                              .format(key=key, thetype=thetype))
+
+        return thedict
+    return validator
+
 @truth
 def is_callable(obj):
     """Returns true if obj is callable"""

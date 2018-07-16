@@ -214,8 +214,9 @@ def test_fg_userfunction():
         )
         grader(None, "that'sbad(1)")
 
-    expect = "1 is not a valid name for a function \(must be a string\)"
-    with raises(ConfigError, match=expect):
+    expect = ("1 is not a valid key, must be of <type 'str'> for dictionary "
+              "value @ data\['user_functions'\]. Got {1: <ufunc 'tan'>}")
+    with raises(Error, match=expect):
         FormulaGrader(
             answers="1",
             user_functions={1: np.tan}
