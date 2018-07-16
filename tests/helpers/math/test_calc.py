@@ -170,12 +170,13 @@ def test_evaluation_does_not_mutate_variables():
 
 def test_inf_overflow():
     """Test that infinity is treated as an overflow when requested"""
+    functions = {'f': lambda _ : float('inf')}
     # This is ok
-    evaluator("fact(500.5)", allow_inf=True)
+    evaluator("f(1)", functions=functions, allow_inf=True)
     # This gives an error
     msg = "Numerical overflow occurred. Does your expression generate very large numbers\?"
     with raises(CalcOverflowError, match=msg):
-        evaluator("fact(500.5)")
+        evaluator("f(1)", functions=functions,)
 
 def test_div_by_zero():
     """Test that division by zero is caught"""

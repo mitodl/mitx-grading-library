@@ -34,10 +34,7 @@ from pyparsing import (
 from mitxgraders.exceptions import StudentFacingError
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
 from mitxgraders.helpers.mitmath.mathfuncs import (
-    DEFAULT_VARIABLES,
-    DEFAULT_FUNCTIONS,
-    DEFAULT_SUFFIXES
-)
+    DEFAULT_VARIABLES, DEFAULT_SUFFIXES)
 from mitxgraders.helpers.mitmath.math_array import MathArray, IdentityMultiple
 from mitxgraders.helpers.mitmath.robust_pow import robust_pow
 from mitxgraders.helpers.mitmath.exceptions import (
@@ -307,7 +304,7 @@ def evaluator(formula,
     >>> evaluator("inf", variables={'inf': float('inf')}, allow_inf=True)[0]
     inf
     """
-    functions = DEFAULT_FUNCTIONS if functions is None else functions
+    functions = {} if functions is None else functions
     suffixes = DEFAULT_SUFFIXES if suffixes is None else suffixes
 
     empty_usage = ScopeUsage(set(), set(), set())
