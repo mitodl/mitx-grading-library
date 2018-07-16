@@ -31,9 +31,9 @@ from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
     has_keys_of_type, is_shape_specification)
-from mitxgraders.helpers.mitmath import (DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
-                                      DEFAULT_VARIABLES, METRIC_SUFFIXES,
-                                      CalcError, evaluator, MathArray)
+from mitxgraders.helpers.mitmath import (
+    DEFAULT_SUFFIXES, DEFAULT_VARIABLES, METRIC_SUFFIXES, CalcError,
+    evaluator, MathArray)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -481,13 +481,13 @@ class DependentSampler(VariableSamplingSet):
         """Return a random entry from the given set"""
         raise Exception("DependentSampler must be invoked with compute_sample.")
 
-    def compute_sample(self, sample_dict):
+    def compute_sample(self, sample_dict, functions, suffixes):
         """Compute the value of this sample"""
         try:
             result, _ = evaluator(formula=self.config['formula'],
                                   variables=sample_dict,
-                                  functions=DEFAULT_FUNCTIONS,
-                                  suffixes=DEFAULT_SUFFIXES)
+                                  functions=functions,
+                                  suffixes=suffixes)
         except CalcError:
             raise ConfigError("Formula error in dependent sampling formula: " +
                               self.config["formula"])
@@ -504,9 +504,16 @@ def is_subset(iterable, iterable_superset):
             return False
     return True
 
-def gen_symbols_samples(symbols, samples, sample_from):
+def gen_symbols_samples(symbols, samples, sample_from, functions=None, suffixes=None):
     """
-    Generates a list of dictionaries mapping variable names to values.
+    Generates a list of dictionaries mapping symbol names to values.
+
+    Arguments:
+        symbols ([str]): a list of symbol names
+        samples (int): how many samples to generate
+        sample_from: a dictionary mapping symbol names to sampling sets
+        functions (dict): function-scope for evaluating dependent variables
+        suffixes (dict): suffix-scope for evaluating dependent variables
 
     The symbols argument will usually be config['variables']
     or config['functions'].
@@ -549,7 +556,8 @@ def gen_symbols_samples(symbols, samples, sample_from):
             progress_made = False
             for symbol, dependencies in unevaluated_dependents.items():
                 if is_subset(dependencies, sample_dict):
-                    sample_dict[symbol] = sample_from[symbol].compute_sample(sample_dict)
+                    sample_dict[symbol] = sample_from[symbol].compute_sample(
+                        sample_dict, functions, suffixes)
                     del unevaluated_dependents[symbol]
                     progress_made = True
 

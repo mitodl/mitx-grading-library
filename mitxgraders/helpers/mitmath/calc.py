@@ -251,8 +251,8 @@ ScopeUsage = namedtuple('ScopeUSage', ['variables', 'functions', 'suffixes'])
 
 def evaluator(formula,
               variables=DEFAULT_VARIABLES,
-              functions=DEFAULT_FUNCTIONS,
-              suffixes=DEFAULT_SUFFIXES,
+              functions=None,
+              suffixes=None,
               max_array_dim=0,
               allow_inf=False):
     """
@@ -307,6 +307,9 @@ def evaluator(formula,
     >>> evaluator("inf", variables={'inf': float('inf')}, allow_inf=True)[0]
     inf
     """
+    functions = DEFAULT_FUNCTIONS if functions is None else functions
+    suffixes = DEFAULT_SUFFIXES if suffixes is None else suffixes
+
     empty_usage = ScopeUsage(set(), set(), set())
     if formula is None:
         # No need to go further.

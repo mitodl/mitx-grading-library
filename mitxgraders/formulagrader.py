@@ -645,11 +645,15 @@ class FormulaGrader(ItemGrader):
                                                                       student_input)
         var_samples = gen_symbols_samples(variable_list,
                                           self.config['samples'],
-                                          sample_from_dict)
+                                          sample_from_dict,
+                                          self.functions,
+                                          self.suffixes)
 
         func_samples = gen_symbols_samples(self.random_funcs.keys(),
                                            self.config['samples'],
-                                           self.random_funcs)
+                                           self.random_funcs,
+                                           self.functions,
+                                           self.suffixes)
 
         # Make a copy of the functions and variables lists
         # We'll add the sampled functions/variables in
