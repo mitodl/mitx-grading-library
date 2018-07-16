@@ -115,7 +115,7 @@ class IntegralGrader(AbstractGrader):
 
     Additionally, take care that the integration limits are real-valued.
     For example, if sqrt(1-a^2) is an integration limit, the sampling range
-    for variable 'a' must gaurantee that the limit sqrt(1-a^2) is real. By
+    for variable 'a' must guarantee that the limit sqrt(1-a^2) is real. By
     default, variables sample from the real interval [1,3].
 
     Configuration Options
@@ -177,6 +177,8 @@ class IntegralGrader(AbstractGrader):
         sample_from
         failable_evals
     """
+
+    default_functions = DEFAULT_FUNCTIONS.copy()
 
     @property
     def schema_config(self):
@@ -275,14 +277,17 @@ class IntegralGrader(AbstractGrader):
         self.true_input_positions = self.validate_input_positions(self.config['input_positions'])
 
         # The below are copied from FormulaGrader.__init__
+        validate_blacklist_whitelist_config(self.default_functions,
+                                            self.config['blacklist'],
+                                            self.config['whitelist'])
 
-        validate_blacklist_whitelist_config(self.config['blacklist'], self.config['whitelist'])
         validate_no_collisions(self.config, keys=['variables', 'user_constants'])
         warn_if_override(self.config, 'variables', DEFAULT_VARIABLES)
         warn_if_override(self.config, 'user_constants', DEFAULT_VARIABLES)
-        warn_if_override(self.config, 'user_functions', DEFAULT_FUNCTIONS)
+        warn_if_override(self.config, 'user_functions', self.default_functions)
 
-        self.permitted_functions = get_permitted_functions(self.config['whitelist'],
+        self.permitted_functions = get_permitted_functions(self.default_functions,
+                                                           self.config['whitelist'],
                                                            self.config['blacklist'],
                                                            self.config['user_functions'])
 

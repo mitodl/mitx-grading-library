@@ -33,26 +33,33 @@ __all__ = [
 ]
 
 # Some of these validators are useful to other classes, e.g., IntegralGrader
-def validate_blacklist_whitelist_config(blacklist, whitelist):
+def validate_blacklist_whitelist_config(default_funcs, blacklist, whitelist):
     """Validates the whitelist/blacklist configuration.
 
-    Voluptuous should already have type-checked blacklist and whitelist. Now check:
-    1. They are not both used
-    2. All whitelist/blacklist functions actually exist
+    Arguments:
+        default_funcs: an iterable whose elements are are function names
+            Examples: {'func1':..., 'func2':..., ...} or ['func1', 'func2']
+        blacklist ([str]): a list of function names
+        whitelist ([str]): a list of function names
+
+    Notes: Voluptuous should already have type-checked blacklist and whitelist.
+    Now check:
+    1. whitelist/blacklist are not both used
+    2. All whitelist/blacklist functions actually exist in default_funcs
     """
     if blacklist and whitelist:
         raise ConfigError("Cannot whitelist and blacklist at the same time")
     for func in blacklist:
         # no need to check user_functions too ... if you don't want student to
         # use one of the user_functions, just don't add it in the first place.
-        if func not in DEFAULT_FUNCTIONS:
+        if func not in default_funcs:
             raise ConfigError("Unknown function in blacklist: {func}".format(func=func))
 
     if whitelist == [None]:
         return
 
     for func in whitelist:
-        if func not in DEFAULT_FUNCTIONS:
+        if func not in default_funcs:
             raise ConfigError("Unknown function in whitelist: {func}".format(func=func))
 
 def validate_forbidden_strings_not_used(expr, forbidden_strings, forbidden_msg):
@@ -112,48 +119,74 @@ def validate_only_permitted_functions_used(used_funcs, permitted_functions):
         raise InvalidInput(message)
     return True
 
-def get_permitted_functions(whitelist, blacklist, always_allowed):
+def get_permitted_functions(default_funcs, whitelist, blacklist, always_allowed):
     """
     Constructs a set of functions whose usage is permitted.
+
     Arguments:
-        whitelist ([str] | [None]): List of allowed function names
-            [None] disallows all except always_allowed
-            [] uses DEFAULT_FUNCTIONS.keys()
-        blacklist ([str]): List of disallowed function names
-        always_allowed (dict): dict whose keys are always-allowed as function names
+        default_funcs: an iterable whose elements are are function names
+            Examples: {'func1':..., 'func2':..., ...} or ['func1', 'func2']
+        blacklist ([str]): function names to remove from default_funcs
+        whitelist ([str]): function names to keep from default_funcs
+        always_allowed: an iterable whose elements are function names that
+            are always allowed.
+
+    Note: whitelist and blacklist cannot both be non-empty
+
     Usage
     =====
     Whitelist some functions:
-    >>> always_allowed = {'f1': None, 'f2': None} # values unimportant
-    >>> get_permitted_functions(['sin', 'cos'], [], always_allowed) == set([
-    ... 'sin', 'cos', 'f1', 'f2'
-    ... ])
+    >>> default_funcs = {'sin': None, 'cos': None, 'tan': None}
+    >>> always_allowed = {'f1': None, 'f2': None}
+    >>> get_permitted_functions(
+    ...     default_funcs,
+    ...     ['sin', 'cos'],
+    ...     [],
+    ...     always_allowed
+    ... ) == set(['sin', 'cos', 'f1', 'f2'])
     True
 
-    [None] disallows all defaults:
-    >>> always_allowed = {'f1': None, 'f2': None} # values unimportant
-    >>> get_permitted_functions([None], [], always_allowed) == set([
-    ... 'f1', 'f2'
-    ... ])
+    If whitelist=[None], all defaults are disallowed:
+    >>> default_funcs = {'sin': None, 'cos': None, 'tan': None}
+    >>> always_allowed = {'f1': None, 'f2': None}
+    >>> get_permitted_functions(
+    ...     default_funcs,
+    ...     [None],
+    ...     [],
+    ...     always_allowed
+    ... ) == set(['f1', 'f2'])
     True
 
     Blacklist some functions:
-    >>> get_permitted_functions([], ['sin', 'cos'], always_allowed) == set(
-    ... DEFAULT_FUNCTIONS).union(['f1', 'f2']).difference(set(['sin', 'cos']))
+    >>> default_funcs = {'sin': None, 'cos': None, 'tan': None}
+    >>> always_allowed = {'f1': None, 'f2': None}
+    >>> get_permitted_functions(
+    ...     default_funcs,
+    ...     [],
+    ...     ['sin', 'cos'],
+    ...     always_allowed
+    ... ) == set(['tan', 'f1', 'f2'])
     True
 
     Blacklist and whitelist cannot be simultaneously used:
-    >>> get_permitted_functions(['sin'], ['cos'], always_allowed)
+    >>> default_funcs = {'sin': None, 'cos': None, 'tan': None}
+    >>> always_allowed = {'f1': None, 'f2': None}
+    >>> get_permitted_functions(
+    ...     default_funcs,
+    ...     ['sin'],
+    ...     ['cos'],
+    ...     always_allowed
+    ... )
     Traceback (most recent call last):
-    ValueError: whitelist and blacklist cannot be simultaneously truthy
+    ValueError: whitelist and blacklist cannot both be non-empty
     """
     # should never trigger except in doctest above,
     # Grader's config validation should raise an error first
     if whitelist and blacklist:
-        raise ValueError('whitelist and blacklist cannot be simultaneously truthy')
+        raise ValueError('whitelist and blacklist cannot both be non-empty')
     if whitelist == []:
         permitted_functions = set(always_allowed).union(
-            set(DEFAULT_FUNCTIONS)
+            set(default_funcs)
             ).difference(set(blacklist))
     elif whitelist == [None]:
         permitted_functions = set(always_allowed)
@@ -377,6 +410,9 @@ class FormulaGrader(ItemGrader):
                 - comparer: a function with signature `comparer(comparer_params_evals, student_eval,
                     utils)` that compares student and comparer_params after evaluation.
     """
+
+    default_functions = DEFAULT_FUNCTIONS.copy()
+
     @property
     def schema_config(self):
         """Define the configuration options for FormulaGrader"""
@@ -489,7 +525,7 @@ class FormulaGrader(ItemGrader):
 
     def __init__(self, config=None, **kwargs):
         """
-        Validate the Formulagrader's configuration.
+        Validate the FormulaGrader's configuration.
         First, we allow the ItemGrader initializer to construct the function list.
         We then construct the lists of functions, suffixes and constants.
         Finally, we refine the sample_from entry.
@@ -497,14 +533,17 @@ class FormulaGrader(ItemGrader):
         super(FormulaGrader, self).__init__(config, **kwargs)
 
         # finish validating
-        validate_blacklist_whitelist_config(self.config['blacklist'], self.config['whitelist'])
+        validate_blacklist_whitelist_config(self.default_functions,
+                                            self.config['blacklist'],
+                                            self.config['whitelist'])
         validate_no_collisions(self.config, keys=['variables', 'user_constants'])
         warn_if_override(self.config, 'variables', DEFAULT_VARIABLES)
         warn_if_override(self.config, 'numbered_vars', DEFAULT_VARIABLES)
         warn_if_override(self.config, 'user_constants', DEFAULT_VARIABLES)
-        warn_if_override(self.config, 'user_functions', DEFAULT_FUNCTIONS)
+        warn_if_override(self.config, 'user_functions', self.default_functions)
 
-        self.permitted_functions = get_permitted_functions(self.config['whitelist'],
+        self.permitted_functions = get_permitted_functions(self.default_functions,
+                                                           self.config['whitelist'],
                                                            self.config['blacklist'],
                                                            self.config['user_functions'])
 
