@@ -290,7 +290,8 @@ class IntegralGrader(AbstractGrader):
                                                            self.config['blacklist'],
                                                            self.config['user_functions'])
 
-        self.functions, self.random_funcs = construct_functions(self.config["user_functions"])
+        self.functions, self.random_funcs = construct_functions(self.default_functions,
+                                                                self.config["user_functions"])
         self.constants = construct_constants(self.config["user_constants"])
         # TODO I would like to move this into construct_constants at some point,
         # perhaps giving construct_constants and optional argument specifying additional defaults

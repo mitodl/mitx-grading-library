@@ -568,36 +568,42 @@ schema_user_functions = All(
                 FunctionSamplingSet)},
 )
 
-def construct_functions(user_funcs):
+def construct_functions(default_functions, user_funcs):
     """
-    Returns the dictionary of available functions
+    Constructs functions for use in sampling math expressions.
 
     Arguments:
         default_funcs: a dict mapping function names (strings) to functions
         user_funcs: a dict mapping function names (strings) to functions OR
             FunctionSamplingSet instances
 
+    Returns:
+        a tuple (functions, random_functions) of dictionaries:
+        functions: maps function names to functions
+        random_functions: maps function names to function sampling sets
+
     Usage
     =====
-    If no user_funcs are specified, DEFAULT_FUNCTIONS is returned
-    >>> funcs, random_funcs = construct_functions({})
-    >>> funcs == DEFAULT_FUNCTIONS
+    Sorts user_funcs into functions and FunctionSamplingSet instances,
+    merging the normal functions into a copy of default_funcs:
+    >>> from math import sin, cos, tan
+    >>> default_funcs = {'sin': sin, 'cos': cos}
+    >>> func, random_func = tan, RandomFunction()
+    >>> user_funcs = {
+    ...     'tan': func,
+    ...     'f': random_func
+    ... }
+    >>> funcs, random_funcs = construct_functions(default_funcs, user_funcs)
+    >>> funcs == {'sin': sin, 'cos': cos, 'tan': tan} # contains defaults and tan
     True
-    >>> random_funcs == {}
+    >>> random_funcs == {'f': random_func}
     True
 
-    Or specify user_funcs:
-    >>> func = lambda x: x
-    >>> randfunc = RandomFunction()
-    >>> funcs, random_funcs = construct_functions({"f": func, "g": randfunc})
-    >>> all([funcs[fn]==DEFAULT_FUNCTIONS[fn] for fn in DEFAULT_FUNCTIONS])
-    True
-    >>> funcs["f"]==func
-    True
-    >>> random_funcs == {"g": randfunc}
+    Does not mutate default_funcs:
+    >>> default_funcs == {'sin': sin, 'cos': cos}
     True
     """
-    functions = DEFAULT_FUNCTIONS.copy()
+    funcs = default_functions.copy()
     random_funcs = {}
     for f in user_funcs:
         # Check if we have a random function or a normal function
@@ -605,9 +611,9 @@ def construct_functions(user_funcs):
             random_funcs[f] = user_funcs[f]
         else:
             # f is a normal function
-            functions[f] = user_funcs[f]
+            funcs[f] = user_funcs[f]
 
-    return functions, random_funcs
+    return funcs, random_funcs
 
 def construct_constants(user_consts):
     """

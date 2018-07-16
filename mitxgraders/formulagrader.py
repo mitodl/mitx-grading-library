@@ -550,7 +550,8 @@ class FormulaGrader(ItemGrader):
         self.comparer_utils = self.get_comparer_utils()
 
         # Set up the various lists we use
-        self.functions, self.random_funcs = construct_functions(self.config["user_functions"])
+        self.functions, self.random_funcs = construct_functions(self.default_functions,
+                                                                self.config["user_functions"])
         self.constants = construct_constants(self.config["user_constants"])
         self.suffixes = construct_suffixes(self.config["metric_suffixes"])
 
