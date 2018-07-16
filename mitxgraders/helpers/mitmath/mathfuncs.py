@@ -156,6 +156,10 @@ def factorial(z):
     ... )
     True
 
+    Really big numbers return inf:
+    >>> factorial(500.5) == float('inf')
+    True
+
     Throws errors at poles:
     >>> factorial(-2)                           # doctest: +ELLIPSIS
     Traceback (most recent call last):
