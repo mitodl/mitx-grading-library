@@ -2,7 +2,7 @@
 Contains classes for numerical and formula graders
 * NumericalGrader
 * FormulaGrader
-* MatrixFormulaGrader
+* MatrixGrader
 """
 
 from mitxgraders.formulagrader.formulagrader import (
@@ -18,8 +18,11 @@ from mitxgraders.formulagrader.formulagrader import (
     NumericalGrader,
 )
 
+from mitxgraders.formulagrader.matrixgrader import MatrixGrader
+
 # Set the objects to be *-imported from package
 __all__ = [
     "NumericalGrader",
     "FormulaGrader",
+    "MatrixGrader"
 ]

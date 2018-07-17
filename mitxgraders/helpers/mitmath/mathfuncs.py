@@ -240,16 +240,26 @@ SCALAR_FUNCTIONS = {key: has_one_scalar_input(key)(ELEMENTWISE_FUNCTIONS[key])
 ARRAY_FUNCTIONS = {
     're': real,
     'im': imag,
-    'conj': np.conj,
-    'norm': np.linalg.norm
+    'conj': np.conj
 }
 
-def merge_dicts(*dict_args):
-    """Merge an arbitrary number of dictionaries."""
-    merged = {}
-    for dict_arg in dict_args:
-        merged.update(dict_arg)
-    return merged
+# TODO: These need validation in order to throw useful error messages
+ARRAY_ONLY_FUNCTIONS = {
+    'norm': np.linalg.norm,
+    'abs': np.linalg.norm,
+    'trans': np.transpose,
+    'det': np.linalg.det,
+    'tr': np.trace,
+    'ctrans': lambda x: np.conj(np.transpose(x)),
+    'adj': lambda x: np.conj(np.transpose(x))
+}
+
+def merge_dicts(*source_dicts):
+    """Create a new dictionary and merge sources into it."""
+    target = {}
+    for source in source_dicts:
+        target.update(source)
+    return target
 
 DEFAULT_FUNCTIONS = merge_dicts(SCALAR_FUNCTIONS, ARRAY_FUNCTIONS)
 

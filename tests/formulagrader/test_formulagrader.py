@@ -533,7 +533,6 @@ def test_fg_debug_log():
     "    'ln': <function log at 0x...>,<br/>\n"
     "    'log10': <function log10 at 0x...>,<br/>\n"
     "    'log2': <function log2 at 0x...>,<br/>\n"
-    "    'norm': <function norm at 0x...>,<br/>\n"
     "    're': <function real at 0x...>,<br/>\n"
     "    'sec': <function sec at 0x...>,<br/>\n"
     "    'sech': <function sech at 0x...>,<br/>\n"

@@ -5,6 +5,7 @@ Contains a subclass of numpy.ndarray with matrix-like operations.
 """
 
 from __future__ import division # necessary for one of the doctests
+from contextlib import contextmanager
 from numbers import Number
 import numpy as np
 from mitxgraders.helpers.mitmath.exceptions import (
@@ -264,14 +265,56 @@ class MathArray(np.ndarray):
         # Henceforth:
         # - self is a square matrix, AND
         # - exponent is a number
-        if isinstance(exponent, int):
+        integer_like = (isinstance(exponent, int) or
+                        isinstance(exponent, float) and exponent.is_integer())
+        if not integer_like:
+            # TODO Should this be a shape error?
+            raise ShapeError("Cannot raise a matrix to non-integer powers.")
+        elif exponent < 0 and not MathArray._negative_powers:
+            raise MathArrayError('Negative matrix powers have been disabled.')
+        else:
+            # just in case it had been an integer-like float
+            exponent = int(exponent)
             return np.linalg.matrix_power(self, exponent)
 
-        elif isinstance(exponent, float) and exponent.is_integer():
-            return np.linalg.matrix_power(self, int(exponent))
+    _default_negative_powers = True
+    _negative_powers = True
+    @classmethod
+    @contextmanager
+    def enable_negative_powers(cls, value):
+        """
+        A context-manager manager that can be used to temporarily disable
+        negative matrix powers.
 
-        elif isinstance(exponent, Number):
-            raise ShapeError("Cannot raise a matrix to non-integer powers.")
+        Usage
+        =====
+
+        By default, negative integer matrix powers are interpretted as inverses.
+        Use MathArray.enable_negative_powers(False) to temporarily throw errors
+        instead:
+        >>> A = MathArray([[2, 1], [-1, 3]])
+        >>> with MathArray.enable_negative_powers(False):
+        ...     try:
+        ...         A**-1
+        ...     except MathArrayError as err:
+        ...         print(err.message)
+        Negative matrix powers have been disabled.
+
+        It's only temporary!
+        >>> approx_equal_as_arrays(
+        ...     A * A**-1,
+        ...     MathArray([[1, 0], [0, 1]])
+        ... )
+        True
+        """
+        # setup
+        cls._negative_powers = value
+        try:
+            # try with block
+            yield
+        finally:
+            # teardown
+            cls._negative_powers = cls._default_negative_powers
 
     def __rpow__(self, other):
         if self.ndim == 0 and isinstance(other, Number):
