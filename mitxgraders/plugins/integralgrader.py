@@ -26,6 +26,7 @@ from mitxgraders.exceptions import (
     InvalidInput, ConfigError, StudentFacingError, MissingInput)
 from mitxgraders.helpers.mitmath import (
     within_tolerance, evaluator, DEFAULT_VARIABLES, DEFAULT_FUNCTIONS)
+from mitxgraders.helpers.mitmath.mathfuncs import merge_dicts
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NonNegative, all_unique, PercentageString, is_callable)
 
@@ -179,7 +180,7 @@ class IntegralGrader(AbstractGrader):
     """
 
     default_functions = DEFAULT_FUNCTIONS.copy()
-    default_variables = DEFAULT_VARIABLES.copy()
+    default_variables = merge_dicts(DEFAULT_VARIABLES, {'infty': float('inf')})
 
     @property
     def schema_config(self):
@@ -299,10 +300,6 @@ class IntegralGrader(AbstractGrader):
         self.functions, self.random_funcs = construct_functions(self.default_functions,
                                                                 self.config["user_functions"])
         self.constants = construct_constants(self.default_variables, self.config["user_constants"])
-        # TODO I would like to move this into construct_constants at some point,
-        # perhaps giving construct_constants and optional argument specifying additional defaults
-        if 'infty' not in self.constants:
-            self.constants['infty'] = float('inf')
 
         # Construct the schema for sample_from
         # First, accept all VariableSamplingSets
