@@ -7,7 +7,8 @@ Contains a subclass of numpy.ndarray with matrix-like operations.
 from __future__ import division # necessary for one of the doctests
 from numbers import Number
 import numpy as np
-from mitxgraders.helpers.mitmath.exceptions import MathArrayError
+from mitxgraders.helpers.mitmath.exceptions import (
+    MathArrayError, MathArrayShapeError as ShapeError)
 from mitxgraders.helpers.mitmath.robust_pow import robust_pow
 
 def is_number_zero(value):
@@ -74,7 +75,7 @@ class MathArray(np.ndarray):
         - powers are only allowed for square matrices and integer-like exponents.
         - supports multiplication with a universal identity irrespective of own shape
         - supports addition/subtraction with a universal identity if MathArray is square matrix.
-        - throws MathArrayError instances when anticipated errors are made.
+        - throws ShapeError instances when anticipated errors are made.
         Raised with student-friendly error messages.
     """
 
@@ -133,17 +134,17 @@ class MathArray(np.ndarray):
         elif isinstance(other, Number):
             if self.ndim == 0:
                 return super_ADD(other)
-            raise MathArrayError("Cannot add/subtract scalars to a {self.shape_name}."
+            raise ShapeError("Cannot add/subtract scalars to a {self.shape_name}."
                                  .format(self=self))
 
         elif isinstance(other, IdentityMultiple):
             if is_square(self):
                 return super_ADD(other.as_matrix(self.shape[0]))
             elif self.ndim == 2:
-                raise MathArrayError("Cannot add/subtract multiples of the identity "
+                raise ShapeError("Cannot add/subtract multiples of the identity "
                                      "to a non-square matrix.")
             else:
-                raise MathArrayError("Cannot add/subtract multiples of the identity "
+                raise ShapeError("Cannot add/subtract multiples of the identity "
                     "to a {self.shape_name}".format(self=self))
 
         elif isinstance(other, MathArray):
@@ -152,7 +153,7 @@ class MathArray(np.ndarray):
 
             msg = ("Cannot add/subtract a {self.description} with a {other.description}.").format(
                 self=self, other=other)
-            raise MathArrayError(msg)
+            raise ShapeError(msg)
 
         raise TypeError("Cannot add/subtract a {self.shape_name} with object of {type}."
                         .format(type=type(other), self=self))
@@ -190,11 +191,11 @@ class MathArray(np.ndarray):
                 if self.ndim == 1 and other.ndim == 1:
                     msg = ("Cannot calculate the dot product of a {self.description} "
                            "with a {other.description}".format(self=self, other=other))
-                    raise MathArrayError(msg)
+                    raise ShapeError(msg)
                 # general message:
                 msg = ("Cannot multiply a {self.description} with a {other.description}.").format(
                     self=self, other=other)
-                raise MathArrayError(msg)
+                raise ShapeError(msg)
 
         raise TypeError("Cannot multiply a {self.shape_name} with object of {type}."
                         .format(type=type(other), self=self))
@@ -217,7 +218,7 @@ class MathArray(np.ndarray):
             if other.ndim == 0:
                 return super_DIV(other.item())
             else:
-                raise MathArrayError('Cannot divide a {self.shape_name} by a {other.shape_name}'
+                raise ShapeError('Cannot divide a {self.shape_name} by a {other.shape_name}'
                                      .format(self=self, other=other))
 
         raise TypeError("Cannot divide {self.shape_name} by object of {type}.".format(
@@ -225,7 +226,7 @@ class MathArray(np.ndarray):
 
     def __rtruediv__(self, other):
         if self.ndim > 0:
-            raise MathArrayError("Cannot divide by a {self.shape_name}".format(self=self))
+            raise ShapeError("Cannot divide by a {self.shape_name}".format(self=self))
         return super(MathArray, self).__rtruediv__(other)
 
     def __pow__(self, other):
@@ -241,11 +242,11 @@ class MathArray(np.ndarray):
                 raise TypeError("Cannot raise a scalar to a {type} power".format(type=type(other)))
 
         elif not self.ndim == 2:
-            raise MathArrayError("Cannot raise a {self.shape_name} to powers.".format(
+            raise ShapeError("Cannot raise a {self.shape_name} to powers.".format(
                 self=self))
 
         elif not is_square(self):
-            raise MathArrayError("Cannot raise a non-square matrix to powers.")
+            raise ShapeError("Cannot raise a non-square matrix to powers.")
 
         # Henceforth, self is a square matrix.
         if isinstance(other, Number):
@@ -254,7 +255,7 @@ class MathArray(np.ndarray):
             if other.ndim == 0:
                 exponent = other.item()
             else:
-                raise MathArrayError("Cannot raise a matrix to {other.shape_name} powers.".format(
+                raise ShapeError("Cannot raise a matrix to {other.shape_name} powers.".format(
                     other=other))
         else:
             raise TypeError("Cannot raise matrix to power of type {type}.".format(
@@ -270,14 +271,14 @@ class MathArray(np.ndarray):
             return np.linalg.matrix_power(self, int(exponent))
 
         elif isinstance(exponent, Number):
-            raise MathArrayError("Cannot raise a matrix to non-integer powers.")
+            raise ShapeError("Cannot raise a matrix to non-integer powers.")
 
     def __rpow__(self, other):
         if self.ndim == 0 and isinstance(other, Number):
             return robust_pow(other, self.item())
 
         if isinstance(other, Number):
-            raise MathArrayError("Cannot raise a scalar to power of a {self.shape_name}."
+            raise ShapeError("Cannot raise a scalar to power of a {self.shape_name}."
                                  .format(self=self))
         raise TypeError("Cannot raise {type} to power of {self.shape_name}."
                         .format(type=type(other), self=self))

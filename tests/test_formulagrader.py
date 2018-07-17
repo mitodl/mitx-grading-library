@@ -26,7 +26,7 @@ from mitxgraders.version import __version__ as VERSION
 from mitxgraders.helpers.mitmath.exceptions import (
     CalcError,
     UndefinedVariable, UndefinedFunction,
-    DomainError, MathArrayError
+    DomainError, MathArrayShapeError as ShapeError
 )
 from mitxgraders.helpers.mitmath import IdentityMultiple
 from mitxgraders import ListGrader
@@ -614,19 +614,19 @@ def test_fg_with_arrays():
     assert grader(None, correct_3)['ok']
 
     match = "Cannot multiply a matrix of shape \(rows: 3, cols: 2\) with a matrix of shape \(rows: 3, cols: 2\)"
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         grader(None, 'B*B')
 
     match = "Cannot raise a non-square matrix to powers."
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         grader(None, 'B^2')
 
     match = "Cannot add/subtract scalars to a matrix."
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         grader(None, 'B + 5')
 
     match = "Cannot add/subtract multiples of the identity to a non-square matrix."
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         grader(None, 'B + 5*I')
 
     match = ("There was an error evaluating function sin\(...\)<br/>"

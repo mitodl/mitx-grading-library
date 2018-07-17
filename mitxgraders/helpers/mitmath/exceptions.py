@@ -58,3 +58,7 @@ class MathArrayError(StudentFacingError):
     """
     Thrown by MathArray when anticipated errors are made.
     """
+
+class MathArrayShapeError(MathArrayError):
+    """Raised when a MathArray operation cannot be performed because of shape
+    mismatch."""
