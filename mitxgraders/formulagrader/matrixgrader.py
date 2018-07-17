@@ -15,9 +15,10 @@ from mitxgraders.helpers.mitmath.mathfuncs import (
 class MatrixGrader(FormulaGrader):
     """
     An extension of FormulaGrader with better support for grading expressions
-    with vectors and matrices.
+    with vectors and matrices. Includes an extra default constant ('I', for the
+    identity operator) and some extra default functions (trans, det, ...)
 
-    Configuration options as per FormulaGrader, plus:
+    Configuration options as per FormulaGrader, except:
         max_array_dim (int): Specify the maximum array dimension that the
             expression parser will accept, defaults to 2 (allows vectors
             and matrices).
@@ -29,6 +30,8 @@ class MatrixGrader(FormulaGrader):
         negative_powers (bool): If True (the default), then for a square matrix
             A and positive integer k, A^-k is interpreted as (inverse(A))^k.
             If False, negative powers raise an error instead.
+
+
     """
 
     # merge_dicts does not mutate the originals
