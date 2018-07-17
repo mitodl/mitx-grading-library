@@ -1,15 +1,39 @@
 from pytest import raises
 import re
-from mitxgraders import MatrixGrader, RealMatrices, RealVectors, ComplexRectangle
+from mitxgraders import (MatrixGrader, RealMatrices, RealVectors,
+                         ComplexRectangle, ConfigError)
 from mitxgraders.helpers.mitmath.exceptions import (DomainError, MathArrayError,
-    MathArrayShapeError as ShapeError)
+    MathArrayShapeError as ShapeError, UnableToParse)
+
+def test_max_array_dim():
+    grader = MatrixGrader(
+        answers="[1, 2, 3]"
+    )
+    # by default, student cannot enter matrices entry-by-entry
+    match = "Matrix expressions have been forbidden in this entry."
+    with raises(UnableToParse, match=match):
+        grader(None, "[[1, 2, 3]]")
+
+    # by default, author cannot enter matrices entry-by-entry
+    # But it's not caught till grading occurs
+    grader = MatrixGrader(
+        answers="[[1, 2, 3]]"
+    )
+    with raises(UnableToParse, match=match):
+        grader(None, "0")
+
+    grader = MatrixGrader(
+        answers="[[1, 2, 3]]",
+        max_array_dim=2
+    )
+    assert grader(None, "[[1, 2, 3]]")['ok']
 
 def test_fg_with_arrays():
     grader = MatrixGrader(
         answers='x*A*B*u + z*C^3*v/(u*C*v)',
         variables=['A', 'B', 'C', 'u', 'v', 'z', 'x'],
         sample_from={
-            'A': RealMatrices(shape=[2,3]),
+            'A': RealMatrices(shape=[2, 3]),
             'B': RealMatrices(shape=[3, 2]),
             'C': RealMatrices(shape=[2, 2]),
             'u': RealVectors(shape=[2]),

@@ -20,9 +20,8 @@ class MatrixGrader(FormulaGrader):
 
     Configuration options as per FormulaGrader, except:
         max_array_dim (int): Specify the maximum array dimension that the
-            expression parser will accept, defaults to 2 (allows vectors
-            and matrices). Variables can still contain higher dimensional
-            arrays.
+            expression parser will accept, defaults to 1 (allows vectors).
+            NOTE: Variables can still contain higher dimensional arrays.
 
         shape_errors (bool): If True (the default), then array shape mismatch
             errors will raise an error rather. If false, shape mismatch will
@@ -45,7 +44,7 @@ class MatrixGrader(FormulaGrader):
     def schema_config(self):
         schema = super(MatrixGrader, self).schema_config
         return schema.extend({
-            Required('max_array_dim', default=2): NonNegative(int),
+            Required('max_array_dim', default=1): NonNegative(int),
             Required('shape_errors', default=True): bool,
             Required('negative_powers', default=True): bool
         })
