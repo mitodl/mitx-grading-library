@@ -1,9 +1,5 @@
 """
 formulagrader.py
-
-Contains classes for numerical and formula graders
-* NumericalGrader
-* FormulaGrader
 """
 from __future__ import division
 from numbers import Number
@@ -25,12 +21,6 @@ from mitxgraders.helpers.mitmath.calc import parsercache
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NonNegative, is_callable, PercentageString, all_unique,
     is_callable_with_args, has_keys_of_type)
-
-# Set the objects to be imported from this grader
-__all__ = [
-    "NumericalGrader",
-    "FormulaGrader",
-]
 
 # Some of these validators are useful to other classes, e.g., IntegralGrader
 def validate_blacklist_whitelist_config(default_funcs, blacklist, whitelist):
