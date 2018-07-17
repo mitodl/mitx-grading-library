@@ -10,7 +10,7 @@ from functools import wraps
 from numbers import Number
 from scipy import integrate
 from numpy import real, imag
-from voluptuous import Schema, Required, Any, All, Extra, Length
+from voluptuous import Schema, Required, Any, All, Extra, Length, Coerce
 from mitxgraders.sampling import (VariableSamplingSet, schema_user_functions, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants, has_keys_of_type)
@@ -311,8 +311,8 @@ class IntegralGrader(AbstractGrader):
         schema_sample_from = Schema({
             Required(varname, default=RealInterval()):
                 Any(VariableSamplingSet,
-                    All(list, lambda pair: RealInterval(pair)),
-                    lambda tup: DiscreteSet(tup))
+                    All(list, Coerce(RealInterval)),
+                    Coerce(DiscreteSet))
             for varname in self.config['variables']
         })
         self.config['sample_from'] = schema_sample_from(self.config['sample_from'])

@@ -8,7 +8,7 @@ from pprint import PrettyPrinter
 import re
 import itertools
 import numpy as np
-from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length
+from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
 from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes, schema_user_functions)
@@ -559,8 +559,8 @@ class FormulaGrader(ItemGrader):
         schema_sample_from = Schema({
             Required(varname, default=RealInterval()):
                 Any(VariableSamplingSet,
-                    All(list, lambda pair: RealInterval(pair)),
-                    lambda tup: DiscreteSet(tup))
+                    All(list, Coerce(RealInterval)),
+                    Coerce(DiscreteSet))
             for varname in (self.config['variables'] + self.config['numbered_vars'])
         })
         self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
