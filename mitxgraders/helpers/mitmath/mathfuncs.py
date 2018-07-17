@@ -158,6 +158,8 @@ def factorial(z):
     True
 
     Really big numbers return inf:
+    >>> factorial(500) == float('inf')
+    True
     >>> factorial(500.5) == float('inf')
     True
 
@@ -255,9 +257,24 @@ ARRAY_FUNCTIONS = {
 def has_one_square_input(display_name):
     return SpecifyDomain.make_decorator('square', display_name=display_name)
 
+def array_abs(obj):
+    """
+    Takes absolute value of numbers or vectors and suggests norm(...) instead
+    for matrix/tensors.
+
+    NOTE: The decision to limit abs(...) to scalars and vectors was motivated
+    by pedagogy not software.
+    """
+    if isinstance(obj, MathArray) and obj.ndim > 1:
+        msg = ("The abs(...) function expects a scalar or vector. To take the "
+               "norm of a {}, try norm(...) instead.".format(
+               MathArray.get_shape_name(obj.ndim)))
+        raise FunctionEvalError(msg)
+    return np.linalg.norm(obj)
+
 ARRAY_ONLY_FUNCTIONS = {
     'norm': np.linalg.norm,
-    'abs': np.linalg.norm,
+    'abs': array_abs,
     'trans': np.transpose,
     'det': has_one_square_input('det')(np.linalg.det),
     'tr': has_one_square_input('tr')(np.trace),

@@ -1,7 +1,7 @@
 import random
 import math
 from pytest import approx, raises
-from mitxgraders.helpers.mitmath.exceptions import DomainError
+from mitxgraders.helpers.mitmath.exceptions import DomainError, FunctionEvalError
 from mitxgraders.helpers.mitmath.mathfuncs import (
     cot, arccot,
     csc, arccsc,
@@ -9,7 +9,6 @@ from mitxgraders.helpers.mitmath.mathfuncs import (
     coth, arccoth,
     csch, arccsch,
     sech, arcsech,
-    cross,
     ARRAY_ONLY_FUNCTIONS, ARRAY_FUNCTIONS)
 from mitxgraders.helpers.mitmath.math_array import (
     MathArray, random_math_array, equal_as_arrays)
@@ -72,7 +71,22 @@ def test_det_and_tr_raise_error_if_not_square():
     with raises(DomainError, match=match):
         tr(random_math_array((2, 3)))
 
+def test_array_abs_input_types():
+    array_abs = ARRAY_ONLY_FUNCTIONS['abs']
+
+    x = random.uniform(0, 10)
+    assert array_abs(x) == x
+    assert array_abs(-x) == x
+
+    assert array_abs(MathArray([2, -3, 6])) == 7
+
+    match = ("The abs\(...\) function expects a scalar or vector. To take the "
+             "norm of a matrix, try norm\(...\) instead.")
+    with raises(FunctionEvalError, match=match):
+        array_abs(MathArray([[1, 2], [3, 4]]))
+
 def test_cross():
+    cross = ARRAY_ONLY_FUNCTIONS['cross']
     a = MathArray([2, -1, 3.5])
     b = MathArray([1.5, 2.25, -1])
     a_cross_b = MathArray([-6.875, 7.25, 6.])

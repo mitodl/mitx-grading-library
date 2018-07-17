@@ -108,7 +108,7 @@ def make_shape_validator(shape):
     Traceback (most recent call last):
     Invalid: received a str, expected a vector of length 4
 
-    Instead of specifying a tuple shape, you can speicfy 'square' to demand
+    Instead of specifying a tuple shape, you can specify 'square' to demand
     square matrices of any dimension.
     >>> validate_square = make_shape_validator('square')
     >>> square2 = MathArray([[1, 2], [3, 4]])

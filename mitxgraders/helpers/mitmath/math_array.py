@@ -288,7 +288,7 @@ class MathArray(np.ndarray):
         Usage
         =====
 
-        By default, negative integer matrix powers are interpretted as inverses.
+        By default, negative integer matrix powers are interpreted as inverses.
         Use MathArray.enable_negative_powers(False) to temporarily throw errors
         instead:
         >>> A = MathArray([[2, 1], [-1, 3]])
