@@ -19,6 +19,7 @@ import scipy.special as special
 from mitxgraders.helpers.mitmath.specify_domain import SpecifyDomain
 from mitxgraders.exceptions import StudentFacingError
 from mitxgraders.helpers.mitmath.exceptions import FunctionEvalError
+from mitxgraders.helpers.mitmath.math_array import MathArray
 
 # Normal Trig
 def sec(arg):
@@ -183,6 +184,14 @@ def factorial(z):
     except ValueError:
         return value
 
+@SpecifyDomain.make_decorator((3,), (3,))
+def cross(a, b):
+    return MathArray([
+        a[1]*b[2] - b[1]*a[2],
+        a[2]*b[0] - b[2]*a[0],
+        a[0]*b[1] - b[0]*a[1]
+    ])
+
 # Variables available by default
 DEFAULT_VARIABLES = {
     'i': np.complex(0, 1),
@@ -243,15 +252,18 @@ ARRAY_FUNCTIONS = {
     'conj': np.conj
 }
 
-# TODO: These need validation in order to throw useful error messages
+def has_one_square_input(display_name):
+    return SpecifyDomain.make_decorator('square', display_name=display_name)
+
 ARRAY_ONLY_FUNCTIONS = {
     'norm': np.linalg.norm,
     'abs': np.linalg.norm,
     'trans': np.transpose,
-    'det': np.linalg.det,
-    'tr': np.trace,
+    'det': has_one_square_input('det')(np.linalg.det),
+    'tr': has_one_square_input('tr')(np.trace),
     'ctrans': lambda x: np.conj(np.transpose(x)),
-    'adj': lambda x: np.conj(np.transpose(x))
+    'adj': lambda x: np.conj(np.transpose(x)),
+    'cross': cross
 }
 
 def merge_dicts(*source_dicts):
