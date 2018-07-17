@@ -7,7 +7,9 @@ from mitxgraders.helpers.mitmath.mathfuncs import (
     sec, arcsec,
     coth, arccoth,
     csch, arccsch,
-    sech, arcsech)
+    sech, arcsech,
+    ARRAY_ONLY_FUNCTIONS)
+from mitxgraders.helpers.mitmath.math_array import MathArray, random_math_array
 
 def test_math_functions():
     """Test the math functions that we've implemented"""
@@ -38,3 +40,10 @@ def test_math_functions():
     assert -arcsech(sech(x)) == approx(x)
     assert arccsch(csch(x)) == approx(x)
     assert arccoth(coth(x)) == approx(x)
+
+def test_array_functions_preserve_type():
+
+    for name in ['trans', 'ctrans', 'adj']:
+        func = ARRAY_ONLY_FUNCTIONS[name]
+        result = func(random_math_array((3, 3)))
+        assert isinstance(result, MathArray)
