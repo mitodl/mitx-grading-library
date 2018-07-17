@@ -5,11 +5,12 @@ Defines class SpecifyDomain, an author-facing decorator for specifying the domai
 of a function. Currently only supports specifying the shape of inputs.
 """
 from numbers import Number
-from voluptuous import Schema, Invalid, Required
+from voluptuous import Schema, Invalid, Required, Any
 from mitxgraders.helpers.validatorfuncs import is_shape_specification
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.helpers.mitmath.exceptions import DomainError
-from mitxgraders.helpers.mitmath.math_array import MathArray, is_scalar_matharray
+from mitxgraders.helpers.mitmath.math_array import (
+    MathArray, is_scalar_matharray, is_square)
 
 def low_ordinal(n):
     """
@@ -46,6 +47,17 @@ def get_description(obj):
     else:
         return obj.__class__.__name__
 
+def get_shape_description(shape):
+    """
+    Get shape description from numpy shape tuple or string 'square'.
+    """
+    if shape == (1,):
+        return 'scalar'
+    elif shape == 'square':
+        return 'square matrix'
+
+    return MathArray.get_description(shape)
+
 def number_validator(obj):
     """
     Voluptuous validator to test that obj is number.
@@ -79,7 +91,7 @@ def make_shape_validator(shape):
 
     Arguments:
     =========
-        shape (tuple): A numpy shape tuple
+        shape: A numpy shape tuple or 'square'
 
     Usage:
     ======
@@ -95,12 +107,33 @@ def make_shape_validator(shape):
     >>> validate_vec4('cat')
     Traceback (most recent call last):
     Invalid: received a str, expected a vector of length 4
+
+    Instead of specifying a tuple shape, you can speicfy 'square' to demand
+    square matrices of any dimension.
+    >>> validate_square = make_shape_validator('square')
+    >>> square2 = MathArray([[1, 2], [3, 4]])
+    >>> square3 = MathArray([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    >>> validate_square(square2)
+    MathArray([[1, 2],
+           [3, 4]])
+    >>> validate_square(square3)
+    MathArray([[1, 2, 3],
+           [4, 5, 6],
+           [7, 8, 9]])
+    >>> validate_square(MathArray([1, 2, 3, 4]))
+    Traceback (most recent call last):
+    Invalid: received a vector of length 4, expected a square matrix
     """
     def shape_validator(obj):
-        if isinstance(obj, MathArray) and obj.shape == shape:
-            return obj
+        if isinstance(obj, MathArray):
+            if obj.shape == shape:
+                return obj
+            elif shape == 'square' and is_square(obj):
+                return obj
+
+        expected = get_shape_description(shape)
         raise Invalid("received a {received}, expected a {expected}"
-            .format(received=get_description(obj), expected=MathArray.get_description(shape)))
+                      .format(received=get_description(obj), expected=expected))
 
     return shape_validator
 
@@ -123,6 +156,7 @@ class SpecifyDomain(ObjectWithSchema):
         k, positive integer: means input is a k-component vector
         [k1, k2, ...], list of positive integers: means input is an array of shape (k1, k2, ...)
         (k1, k2, ...), tuple of positive integers: means input is an array of shape (k1, k2, ...)
+        'square' indicates a square matrix of any dimension
     - display_name (?str): Function name to be used in error messages
       defaults to None, meaning that the function's __name__ attribute is used.
 
@@ -157,20 +191,26 @@ class SpecifyDomain(ObjectWithSchema):
     DomainError: There was an error evaluating function cross(...): expected 2 inputs, but received 1.
 
     To specify that an input should be a an array of specific size, use a list or tuple
-    for that shape value. Here, [3, 2] specifies a 3 by 2 matrix; (3, 2) would work also:
-    >>> @SpecifyDomain(input_shapes=[1, [3, 2], 2])
+    for that shape value. Below, [3, 2] specifies a 3 by 2 matrix (the tuple
+    (3, 2) would work also). Use 'square' to indicate square matrix of any
+    dimension:
+    >>> @SpecifyDomain(input_shapes=[1, [3, 2], 2, 'square'])
     ... def f(x, y, z):
     ...     pass # implement complicated stuff here
-    >>> f(1, 2, 3)                                      # doctest: +ELLIPSIS
+    >>> square_mat = MathArray([[1, 2], [3, 4]])
+    >>> f(1, 2, 3, square_mat)                                      # doctest: +ELLIPSIS
     Traceback (most recent call last):
     DomainError: There was an error evaluating function f(...)
     1st input is ok: received a scalar as expected
     2nd input has an error: received a scalar, expected a matrix of shape (rows: 3, cols: 2)
     3rd input has an error: received a scalar, expected a vector of length 2
+    4th input is ok: received a square matrix as expected
     """
 
     schema_config = Schema({
-        Required('input_shapes'): [Schema(is_shape_specification())],
+        Required('input_shapes'): [Schema(
+            Any(is_shape_specification(), 'square')
+        )],
         Required('display_name', default=None): str
     })
 
@@ -226,7 +266,7 @@ class SpecifyDomain(ObjectWithSchema):
                     if error:
                         lines.append('{0} input has an error: '.format(ordinal) + error.error_message)
                     else:
-                        expected = 'scalar' if shape == (1,) else MathArray.get_description(shape)
+                        expected = get_shape_description(shape)
                         lines.append('{0} input is ok: received a {1} as expected'
                             .format(ordinal, expected))
 
