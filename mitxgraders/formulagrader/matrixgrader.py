@@ -13,6 +13,23 @@ from mitxgraders.helpers.mitmath.mathfuncs import (
     merge_dicts, ARRAY_ONLY_FUNCTIONS)
 
 class MatrixGrader(FormulaGrader):
+    """
+    An extension of FormulaGrader with better support for grading expressions
+    with vectors and matrices.
+
+    Configuration options as per FormulaGrader, plus:
+        max_array_dim (int): Specify the maximum array dimension that the
+            expression parser will accept, defaults to 2 (allows vectors
+            and matrices).
+
+        shape_errors (bool): If True (the default), then array shape mismatch
+            errors will raise an error rather. If false, shape mismatch will
+            result in input being graded incorrect.
+
+        negative_powers (bool): If True (the default), then for a square matrix
+            A and positive integer k, A^-k is interpreted as (inverse(A))^k.
+            If False, negative powers raise an error instead.
+    """
 
     # merge_dicts does not mutate the originals
     default_functions = merge_dicts(FormulaGrader.default_functions,
