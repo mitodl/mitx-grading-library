@@ -9,9 +9,10 @@ import re
 import itertools
 import numpy as np
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
-from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
-                                  DiscreteSet, gen_symbols_samples, construct_functions,
-                                  construct_constants, construct_suffixes, schema_user_functions)
+from mitxgraders.sampling import (VariableSamplingSet, RealInterval,DiscreteSet,
+                                  gen_symbols_samples, construct_functions,
+                                  construct_constants, construct_suffixes,
+                                  schema_user_functions, validate_user_constants)
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.helpers.mitmath import (evaluator, within_tolerance, MathArray,
@@ -414,7 +415,8 @@ class FormulaGrader(ItemGrader):
         forbidden_default = "Invalid Input: This particular answer is forbidden"
         return schema.extend({
             Required('user_functions', default={}): schema_user_functions,
-            Required('user_constants', default={}): self.schema_user_consts,
+            Required('user_constants', default={}): validate_user_constants(
+                Number, MathArray, IdentityMultiple),
             # Blacklist/Whitelist have additional validation that can't happen here, because
             # their validation is correlated with each other
             Required('blacklist', default=[]): [str],
@@ -435,10 +437,7 @@ class FormulaGrader(ItemGrader):
             Required('max_array_dim', default=0): NonNegative(int)
         })
 
-    schema_user_consts = All(
-        has_keys_of_type(str),
-        {Extra: Any(Number, MathArray, IdentityMultiple)},
-    )
+
 
     Utils = namedtuple('Utils', ['tolerance', 'within_tolerance'])
 

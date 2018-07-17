@@ -622,6 +622,12 @@ def construct_functions(default_functions, user_funcs):
 
     return funcs, random_funcs
 
+def validate_user_constants(*allow_types):
+    return All(
+        has_keys_of_type(str),
+        {Extra: Any(*allow_types)},
+    )
+
 def construct_constants(default_variables, user_consts):
     """
     Create a new dict that is the merge of user_consts into default_variables

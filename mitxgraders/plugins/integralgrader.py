@@ -13,7 +13,7 @@ from numpy import real, imag
 from voluptuous import Schema, Required, Any, All, Extra, Length, Coerce
 from mitxgraders.sampling import (VariableSamplingSet, schema_user_functions, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
-                                  construct_constants, has_keys_of_type)
+                                  construct_constants, has_keys_of_type, validate_user_constants)
 from mitxgraders.formulagrader import (
     validate_blacklist_whitelist_config,
     validate_only_permitted_functions_used,
@@ -214,7 +214,7 @@ class IntegralGrader(AbstractGrader):
             Required('complex_integrand', default=False): bool,
             # Most of the below are copied from FormulaGrader
             Required('user_functions', default={}): schema_user_functions,
-            Required('user_constants', default={}): {Extra: Number},
+            Required('user_constants', default={}): validate_user_constants(Number),
             # Blacklist/Whitelist have additional validation that can't happen here, because
             # their validation is correlated with each other
             Required('blacklist', default=[]): [str],
