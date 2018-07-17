@@ -503,7 +503,7 @@ def is_subset(iterable, iterable_superset):
             return False
     return True
 
-def gen_symbols_samples(symbols, samples, sample_from, functions=None, suffixes=None):
+def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes):
     """
     Generates a list of dictionaries mapping symbol names to values.
 
@@ -525,7 +525,7 @@ def gen_symbols_samples(symbols, samples, sample_from, functions=None, suffixes=
     ...     {
     ...         'a': RealInterval([1,3]),
     ...         'b': RealInterval([-4,-2])
-    ...     }
+    ...     }, {}, {}
     ... )
     >>> variable_samples # doctest: +SKIP
     [

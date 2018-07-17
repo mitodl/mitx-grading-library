@@ -231,7 +231,8 @@ def test_dependent_sampler():
         'a': IntegerRange([1, 1]),
         'b': DependentSampler(depends=["a"], formula="a+1")
     }
-    result = gen_symbols_samples(symbols, samples, sample_from)
+    funcs, suffs = {}, {}
+    result = gen_symbols_samples(symbols, samples, sample_from, funcs, suffs)
     assert result == [{"a": 1, "b": 2.0}, {"a": 1, "b": 2.0}]
 
     symbols = ["a", "b", "c", "d"]
@@ -242,7 +243,8 @@ def test_dependent_sampler():
         'c': DependentSampler(depends=["b"], formula="b+1"),
         'b': DependentSampler(depends=["a"], formula="a+1")
     }
-    result = gen_symbols_samples(symbols, samples, sample_from)[0]
+    funcs, suffs = {}, {}
+    result = gen_symbols_samples(symbols, samples, sample_from, funcs, suffs)[0]
     assert result["b"] == 2 and result["c"] == 3 and result["d"] == 4
 
     symbols = ["x", "y", "z", "r"]
@@ -253,8 +255,9 @@ def test_dependent_sampler():
         'z': RealInterval([-5, 5]),
         'r': DependentSampler(depends=["x", "y", "z"], formula="sqrt(x^2+y^2+z^2)")
     }
-    functions = {'sqrt': lambda x: x**0.5}
-    result = gen_symbols_samples(symbols, samples, sample_from, functions)[0]
+    funcs = {'sqrt': lambda x: x**0.5}
+    suffs = {}
+    result = gen_symbols_samples(symbols, samples, sample_from, funcs, suffs)[0]
     assert result["x"]**2 + result["y"]**2 + result["z"]**2 == approx(result["r"]**2)
 
     symbols = ["x", "y"]
@@ -263,14 +266,16 @@ def test_dependent_sampler():
         'x': DependentSampler(depends=["y"], formula="1"),
         'y': DependentSampler(depends=["x"], formula="1")
     }
+    funcs = {}
+    suffs = {}
     with raises(ConfigError, match="Circularly dependent DependentSamplers detected: x, y"):
-        gen_symbols_samples(symbols, samples, sample_from)
+        gen_symbols_samples(symbols, samples, sample_from, funcs, suffs)
 
     with raises(ConfigError, match=r"Formula error in dependent sampling formula: 1\+\(2"):
         symbols = ["x"]
         samples = 1
         sample_from = {'x': DependentSampler(depends=[], formula="1+(2")}
-        gen_symbols_samples(symbols, samples, sample_from)
+        gen_symbols_samples(symbols, samples, sample_from, funcs, suffs)
 
     with raises(Exception, match="DependentSampler must be invoked with compute_sample."):
         DependentSampler(depends=[], formula="1").gen_sample()

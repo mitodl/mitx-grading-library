@@ -35,6 +35,8 @@ from mitxgraders.exceptions import StudentFacingError
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
 from mitxgraders.helpers.mitmath.math_array import MathArray, IdentityMultiple
 from mitxgraders.helpers.mitmath.robust_pow import robust_pow
+from mitxgraders.helpers.mitmath.mathfuncs import (
+    DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
 from mitxgraders.helpers.mitmath.exceptions import (
     CalcError,
     CalcOverflowError,
@@ -245,9 +247,9 @@ parsercache = ParserCache()
 ScopeUsage = namedtuple('ScopeUSage', ['variables', 'functions', 'suffixes'])
 
 def evaluator(formula,
-              variables=None,
-              functions=None,
-              suffixes=None,
+              variables=DEFAULT_VARIABLES,
+              functions=DEFAULT_FUNCTIONS,
+              suffixes=DEFAULT_SUFFIXES,
               max_array_dim=0,
               allow_inf=False):
     """
@@ -257,9 +259,9 @@ def evaluator(formula,
     =========
     - formula (str): The formula to be evaluated
     Pass a scope consisting of variables, functions, and suffixes:
-    - variables (dict): maps strings to variable values
-    - functions (dict): maps strings to functions
-    - suffixes (dict): maps strings to suffix values
+    - variables (dict): maps strings to variable values, defaults to DEFAULT_VARIABLES
+    - functions (dict): maps strings to functions, defaults to DEFAULT_FUNCTIONS
+    - suffixes (dict): maps strings to suffix values, defaults to DEFAULT_SUFFIXES
     Also:
     - max_array_dim: Maximum dimension of MathArrays
     - allow_inf: Whether to raise an error if the evaluator encounters an infinity
@@ -302,9 +304,6 @@ def evaluator(formula,
     >>> evaluator("inf", variables={'inf': float('inf')}, allow_inf=True)[0]
     inf
     """
-    variables = {} if variables is None else variables
-    functions = {} if functions is None else functions
-    suffixes = {} if suffixes is None else suffixes
 
     empty_usage = ScopeUsage(set(), set(), set())
     if formula is None:
