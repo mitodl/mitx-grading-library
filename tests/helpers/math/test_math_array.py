@@ -357,7 +357,7 @@ def test_power_error_messages():
         u**A
 
     match = "Cannot raise a matrix to non-integer powers"
-    with raises(ShapeError, match=match):
+    with raises(MathArrayError, match=match):
         A**2.4
 
     match = "Cannot raise a non-square matrix to powers."

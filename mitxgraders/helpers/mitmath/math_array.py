@@ -268,8 +268,7 @@ class MathArray(np.ndarray):
         integer_like = (isinstance(exponent, int) or
                         isinstance(exponent, float) and exponent.is_integer())
         if not integer_like:
-            # TODO Should this be a shape error?
-            raise ShapeError("Cannot raise a matrix to non-integer powers.")
+            raise MathArrayError("Cannot raise a matrix to non-integer powers.")
         elif exponent < 0 and not MathArray._negative_powers:
             raise MathArrayError('Negative matrix powers have been disabled.')
         else:
