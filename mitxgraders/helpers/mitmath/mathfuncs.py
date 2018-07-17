@@ -301,6 +301,21 @@ METRIC_SUFFIXES = {
     'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12
 }
 
+pauli = {
+    'x': MathArray([
+        [0, 1],
+        [1, 0]
+    ]),
+    'y': MathArray([
+        [0, -1j],
+        [1j, 0]
+    ]),
+    'z': MathArray([
+        [1, 0],
+        [0, -1]
+    ])
+}
+
 def within_tolerance(x, y, tolerance):
     """
     Check that |x-y| <= tolerance with appropriate norm.

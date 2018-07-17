@@ -9,6 +9,7 @@ from mitxgraders.helpers.mitmath.mathfuncs import (
     DEFAULT_FUNCTIONS,
     DEFAULT_SUFFIXES,
     METRIC_SUFFIXES,
+    pauli,
     within_tolerance
 )
 from mitxgraders.helpers.mitmath.math_array import MathArray, IdentityMultiple
