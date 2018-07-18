@@ -104,6 +104,14 @@ def test_addition_with_zero():
     A = MathArray([[5,  2, 1], [-2, 4, -3]])
     assert equal_as_arrays(A + 0, A)
     assert equal_as_arrays(0 + A, A)
+    z0 = MathArray(0)
+    assert equal_as_arrays(A + z0, A)
+    assert equal_as_arrays(z0 + A, A)
+
+    # This is ugly, but convenient for logic and implementation
+    z3 = MathArray([[[0]]])
+    assert equal_as_arrays(A + z3, A)
+    assert equal_as_arrays(z3 + A, A)
 
     u = MathArray([1, 2])
     assert equal_as_arrays(u + 0, u)
@@ -264,6 +272,7 @@ def test_scalar_product():
         [10, 20, 30]
     ])
     two = MathArray(2)
+    two3 = MathArray([[[2]]])
     Y = MathArray([
         [2, 4, 6],
         [20, 40, 60]
@@ -272,6 +281,9 @@ def test_scalar_product():
     assert equal_as_arrays(X*2, Y)
     assert equal_as_arrays(two*X, Y)
     assert equal_as_arrays(X*two, Y)
+    # This is ugly, but convenient for logic and implementation
+    assert equal_as_arrays(two3*X, Y)
+    assert equal_as_arrays(X*two3, Y)
 
 def test_tensor_multiplication_not_supported():
     A = random_math_array([2, 3, 4])

@@ -150,12 +150,15 @@ class MathArray(np.ndarray):
     def __add__(self, other):
         super_ADD = super(MathArray, self).__add__
 
-        if is_number_zero(other) or is_numberlike_zero_array(other):
+        if is_number_zero(other):
             return super_ADD(other)
+
+        elif is_numberlike_zero_array(other):
+            return super_ADD(other.item())
 
         elif isinstance(other, Number):
             if is_numberlike_array(self):
-                return super_ADD(other)
+                return self.item() + (other)
             raise ShapeError("Cannot add/subtract scalars to a {self.shape_name}."
                                  .format(self=self))
 
@@ -199,7 +202,7 @@ class MathArray(np.ndarray):
 
         elif isinstance(other, MathArray):
             if is_numberlike_array(self):
-                return super_MUL(other)
+                return self.item() * (other)
             elif is_numberlike_array(other):
                 return super_MUL(other.item())
             elif self.ndim > 2 or other.ndim > 2:
