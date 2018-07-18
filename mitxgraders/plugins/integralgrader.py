@@ -24,9 +24,9 @@ from mitxgraders.formulagrader import (
 from mitxgraders.baseclasses import AbstractGrader
 from mitxgraders.exceptions import (
     InvalidInput, ConfigError, StudentFacingError, MissingInput)
-from mitxgraders.helpers.mitmath import (
+from mitxgraders.helpers.calc import (
     within_tolerance, evaluator, DEFAULT_VARIABLES, DEFAULT_FUNCTIONS)
-from mitxgraders.helpers.mitmath.mathfuncs import merge_dicts
+from mitxgraders.helpers.calc.mathfuncs import merge_dicts
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NonNegative, all_unique, PercentageString, is_callable)
 

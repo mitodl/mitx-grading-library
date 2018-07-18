@@ -1,9 +1,9 @@
 from __future__ import division
 from pytest import raises
 import numpy as np
-from mitxgraders.helpers.mitmath import evaluator, MathArray, IdentityMultiple
-from mitxgraders.helpers.mitmath.math_array import equal_as_arrays
-from mitxgraders.helpers.mitmath.exceptions import UnableToParse
+from mitxgraders import evaluator, MathArray, IdentityMultiple
+from mitxgraders.helpers.calc.math_array import equal_as_arrays
+from mitxgraders.helpers.calc.exceptions import UnableToParse
 
 def test_array_input():
     """Test that vectors/matrices can be inputted into calc.py"""
@@ -19,13 +19,16 @@ def test_array_input():
 
     msg = "Vector and matrix expressions have been forbidden in this entry."
     with raises(UnableToParse, match=msg):
-        evaluator("[[1, 2], [3, 4]]", {}, {}, {})
+        evaluator("[[1, 2], [3, 4]]", {}, {}, {}, max_array_dim=0)
     msg = "Matrix expressions have been forbidden in this entry."
     with raises(UnableToParse, match=msg):
         evaluator("[[1, 2], [3, 4]]", {}, {}, {}, max_array_dim=1)
     msg = "Tensor expressions have been forbidden in this entry."
     with raises(UnableToParse, match=msg):
         evaluator("[[[1, 2], [3, 4]]]", {}, {}, {}, max_array_dim=2)
+
+    # By default, this is fine
+    evaluator("[[[1, 2], [3, 4]]]")
 
 # NOTE: These two examples are very brief. The vast majority of MathArray testing
 # is done in its own file. Essentially, all I want to do here is verify that

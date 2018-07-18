@@ -8,8 +8,8 @@ from numbers import Number
 from voluptuous import Schema, Invalid, Required, Any
 from mitxgraders.helpers.validatorfuncs import is_shape_specification
 from mitxgraders.baseclasses import ObjectWithSchema
-from mitxgraders.helpers.mitmath.exceptions import DomainError
-from mitxgraders.helpers.mitmath.math_array import (
+from mitxgraders.helpers.calc.exceptions import DomainError
+from mitxgraders.helpers.calc.math_array import (
     MathArray, is_scalar_matharray, is_square)
 
 def low_ordinal(n):

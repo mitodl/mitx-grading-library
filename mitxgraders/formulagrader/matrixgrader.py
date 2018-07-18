@@ -6,10 +6,10 @@ Defines a FormulaGrader subtype that handles matrices, too.
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from voluptuous import Required
 from mitxgraders.helpers.validatorfuncs import NonNegative
-from mitxgraders.helpers.mitmath import IdentityMultiple, MathArray
-from mitxgraders.helpers.mitmath.exceptions import (
+from mitxgraders.helpers.calc import IdentityMultiple, MathArray
+from mitxgraders.helpers.calc.exceptions import (
     MathArrayShapeError as ShapeError)
-from mitxgraders.helpers.mitmath.mathfuncs import (
+from mitxgraders.helpers.calc.mathfuncs import (
     merge_dicts, ARRAY_ONLY_FUNCTIONS)
 
 class MatrixGrader(FormulaGrader):

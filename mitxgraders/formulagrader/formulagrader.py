@@ -9,19 +9,19 @@ import re
 import itertools
 import numpy as np
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
-from mitxgraders.sampling import (VariableSamplingSet, RealInterval,DiscreteSet,
+from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
                                   gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes,
                                   schema_user_functions, validate_user_constants)
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.baseclasses import ItemGrader
-from mitxgraders.helpers.mitmath import (evaluator, within_tolerance, MathArray,
-                                         IdentityMultiple, DEFAULT_VARIABLES,
-                                         DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
-from mitxgraders.helpers.mitmath.calc import parsercache
+from mitxgraders.helpers.calc import (evaluator, within_tolerance, MathArray,
+                                      IdentityMultiple, DEFAULT_VARIABLES,
+                                      DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
+from mitxgraders.helpers.calc.calc import parsercache
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NonNegative, is_callable, PercentageString, all_unique,
-    is_callable_with_args, has_keys_of_type)
+    is_callable_with_args)
 
 # Some of these validators are useful to other classes, e.g., IntegralGrader
 def validate_blacklist_whitelist_config(default_funcs, blacklist, whitelist):

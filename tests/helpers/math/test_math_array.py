@@ -3,14 +3,14 @@ from pytest import raises
 import random
 import numpy as np
 from numbers import Number
-from mitxgraders.helpers.mitmath.math_array import (
+from mitxgraders.helpers.calc.math_array import (
     MathArray,
     IdentityMultiple as IdMult,
     equal_as_arrays,
     approx_equal_as_arrays,
     random_math_array
 )
-from mitxgraders.helpers.mitmath.exceptions import (
+from mitxgraders.helpers.calc.exceptions import (
     MathArrayError, MathArrayShapeError as ShapeError)
 
 def test_random_math_array():

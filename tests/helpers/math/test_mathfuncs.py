@@ -1,8 +1,8 @@
 import random
 import math
 from pytest import approx, raises
-from mitxgraders.helpers.mitmath.exceptions import DomainError, FunctionEvalError
-from mitxgraders.helpers.mitmath.mathfuncs import (
+from mitxgraders.helpers.calc.exceptions import DomainError, FunctionEvalError
+from mitxgraders.helpers.calc.mathfuncs import (
     cot, arccot,
     csc, arccsc,
     sec, arcsec,
@@ -10,7 +10,7 @@ from mitxgraders.helpers.mitmath.mathfuncs import (
     csch, arccsch,
     sech, arcsech,
     ARRAY_ONLY_FUNCTIONS, ARRAY_FUNCTIONS)
-from mitxgraders.helpers.mitmath.math_array import (
+from mitxgraders.helpers.calc.math_array import (
     MathArray, random_math_array, equal_as_arrays)
 
 def test_math_functions():
