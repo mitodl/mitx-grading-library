@@ -10,7 +10,7 @@ from mitxgraders.helpers.validatorfuncs import is_shape_specification
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.helpers.calc.exceptions import DomainError
 from mitxgraders.helpers.calc.math_array import (
-    MathArray, is_scalar_matharray, is_square)
+    MathArray, is_numberlike_array, is_square)
 
 def low_ordinal(n):
     """
@@ -78,7 +78,7 @@ def number_validator(obj):
     """
     if isinstance(obj, Number):
         return obj
-    elif is_scalar_matharray(obj):
+    elif is_numberlike_array(obj):
         return obj.item()
 
     raise Invalid("received a {0}, expected a scalar".format(get_description(obj)))

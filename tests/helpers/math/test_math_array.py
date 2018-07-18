@@ -199,6 +199,10 @@ def test_matrix_times_matrix_multiplication():
     with raises(ShapeError, match=match):
         X*Y
 
+    row = MathArray([[1, 2, 3]])
+    col = MathArray([[1], [2], [3]])
+    assert row*col == 14 and isinstance(row*col, Number)
+
 def test_matrix_times_vector_multiplication():
     u = MathArray([1, -2, 3])
     A = MathArray([
