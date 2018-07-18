@@ -23,26 +23,47 @@ def is_number_zero(value):
     """
     return isinstance(value, Number) and value == 0
 
-def is_scalar_matharray(obj):
-    """Test than obj is a 0-dimensional MathArray (scalar)"""
-    return isinstance(obj, MathArray) and obj.ndim == 0
+def is_numberlike_array(obj):
+    """
+    Test than obj is a MathArray with 1 item
 
-def is_scalar_array_zero(obj):
+    >>> is_numberlike_array(MathArray(5))
+    True
+    >>> is_numberlike_array(MathArray([5]))
+    True
+    >>> is_numberlike_array(MathArray([[5]]))
+    True
+    >>> is_numberlike_array(MathArray([5, 5]))
+    False
+
+
+    The unique item of a numberlike array is a number:
+    >>> numberlike = MathArray([[[[5]]]])
+    >>> is_numberlike_array(numberlike)
+    True
+    >>> isinstance(numberlike.item(), Number)
+    True
+    """
+    return isinstance(obj, MathArray) and obj.size == 1
+
+def is_numberlike_zero_array(obj):
     """
     Tests if value is a scalar MathArray with value 0.
 
     >>> zero = MathArray(0)
-    >>> is_scalar_array_zero(zero)
+    >>> is_numberlike_zero_array(zero)
+    True
+    >>> is_numberlike_zero_array(MathArray([[[0]]]))
     True
     >>> five = MathArray(5) # scalar MathArray, but not zero
-    >>> is_scalar_array_zero(MathArray(5))
+    >>> is_numberlike_zero_array(MathArray(5))
     False
-    >>> is_scalar_array_zero(MathArray([0, 0, 0])) # vector zero, not scalar
+    >>> is_numberlike_zero_array(MathArray([0, 0, 0])) # vector zero, not scalar
     False
-    >>> is_scalar_array_zero(0) # number zero, not MathArray
+    >>> is_numberlike_zero_array(0) # number zero, not MathArray
     False
     """
-    return is_scalar_matharray(obj) and obj.item() == 0
+    return is_numberlike_array(obj) and obj.item() == 0
 
 def is_square(array):
     return array.ndim == 2 and array.shape[0] == array.shape[1]
@@ -129,12 +150,15 @@ class MathArray(np.ndarray):
     def __add__(self, other):
         super_ADD = super(MathArray, self).__add__
 
-        if is_number_zero(other) or is_scalar_array_zero(other):
+        if is_number_zero(other):
             return super_ADD(other)
 
+        elif is_numberlike_zero_array(other):
+            return super_ADD(other.item())
+
         elif isinstance(other, Number):
-            if self.ndim == 0:
-                return super_ADD(other)
+            if is_numberlike_array(self):
+                return self.item() + (other)
             raise ShapeError("Cannot add/subtract scalars to a {self.shape_name}."
                                  .format(self=self))
 
@@ -151,6 +175,8 @@ class MathArray(np.ndarray):
         elif isinstance(other, MathArray):
             if self.shape == other.shape:
                 return super_ADD(other)
+            elif is_numberlike_zero_array(self):
+                return self.item() + other
 
             msg = ("Cannot add/subtract a {self.description} with a {other.description}.").format(
                 self=self, other=other)
@@ -177,15 +203,21 @@ class MathArray(np.ndarray):
             return super_MUL(other.value)
 
         elif isinstance(other, MathArray):
-            if self.ndim == 0:
-                return super_MUL(other)
-            elif other.ndim == 0:
+            if is_numberlike_array(self):
+                return self.item() * (other)
+            elif is_numberlike_array(other):
                 return super_MUL(other.item())
             elif self.ndim > 2 or other.ndim > 2:
                 raise MathArrayError("Multiplication of tensor arrays is not currently supported.")
             try:
                 # can't mutate self during the multiplication
-                return np.dot(self, other)
+                result = np.dot(self, other)
+                # If A has shape (1, n) and B has shape (n, 1), return a
+                # number instead of a (1, 1) array
+                if isinstance(result, MathArray) and is_numberlike_array(result):
+                    return result.item()
+                else:
+                    return result
 
             except ValueError:
                 # vector-specific message mentions dot product
@@ -216,7 +248,7 @@ class MathArray(np.ndarray):
         if isinstance(other, Number):
             return super_DIV(other)
         elif isinstance(other, MathArray):
-            if other.ndim == 0:
+            if is_numberlike_array(other):
                 return super_DIV(other.item())
             else:
                 raise ShapeError('Cannot divide a {self.shape_name} by a {other.shape_name}'
@@ -234,7 +266,7 @@ class MathArray(np.ndarray):
         """
         Matrix powers for MathArrays of dimension 0 and 2.
         """
-        if self.ndim == 0:
+        if is_numberlike_array(self):
             if isinstance(other, Number):
                 return robust_pow(self.item(), other)
             elif isinstance(other, MathArray):
@@ -253,7 +285,7 @@ class MathArray(np.ndarray):
         if isinstance(other, Number):
             exponent = other
         elif isinstance(other, MathArray):
-            if other.ndim == 0:
+            if is_numberlike_array(other):
                 exponent = other.item()
             else:
                 raise ShapeError("Cannot raise a matrix to {other.shape_name} powers.".format(
@@ -316,7 +348,7 @@ class MathArray(np.ndarray):
             cls._negative_powers = cls._default_negative_powers
 
     def __rpow__(self, other):
-        if self.ndim == 0 and isinstance(other, Number):
+        if is_numberlike_array(self) and isinstance(other, Number):
             return robust_pow(other, self.item())
 
         if isinstance(other, Number):
