@@ -25,14 +25,14 @@ from numbers import Number
 import abc
 import random
 import numpy as np
-from voluptuous import Schema, Required, All, Length, Coerce, Any
+from voluptuous import Schema, Required, All, Length, Coerce, Any, Extra
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
-from mitxgraders.helpers.validatorfuncs import (Positive, NumberRange, ListOfType,
-                                                TupleOfType, is_callable, is_shape_specification)
-from mitxgraders.helpers.mitmath import (DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
-                                      DEFAULT_VARIABLES, METRIC_SUFFIXES,
-                                      CalcError, evaluator, MathArray)
+from mitxgraders.helpers.validatorfuncs import (
+    Positive, NumberRange, ListOfType, TupleOfType, is_callable,
+    has_keys_of_type, is_shape_specification)
+from mitxgraders.helpers.mitmath import (
+    METRIC_SUFFIXES, CalcError, evaluator, MathArray)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -480,13 +480,13 @@ class DependentSampler(VariableSamplingSet):
         """Return a random entry from the given set"""
         raise Exception("DependentSampler must be invoked with compute_sample.")
 
-    def compute_sample(self, sample_dict):
+    def compute_sample(self, sample_dict, functions, suffixes):
         """Compute the value of this sample"""
         try:
             result, _ = evaluator(formula=self.config['formula'],
                                   variables=sample_dict,
-                                  functions=DEFAULT_FUNCTIONS,
-                                  suffixes=DEFAULT_SUFFIXES)
+                                  functions=functions,
+                                  suffixes=suffixes)
         except CalcError:
             raise ConfigError("Formula error in dependent sampling formula: " +
                               self.config["formula"])
@@ -503,9 +503,16 @@ def is_subset(iterable, iterable_superset):
             return False
     return True
 
-def gen_symbols_samples(symbols, samples, sample_from):
+def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes):
     """
-    Generates a list of dictionaries mapping variable names to values.
+    Generates a list of dictionaries mapping symbol names to values.
+
+    Arguments:
+        symbols ([str]): a list of symbol names
+        samples (int): how many samples to generate
+        sample_from: a dictionary mapping symbol names to sampling sets
+        functions (dict): function-scope for evaluating dependent variables
+        suffixes (dict): suffix-scope for evaluating dependent variables
 
     The symbols argument will usually be config['variables']
     or config['functions'].
@@ -518,7 +525,7 @@ def gen_symbols_samples(symbols, samples, sample_from):
     ...     {
     ...         'a': RealInterval([1,3]),
     ...         'b': RealInterval([-4,-2])
-    ...     }
+    ...     }, {}, {}
     ... )
     >>> variable_samples # doctest: +SKIP
     [
@@ -548,7 +555,8 @@ def gen_symbols_samples(symbols, samples, sample_from):
             progress_made = False
             for symbol, dependencies in unevaluated_dependents.items():
                 if is_subset(dependencies, sample_dict):
-                    sample_dict[symbol] = sample_from[symbol].compute_sample(sample_dict)
+                    sample_dict[symbol] = sample_from[symbol].compute_sample(
+                        sample_dict, functions, suffixes)
                     del unevaluated_dependents[symbol]
                     progress_made = True
 
@@ -560,89 +568,106 @@ def gen_symbols_samples(symbols, samples, sample_from):
         sample_list.append(sample_dict)
     return sample_list
 
-def construct_functions(user_funcs):
+schema_user_functions = All(
+    has_keys_of_type(str),
+    {Extra: Any(is_callable,
+                All([is_callable], Coerce(SpecificFunctions)),
+                FunctionSamplingSet)},
+)
+
+def construct_functions(default_functions, user_funcs):
     """
-    Returns the dictionary of available functions
+    Constructs functions for use in sampling math expressions.
 
     Arguments:
-        user_funcs (dict): Dictionary of "name": function pairs specifying user-defined
-            functions to include.
+        default_funcs: a dict mapping function names (strings) to functions
+        user_funcs: a dict mapping function names (strings) to functions OR
+            FunctionSamplingSet instances
+
+    Returns:
+        a tuple (functions, random_functions) of dictionaries:
+        functions: maps function names to functions
+        random_functions: maps function names to function sampling sets
 
     Usage
     =====
-    If no user_funcs are specified, DEFAULT_FUNCTIONS is returned
-    >>> funcs, random_funcs = construct_functions({})
-    >>> funcs == DEFAULT_FUNCTIONS
+    Sorts user_funcs into functions and FunctionSamplingSet instances,
+    merging the normal functions into a copy of default_funcs:
+    >>> from math import sin, cos, tan
+    >>> default_funcs = {'sin': sin, 'cos': cos}
+    >>> func, random_func = tan, RandomFunction()
+    >>> user_funcs = {
+    ...     'tan': func,
+    ...     'f': random_func
+    ... }
+    >>> funcs, random_funcs = construct_functions(default_funcs, user_funcs)
+    >>> funcs == {'sin': sin, 'cos': cos, 'tan': tan} # contains defaults and tan
     True
-    >>> random_funcs == {}
+    >>> random_funcs == {'f': random_func}
     True
 
-    Or specify user_funcs:
-    >>> func = lambda x: x
-    >>> randfunc = RandomFunction()
-    >>> funcs, random_funcs = construct_functions({"f": func, "g": randfunc})
-    >>> all([funcs[fn]==DEFAULT_FUNCTIONS[fn] for fn in DEFAULT_FUNCTIONS])
-    True
-    >>> funcs["f"]==func
-    True
-    >>> random_funcs == {"g": randfunc}
+    Does not mutate default_funcs:
+    >>> default_funcs == {'sin': sin, 'cos': cos}
     True
     """
-    functions = DEFAULT_FUNCTIONS.copy()
+    funcs = default_functions.copy()
     random_funcs = {}
     for f in user_funcs:
-        if not isinstance(f, str):
-            msg = str(f) + " is not a valid name for a function (must be a string)"
-            raise ConfigError(msg)
         # Check if we have a random function or a normal function
-        if isinstance(user_funcs[f], list):
-            # A list of functions; convert to a SpecificFunctions class
-            random_funcs[f] = SpecificFunctions(user_funcs[f])
-        elif isinstance(user_funcs[f], FunctionSamplingSet):
+        if isinstance(user_funcs[f], FunctionSamplingSet):
             random_funcs[f] = user_funcs[f]
         else:
             # f is a normal function
-            functions[f] = user_funcs[f]
+            funcs[f] = user_funcs[f]
 
-    return functions, random_funcs
+    return funcs, random_funcs
 
-def construct_constants(user_consts):
+def validate_user_constants(*allow_types):
+    return All(
+        has_keys_of_type(str),
+        {Extra: Any(*allow_types)},
+    )
+
+def construct_constants(default_variables, user_consts):
     """
-    Returns the dictionary of available constants
-    user_consts is a dictionary of "name": value pairs of constants to add to the defaults
+    Create a new dict that is the merge of user_consts into default_variables
 
     Usage
     =====
-    >>> construct_constants({})
+    >>> default_variables = {
+    ...     'i': 1j,
+    ...     'pi': 3.141592653589793,
+    ...     'e': 2.718281828459045,
+    ...     'j': 1j
+    ... }
+    >>> construct_constants(default_variables, {})
     {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'j': 1j}
-    >>> construct_constants({"T": 1.5})
+    >>> construct_constants(default_variables, {"T": 1.5})
     {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'T': 1.5, 'j': 1j}
     """
-    constants = DEFAULT_VARIABLES.copy()
+    constants = default_variables.copy()
 
     # Add in any user constants
     for var in user_consts:
-        if not isinstance(var, str):
-            msg = str(var) + " is not a valid name for a constant (must be a string)"
-            raise ConfigError(msg)
         constants[var] = user_consts[var]
 
     return constants
 
-def construct_suffixes(metric=False):
+def construct_suffixes(default_suffixes, metric=False):
     """
-    Returns the dictionary of available suffixes.
-    Setting metric=True adds in the metric suffixes.
+    Returns a copy of default_suffixes. If metric=True, metric suffixes
+    are merged into the copy.
 
     Usage
     =====
-    >>> construct_suffixes()
+    >>> default_suffixes={'%': 0.01}
+    >>> construct_suffixes(default_suffixes)
     {'%': 0.01}
-    >>> suff = construct_suffixes(True)
+    >>> suff = construct_suffixes(default_suffixes, metric=True)
     >>> suff['G'] == 1e9
     True
     """
-    suffixes = DEFAULT_SUFFIXES.copy()
+    suffixes = default_suffixes.copy()
     if metric:
         suffixes.update(METRIC_SUFFIXES)
     return suffixes

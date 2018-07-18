@@ -10,10 +10,10 @@ from functools import wraps
 from numbers import Number
 from scipy import integrate
 from numpy import real, imag
-from voluptuous import Schema, Required, Any, All, Extra, Length
-from mitxgraders.sampling import (VariableSamplingSet, FunctionSamplingSet, RealInterval,
+from voluptuous import Schema, Required, Any, All, Extra, Length, Coerce
+from mitxgraders.sampling import (VariableSamplingSet, schema_user_functions, RealInterval,
                                   DiscreteSet, gen_symbols_samples, construct_functions,
-                                  construct_constants)
+                                  construct_constants, has_keys_of_type, validate_user_constants)
 from mitxgraders.formulagrader import (
     validate_blacklist_whitelist_config,
     validate_only_permitted_functions_used,
@@ -26,6 +26,7 @@ from mitxgraders.exceptions import (
     InvalidInput, ConfigError, StudentFacingError, MissingInput)
 from mitxgraders.helpers.mitmath import (
     within_tolerance, evaluator, DEFAULT_VARIABLES, DEFAULT_FUNCTIONS)
+from mitxgraders.helpers.mitmath.mathfuncs import merge_dicts
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NonNegative, all_unique, PercentageString, is_callable)
 
@@ -115,7 +116,7 @@ class IntegralGrader(AbstractGrader):
 
     Additionally, take care that the integration limits are real-valued.
     For example, if sqrt(1-a^2) is an integration limit, the sampling range
-    for variable 'a' must gaurantee that the limit sqrt(1-a^2) is real. By
+    for variable 'a' must guarantee that the limit sqrt(1-a^2) is real. By
     default, variables sample from the real interval [1,3].
 
     Configuration Options
@@ -178,6 +179,9 @@ class IntegralGrader(AbstractGrader):
         failable_evals
     """
 
+    default_functions = DEFAULT_FUNCTIONS.copy()
+    default_variables = merge_dicts(DEFAULT_VARIABLES, {'infty': float('inf')})
+
     @property
     def schema_config(self):
         """Define the configuration options for IntegralGrader"""
@@ -209,9 +213,8 @@ class IntegralGrader(AbstractGrader):
             },
             Required('complex_integrand', default=False): bool,
             # Most of the below are copied from FormulaGrader
-            Required('user_functions', default={}):
-                {Extra: Any(is_callable, [is_callable], FunctionSamplingSet)},
-            Required('user_constants', default={}): {Extra: Number},
+            Required('user_functions', default={}): schema_user_functions,
+            Required('user_constants', default={}): validate_user_constants(Number),
             # Blacklist/Whitelist have additional validation that can't happen here, because
             # their validation is correlated with each other
             Required('blacklist', default=[]): [str],
@@ -225,6 +228,11 @@ class IntegralGrader(AbstractGrader):
             Required('sample_from', default={}): dict,
             Required('failable_evals', default=0): NonNegative(int)
         })
+
+    schema_user_consts = All(
+        has_keys_of_type(str),
+        {Extra: Any(Number)},
+    )
 
     debug_appendix_template = (
         "\n"
@@ -275,23 +283,23 @@ class IntegralGrader(AbstractGrader):
         self.true_input_positions = self.validate_input_positions(self.config['input_positions'])
 
         # The below are copied from FormulaGrader.__init__
+        validate_blacklist_whitelist_config(self.default_functions,
+                                            self.config['blacklist'],
+                                            self.config['whitelist'])
 
-        validate_blacklist_whitelist_config(self.config['blacklist'], self.config['whitelist'])
         validate_no_collisions(self.config, keys=['variables', 'user_constants'])
-        warn_if_override(self.config, 'variables', DEFAULT_VARIABLES)
-        warn_if_override(self.config, 'user_constants', DEFAULT_VARIABLES)
-        warn_if_override(self.config, 'user_functions', DEFAULT_FUNCTIONS)
+        warn_if_override(self.config, 'variables', self.default_variables)
+        warn_if_override(self.config, 'user_constants', self.default_variables)
+        warn_if_override(self.config, 'user_functions', self.default_functions)
 
-        self.permitted_functions = get_permitted_functions(self.config['whitelist'],
+        self.permitted_functions = get_permitted_functions(self.default_functions,
+                                                           self.config['whitelist'],
                                                            self.config['blacklist'],
                                                            self.config['user_functions'])
 
-        self.functions, self.random_funcs = construct_functions(self.config["user_functions"])
-        self.constants = construct_constants(self.config["user_constants"])
-        # TODO I would like to move this into construct_constants at some point,
-        # perhaps giving construct_constants and optional argument specifying additional defaults
-        if 'infty' not in self.constants:
-            self.constants['infty'] = float('inf')
+        self.functions, self.random_funcs = construct_functions(self.default_functions,
+                                                                self.config["user_functions"])
+        self.constants = construct_constants(self.default_variables, self.config["user_constants"])
 
         # Construct the schema for sample_from
         # First, accept all VariableSamplingSets
@@ -300,8 +308,8 @@ class IntegralGrader(AbstractGrader):
         schema_sample_from = Schema({
             Required(varname, default=RealInterval()):
                 Any(VariableSamplingSet,
-                    All(list, lambda pair: RealInterval(pair)),
-                    lambda tup: DiscreteSet(tup))
+                    All(list, Coerce(RealInterval)),
+                    Coerce(DiscreteSet))
             for varname in self.config['variables']
         })
         self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
@@ -365,11 +373,13 @@ class IntegralGrader(AbstractGrader):
 
         var_samples = gen_symbols_samples(self.config['variables'],
                                           self.config['samples'],
-                                          self.config['sample_from'])
+                                          self.config['sample_from'],
+                                          self.functions, {})
 
         func_samples = gen_symbols_samples(self.random_funcs.keys(),
                                            self.config['samples'],
-                                           self.random_funcs)
+                                           self.random_funcs,
+                                           self.functions, {})
 
         # Make a copy of the functions and variables lists
         # We'll add the sampled functions/variables in

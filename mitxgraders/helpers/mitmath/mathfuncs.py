@@ -19,6 +19,7 @@ import scipy.special as special
 from mitxgraders.helpers.mitmath.specify_domain import SpecifyDomain
 from mitxgraders.exceptions import StudentFacingError
 from mitxgraders.helpers.mitmath.exceptions import FunctionEvalError
+from mitxgraders.helpers.mitmath.math_array import MathArray
 
 # Normal Trig
 def sec(arg):
@@ -156,6 +157,12 @@ def factorial(z):
     ... )
     True
 
+    Really big numbers return inf:
+    >>> factorial(500) == float('inf')
+    True
+    >>> factorial(500.5) == float('inf')
+    True
+
     Throws errors at poles:
     >>> factorial(-2)                           # doctest: +ELLIPSIS
     Traceback (most recent call last):
@@ -178,6 +185,14 @@ def factorial(z):
         return value.item()
     except ValueError:
         return value
+
+@SpecifyDomain.make_decorator((3,), (3,))
+def cross(a, b):
+    return MathArray([
+        a[1]*b[2] - b[1]*a[2],
+        a[2]*b[0] - b[2]*a[0],
+        a[0]*b[1] - b[0]*a[1]
+    ])
 
 # Variables available by default
 DEFAULT_VARIABLES = {
@@ -236,16 +251,44 @@ SCALAR_FUNCTIONS = {key: has_one_scalar_input(key)(ELEMENTWISE_FUNCTIONS[key])
 ARRAY_FUNCTIONS = {
     're': real,
     'im': imag,
-    'conj': np.conj,
-    'norm': np.linalg.norm
+    'conj': np.conj
 }
 
-def merge_dicts(*dict_args):
-    """Merge an arbitrary number of dictionaries."""
-    merged = {}
-    for dict_arg in dict_args:
-        merged.update(dict_arg)
-    return merged
+def has_one_square_input(display_name):
+    return SpecifyDomain.make_decorator('square', display_name=display_name)
+
+def array_abs(obj):
+    """
+    Takes absolute value of numbers or vectors and suggests norm(...) instead
+    for matrix/tensors.
+
+    NOTE: The decision to limit abs(...) to scalars and vectors was motivated
+    by pedagogy not software.
+    """
+    if isinstance(obj, MathArray) and obj.ndim > 1:
+        msg = ("The abs(...) function expects a scalar or vector. To take the "
+               "norm of a {}, try norm(...) instead.".format(
+               MathArray.get_shape_name(obj.ndim)))
+        raise FunctionEvalError(msg)
+    return np.linalg.norm(obj)
+
+ARRAY_ONLY_FUNCTIONS = {
+    'norm': np.linalg.norm,
+    'abs': array_abs,
+    'trans': np.transpose,
+    'det': has_one_square_input('det')(np.linalg.det),
+    'tr': has_one_square_input('tr')(np.trace),
+    'ctrans': lambda x: np.conj(np.transpose(x)),
+    'adj': lambda x: np.conj(np.transpose(x)),
+    'cross': cross
+}
+
+def merge_dicts(*source_dicts):
+    """Create a new dictionary and merge sources into it."""
+    target = {}
+    for source in source_dicts:
+        target.update(source)
+    return target
 
 DEFAULT_FUNCTIONS = merge_dicts(SCALAR_FUNCTIONS, ARRAY_FUNCTIONS)
 
@@ -256,6 +299,21 @@ DEFAULT_SUFFIXES = {
 METRIC_SUFFIXES = {
     'k': 1e3, 'M': 1e6, 'G': 1e9, 'T': 1e12,
     'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12
+}
+
+pauli = {
+    'sigma_x': MathArray([
+        [0, 1],
+        [1, 0]
+    ]),
+    'sigma_y': MathArray([
+        [0, -1j],
+        [1j, 0]
+    ]),
+    'sigma_z': MathArray([
+        [1, 0],
+        [0, -1]
+    ])
 }
 
 def within_tolerance(x, y, tolerance):

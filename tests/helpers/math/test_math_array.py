@@ -6,11 +6,12 @@ from numbers import Number
 from mitxgraders.helpers.mitmath.math_array import (
     MathArray,
     IdentityMultiple as IdMult,
-    MathArrayError,
     equal_as_arrays,
     approx_equal_as_arrays,
     random_math_array
 )
+from mitxgraders.helpers.mitmath.exceptions import (
+    MathArrayError, MathArrayShapeError as ShapeError)
 
 def test_random_math_array():
     matrix = random_math_array([3, 7])
@@ -84,7 +85,7 @@ def test_addition_with_shape_mismath():
     B = MathArray([[2, -1], [3, 0]])
     match = ('Cannot add/subtract a matrix of shape \(rows: 2, cols: 3\) '
              'with a matrix of shape \(rows: 2, cols: 2\).')
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         A + B
 
     # dimension mismatch
@@ -92,11 +93,11 @@ def test_addition_with_shape_mismath():
     v = MathArray([1, 2, 3])
     match = ('Cannot add/subtract a vector of length 2 with a matrix of '
              'shape \(rows: 2, cols: 2\).')
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         u + B
 
     match = ('Cannot add/subtract a vector of length 2 with a vector of length 3.')
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         u + v
 
 def test_addition_with_zero():
@@ -111,11 +112,11 @@ def test_addition_with_zero():
 def test_addition_with_other_types():
     A = MathArray([[5, 2], [-2, 4]])
     match = "Cannot add/subtract scalars to a matrix."
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         A + 1
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         A + 1.0
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         A + (1 + 2j)
     with raises(TypeError, match="Cannot add/subtract a matrix with object of "
                 "<type 'list'>"):
@@ -140,14 +141,14 @@ def test_subtraction_with_shape_mismath():
     B = MathArray([[2, -1], [3,  0]])
     match = ('Cannot add/subtract a matrix of shape \(rows: 2, cols: 3\) '
              'with a matrix of shape \(rows: 2, cols: 2\).')
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         A - B
 
     # dimension mismatch
     u = MathArray([1, 2])
     match = ('Cannot add/subtract a vector of length 2 with a matrix of '
              'shape \(rows: 2, cols: 2\).')
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         u - B
 
 def test_subtraction_with_zero():
@@ -163,11 +164,11 @@ def test_subtraction_with_other_types():
     A = MathArray([[5,  2], [-2, 4]])
 
     match = "Cannot add/subtract scalars to a matrix."
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         A - 1
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         A - 1.0
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         A - (1 + 2j)
     with raises(TypeError, match="Cannot add/subtract a matrix with object of "
                 "<type 'list'>"):
@@ -195,7 +196,7 @@ def test_matrix_times_matrix_multiplication():
 
     match = ("Cannot multiply a matrix of shape \(rows: 3, cols: 5\) with a matrix "
              "of shape \(rows: 4, cols: 2\)")
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         X*Y
 
 def test_matrix_times_vector_multiplication():
@@ -213,7 +214,7 @@ def test_matrix_times_vector_multiplication():
 
     match = ("Cannot multiply a matrix of shape \(rows: 4, cols: 3\) with a vector "
              "of length 5.")
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         X*Y
 
 def test_vector_times_matrix_multiplication():
@@ -232,7 +233,7 @@ def test_vector_times_matrix_multiplication():
 
     match = ("Cannot multiply a vector of length 5 with a matrix of shape "
              "\(rows: 4, cols: 3\)")
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         X*Y
 
 def test_vector_times_vector_is_dot_product():
@@ -244,7 +245,7 @@ def test_vector_times_vector_is_dot_product():
     assert a*b == b*a == 16
 
     match = "Cannot calculate the dot product of a vector of length 3 with a vector of length 5"
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         a*c
 
 def test_vector_times_vector_does_not_conjugate():
@@ -301,11 +302,11 @@ def test_division_by_array_raises_error():
     A = MathArray([4, 8])
 
     match = "Cannot divide by a vector"
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         2/A
 
     match = "Cannot divide a vector by a vector"
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         A/A
 
     match = "Cannot divide vector by object of <type 'list'>"
@@ -339,7 +340,7 @@ def test_power_error_messages():
 
     # Plausible case with MathArray on the right.
     match = 'Cannot raise a scalar to power of a matrix.'
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         2**A
 
     # Weird case with MathArray on the right.
@@ -350,9 +351,9 @@ def test_power_error_messages():
     # with MathArrays on the left:
 
     match = 'Cannot raise a vector to powers.'
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         u**2
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         u**A
 
     match = "Cannot raise a matrix to non-integer powers"
@@ -360,11 +361,11 @@ def test_power_error_messages():
         A**2.4
 
     match = "Cannot raise a non-square matrix to powers."
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         B**2
 
     match = "Cannot raise a matrix to matrix powers."
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         A**B
 
     match = "Cannot raise matrix to power of type <type 'list'>."
@@ -393,7 +394,7 @@ def test_scalar_special_cases():
         MathArray(2)**[1, 2, 3]
 
     match = 'Cannot raise a scalar to power of a vector.'
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         MathArray(2)**MathArray([1, 2, 3])
 
 ##########     Test in-place operations     ##########
@@ -473,24 +474,24 @@ def test_addition_subtraction_with_identity_multiple():
     # IdentityMultiple raises an error when added to non-rectangular matrices
     sample_2_3 = random_math_array([2, 3])
     match = "Cannot add/subtract multiples of the identity to a non-square matrix"
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         sample_2_3 + IdMult(a)
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         IdMult(a) + sample_2_3
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         sample_2_3 - IdMult(a)
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         IdMult(a) - sample_2_3
 
     sample_4 = random_math_array([2])
     match = "Cannot add/subtract multiples of the identity to a vector"
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         sample_4 + IdMult(a)
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         IdMult(a) + sample_4
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         sample_4 - IdMult(a)
-    with raises(MathArrayError, match=match):
+    with raises(ShapeError, match=match):
         IdMult(a) - sample_4
 
 def test_multiplication_with_identity_multiple():
