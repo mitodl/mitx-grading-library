@@ -36,6 +36,13 @@ def is_numberlike_array(obj):
     >>> is_numberlike_array(MathArray([5, 5]))
     False
 
+
+    The unique item of a numberlike array is a number:
+    >>> numberlike = MathArray([[[[5]]]])
+    >>> is_numberlike_array(numberlike)
+    True
+    >>> isinstance(numberlike.item(), Number)
+    True
     """
     return isinstance(obj, MathArray) and obj.size == 1
 
@@ -45,6 +52,8 @@ def is_numberlike_zero_array(obj):
 
     >>> zero = MathArray(0)
     >>> is_numberlike_zero_array(zero)
+    True
+    >>> is_numberlike_zero_array(MathArray([[[0]]]))
     True
     >>> five = MathArray(5) # scalar MathArray, but not zero
     >>> is_numberlike_zero_array(MathArray(5))
