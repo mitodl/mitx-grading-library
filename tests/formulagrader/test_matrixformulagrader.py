@@ -1,9 +1,10 @@
 from pytest import raises
 import re
-from mitxgraders import (MatrixGrader, RealMatrices, RealVectors,
-                         ComplexRectangle, ConfigError)
-from mitxgraders.helpers.mitmath.exceptions import (DomainError, MathArrayError,
-    MathArrayShapeError as ShapeError, UnableToParse)
+from mitxgraders import (MatrixGrader, RealMatrices, RealVectors, ComplexRectangle)
+from mitxgraders.helpers.calc.exceptions import (
+    DomainError, MathArrayError,
+    MathArrayShapeError as ShapeError, UnableToParse
+)
 
 def test_max_array_dim():
     grader = MatrixGrader(

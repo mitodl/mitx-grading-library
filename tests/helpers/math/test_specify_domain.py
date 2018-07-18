@@ -1,9 +1,9 @@
 from pytest import raises
 import numpy as np
 from voluptuous import Error
-from mitxgraders.helpers.mitmath import specify_domain
-from mitxgraders.helpers.mitmath.exceptions import DomainError
-from mitxgraders.helpers.mitmath.math_array import equal_as_arrays, random_math_array
+from mitxgraders.helpers.calc import specify_domain
+from mitxgraders.helpers.calc.exceptions import DomainError
+from mitxgraders.helpers.calc.math_array import equal_as_arrays, random_math_array
 
 def get_somefunc(display_name=None):
 

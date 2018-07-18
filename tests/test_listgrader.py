@@ -7,7 +7,7 @@ import mock
 from pytest import raises
 from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader,
                          NumericalGrader, SingleListGrader)
-from mitxgraders.helpers.mitmath import CalcError
+from mitxgraders import CalcError
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint

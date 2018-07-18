@@ -6,8 +6,8 @@ import re
 import numpy as np
 from pytest import raises, approx
 from mitxgraders.exceptions import StudentFacingError
-from mitxgraders.helpers.mitmath import evaluator
-from mitxgraders.helpers.mitmath.exceptions import (
+from mitxgraders import evaluator
+from mitxgraders.helpers.calc.exceptions import (
     CalcError, UnableToParse,
     UnbalancedBrackets, UndefinedVariable,
     ArgumentError, CalcOverflowError, CalcZeroDivisionError

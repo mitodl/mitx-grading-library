@@ -25,13 +25,13 @@ from numbers import Number
 import abc
 import random
 import numpy as np
-from voluptuous import Schema, Required, All, Length, Coerce, Any, Extra
+from voluptuous import Schema, Required, All, Coerce, Any, Extra
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
     has_keys_of_type, is_shape_specification)
-from mitxgraders.helpers.mitmath import (
+from mitxgraders.helpers.calc import (
     METRIC_SUFFIXES, CalcError, evaluator, MathArray)
 
 # Set the objects to be imported from this grader

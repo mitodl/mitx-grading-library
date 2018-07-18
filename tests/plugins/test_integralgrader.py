@@ -1,6 +1,6 @@
 from pytest import raises
 from mitxgraders.version import __version__
-from mitxgraders.helpers.mitmath import CalcError
+from mitxgraders import CalcError
 from mitxgraders.plugins.integralgrader import IntegralGrader, IntegrationError
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 

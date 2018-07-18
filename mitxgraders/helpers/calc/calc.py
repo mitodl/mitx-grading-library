@@ -33,11 +33,11 @@ from pyparsing import (
 )
 from mitxgraders.exceptions import StudentFacingError
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
-from mitxgraders.helpers.mitmath.math_array import MathArray, IdentityMultiple
-from mitxgraders.helpers.mitmath.robust_pow import robust_pow
-from mitxgraders.helpers.mitmath.mathfuncs import (
+from mitxgraders.helpers.calc.math_array import MathArray, IdentityMultiple
+from mitxgraders.helpers.calc.robust_pow import robust_pow
+from mitxgraders.helpers.calc.mathfuncs import (
     DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
-from mitxgraders.helpers.mitmath.exceptions import (
+from mitxgraders.helpers.calc.exceptions import (
     CalcError,
     CalcOverflowError,
     CalcZeroDivisionError,
@@ -250,7 +250,7 @@ def evaluator(formula,
               variables=DEFAULT_VARIABLES,
               functions=DEFAULT_FUNCTIONS,
               suffixes=DEFAULT_SUFFIXES,
-              max_array_dim=0,
+              max_array_dim=None,
               allow_inf=False):
     """
     Evaluate an expression; that is, take a string of math and return a float.
@@ -327,7 +327,7 @@ def evaluator(formula,
     result = math_interpreter.evaluate(allow_inf)
 
     # Were vectors/matrices/tensors used when they shouldn't have been?
-    if math_interpreter.max_array_dim_used > max_array_dim:
+    if max_array_dim is not None and math_interpreter.max_array_dim_used > max_array_dim:
         if max_array_dim == 0:
             msg = "Vector and matrix expressions have been forbidden in this entry."
         elif max_array_dim == 1:

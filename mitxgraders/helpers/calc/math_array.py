@@ -4,13 +4,13 @@ math_array.py
 Contains a subclass of numpy.ndarray with matrix-like operations.
 """
 
-from __future__ import division # necessary for one of the doctests
+from __future__ import division  # necessary for one of the doctests
 from contextlib import contextmanager
 from numbers import Number
 import numpy as np
-from mitxgraders.helpers.mitmath.exceptions import (
+from mitxgraders.helpers.calc.exceptions import (
     MathArrayError, MathArrayShapeError as ShapeError)
-from mitxgraders.helpers.mitmath.robust_pow import robust_pow
+from mitxgraders.helpers.calc.robust_pow import robust_pow
 
 def is_number_zero(value):
     """

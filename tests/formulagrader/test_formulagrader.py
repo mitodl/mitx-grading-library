@@ -14,8 +14,6 @@ from mitxgraders import (
     DiscreteSet,
     ComplexRectangle,
     ComplexSector,
-    RealMatrices,
-    RealVectors,
     SpecificFunctions,
     RandomFunction,
     ConfigError,
@@ -23,12 +21,9 @@ from mitxgraders import (
 from mitxgraders.exceptions import MissingInput, InvalidInput
 from mitxgraders.sampling import set_seed
 from mitxgraders.version import __version__ as VERSION
-from mitxgraders.helpers.mitmath.exceptions import (
-    CalcError,
-    UndefinedVariable, UndefinedFunction,
-    DomainError, MathArrayShapeError as ShapeError
+from mitxgraders.helpers.calc.exceptions import (
+    CalcError, UndefinedVariable, UndefinedFunction
 )
-from mitxgraders.helpers.mitmath import IdentityMultiple
 from mitxgraders import ListGrader
 
 def test_square_root_of_negative_number():

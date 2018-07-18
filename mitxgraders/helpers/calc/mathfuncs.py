@@ -13,13 +13,13 @@ Defines:
 * METRIC_SUFFIXES
 """
 from __future__ import division
-import math
+import math  # Used in doctests
 import numpy as np
 import scipy.special as special
-from mitxgraders.helpers.mitmath.specify_domain import SpecifyDomain
+from mitxgraders.helpers.calc.specify_domain import SpecifyDomain
 from mitxgraders.exceptions import StudentFacingError
-from mitxgraders.helpers.mitmath.exceptions import FunctionEvalError
-from mitxgraders.helpers.mitmath.math_array import MathArray
+from mitxgraders.helpers.calc.exceptions import FunctionEvalError
+from mitxgraders.helpers.calc.math_array import MathArray
 
 # Normal Trig
 def sec(arg):
