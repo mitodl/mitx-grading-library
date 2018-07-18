@@ -302,15 +302,15 @@ METRIC_SUFFIXES = {
 }
 
 pauli = {
-    'x': MathArray([
+    'sigma_x': MathArray([
         [0, 1],
         [1, 0]
     ]),
-    'y': MathArray([
+    'sigma_y': MathArray([
         [0, -1j],
         [1j, 0]
     ]),
-    'z': MathArray([
+    'sigma_z': MathArray([
         [1, 0],
         [0, -1]
     ])
