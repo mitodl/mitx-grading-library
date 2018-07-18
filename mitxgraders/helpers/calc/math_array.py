@@ -175,6 +175,8 @@ class MathArray(np.ndarray):
         elif isinstance(other, MathArray):
             if self.shape == other.shape:
                 return super_ADD(other)
+            elif is_numberlike_zero_array(self):
+                return self.item() + other
 
             msg = ("Cannot add/subtract a {self.description} with a {other.description}.").format(
                 self=self, other=other)
