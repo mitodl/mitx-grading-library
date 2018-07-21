@@ -325,6 +325,8 @@ def within_tolerance(x, y, tolerance):
         y: number or array (np array_like)
         tolerance: Number or PercentageString
 
+    NOTE: Calculates x - y; may raise an error for incompatible shapes.
+
     Usage
     =====
 
@@ -348,14 +350,6 @@ def within_tolerance(x, y, tolerance):
     0.223607
     >>> within_tolerance(A, B, 0.25)
     True
-
-    If x - y raises a StudentFacingError, then subtraction of these types
-    is intentionally not supported and (x, y) are not within_tolerance:
-    >>> class Foo():
-    ...     def __sub__(self, other): raise StudentFacingError()
-    ...     def __rsub__(self, other): raise StudentFacingError()
-    >>> within_tolerance(0, Foo(), '1%')
-    False
     """
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
@@ -364,10 +358,6 @@ def within_tolerance(x, y, tolerance):
         tolerance = tolerance.strip()
         tolerance = np.linalg.norm(x) * float(tolerance[:-1]) * 0.01
 
-    try:
-        difference = x - y
-    except StudentFacingError:
-        # Apparently, the answer and the student_input cannot be compared.
-        return False
+    difference = x - y
 
     return np.linalg.norm(difference) <= tolerance
