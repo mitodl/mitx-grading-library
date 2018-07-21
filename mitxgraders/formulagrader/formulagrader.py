@@ -464,12 +464,11 @@ class FormulaGrader(ItemGrader):
         Required('comparer'): is_callable_with_args(3)
     })
 
-    @classmethod
-    def validate_expect(cls, expect):
+    def validate_expect(self, expect):
         """
         Validate the answers's expect key.
 
-        >>> result = FormulaGrader.validate_expect('mc^2')
+        >>> result = FormulaGrader().validate_expect('mc^2')
         >>> expected = {
         ... 'comparer_params': ['mc^2'],
         ... 'comparer': FormulaGrader.default_equality_comparer
@@ -478,13 +477,13 @@ class FormulaGrader(ItemGrader):
         True
         """
         if isinstance(expect, str):
-            return cls.schema_expect({
-                'comparer': cls.default_equality_comparer,
+            return self.schema_expect({
+                'comparer': self.default_equality_comparer,
                 'comparer_params': [expect]
                 })
 
         try:
-            return cls.schema_expect(expect)
+            return self.schema_expect(expect)
         except Invalid:
             # Only raise the detailed error message if author is trying to use comparer.
             if isinstance(expect, dict) and 'comparer' in expect:
