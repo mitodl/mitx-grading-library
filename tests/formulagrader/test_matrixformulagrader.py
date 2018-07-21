@@ -128,3 +128,69 @@ def test_matrix_inverses_raise_error_if_disabled():
     match='Negative matrix powers have been disabled.'
     with raises(MathArrayError, match=match):
         grader(None, 'A^3*A^-1')['ok']
+
+def test_wrong_answer_type_error_messages():
+    # Note: our convention is that single-row matrix and vectors cannot
+    # be compared, [[1, 2, 3]] are graded as different [1, 2, 3]
+    # (and, in particular, incomparable)
+
+    grader = MatrixGrader(
+        answers='[[1, 2, 3]]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=True,
+            msg_detail='shape'
+        )
+    )
+    match = ('Exepected answer to be a matrix of shape \(rows: 1, cols: 3\), '
+             'but input is a vector of length 3.')
+    with raises(ShapeError, match=match):
+        grader(None, '[1, 2, 3]')
+
+    grader = MatrixGrader(
+        answers='[[1, 2, 3]]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=True,
+            msg_detail='type'
+        )
+    )
+    match = 'Exepected answer to be a matrix, but input is a vector'
+    with raises(ShapeError, match=match):
+        grader(None, '[1, 2, 3]')
+
+    grader = MatrixGrader(
+        answers='[[1, 2, 3]]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=False,
+            msg_detail='shape'
+        )
+    )
+    msg = ('Exepected answer to be a matrix of shape \(rows: 1, cols: 3\), '
+           'but input is a vector of length 3.')
+    grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
+
+    grader = MatrixGrader(
+        answers='[[1, 2, 3]]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=False,
+            msg_detail='type'
+        )
+    )
+    msg = 'Exepected answer to be a matrix, but input is a vector'
+    grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
+
+    msg = 'Exepected answer to be a matrix, but input is a matrix of incorrect shape'
+    grader(None, '[[1, 2, 3, 4]]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
+
+    grader = MatrixGrader(
+        answers='[[1, 2, 3]]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=False,
+            msg_detail=None
+        )
+    )
+    grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': '' }
