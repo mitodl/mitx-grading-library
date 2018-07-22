@@ -400,7 +400,9 @@ class FormulaGrader(ItemGrader):
                 - comparer_params: a list of strings to be numerically sampled and passed to the
                     comparer function.
                 - comparer: a function with signature `comparer(comparer_params_evals, student_eval,
-                    utils)` that compares student and comparer_params after evaluation.
+                    utils)` that compares student and comparer_params after evaluation. This function
+                    should return `True`, `False`, `partial`, or a with required key 'grade_decimal'
+                    and optional key 'msg'.
     """
 
     default_functions = DEFAULT_FUNCTIONS.copy()
