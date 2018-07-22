@@ -100,10 +100,12 @@ class MatrixGrader(FormulaGrader):
                 expected_shape = get_description(comparer_params[0], detailed=detailed)
                 received_shape = get_description(student_input, detailed=detailed)
                 if not detailed and expected_shape == received_shape:
-                    msg = ("Exepected answer to be a {0}, but input is a {1}."
-                           "of incorrect shape.".format(expected_shape, received_shape))
-                msg = ("Exepected answer to be a {0}, but input is a {1}."
-                       .format(expected_shape, received_shape))
+                    msg = ("Expected answer to be a {0}, but input is a {1} "
+                           "of incorrect shape".format(expected_shape, received_shape))
+                else:
+                    msg = ("Expected answer to be a {0}, but input is a {1}"
+                        .format(expected_shape, received_shape))
+
             if is_raised:
                 raise ShapeError(msg)
             else:

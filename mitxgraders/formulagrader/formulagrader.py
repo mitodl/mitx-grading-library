@@ -3,6 +3,7 @@ formulagrader.py
 """
 from __future__ import division
 from numbers import Number
+from functools import wraps
 from collections import namedtuple
 from pprint import PrettyPrinter
 import re
@@ -513,7 +514,7 @@ class FormulaGrader(ItemGrader):
         "Student Eval: {student_eval}\n"
         "Compare to:  {compare_parms_eval}\n"  # compare_parms_eval is list, so start 1 char earlier
         "Comparer Function: {comparer}\n"
-        "Comparison Satisfied: {comparer_result}\n"
+        "Comparison Result: {comparer_result}\n"
         ""
     )
 
@@ -690,16 +691,17 @@ class FormulaGrader(ItemGrader):
 
             # Check if expressions agree
             comparer_result = comparer(comparer_params_eval, student_eval, self.comparer_utils)
+            comparer_result = ItemGrader.standardize_cfn_return(comparer_result)
             if self.config['debug']:
                 # Put the siblings back in for the debug output
                 varlist.update(siblings_eval)
                 self.log_sample_info(i, varlist, funclist, student_eval,
                                      comparer, comparer_params_eval, comparer_result)
 
-            if not comparer_result:
+            if not comparer_result['ok']:
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
-                    return {'ok': False, 'grade_decimal': 0, 'msg': ''}, used.functions
+                    return comparer_result, used.functions
 
         # This response appears to agree with the expected answer
         return {
@@ -754,7 +756,7 @@ class FormulaGrader(ItemGrader):
             variables=pp.pformat(varlist),
             student_eval=student_eval,
             comparer=re.sub(r"0x[0-9a-fA-F]+", "0x...", str(comparer)),
-            comparer_result=comparer_result,
+            comparer_result=pp.pformat(comparer_result),
             compare_parms_eval=pp.pformat(comparer_params_eval)
         ))
 
