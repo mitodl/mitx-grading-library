@@ -3,10 +3,12 @@ matrixgrader.py
 
 Defines a FormulaGrader subtype that handles matrices, too.
 """
+from numbers import Number
+from collections import namedtuple
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from voluptuous import Required, Any
 from mitxgraders.helpers.validatorfuncs import NonNegative
-from mitxgraders.helpers.calc import IdentityMultiple, MathArray
+from mitxgraders.helpers.calc import IdentityMultiple, MathArray, within_tolerance
 from mitxgraders.helpers.calc.exceptions import (
     MathArrayShapeError as ShapeError)
 from mitxgraders.helpers.calc.mathfuncs import (
@@ -64,7 +66,10 @@ class MatrixGrader(FormulaGrader):
             Required('max_array_dim', default=1): NonNegative(int),
             Required('negative_powers', default=True): bool,
             Required('shape_errors', default=True): bool,
-            Required('answer_shape_mismatch', default={}): {
+            Required('answer_shape_mismatch', default={
+                'is_raised': True,
+                'msg_detail': 'type'
+            }): {
                 Required('is_raised', default=True): bool,
                 Required('msg_detail', default='type'): Any(None, 'type', 'shape')
             }
@@ -81,32 +86,77 @@ class MatrixGrader(FormulaGrader):
                 return {'ok': False, 'msg': err.message, 'grade_decimal': 0}
         return result
 
+    @staticmethod
+    def validate_student_input_shape(student_input, expected_shape, detail):
+        """
+        Checks that student_input has expected_shape and raises a ShapeError
+        if it does not.
+
+        Arguments:
+            student_input (number | MathArray): The numerically-sampled student
+                input
+            expected_shape (tuple): A numpy shape tuple
+            detail (None|'shape'|'type') detail-level of ShapeError message
+        """
+        try:
+            input_shape = student_input.shape
+        except AttributeError:
+            if isinstance(student_input, Number):
+                input_shape = tuple()
+            else:
+                raise
+
+        if expected_shape == input_shape:
+            return True
+
+        if detail is None:
+            raise ShapeError('')
+
+        if detail == 'shape':
+            expected = MathArray.get_description(expected_shape)
+            received = MathArray.get_description(input_shape)
+        else:
+            expected = MathArray.get_shape_name(len(expected_shape))
+            received = MathArray.get_shape_name(len(input_shape))
+
+        if detail != 'shape' and expected == received:
+            msg = ("Expected answer to be a {0}, but input is a {1} "
+                   "of incorrect shape".format(expected, received))
+        else:
+            msg = ("Expected answer to be a {0}, but input is a {1}"
+                .format(expected, received))
+
+        raise ShapeError(msg)
+
+    Utils = namedtuple('Utils', ['tolerance', 'within_tolerance', 'validate_shape'])
+
+    def get_comparer_utils(self):
+        """Get the utils for comparer function."""
+        def _within_tolerance(x, y):
+            return within_tolerance(x, y, self.config['tolerance'])
+        def _validate_shape(student_input, shape):
+            detail = self.config['answer_shape_mismatch']['msg_detail']
+            return self.validate_student_input_shape(student_input, shape, detail)
+
+        return self.Utils(tolerance=self.config['tolerance'],
+                          within_tolerance=_within_tolerance,
+                          validate_shape=_validate_shape)
+
     def default_equality_comparer(self, comparer_params, student_input, utils):
         """
         Default comparer function.
 
         Assumes comparer_params is just the single expected answer wrapped in a list.
         """
+        expected_input =comparer_params[0]
         try:
-            return utils.within_tolerance(comparer_params[0], student_input)
+            # in numpy, scalars have empty tuples as their shapes
+            shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
+            utils.validate_shape(student_input, shape)
         except ShapeError as err:
-            is_raised = self.config['answer_shape_mismatch']['is_raised']
-            msg_detail = self.config['answer_shape_mismatch']['msg_detail']
-
-            if msg_detail is None:
-                msg = ''
+            if self.config['answer_shape_mismatch']['is_raised']:
+                raise err
             else:
-                detailed = msg_detail == 'shape'
-                expected_shape = get_description(comparer_params[0], detailed=detailed)
-                received_shape = get_description(student_input, detailed=detailed)
-                if not detailed and expected_shape == received_shape:
-                    msg = ("Expected answer to be a {0}, but input is a {1} "
-                           "of incorrect shape".format(expected_shape, received_shape))
-                else:
-                    msg = ("Expected answer to be a {0}, but input is a {1}"
-                        .format(expected_shape, received_shape))
+                return {'ok': False, 'grade_decimal': 0, 'msg': err.message}
 
-            if is_raised:
-                raise ShapeError(msg)
-            else:
-                return {'ok': False, 'grade_decimal': 0, 'msg': msg}
+        return utils.within_tolerance(expected_input, student_input)

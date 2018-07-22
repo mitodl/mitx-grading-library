@@ -194,3 +194,36 @@ def test_wrong_answer_type_error_messages():
         )
     )
     assert grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': '' }
+
+def test_wrong_answer_type_error_messages_with_scalars():
+    """
+    Check that answer shape errors are raised correctly when answer or student_input
+    is a scalar.
+
+    These are worth checking separately because the numbers do not have 'shape'
+    attributes.
+    """
+
+    grader = MatrixGrader(
+        answers='[1, 2, 3]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=True,
+            msg_detail='type'
+        )
+    )
+    match = 'Expected answer to be a vector, but input is a scalar'
+    with raises(ShapeError, match=match):
+        grader(None, '10')
+
+    grader = MatrixGrader(
+        answers='10',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=True,
+            msg_detail='type'
+        )
+    )
+    match = 'Expected answer to be a scalar, but input is a vector'
+    with raises(ShapeError, match=match):
+        grader(None, '[1, 2, 3]')
