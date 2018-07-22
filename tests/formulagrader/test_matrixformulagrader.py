@@ -142,8 +142,8 @@ def test_wrong_answer_type_error_messages():
             msg_detail='shape'
         )
     )
-    match = ('Exepected answer to be a matrix of shape \(rows: 1, cols: 3\), '
-             'but input is a vector of length 3.')
+    match = ('Expected answer to be a matrix of shape \(rows: 1, cols: 3\), '
+             'but input is a vector of length 3')
     with raises(ShapeError, match=match):
         grader(None, '[1, 2, 3]')
 
@@ -155,7 +155,7 @@ def test_wrong_answer_type_error_messages():
             msg_detail='type'
         )
     )
-    match = 'Exepected answer to be a matrix, but input is a vector'
+    match = 'Expected answer to be a matrix, but input is a vector'
     with raises(ShapeError, match=match):
         grader(None, '[1, 2, 3]')
 
@@ -167,9 +167,9 @@ def test_wrong_answer_type_error_messages():
             msg_detail='shape'
         )
     )
-    msg = ('Exepected answer to be a matrix of shape \(rows: 1, cols: 3\), '
-           'but input is a vector of length 3.')
-    grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
+    msg = ('Expected answer to be a matrix of shape (rows: 1, cols: 3), '
+           'but input is a vector of length 3')
+    assert grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
 
     grader = MatrixGrader(
         answers='[[1, 2, 3]]',
@@ -179,11 +179,11 @@ def test_wrong_answer_type_error_messages():
             msg_detail='type'
         )
     )
-    msg = 'Exepected answer to be a matrix, but input is a vector'
-    grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
+    msg = 'Expected answer to be a matrix, but input is a vector'
+    assert grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
 
-    msg = 'Exepected answer to be a matrix, but input is a matrix of incorrect shape'
-    grader(None, '[[1, 2, 3, 4]]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
+    msg = 'Expected answer to be a matrix, but input is a matrix of incorrect shape'
+    assert grader(None, '[[1, 2, 3, 4]]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
 
     grader = MatrixGrader(
         answers='[[1, 2, 3]]',
@@ -193,4 +193,4 @@ def test_wrong_answer_type_error_messages():
             msg_detail=None
         )
     )
-    grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': '' }
+    assert grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': '' }
