@@ -1,6 +1,7 @@
 from pytest import raises
 import re
 from mitxgraders import (MatrixGrader, RealMatrices, RealVectors, ComplexRectangle)
+from mitxgraders.formulagrader.matrixgrader import InputTypeError
 from mitxgraders.helpers.calc.exceptions import (
     DomainError, MathArrayError,
     MathArrayShapeError as ShapeError, UnableToParse
@@ -144,7 +145,7 @@ def test_wrong_answer_type_error_messages():
     )
     match = ('Expected answer to be a matrix of shape \(rows: 1, cols: 3\), '
              'but input is a vector of length 3')
-    with raises(ShapeError, match=match):
+    with raises(InputTypeError, match=match):
         grader(None, '[1, 2, 3]')
 
     grader = MatrixGrader(
@@ -156,7 +157,7 @@ def test_wrong_answer_type_error_messages():
         )
     )
     match = 'Expected answer to be a matrix, but input is a vector'
-    with raises(ShapeError, match=match):
+    with raises(InputTypeError, match=match):
         grader(None, '[1, 2, 3]')
 
     grader = MatrixGrader(
@@ -213,7 +214,7 @@ def test_wrong_answer_type_error_messages_with_scalars():
         )
     )
     match = 'Expected answer to be a vector, but input is a scalar'
-    with raises(ShapeError, match=match):
+    with raises(InputTypeError, match=match):
         grader(None, '10')
 
     grader = MatrixGrader(
@@ -225,5 +226,5 @@ def test_wrong_answer_type_error_messages_with_scalars():
         )
     )
     match = 'Expected answer to be a scalar, but input is a vector'
-    with raises(ShapeError, match=match):
+    with raises(InputTypeError, match=match):
         grader(None, '[1, 2, 3]')
