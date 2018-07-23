@@ -1,6 +1,7 @@
 from pytest import raises
 import re
 from mitxgraders import (MatrixGrader, RealMatrices, RealVectors, ComplexRectangle)
+from mitxgraders.formulagrader.matrixgrader import InputTypeError
 from mitxgraders.helpers.calc.exceptions import (
     DomainError, MathArrayError,
     MathArrayShapeError as ShapeError, UnableToParse
@@ -128,3 +129,106 @@ def test_matrix_inverses_raise_error_if_disabled():
     match='Negative matrix powers have been disabled.'
     with raises(MathArrayError, match=match):
         grader(None, 'A^3*A^-1')['ok']
+
+def test_wrong_answer_type_error_messages():
+    # Note: our convention is that single-row matrix and vectors cannot
+    # be compared, [[1, 2, 3]] are graded as different [1, 2, 3]
+    # (and, in particular, incomparable)
+
+    grader = MatrixGrader(
+        answers='[[1, 2, 3]]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=True,
+            msg_detail='shape'
+        )
+    )
+    match = ('Expected answer to be a matrix of shape \(rows: 1, cols: 3\), '
+             'but input is a vector of length 3')
+    with raises(InputTypeError, match=match):
+        grader(None, '[1, 2, 3]')
+
+    grader = MatrixGrader(
+        answers='[[1, 2, 3]]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=True,
+            msg_detail='type'
+        )
+    )
+    match = 'Expected answer to be a matrix, but input is a vector'
+    with raises(InputTypeError, match=match):
+        grader(None, '[1, 2, 3]')
+
+    grader = MatrixGrader(
+        answers='[[1, 2, 3]]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=False,
+            msg_detail='shape'
+        )
+    )
+    msg = ('Expected answer to be a matrix of shape (rows: 1, cols: 3), '
+           'but input is a vector of length 3')
+    assert grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
+
+    grader = MatrixGrader(
+        answers='[[1, 2, 3]]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=False,
+            msg_detail='type'
+        )
+    )
+    msg = 'Expected answer to be a matrix, but input is a vector'
+    assert grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
+
+    msg = 'Expected answer to be a matrix, but input is a matrix of incorrect shape'
+    assert grader(None, '[[1, 2, 3, 4]]') == { 'ok': False, 'grade_decimal': 0, 'msg': msg }
+
+    grader = MatrixGrader(
+        answers='[[1, 2, 3]]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=False,
+            msg_detail=None
+        )
+    )
+    assert grader(None, '[1, 2, 3]') == { 'ok': False, 'grade_decimal': 0, 'msg': '' }
+
+def test_wrong_answer_type_error_messages_with_scalars():
+    """
+    Check that answer shape errors are raised correctly when answer or student_input
+    is a scalar.
+
+    These are worth checking separately because the numbers do not have 'shape'
+    attributes.
+    """
+
+    grader = MatrixGrader(
+        answers='[1, 2, 3]',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=True,
+            msg_detail='type'
+        )
+    )
+    match = 'Expected answer to be a vector, but input is a scalar'
+    with raises(InputTypeError, match=match):
+        grader(None, '10')
+
+    grader = MatrixGrader(
+        answers='10',
+        max_array_dim=2,
+        answer_shape_mismatch=dict(
+            is_raised=True,
+            msg_detail='type'
+        )
+    )
+    match = 'Expected answer to be a scalar, but input is a vector'
+    with raises(InputTypeError, match=match):
+        grader(None, '[1, 2, 3]')
+
+def test_validate_student_input_shape_edge_case():
+    with raises(AttributeError):
+        MatrixGrader.validate_student_input_shape([1, 2], (2,), 'type')

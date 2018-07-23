@@ -555,7 +555,7 @@ def test_fg_debug_log():
     "Student Eval: (14.7111745179+2.08976636599j)<br/>\n"
     "Compare to:  [(14.711174517877566+2.0897663659937935j)]<br/>\n"
     "Comparer Function: <function default_equality_comparer at 0x...><br/>\n"
-    "Comparison Satisfied: True<br/>\n"
+    "Comparison Result: {{   'grade_decimal': 1.0, 'msg': '', 'ok': True}}<br/>\n"
     "<br/>\n"
     "<br/>\n"
     "==========================================<br/>\n"
@@ -572,7 +572,7 @@ def test_fg_debug_log():
     "Student Eval: (11.9397106851+2.78354600156j)<br/>\n"
     "Compare to:  [(11.939710685061661+2.7835460015641598j)]<br/>\n"
     "Comparer Function: <function default_equality_comparer at 0x...><br/>\n"
-    "Comparison Satisfied: True<br/>\n"
+    "Comparison Result: {{   'grade_decimal': 1.0, 'msg': '', 'ok': True}}<br/>\n"
     "</pre>"
     ).format(version=VERSION)
     assert result['msg'] == message

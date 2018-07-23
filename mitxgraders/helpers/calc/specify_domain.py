@@ -11,6 +11,7 @@ from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.helpers.calc.exceptions import DomainError
 from mitxgraders.helpers.calc.math_array import (
     MathArray, is_numberlike_array, is_square)
+from mitxgraders.helpers.calc.formatters import get_description
 
 def low_ordinal(n):
     """
@@ -23,29 +24,6 @@ def low_ordinal(n):
     """
     first_three = {1: '1st', 2: '2nd', 3: '3rd'}
     return first_three.get(n, '{0}th'.format(n))
-
-def get_description(obj):
-    """
-    Gets a student-facing description of obj.
-
-    Numbers return scalar:
-    >>> get_description(5)
-    'scalar'
-
-    MathArrays return their own description:
-    >>> get_description(MathArray([1, 2, 3]))
-    'vector of length 3'
-
-    Other objects return their class name:
-    >>> get_description("puppy")
-    'str'
-    """
-    if isinstance(obj, Number):
-        return 'scalar'
-    elif isinstance(obj, MathArray):
-        return obj.description
-    else:
-        return obj.__class__.__name__
 
 def get_shape_description(shape):
     """

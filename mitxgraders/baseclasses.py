@@ -280,11 +280,6 @@ class ItemGrader(AbstractGrader):
 
         return validated_answer
 
-    @staticmethod
-    def grade_decimal_to_ok(grade):
-        """Converts a grade decimal into an 'ok' value: True, False or 'partial'"""
-        return {0: False, 1: True}.get(grade, 'partial')
-
     @property
     def schema_answer(self):
         """Defines the schema that a fully-specified answer should satisfy."""
@@ -303,6 +298,64 @@ class ItemGrader(AbstractGrader):
         Usually this is a just a string.
         """
         return Schema(str)(expect)
+
+    @staticmethod
+    def grade_decimal_to_ok(grade):
+        """Converts a grade decimal into an 'ok' value: True, False or 'partial'"""
+        return {0: False, 1: True}.get(grade, 'partial')
+
+    @staticmethod
+    def standardize_cfn_return(value):
+        """
+        Standardize an edX cfn return into dictionary form.
+
+        Arguments:
+            value: One of True, False, 'partial', or a dictionary with keys
+                'grade_decimal' (required): number between 0 and 1
+                'msg' (optional): string
+        Returns:
+            A dictionary with keys 'ok', 'grade_decimal', and 'msg'. The 'ok'
+            value is always inferred.
+
+        If input is True, False, or 'partial':
+        >>> standardize_cfn_return = ItemGrader.standardize_cfn_return
+        >>> standardize_cfn_return(True) == {
+        ...     'ok': True, 'grade_decimal': 1.0, 'msg': ''
+        ... }
+        True
+        >>> standardize_cfn_return(False) == {
+        ...     'ok': False, 'grade_decimal': 0.0, 'msg': ''
+        ... }
+        True
+        >>> standardize_cfn_return('partial') == {
+        ...     'ok': 'partial', 'grade_decimal': 0.5, 'msg': ''
+        ... }
+        True
+
+        If input is a dictionary with key 'grade_decimal':
+        >>> standardize_cfn_return({'grade_decimal': 0.75}) == {
+        ... 'ok': 'partial', 'msg': '', 'grade_decimal': 0.75
+        ... }
+        True
+
+        If 'msg' is present in input dict, it is preserved:
+        >>> standardize_cfn_return({'grade_decimal': 1, 'msg': 'Nice!'}) == {
+        ... 'ok': True, 'msg': 'Nice!', 'grade_decimal': 1.0
+        ... }
+        True
+
+        """
+        if value == True:
+            return {'ok': True, 'msg': '', 'grade_decimal': 1.0}
+        elif isinstance(value, str) and value.lower() == 'partial':
+            return {'ok': 'partial', 'msg': '', 'grade_decimal': 0.5}
+        elif value == False:
+            return {'ok': False, 'msg': '', 'grade_decimal': 0}
+
+        grade_decimal = value['grade_decimal']
+        ok = ItemGrader.grade_decimal_to_ok(grade_decimal)
+        msg = value.get('msg', '')
+        return {'ok': ok, 'msg': msg, 'grade_decimal': grade_decimal}
 
     def check(self, answers, student_input, **kwargs):
         """
