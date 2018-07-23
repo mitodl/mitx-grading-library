@@ -228,3 +228,7 @@ def test_wrong_answer_type_error_messages_with_scalars():
     match = 'Expected answer to be a scalar, but input is a vector'
     with raises(InputTypeError, match=match):
         grader(None, '[1, 2, 3]')
+
+def test_validate_student_input_shape_edge_case():
+    with raises(AttributeError):
+        MatrixGrader.validate_student_input_shape([1, 2], (2,), 'type')
