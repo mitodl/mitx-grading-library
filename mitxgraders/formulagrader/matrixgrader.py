@@ -159,7 +159,7 @@ class MatrixGrader(FormulaGrader):
 
         Assumes comparer_params is just the single expected answer wrapped in a list.
         """
-        expected_input =comparer_params[0]
+        expected_input = comparer_params[0]
         # in numpy, scalars have empty tuples as their shapes
         shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
         utils.validate_shape(student_input, shape)
