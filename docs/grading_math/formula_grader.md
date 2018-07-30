@@ -2,7 +2,9 @@
 
 FormulaGrader is the grading class used to grade mathematical formulas and closely resembles the behavior of edX's `<formularesponse />` tag, but with much more versatility.
 
-All whitespace is stripped from formulas that are entered. So, `1 + x ^ 2` is equivalent to `1+x^2`.
+!!! Note
+    - All expressions are treated in a case sensitive manner. This means that variables `'m'` and `'M'` are distinct. Case-insensitive FormulaGraders were deprecated in [Version 1.1.0](../changelog.md#version-110)
+    - All whitespace is stripped from formulas that are entered. So, `1 + x ^ 2` is equivalent to `1+x^2`.
 
 
 ## Variables and Sampling
@@ -262,10 +264,6 @@ grader = FormulaGrader(
 
 Tolerances are necessary because of numerical roundoff error that lead to small differences in evaluations of algebraically equivalent expressions. Zero tolerance should be used sparingly, perhaps only with integer sampling and answers.
 
-
-## Case Sensitive Input
-
-All expressions are treated in a case sensitive manner. This means that variables `m` and `M` are distinct variables. Prior to version 1.1, we had a case-insensitive option available. However, this option is now deprecated, as it was causing issues in the codebase, nobody was using it (that we know of), and the majority of languages are case-sensitive anway.
 
 ## Suffixes
 

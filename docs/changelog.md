@@ -1,5 +1,7 @@
 # Change Log
 
+## Version 1.1.x
+
 ### Version 1.1.2
 * This version includes an internal change to the way that errors are handled during check.
   * If you only use builtin graders (FormulaGrader, ListGrader...) or public plugins (IntegralGrader) you should not notice any difference.
@@ -14,9 +16,20 @@
 * Removed .pyc files from the zip file
 * Minor bug fixes
 
-## Version 1.1.0
+### Version 1.1.0
 * Added numbered variables to FormulaGrader
-* Removed case-insensitive comparisons from FormulaGrader and IntegralGrader. *WARNING:* This breaks backwards compatibility, and is a departure from edX. However, we believe that students should know that `M` and `m` are different variables, and removing case-insensitive comparison fixes a number of ambiguous situations.
+* Removed case-insensitive comparisons from FormulaGrader and IntegralGrader.
+
+    !!! warning
+        This is a departure from edX and is a breaking change for authors who used case-insensitive FormulaGraders. However:
+
+        - Case-sensitive has always been the default for FormulaGrader and we are not aware of authors using case-insensitive FormulaGraders.
+        - Pedagogically, we believe that students should think of `M` and `m` are different variables.
+        - Removing case-insensitive comparison fixes a number of ambiguous situations.
+
+
+
+## Version 1.0.x
 
 ### Version 1.0.5
 * Improved debugging information for FormulaGrader
