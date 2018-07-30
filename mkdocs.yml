@@ -19,5 +19,5 @@ pages:
   - Changelog: 'changelog.md'
 markdown_extensions:
     - toc:
-        permalink: 
+        permalink: "\uF0C1"
     - admonition
