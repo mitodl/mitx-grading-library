@@ -1,6 +1,6 @@
 site_name: MITxGraders
 pages:
-  - Home: 'getting_started.md'
+  - Home: 'index.md'
   - ItemGrader: 'item_grader.md'
   - StringGrader: 'string_grader.md'
   - Grading Math:
