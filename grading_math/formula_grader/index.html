@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>NumericalGrader - MITxGraders</title>
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="../../getting_started/">MITxGraders</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="../../getting_started/">Home</a>
+                    </li>
+                    <li >
+                        <a href="../../item_grader/">ItemGrader</a>
+                    </li>
+                    <li >
+                        <a href="../../string_grader/">StringGrader</a>
+                    </li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Math <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="./">FormulaGrader</a>
+</li>
+                            
+<li class="active">
+    <a href="./">NumericalGrader</a>
+</li>
+                            
+<li >
+    <a href="../sampling/">Sampling Sets</a>
+</li>
+                            
+<li >
+    <a href="../renderer/">AsciiMath Renderer Definitions</a>
+</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Lists <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../../grading_lists/list_grader/">ListGrader</a>
+</li>
+                            
+<li >
+    <a href="../../grading_lists/single_list_grader/">SingleListGrader</a>
+</li>
+                        </ul>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="./">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../sampling/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#formulagrader">FormulaGrader</a></li>
+            <li><a href="#variables-and-sampling">Variables and Sampling</a></li>
+            <li><a href="#numbered-variables">Numbered Variables</a></li>
+            <li><a href="#samples-and-failable-evaluations">Samples and Failable Evaluations</a></li>
+            <li><a href="#functions">Functions</a></li>
+            <li><a href="#constants">Constants</a></li>
+            <li><a href="#overriding-default-functions-and-constants">Overriding Default Functions and Constants</a></li>
+            <li><a href="#restricting-student-input">Restricting Student Input</a></li>
+            <li><a href="#tolerance">Tolerance</a></li>
+            <li><a href="#case-sensitive-input">Case Sensitive Input</a></li>
+            <li><a href="#suffixes">Suffixes</a></li>
+            <li><a href="#comparer-functions">Comparer Functions</a></li>
+            <li><a href="#other-improvements">Other Improvements</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="formulagrader">FormulaGrader</h1>
+<p>FormulaGrader is the grading class used to grade mathematical formulas and closely resembles the behavior of edX's <code>&lt;formularesponse /&gt;</code> tag, but with much more versatility.</p>
+<p>All whitespace is stripped from formulas that are entered. So, <code>1 + x ^ 2</code> is equivalent to <code>1+x^2</code>.</p>
+<h2 id="variables-and-sampling">Variables and Sampling</h2>
+<p>FormulaGrader grades a formula by numerical sampling. That is, random values are  assigned to each of the unknown variables and unknown functions, then the numerical value of the student's input expression and author's answer are calculated. The sampling process is repeated, and if the student answer and author answer compare within the desired tolerance enough times, the student input is graded as correct.</p>
+<p>Variables are configured by including a list of strings of each variable name as follows.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='1+x^2+y',
+    variables=['x', 'y']
+)
+</code></pre>
+
+<p>Note that the <code>answers</code> parameter follows all of the usual allowances from ItemGrader.</p>
+<p>The variables need to have numbers randomly assigned to them. Each is sampled from a <a href="../sampling/">sampling set</a>, which is RealInterval() by default (random numbers from 1 to 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the <code>sample_from</code> key.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='1+x^2+y+z/2',
+    variables=['x', 'y', 'z'],
+    sample_from={
+        'x': ComplexRectangle(),
+        'y': [2, 6],
+        'z': (1, 3, 4, 8)
+    }
+)
+</code></pre>
+
+<p>The <code>sample_from</code> key must be a dictionary of 'variable_name': sampling_set pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.</p>
+<h2 id="numbered-variables">Numbered Variables</h2>
+<p>You can also specify special variables that are numbered. For example, if you specify that <code>a</code> is a numbered variable, students can include <code>a_{0}</code>, <code>a_{5}</code>, <code>a_{-2}</code>, etc, using any integer. All entries for a numbered variable will use the sampling set specified by the base name.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='a_{0} + a_{1}*x + 1/2*a_{2}*x^2',
+    variables=['x'],
+    numbered_vars=['a'],
+    sample_from={
+        'x': [-5, 5],
+        'a': [-10, 10]
+    }
+)
+</code></pre>
+
+<p>If you have a variable name that would clash with a numbered variable (say, you defined <code>a_{0}</code> and also a numbered variable <code>a</code>), then the specific variable has precedence.</p>
+<h2 id="samples-and-failable-evaluations">Samples and Failable Evaluations</h2>
+<p>To control the number of samples that are checked to ensure correctness, you can modify the <code>samples</code> key.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='1+x^2',
+    variables=['x'],
+    samples=10
+)
+</code></pre>
+
+<p>The default for <code>samples</code> is 5.</p>
+<p>You may want to allow for a certain number of comparisons to fail before the student is marked incorrect. To do this, set <code>failable_evals</code>. This should be used very sparingly!</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='1+x^2',
+    variables=['x'],
+    samples=10,
+    failable_evals=1
+)
+</code></pre>
+
+<h2 id="functions">Functions</h2>
+<p>By default, a large array of mathematical functions are available for use. See the full list <a href="function_list.md">here</a>. Note that functions for manipulating complex variables are available, which allows you to grade complex expressions. In the following example, <code>z*z</code> is recognized to be different from <code>abs(z)^2</code>.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='abs(z)^2',
+    variables=['z'],
+    sample_from={
+        'z': ComplexRectangle()
+    }
+)
+</code></pre>
+
+<h3 id="user-functions">User Functions</h3>
+<p>You can make user-defined functions available for students to use in their answers. To add user-defined functions, pass in a dictionary to the <code>user_functions</code> key as follows.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='x*x',
+    variables=['x'],
+    user_functions={'f': lambda x: x*x}
+)
+</code></pre>
+
+<p>This defines a function <code>f(x) = x^2</code>. User-defined function names must start with a letter, and can use numbers and underscores, such as <code>my_func2</code>. They are also allowed to have apostrophes (primes) at the end of the name, such as to indicate derivatives. Eg, <code>f''</code>. Be careful about using quotation marks appropriately when using primes in function names!</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers=&quot;f''(x)&quot;,
+    variables=['x'],
+    user_functions={&quot;f''&quot;: lambda x: x*x}
+)
+</code></pre>
+
+<p>You can also specify random functions by specifying a sampling set for a function. You can provide a list of functions to randomly choose from as follows.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers=&quot;f(x)&quot;,
+    variables=['x'],
+    user_functions={&quot;f&quot;: [np.sin, np.cos]}
+)
+</code></pre>
+
+<p>Each time this formula is checked, the function <code>f</code> will be sampled from the list of available functions.</p>
+<p>You can also specify a random well-behaved function by using the RandomFunction() sampling set.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers=&quot;f''(x) + omega^2*f(x)&quot;,
+    variables=['x', 'omega'],
+    user_functions={
+        &quot;f&quot;: RandomFunction(),
+        &quot;f''&quot;: RandomFunction()
+    }
+)
+</code></pre>
+
+<p>This allows you to grade mathematical expressions that involve unknown functions, such as the differential equation described in this example.</p>
+<h2 id="constants">Constants</h2>
+<p>By default, four constants are defined: <code>e</code>, <code>pi</code>, and <code>i=j=sqrt(-1)</code>. You can define new constants by passing in a dictionary to <code>user_constants</code> as follows.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='1/sqrt(1-v^2/c^2)',
+    variables=['v'],
+    user_constants={
+        'c': 3e8
+    }
+)
+</code></pre>
+
+<p>Constants are like variables that only ever have one value.</p>
+<h2 id="overriding-default-functions-and-constants">Overriding Default Functions and Constants</h2>
+<p>You can override default functions and constants if you really want, although this is discouraged and requires suppressing warnings with <code>suppress_warnings=True</code>. The grader</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='x^2',
+    variables=['x'],
+    user_functions={'sin': lambda x: x*x},
+)
+</code></pre>
+
+<p>will raise an error</p>
+<blockquote>
+<p>ConfigError: Warning: 'user_functions' contains entries '['sin']' which will override default values. If you intend to override to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</p>
+</blockquote>
+<p>The error can be suppressed by setting <code>suppress_warnings=True</code>.</p>
+<h2 id="restricting-student-input">Restricting Student Input</h2>
+<p>For some questions, you will want to restrict the sorts of input that are marked correct. For example, if you want students to expand <code>sin(2*theta)</code>, then you don't want students to be able to just write <code>sin(2*theta)</code> and be graded correct.</p>
+<p>FormulaGrader offers a few ways to restrict what sort of answers will be marked correct.</p>
+<h3 id="forbidden-strings">Forbidden Strings</h3>
+<p>You can forbid students from entering certain strings using the <code>forbidden_strings</code> key:</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='2*sin(theta)*cos(theta)',
+    variables=['theta'],
+    forbidden_strings=['*theta', 'theta*', 'theta/', '+theta', 'theta+', '-theta', 'theta-'],
+    forbidden_message=&quot;Your answer should only use trigonometric functions acting on theta, not multiples of theta&quot;
+)
+</code></pre>
+
+<p>If a student tries to use one of these strings, then they receive the <code>forbidden_message</code>, without giving away what the forbidden string is. We recommend using this sparingly, as students will find it confusing. The default <code>forbidden_message</code> is "Invalid Input: This particular answer is forbidden".</p>
+<p>Forbidden strings and student answers are stripped of whitespace before being compared. Thus, if <code>x + y</code> is forbidden, then answers containing <code>x+y</code> or <code>x   +   y</code> will be rejected.</p>
+<h3 id="blacklists-and-whitelists">Blacklists and Whitelists</h3>
+<p>You can disallow specific functions by adding them to the blacklist of functions as a list of disallowed function names. In the following example, <code>sin</code> is disallowed in correct answers.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='sqrt(1 - cos(x)^2)',
+    variables=['x'],
+    sample_from={'x': [0, np.pi]},
+    blacklist=['sin']
+)
+</code></pre>
+
+<p>If you want to exclude everything except for a specific set of functions, instead use a whitelist. In the following example, the only allowed functions in correct answers are sin and cos.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='sin(x)/cos(x)',
+    variables=['x'],
+    whitelist=['sin', 'cos']
+)
+</code></pre>
+
+<p>If you want to exclude all functions, use <code>whitelist=[None]</code>:</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='pi/2-x',
+    variables=['x'],
+    whitelist=[None] # no functions are allowed
+)
+</code></pre>
+
+<p>You cannot use a whitelist and a blacklist at the same time.</p>
+<h3 id="required-functions">Required Functions</h3>
+<p>You can specifically require certain functions to appear in the solution. Any solution that does not include all of these functions will generate an error message. To do this, specify a list of strings of function names that are required.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='2*sin(theta)*cos(theta)',
+    variables=['theta'],
+    required_functions=['sin', 'cos']
+)
+</code></pre>
+
+<h2 id="tolerance">Tolerance</h2>
+<p>Student inputs are compared to answers with a numerical tolerance. You can set this as an absolute number (eg, <code>0.1</code>) or a percentage (eg, <code>"0.01%"</code>, which is the default tolerance).  Tolerances must be nonnegative numbers or percentages.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='2*sin(theta)*cos(theta)',
+    variables=['theta'],
+    tolerance=0.00001
+)
+</code></pre>
+
+<p>Tolerances are necessary because of numerical roundoff error that lead to small differences in evaluations of algebraically equivalent expressions. Zero tolerance should be used sparingly, perhaps only with integer sampling and answers.</p>
+<h2 id="case-sensitive-input">Case Sensitive Input</h2>
+<p>All expressions are treated in a case sensitive manner. This means that variables <code>m</code> and <code>M</code> are distinct variables. Prior to version 1.1, we had a case-insensitive option available. However, this option is now deprecated, as it was causing issues in the codebase, nobody was using it (that we know of), and the majority of languages are case-sensitive anway.</p>
+<h2 id="suffixes">Suffixes</h2>
+<p>Numbers with a % at the end will be treated as percentages, and converted to the appropriate decimals.</p>
+<p>edX also defines a number of metric suffixes (k, M, G, T, m, u, n, and p) that modify a number appropriately. However, in our experience, these metric suffixes lead to more confusion than use. For example, <code>2M</code>, which one would expect should be rejected as an error when <code>2*M</code> was intended, is accepted by edX, interpreted as <code>2*10^6</code>, marked incorrect, and eats a student's attempt. Similarly for all of the other metric suffixes.</p>
+<p>We have therefore made the decision to disable metric suffixes by default. If you want to enable them, you can do so using the following.</p>
+<pre><code class="python">grader = FormulaGrader(
+    answers='2*m',
+    variables=['m'],
+    metric_suffixes=True
+)
+</code></pre>
+
+<p>We strongly recommend <em>not</em> doing this when using the following variable names: k, M, G, T, m, u, n, and p.</p>
+<h2 id="comparer-functions">Comparer Functions</h2>
+<p>By default, FormulaGrader compares the numerically sampled author formula and student formula for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. For example, if grading angles in degrees, it may be useful to compare formulas modulo 360.</p>
+<p>To use an alternate comparer, specify the <code>answers</code> key as a dictionary with keys <code>comparer</code> and <code>comparer_params</code> rather than a single string. For example, to compare formulas modulo 360:</p>
+<pre><code class="python">def is_coterminal(comparer_params_evals, student_eval, utils):
+    answer = comparer_params_evals[0]
+    reduced = student_eval % (360)
+    return utils.within_tolerance(answer, reduced)
+
+grader = FormulaGrader(
+    answers={
+        'comparer': is_coterminal,
+        'comparer_params': ['b^2/a'],
+    },
+    variables=['a', 'b'],
+    tolerance='1%'
+)
+</code></pre>
+
+<p>This grader would accept <code>'b^2/a'</code> as well as <code>'b^2/a + 360'</code>, <code>'b^2/a + 720'</code>, etc.</p>
+<p>In the grader configuration, <code>comparer_params</code> is a list of strings that are numerically evaluated and passed to the comparer function. The <code>comparer</code> function is a user-specified function with signature <code>comparer(comparer_params_evals, student_eval, utils)</code>. When <code>FormulaGrader</code> calls the comparer function, <code>comparer</code> the argument values are:
+- <code>comparer_params_evals</code>: The <code>comparer_params</code> list, numerically evaluated according to variable and function sampling.
+- <code>student_eval</code>: The student's input, numerically evaluated according to variable and function sampling
+- <code>utils</code>: A convenience object that may be helpful when writing custom comparer functions. Has properties:
+  - <code>utils.tolerance</code>: The tolerance specified in grader configuration, <code>0.01%</code> by default
+  - <code>utils.within_tolerance:</code> A function with signature <code>within_tolerance(x, y)</code> which checks that <code>y</code> is within specified tolerance of <code>x</code>. Can handle scalars, vectors, and matrices. If tolerance was specified as a percentage, then checks that <code>|x-y| &lt; tolerance * x</code>.</p>
+<h2 id="other-improvements">Other Improvements</h2>
+<p>We have made a number of other improvements over the edX formula graders, including:</p>
+<ul>
+<li>Square roots and other functions have a wider domain: with edX's default FormulaResponse, authors need to be careful that expressions like <code>sqrt(x-1)</code> or <code>(x-1)^0.5</code> always pass nonnegative inputs to the square root and power functions. Our square root, power, logarithm, and inverse trigonometric functions accept a wider array of inputs (the entire complex plane, minus poles). For this reason, authors can feel safe using the default sample range in most cases.</li>
+<li>Our parser uses a parsing cache, and hence runs much more efficiently than the edX graders.</li>
+<li>If students input an expression with mismatched parentheses, this generates an intelligible error message that points to the exact issue.</li>
+<li>When students use an unknown variable, the resulting error message highlights that the unknown quantity was interpreted as a variable.</li>
+<li>Similarly, when students use an unknown function, the resulting error message highlights that the unknown quantity was interpreted as a function. If a variable of that name exists, the error message suggests that a multiplication symbol was missing.</li>
+<li>If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the <code>debug</code> flag to True, and a more technical message will usually be displayed.</li>
+<li>Full sampling details are included when the <code>debug</code> flag is set to True.</li>
+<li>
+<p>Enhancements to the AsciiMath renderer (the preview that students see when using <code>&lt;textline&gt;</code> inputs) are available using our <a href="../renderer/">AsciiMath renderer definitions</a>.</p>
+</li>
+<li>
+<p><a href="README.md">Home</a></p>
+</li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '../..';</script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/require.js"></script>
+        <script src="../../search/search.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&larr;</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&rarr;</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </body>
+</html>

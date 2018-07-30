@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>SingleListGrader - MITxGraders</title>
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="../../getting_started/">MITxGraders</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="../../getting_started/">Home</a>
+                    </li>
+                    <li >
+                        <a href="../../item_grader/">ItemGrader</a>
+                    </li>
+                    <li >
+                        <a href="../../string_grader/">StringGrader</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Math <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../../grading_math/formula_grader/">FormulaGrader</a>
+</li>
+                            
+<li >
+    <a href="../../grading_math/formula_grader/">NumericalGrader</a>
+</li>
+                            
+<li >
+    <a href="../../grading_math/sampling/">Sampling Sets</a>
+</li>
+                            
+<li >
+    <a href="../../grading_math/renderer/">AsciiMath Renderer Definitions</a>
+</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Lists <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../list_grader/">ListGrader</a>
+</li>
+                            
+<li class="active">
+    <a href="./">SingleListGrader</a>
+</li>
+                        </ul>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="../list_grader/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li class="disabled">
+                        <a rel="prev" >
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#singlelistgrader">SingleListGrader</a></li>
+            <li><a href="#ordered-input">Ordered Input</a></li>
+            <li><a href="#length-checking">Length Checking</a></li>
+            <li><a href="#choosing-delimiters">Choosing Delimiters</a></li>
+            <li><a href="#turning-partial-credit-off">Turning Partial Credit Off</a></li>
+            <li><a href="#messages">Messages</a></li>
+            <li><a href="#option-listing">Option Listing</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="singlelistgrader">SingleListGrader</h1>
+<p>If you want a response to be a delimiter-separated list of items, you can use a special ItemGrader called <code>SingleListGrader</code> to perform the grading. You need to specify a subgrader (which must be an ItemGrader, and could even be another SingleListGrader) to evaluate each individual item. The basic usage is as follows.</p>
+<pre><code class="python">grader = SingleListGrader(
+    answers=['cat', 'dog'],
+    subgrader=StringGrader()
+)
+</code></pre>
+
+<p>To receive full points for this problem, a student would enter <code>cat, dog</code> or <code>dog, cat</code> into the input box. Entering <code>cat, octopus</code> or just <code>cat</code> will receive half points.</p>
+<p>You can use a tuple of lists to specify multiple lists of answers, just like normal ItemGraders.</p>
+<pre><code class="python">grader = SingleListGrader(
+    answers=(
+        [('cat', 'feline'), 'dog'],
+        ['goat', 'vole'],
+    ),
+    subgrader=StringGrader()
+)
+</code></pre>
+
+<p>Now, <code>cat, dog</code> and <code>goat, vole</code> will get full grades. But mixes won't: <code>cat, vole</code> will score half credit.</p>
+<h2 id="ordered-input">Ordered Input</h2>
+<p>By default a SingleListGrader doesn't care which order the input is given in. If you want the answers and the student input to be compared in order, set <code>ordered=True</code>.</p>
+<pre><code class="python">grader = SingleListGrader(
+    answers=['cat', 'dog'],
+    subgrader=StringGrader(),
+    ordered=True
+)
+</code></pre>
+
+<p>Now <code>cat, dog</code> will receive full grades, but <code>dog, cat</code> will be marked wrong. Note that <code>cat</code> will receive half credit, but <code>dog</code> will receive zero, as dog is incorrect in the first position. Ordered is false by default.</p>
+<h2 id="length-checking">Length Checking</h2>
+<p>If students are asked to enter a list of three items but only enter two, should this use up an attempt, or present an error message? If you want to present an error message, turn on length checking.</p>
+<pre><code class="python">grader = SingleListGrader(
+    answers=['cat', 'dog'],
+    subgrader=StringGrader(),
+    length_error=True
+)
+</code></pre>
+
+<p>If you give this <code>cat</code>, it will tell you that you've got the wrong length, and won't use up an attempt.</p>
+<p>Length_error is false by default. If you set length_error to True, then all answers in a tuple of lists (rather than a single answer list) must have the same length.</p>
+<h2 id="choosing-delimiters">Choosing Delimiters</h2>
+<p>You can use whatever delimiter you like. The default is a comma (<code>,</code>). The following uses a semicolon as a delimiter. We recommend not using multi-character delimiters, but do not disallow it.</p>
+<pre><code class="python">grader = SingleListGrader(
+    answers=['cat', 'dog'],
+    subgrader=StringGrader(),
+    delimiter=';'
+)
+</code></pre>
+
+<p>By using different delimiters, it is possible to nest SingleListGraders:</p>
+<pre><code class="python">grader = SingleListGrader(
+    answers=[['a', 'b'], ['c', 'd']],
+    subgrader=SingleListGrader(
+        subgrader=StringGrader()
+    ),
+    delimiter=';'
+)
+</code></pre>
+
+<p>Here the expected student input is <code>a, b; c, d</code>. It will also take <code>b, a; d, c</code> or <code>c, d; a, b</code> due to the unordered nature of both lists. However, <code>a, c; d, b</code> is only worth half points.</p>
+<h2 id="turning-partial-credit-off">Turning Partial Credit Off</h2>
+<p>By default, partial credit is awarded to partially correct answers. Answers that have insufficient items lose points, as do answers that have too many items. To turn off partial credit, set partial_credit to False. It is True by default.</p>
+<pre><code class="python">grader = SingleListGrader(
+    answers=['cat', 'dog'],
+    subgrader=StringGrader(),
+    partial_credit=False
+)
+</code></pre>
+
+<p>Now <code>cat, octopus</code> will receive a grade of zero.</p>
+<h2 id="messages">Messages</h2>
+<p>Messages from the individual items are all concatenated together and presented to the student. It is also possible to have a <code>wrong_msg</code> on the <code>SingleListGrader</code>, which is presented to the student if the score is zero and there are no other messages, just like on an <code>ItemGrader</code>.</p>
+<pre><code class="python">grader = SingleListGrader(
+    answers=['cat', 'dog'],
+    subgrader=StringGrader(),
+    wrong_msg='Try again!'
+)
+</code></pre>
+
+<h2 id="option-listing">Option Listing</h2>
+<p>Here is the full list of options specific to a <code>SingleListGrader</code>.</p>
+<pre><code class="python">grader = SingleListGrader(
+    answers=list or tuple of lists,
+    subgrader=ItemGrader(),
+    partial_credit=bool (default True),
+    ordered=bool (default False),
+    length_error=bool (default False),
+    delimiter=string (default ',')
+)
+</code></pre>
+
+<ul>
+<li><a href="README.md">Home</a></li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '../..';</script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/require.js"></script>
+        <script src="../../search/search.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&larr;</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&rarr;</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </body>
+</html>
