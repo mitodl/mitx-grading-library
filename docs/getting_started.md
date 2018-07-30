@@ -4,27 +4,6 @@ This documentation describes how to use the grading library. In particular, it g
 
 For information on installation and how to use the library in edX, see [here](../README.md).
 
-**Table of Contents**
-
-- [Overview](#overview)
-- [Using Grading Classes](#using-grading-classes)
-- [Options](#options)
-- [Grading Classes](#grading-classes)
-- [Plugins](#plugins)
-
-**Grading Classes**
-
-- [ItemGrader](item_grader.md)
-  - [StringGrader](string_grader.md)
-  - [FormulaGrader and NumericalGrader](formula_grader.md)
-  - [SingleListGrader](single_list_grader.md)
-- [ListGrader](list_grader.md)
-
-**Other**
-
-- [AsciiMath renderer definitions](renderer.md)
-
-
 ## Overview
 
 The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.

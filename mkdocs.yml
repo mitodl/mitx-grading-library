@@ -1,0 +1,13 @@
+site_name: MITxGraders
+pages:
+  - Home: 'getting_started.md'
+  - ItemGrader: 'item_grader.md'
+  - StringGrader: 'string_grader.md'
+  - Grading Math:
+    - FormulaGrader: 'grading_math/formula_grader.md'
+    - NumericalGrader: 'grading_math/formula_grader.md'
+    - Sampling Sets: 'grading_math/sampling.md'
+    - AsciiMath Renderer Definitions: 'grading_math/renderer.md'
+  - Grading Lists:
+    - ListGrader: 'grading_lists/list_grader.md'
+    - SingleListGrader: 'grading_lists/single_list_grader.md'

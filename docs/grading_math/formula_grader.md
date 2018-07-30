@@ -1,8 +1,6 @@
-# FormulaGrader and NumericalGrader
+# FormulaGrader
 
-FormulaGrader and NumericalGrader are the grading classes that are used to grade numbers and formulas. They closely resemble the edX formularesponse and numericalresponse tags, but with much more versatility.
-
-We begin by introducing FormulaGrader. NumericalGrader is a special version of FormulaGrader, described towards the end of this document.
+FormulaGrader is the grading class used to grade mathematical formulas and closely resembles the behavior of edX's `<formularesponse />` tag, but with much more versatility.
 
 All whitespace is stripped from formulas that are entered. So, `1 + x ^ 2` is equivalent to `1+x^2`.
 
@@ -316,19 +314,6 @@ In the grader configuration, `comparer_params` is a list of strings that are num
 - `utils`: A convenience object that may be helpful when writing custom comparer functions. Has properties:
   - `utils.tolerance`: The tolerance specified in grader configuration, `0.01%` by default
   - `utils.within_tolerance:` A function with signature `within_tolerance(x, y)` which checks that `y` is within specified tolerance of `x`. Can handle scalars, vectors, and matrices. If tolerance was specified as a percentage, then checks that `|x-y| < tolerance * x`.
-
-## NumericalGrader
-
-When you do not have any random functions or variables, you can use NumericalGrader instead of FormulaGrader. NumericalGrader is a specialized version of FormulaGrader with a different default tolerance (`'5%'`). All of the FormulaGrader options are available, with the following exceptions.
-
-* `failable_evals` is always set to 0
-* `samples` is always set to 1
-* `variables` is always set to `[]` (no variables allowed)
-* `sample_from` is always set to `{}` (no variables allowed)
-* `user_functions` can only define specific functions, with no random functions
-
-If you are grading simple integers (such as 0, 1, 2, -1, etc), you may want to consider using StringGrader instead of NumericalGrader.
-
 
 ## Other Improvements
 
