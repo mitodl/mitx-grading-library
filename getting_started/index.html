@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>ItemGrader - MITxGraders</title>
+        <title>Getting Started - MITxGraders</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -52,12 +52,12 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
-<li >
-    <a href="../getting_started/">Getting Started</a>
+<li class="active">
+    <a href="./">Getting Started</a>
 </li>
                             
-<li class="active">
-    <a href="./">ItemGrader</a>
+<li >
+    <a href="../item_grader/">ItemGrader</a>
 </li>
                             
 <li >
@@ -115,12 +115,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../getting_started/">
+                        <a rel="next" href="..">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../string_grader/">
+                        <a rel="prev" href="../item_grader/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -135,74 +135,61 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#itemgrader">ItemGrader</a></li>
-            <li><a href="#option-listing">Option Listing</a></li>
+        <li class="main active"><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#usage-in-edx">Usage in edX</a></li>
+            <li><a href="#mitxgraders-reusable-customresponse-check-functions">MITxGraders: Reusable CustomResponse Check Functions</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="itemgrader">ItemGrader<a class="headerlink" href="#itemgrader" title="Permanent link"></a></h1>
-<p>When an individual input needs to be graded, it is graded by an item grader. All item graders work by specifying answers and their corresponding points/messages, as well as an optional message for wrong answers. In these examples, we use <code>StringGrader</code> as an example of how to use a generic ItemGrader. You cannot use a generic ItemGrader by itself.</p>
-<pre><code class="python">grader = StringGrader(
-    answers='cat',
-    wrong_msg='Try again!'
+<h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link"></a></h1>
+<h2 id="usage-in-edx">Usage in edX<a class="headerlink" href="#usage-in-edx" title="Permanent link"></a></h2>
+<p>Download <a href="../python_lib.zip">python_lib.zip</a> and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip. If you want to use our AsciiMath renderer definitions, place the <a href="../MjxPrep.js">MjxPrep.js</a> file in your static folder (XML) or upload the file to your course (Studio).</p>
+<h2 id="mitxgraders-reusable-customresponse-check-functions">MITxGraders: Reusable CustomResponse Check Functions<a class="headerlink" href="#mitxgraders-reusable-customresponse-check-functions" title="Permanent link"></a></h2>
+<p>A custom response problem is defined using the <code>&lt;customresponse&gt;</code> tag. It needs to be supplied with a particular type of Python function that edX calls a check function (or "cfn"). The mitxgraders library provides reusable check functions. The basic usage pattern is:</p>
+<pre><code class="xml">&lt;script type=&quot;text/python&quot; system_path=&quot;python_lib&quot;&gt;
+from mitxgraders import *
+grader = GraderType(
+    [configuration]
 )
+&lt;/script&gt;
+
+&lt;customresponse cfn=&quot;grader&quot;&gt;
+    &lt;textline/&gt;
+&lt;/customresponse&gt;
 </code></pre>
 
-<p>The <code>answers</code> can be used to specify correct answers, specific feedback messages, and to assign partial credit. The <code>answers</code> key accepts a few formats:</p>
-<ol>
-<li>A single dictionary can be used to specify an answer, feedback, correctness, and partial credit:</li>
-</ol>
-<pre><code class="python">grader = StringGrader(
-    answers={'expect': 'zebra', 'ok': True, 'grade_decimal': 1, 'msg': 'Yay!'},
-    wrong_msg='Try again!'
+<p>The configuration depends on the type of grader that you're using. Note that all answers must be passed through the configuration. In particular, the <code>expect</code>  attribute on <code>&lt;customresponse&gt;</code> tag is ignored by our graders (but can be used to display an answer string to students).</p>
+<p>Here is an example where we use a StringGrader with answer <code>cat</code>.</p>
+<pre><code class="xml">&lt;script type=&quot;text/python&quot; system_path=&quot;python_lib&quot;&gt;
+from mitxgraders import *
+grader = StringGrader(
+    answers='cat'
 )
+&lt;/script&gt;
+
+&lt;customresponse cfn=&quot;grader&quot;&gt;
+    &lt;textline correct_answer=&quot;cat&quot;/&gt;
+&lt;/customresponse&gt;
 </code></pre>
 
-<p>The answers dictionary keys are:
-  - <code>'expect'</code> (required): compared against student answer. Most ItemGraders use strings to specify the <code>'expect'</code> value.
-  - <code>'grade_decimal'</code> (a number between <code>0</code> and <code>1</code>): The partial credit associated with this answer; default value is <code>1</code>.
-  - <code>'ok'</code> (<code>True</code>, <code>False</code>, or <code>'partial'</code>): The answer's correctness; determines icon used by edX. The default value is inferred from <code>grade_decimal</code>.
-  - <code>'msg'</code> (string): A feedback message associated with this answer.</p>
-<ol>
-<li>A single <code>'expect'</code> value: can be used to specify the correct answer. For example,</li>
-</ol>
-<pre><code class="python">grader = StringGrader(
-    answers='cat',
-    # Equivalent to:
-    # answers={'expect': 'cat', 'msg': '', 'grade_decimal': 1, 'ok': True}
-    wrong_msg='Try again!'
+<p>The <code>expect</code> keyword is ignored by the grader, but is shown when students click on "Show Answer". This works only for single-input problems.</p>
+<p>Here is another example where we use a ListGrader to grade two numbers in an unordered fashion.</p>
+<pre><code class="xml">&lt;script type=&quot;text/python&quot; system_path=&quot;python_lib&quot;&gt;
+from mitxgraders import *
+grader = ListGrader(
+    answers=['1', '2'],
+    subgraders=FormulaGrader()
 )
+&lt;/script&gt;
+
+&lt;customresponse cfn=&quot;grader&quot;&gt;
+    &lt;textline correct_answer=&quot;1&quot;/&gt;
+    &lt;textline correct_answer=&quot;2&quot;/&gt;
+&lt;/customresponse&gt;
 </code></pre>
 
-<p>Again, most ItemGraders use strings to store <code>'expect'</code> values.</p>
-<ol>
-<li>A tuple of dictionaries or strings:</li>
-</ol>
-<pre><code class="python">grader = StringGrader(
-    answers=(
-        # the correct answer
-        'wolf',
-        # an alternative correct answer
-        'canis lupus',
-        # a partially correct answer
-        {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
-        # a wrong answer with specific feedback
-        {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
-    ),
-    wrong_msg='Try again!'
-)
-</code></pre>
-
-<p>Internally, the ItemGrader converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.</p>
-<p>The <code>wrong_msg</code> is only displayed if the score is zero, and there are no other messages.</p>
-<h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"></a></h2>
-<p>Here is the full list of options specific to an <code>ItemGrader</code>.</p>
-<pre><code class="python">grader = ItemGrader(
-    answers=answer or tuple of answers,
-    wrong_msg=string (default '')
-)
-</code></pre></div>
+<p>Here, the <code>correct_answer</code> entries are shown to students when they click "Show Answer". These values are not provided to the grader. The <code>correct_answer</code> attributes can also be used for single-input problems.</p></div>
         </div>
 
         <footer class="col-md-12">

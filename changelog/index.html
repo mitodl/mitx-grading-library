@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>ItemGrader - MITxGraders</title>
+        <title>Changelog - MITxGraders</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -48,7 +48,7 @@
                     <li >
                         <a href="..">Home</a>
                     </li>
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -56,8 +56,8 @@
     <a href="../getting_started/">Getting Started</a>
 </li>
                             
-<li class="active">
-    <a href="./">ItemGrader</a>
+<li >
+    <a href="../item_grader/">ItemGrader</a>
 </li>
                             
 <li >
@@ -103,8 +103,8 @@
 </li>
                         </ul>
                     </li>
-                    <li >
-                        <a href="../changelog/">Changelog</a>
+                    <li class="active">
+                        <a href="./">Changelog</a>
                     </li>
                 </ul>
 
@@ -115,12 +115,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../getting_started/">
+                        <a rel="next" href="../grading_lists/single_list_grader/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
-                    <li >
-                        <a rel="prev" href="../string_grader/">
+                    <li class="disabled">
+                        <a rel="prev" >
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -135,74 +135,78 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#itemgrader">ItemGrader</a></li>
-            <li><a href="#option-listing">Option Listing</a></li>
+        <li class="main active"><a href="#change-log">Change Log</a></li>
+            <li><a href="#version-11x">Version 1.1.x</a></li>
+            <li><a href="#version-10x">Version 1.0.x</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="itemgrader">ItemGrader<a class="headerlink" href="#itemgrader" title="Permanent link"></a></h1>
-<p>When an individual input needs to be graded, it is graded by an item grader. All item graders work by specifying answers and their corresponding points/messages, as well as an optional message for wrong answers. In these examples, we use <code>StringGrader</code> as an example of how to use a generic ItemGrader. You cannot use a generic ItemGrader by itself.</p>
-<pre><code class="python">grader = StringGrader(
-    answers='cat',
-    wrong_msg='Try again!'
-)
-</code></pre>
-
-<p>The <code>answers</code> can be used to specify correct answers, specific feedback messages, and to assign partial credit. The <code>answers</code> key accepts a few formats:</p>
-<ol>
-<li>A single dictionary can be used to specify an answer, feedback, correctness, and partial credit:</li>
-</ol>
-<pre><code class="python">grader = StringGrader(
-    answers={'expect': 'zebra', 'ok': True, 'grade_decimal': 1, 'msg': 'Yay!'},
-    wrong_msg='Try again!'
-)
-</code></pre>
-
-<p>The answers dictionary keys are:
-  - <code>'expect'</code> (required): compared against student answer. Most ItemGraders use strings to specify the <code>'expect'</code> value.
-  - <code>'grade_decimal'</code> (a number between <code>0</code> and <code>1</code>): The partial credit associated with this answer; default value is <code>1</code>.
-  - <code>'ok'</code> (<code>True</code>, <code>False</code>, or <code>'partial'</code>): The answer's correctness; determines icon used by edX. The default value is inferred from <code>grade_decimal</code>.
-  - <code>'msg'</code> (string): A feedback message associated with this answer.</p>
-<ol>
-<li>A single <code>'expect'</code> value: can be used to specify the correct answer. For example,</li>
-</ol>
-<pre><code class="python">grader = StringGrader(
-    answers='cat',
-    # Equivalent to:
-    # answers={'expect': 'cat', 'msg': '', 'grade_decimal': 1, 'ok': True}
-    wrong_msg='Try again!'
-)
-</code></pre>
-
-<p>Again, most ItemGraders use strings to store <code>'expect'</code> values.</p>
-<ol>
-<li>A tuple of dictionaries or strings:</li>
-</ol>
-<pre><code class="python">grader = StringGrader(
-    answers=(
-        # the correct answer
-        'wolf',
-        # an alternative correct answer
-        'canis lupus',
-        # a partially correct answer
-        {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
-        # a wrong answer with specific feedback
-        {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
-    ),
-    wrong_msg='Try again!'
-)
-</code></pre>
-
-<p>Internally, the ItemGrader converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.</p>
-<p>The <code>wrong_msg</code> is only displayed if the score is zero, and there are no other messages.</p>
-<h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"></a></h2>
-<p>Here is the full list of options specific to an <code>ItemGrader</code>.</p>
-<pre><code class="python">grader = ItemGrader(
-    answers=answer or tuple of answers,
-    wrong_msg=string (default '')
-)
-</code></pre></div>
+<h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link"></a></h1>
+<h2 id="version-11x">Version 1.1.x<a class="headerlink" href="#version-11x" title="Permanent link"></a></h2>
+<h3 id="version-112">Version 1.1.2<a class="headerlink" href="#version-112" title="Permanent link"></a></h3>
+<ul>
+<li>This version includes an internal change to the way that errors are handled during check.</li>
+<li>If you only use builtin graders (FormulaGrader, ListGrader...) or public plugins (IntegralGrader) you should not notice any difference.</li>
+<li>If you have previously written your own grading class, this change could affect what errors messages are displayed to students. In particular, only exceptions inheriting from <code>MITxError</code> will display their messages to students; other errors will be replaced with a generic error message.</li>
+</ul>
+<h3 id="version-111">Version 1.1.1<a class="headerlink" href="#version-111" title="Permanent link"></a></h3>
+<ul>
+<li>Added AsciiMath renderer definitions</li>
+<li>We now check for naming collisions in your configuration</li>
+<li>Cleaned up voluptuous incorporation</li>
+<li>Extend domain of factorial function to all complex, except negative integers</li>
+<li>Removed .pyc files from the zip file</li>
+<li>Minor bug fixes</li>
+</ul>
+<h3 id="version-110">Version 1.1.0<a class="headerlink" href="#version-110" title="Permanent link"></a></h3>
+<ul>
+<li>Added numbered variables to FormulaGrader</li>
+<li>
+<p>Removed case-insensitive comparisons from FormulaGrader and IntegralGrader.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is a departure from edX and is a breaking change for authors who used case-insensitive FormulaGraders. However:</p>
+<ul>
+<li>Case-sensitive has always been the default for FormulaGrader and we are not aware of authors using case-insensitive FormulaGraders.</li>
+<li>Pedagogically, we believe that students should think of <code>M</code> and <code>m</code> are different variables.</li>
+<li>Removing case-insensitive comparison fixes a number of ambiguous situations.</li>
+</ul>
+</div>
+</li>
+</ul>
+<h2 id="version-10x">Version 1.0.x<a class="headerlink" href="#version-10x" title="Permanent link"></a></h2>
+<h3 id="version-105">Version 1.0.5<a class="headerlink" href="#version-105" title="Permanent link"></a></h3>
+<ul>
+<li>Improved debugging information for FormulaGrader</li>
+<li>FormulaGrader and IntegralGrader perform whitelist, blacklist, and forbidden_string checks after determining answer correctness. Incorrect answers using forbidden strings / functions are now marked incorrect, while correct answers using forbidden strings / functions raise errors.</li>
+<li>Minor improvements to existing unit tests</li>
+</ul>
+<h3 id="version-104">Version 1.0.4<a class="headerlink" href="#version-104" title="Permanent link"></a></h3>
+<ul>
+<li>Authors can now specify a custom comparer function for FormulaGrader</li>
+<li>IntegralGrader now handles complex integrands, and gives meaningful error messages
+  for complex limits.</li>
+<li>Miscellaneous bug fixes for tensor variable name parsing</li>
+</ul>
+<h3 id="version-103">Version 1.0.3<a class="headerlink" href="#version-103" title="Permanent link"></a></h3>
+<ul>
+<li>Added tensor variable names</li>
+</ul>
+<h3 id="version-102">Version 1.0.2<a class="headerlink" href="#version-102" title="Permanent link"></a></h3>
+<ul>
+<li>Added error messages for overflow, division-by-zero, and out-of-domain errors in formulas</li>
+<li>Added tests to reach 100% coverage</li>
+<li>Removed redundant code</li>
+<li>Fixed some bugs in unused code</li>
+</ul>
+<h3 id="version-101">Version 1.0.1<a class="headerlink" href="#version-101" title="Permanent link"></a></h3>
+<ul>
+<li>Added DependentSampler</li>
+<li>Fixed issue with zip file tests</li>
+<li>Added doctests to test suite</li>
+<li>Fixed bug in FormulaGrader when given an empty string</li>
+</ul></div>
         </div>
 
         <footer class="col-md-12">

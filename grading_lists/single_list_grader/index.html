@@ -48,11 +48,22 @@
                     <li >
                         <a href="../..">Home</a>
                     </li>
-                    <li >
-                        <a href="../../item_grader/">ItemGrader</a>
-                    </li>
-                    <li >
-                        <a href="../../string_grader/">StringGrader</a>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../../getting_started/">Getting Started</a>
+</li>
+                            
+<li >
+    <a href="../../item_grader/">ItemGrader</a>
+</li>
+                            
+<li >
+    <a href="../../string_grader/">StringGrader</a>
+</li>
+                        </ul>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Math <b class="caret"></b></a>
@@ -63,11 +74,15 @@
 </li>
                             
 <li >
-    <a href="../../grading_math/formula_grader/">NumericalGrader</a>
+    <a href="../../grading_math/numerical_grader/">NumericalGrader</a>
 </li>
                             
 <li >
     <a href="../../grading_math/sampling/">Sampling Sets</a>
+</li>
+                            
+<li >
+    <a href="../../grading_math/function_list/">Function List</a>
 </li>
                             
 <li >
@@ -88,6 +103,9 @@
 </li>
                         </ul>
                     </li>
+                    <li >
+                        <a href="../../changelog/">Changelog</a>
+                    </li>
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
@@ -101,10 +119,13 @@
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
-                    <li class="disabled">
-                        <a rel="prev" >
+                    <li >
+                        <a rel="prev" href="../../changelog/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -125,7 +146,7 @@
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="singlelistgrader">SingleListGrader</h1>
+<h1 id="singlelistgrader">SingleListGrader<a class="headerlink" href="#singlelistgrader" title="Permanent link"></a></h1>
 <p>If you want a response to be a delimiter-separated list of items, you can use a special ItemGrader called <code>SingleListGrader</code> to perform the grading. You need to specify a subgrader (which must be an ItemGrader, and could even be another SingleListGrader) to evaluate each individual item. The basic usage is as follows.</p>
 <pre><code class="python">grader = SingleListGrader(
     answers=['cat', 'dog'],
@@ -145,7 +166,7 @@
 </code></pre>
 
 <p>Now, <code>cat, dog</code> and <code>goat, vole</code> will get full grades. But mixes won't: <code>cat, vole</code> will score half credit.</p>
-<h2 id="ordered-input">Ordered Input</h2>
+<h2 id="ordered-input">Ordered Input<a class="headerlink" href="#ordered-input" title="Permanent link"></a></h2>
 <p>By default a SingleListGrader doesn't care which order the input is given in. If you want the answers and the student input to be compared in order, set <code>ordered=True</code>.</p>
 <pre><code class="python">grader = SingleListGrader(
     answers=['cat', 'dog'],
@@ -155,7 +176,7 @@
 </code></pre>
 
 <p>Now <code>cat, dog</code> will receive full grades, but <code>dog, cat</code> will be marked wrong. Note that <code>cat</code> will receive half credit, but <code>dog</code> will receive zero, as dog is incorrect in the first position. Ordered is false by default.</p>
-<h2 id="length-checking">Length Checking</h2>
+<h2 id="length-checking">Length Checking<a class="headerlink" href="#length-checking" title="Permanent link"></a></h2>
 <p>If students are asked to enter a list of three items but only enter two, should this use up an attempt, or present an error message? If you want to present an error message, turn on length checking.</p>
 <pre><code class="python">grader = SingleListGrader(
     answers=['cat', 'dog'],
@@ -166,7 +187,7 @@
 
 <p>If you give this <code>cat</code>, it will tell you that you've got the wrong length, and won't use up an attempt.</p>
 <p>Length_error is false by default. If you set length_error to True, then all answers in a tuple of lists (rather than a single answer list) must have the same length.</p>
-<h2 id="choosing-delimiters">Choosing Delimiters</h2>
+<h2 id="choosing-delimiters">Choosing Delimiters<a class="headerlink" href="#choosing-delimiters" title="Permanent link"></a></h2>
 <p>You can use whatever delimiter you like. The default is a comma (<code>,</code>). The following uses a semicolon as a delimiter. We recommend not using multi-character delimiters, but do not disallow it.</p>
 <pre><code class="python">grader = SingleListGrader(
     answers=['cat', 'dog'],
@@ -186,7 +207,7 @@
 </code></pre>
 
 <p>Here the expected student input is <code>a, b; c, d</code>. It will also take <code>b, a; d, c</code> or <code>c, d; a, b</code> due to the unordered nature of both lists. However, <code>a, c; d, b</code> is only worth half points.</p>
-<h2 id="turning-partial-credit-off">Turning Partial Credit Off</h2>
+<h2 id="turning-partial-credit-off">Turning Partial Credit Off<a class="headerlink" href="#turning-partial-credit-off" title="Permanent link"></a></h2>
 <p>By default, partial credit is awarded to partially correct answers. Answers that have insufficient items lose points, as do answers that have too many items. To turn off partial credit, set partial_credit to False. It is True by default.</p>
 <pre><code class="python">grader = SingleListGrader(
     answers=['cat', 'dog'],
@@ -196,7 +217,7 @@
 </code></pre>
 
 <p>Now <code>cat, octopus</code> will receive a grade of zero.</p>
-<h2 id="messages">Messages</h2>
+<h2 id="messages">Messages<a class="headerlink" href="#messages" title="Permanent link"></a></h2>
 <p>Messages from the individual items are all concatenated together and presented to the student. It is also possible to have a <code>wrong_msg</code> on the <code>SingleListGrader</code>, which is presented to the student if the score is zero and there are no other messages, just like on an <code>ItemGrader</code>.</p>
 <pre><code class="python">grader = SingleListGrader(
     answers=['cat', 'dog'],
@@ -205,7 +226,7 @@
 )
 </code></pre>
 
-<h2 id="option-listing">Option Listing</h2>
+<h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"></a></h2>
 <p>Here is the full list of options specific to a <code>SingleListGrader</code>.</p>
 <pre><code class="python">grader = SingleListGrader(
     answers=list or tuple of lists,
@@ -215,11 +236,7 @@
     length_error=bool (default False),
     delimiter=string (default ',')
 )
-</code></pre>
-
-<ul>
-<li><a href="README.md">Home</a></li>
-</ul></div>
+</code></pre></div>
         </div>
 
         <footer class="col-md-12">

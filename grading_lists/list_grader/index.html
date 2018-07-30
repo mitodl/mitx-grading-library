@@ -48,11 +48,22 @@
                     <li >
                         <a href="../..">Home</a>
                     </li>
-                    <li >
-                        <a href="../../item_grader/">ItemGrader</a>
-                    </li>
-                    <li >
-                        <a href="../../string_grader/">StringGrader</a>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../../getting_started/">Getting Started</a>
+</li>
+                            
+<li >
+    <a href="../../item_grader/">ItemGrader</a>
+</li>
+                            
+<li >
+    <a href="../../string_grader/">StringGrader</a>
+</li>
+                        </ul>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Math <b class="caret"></b></a>
@@ -63,11 +74,15 @@
 </li>
                             
 <li >
-    <a href="../../grading_math/formula_grader/">NumericalGrader</a>
+    <a href="../../grading_math/numerical_grader/">NumericalGrader</a>
 </li>
                             
 <li >
     <a href="../../grading_math/sampling/">Sampling Sets</a>
+</li>
+                            
+<li >
+    <a href="../../grading_math/function_list/">Function List</a>
 </li>
                             
 <li >
@@ -88,6 +103,9 @@
 </li>
                         </ul>
                     </li>
+                    <li >
+                        <a href="../../changelog/">Changelog</a>
+                    </li>
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
@@ -105,6 +123,9 @@
                         <a rel="prev" href="../single_list_grader/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -125,9 +146,9 @@
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="listgrader">ListGrader</h1>
+<h1 id="listgrader">ListGrader<a class="headerlink" href="#listgrader" title="Permanent link"></a></h1>
 <p>A <code>ListGrader</code> is used to grade a list of student inputs wherein each input is entered in a separate answer box. (In contrast, <code>SingleListGrader</code> can be used to grade a list of items entered all at once into a single answer box.) ListGraders work by farming out individual items to subgraders, and then collecting the results and working out the optimal farming scheme for the student.</p>
-<h2 id="basic-usage">Basic usage</h2>
+<h2 id="basic-usage">Basic usage<a class="headerlink" href="#basic-usage" title="Permanent link"></a></h2>
 <p>In this example, each input is checked against the corresponding answer, using <code>StringGrader</code> as the subgrader.</p>
 <pre><code class="python">grader = ListGrader(
     answers=['cat', 'dog'],
@@ -153,7 +174,7 @@ grader = ListGrader(
 </code></pre>
 
 <p>In this example, the grader will try assigning the first input to answer1 and the second to answer2, and computing the total score. Then it will repeat, with the inputs switched. The student will receive the highest grade. So, note that while <code>cat</code> and <code>unicorn</code> will get the unicorn message (and 1/2 points), <code>zebra</code> and <code>unicorn</code> will not (and also get 1/2 points).</p>
-<h2 id="ordered-input">Ordered Input</h2>
+<h2 id="ordered-input">Ordered Input<a class="headerlink" href="#ordered-input" title="Permanent link"></a></h2>
 <p>By default, the ListGrader doesn't care what order the inputs are given in, so "cat" and "dog" is equivalent to "dog" and "cat". If you want the inputs to be ordered, simply set ordered to True.</p>
 <pre><code class="python">grader = ListGrader(
     answers=['cat', 'dog'],
@@ -163,7 +184,7 @@ grader = ListGrader(
 </code></pre>
 
 <p>Now, "cat" and "dog" will receive full credit, but "dog" and "cat" will receive none.</p>
-<h2 id="multiple-graders">Multiple Graders</h2>
+<h2 id="multiple-graders">Multiple Graders<a class="headerlink" href="#multiple-graders" title="Permanent link"></a></h2>
 <p>If you have inhomogeneous inputs, you can grade them using different graders. Simply give a list of subgraders, and the data will be passed into the graders in that order. Note that the length of answers must be the same as the number of subgraders in this case. Further note that you must set ordered to True when using a list of subgraders.</p>
 <pre><code class="python">grader = ListGrader(
     answers=['cat', 'x^2+1'],
@@ -172,7 +193,7 @@ grader = ListGrader(
 )
 </code></pre>
 
-<h2 id="singlelistgraders-in-listgrader">SingleListGraders in ListGrader</h2>
+<h2 id="singlelistgraders-in-listgrader">SingleListGraders in ListGrader<a class="headerlink" href="#singlelistgraders-in-listgrader" title="Permanent link"></a></h2>
 <p>Some questions will require nested list graders. Simple versions can make use of a <code>SingleListGrader</code> subgrader, as in the following example.</p>
 <p>Consider two input boxes, where the first should be a comma-separated list of even numbers beneath 5, and the second should be a comma-separated list of odd numbers beneath 5. The order of the boxes is important, but within each box, the order becomes unimportant. Here's how you can encode this type of problem.</p>
 <pre><code class="python">grader = ListGrader(
@@ -188,7 +209,7 @@ grader = ListGrader(
 </code></pre>
 
 <p>The nested <code>SingleListGrader</code> will be used to grade the first input box against an unordered answer of 2 and 4, and then the second input box against an unordered answer of 1 and 3.</p>
-<h2 id="grouped-inputs">Grouped Inputs</h2>
+<h2 id="grouped-inputs">Grouped Inputs<a class="headerlink" href="#grouped-inputs" title="Permanent link"></a></h2>
 <p>If you find yourself wanting to nest ListGraders, then you will need to specify how the inputs should be grouped together to be passed to the subgraders. A simple example would be to ask for the name and number of each animal in a picture. Each name/number group needs to be graded together. Here is an example of such a question.</p>
 <pre><code class="python">grader = ListGrader(
     answers=[
@@ -265,7 +286,7 @@ grader = ListGrader(
 )
 </code></pre>
 
-<h2 id="option-listing">Option Listing</h2>
+<h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"></a></h2>
 <p>Here is the full list of options specific to a <code>ListGrader</code>.</p>
 <pre><code class="python">grader = ListGrader(
     answers=list,
@@ -273,11 +294,7 @@ grader = ListGrader(
     ordered=bool, (default False)
     grouping=list
 )
-</code></pre>
-
-<ul>
-<li><a href="README.md">Home</a></li>
-</ul></div>
+</code></pre></div>
         </div>
 
         <footer class="col-md-12">

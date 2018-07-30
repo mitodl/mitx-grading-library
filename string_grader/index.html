@@ -48,11 +48,22 @@
                     <li >
                         <a href="..">Home</a>
                     </li>
-                    <li >
-                        <a href="../item_grader/">ItemGrader</a>
-                    </li>
-                    <li class="active">
-                        <a href="./">StringGrader</a>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../getting_started/">Getting Started</a>
+</li>
+                            
+<li >
+    <a href="../item_grader/">ItemGrader</a>
+</li>
+                            
+<li class="active">
+    <a href="./">StringGrader</a>
+</li>
+                        </ul>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Math <b class="caret"></b></a>
@@ -63,11 +74,15 @@
 </li>
                             
 <li >
-    <a href="../grading_math/formula_grader/">NumericalGrader</a>
+    <a href="../grading_math/numerical_grader/">NumericalGrader</a>
 </li>
                             
 <li >
     <a href="../grading_math/sampling/">Sampling Sets</a>
+</li>
+                            
+<li >
+    <a href="../grading_math/function_list/">Function List</a>
 </li>
                             
 <li >
@@ -88,6 +103,9 @@
 </li>
                         </ul>
                     </li>
+                    <li >
+                        <a href="../changelog/">Changelog</a>
+                    </li>
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
@@ -106,6 +124,9 @@
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
+                    <li>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                    </li>
             </ul>
         </div>
     </div>
@@ -122,7 +143,7 @@
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="stringgrader">StringGrader</h1>
+<h1 id="stringgrader">StringGrader<a class="headerlink" href="#stringgrader" title="Permanent link"></a></h1>
 <p>The StringGrader class does a letter-for-letter comparison of the student's answer with the expected answer. It is the simplest grading class, both in code and in usage.</p>
 <p>To use a StringGrader, simply pass in the set of answers you want to grade, as described in the <a href="../item_grader/">ItemGrader documentation</a>.</p>
 <pre><code class="python">grader = StringGrader(
@@ -131,7 +152,7 @@
 </code></pre>
 
 <p>This will accept the answer of <code>cat</code>, but not <code>CAT</code> or <code>Cat</code>, as grading is case-sensitive by default.</p>
-<h2 id="case-sensitive">Case Sensitive</h2>
+<h2 id="case-sensitive">Case Sensitive<a class="headerlink" href="#case-sensitive" title="Permanent link"></a></h2>
 <p>To perform case-insensitive grading, pass in the appropriate flag as follows.</p>
 <pre><code class="python">grader = StringGrader(
     answers='Cat',
@@ -140,7 +161,7 @@
 </code></pre>
 
 <p>This will accept <code>Cat</code>, <code>cat</code> and <code>CAT</code>. By default, <code>case_sensitive=True</code>.</p>
-<h2 id="stripping-input">Stripping Input</h2>
+<h2 id="stripping-input">Stripping Input<a class="headerlink" href="#stripping-input" title="Permanent link"></a></h2>
 <p>Leading or trailing spaces in an answer rarely change the meaning of the answer. Hence, by default, we strip all leading and trailing spaces from the student input and author-specified answers before comparison. If you want to keep those spaces around for the comparison, you need to disable strip.</p>
 <pre><code class="python">grader = StringGrader(
     answers='cat',
@@ -149,17 +170,13 @@
 </code></pre>
 
 <p>This will accept <code>cat</code>, but will reject answers with leading or trailing spaces. By default, <code>strip=True</code>.</p>
-<h2 id="option-listing">Option Listing</h2>
+<h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"></a></h2>
 <p>Here is the full list of options specific to a <code>StringGrader</code>.</p>
 <pre><code class="python">grader = SingleListGrader(
     case_sensitive=bool (default True),
     strip=bool (default False)
 )
-</code></pre>
-
-<ul>
-<li><a href="README.md">Home</a></li>
-</ul></div>
+</code></pre></div>
         </div>
 
         <footer class="col-md-12">

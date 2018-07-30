@@ -48,11 +48,22 @@
                     <li >
                         <a href="../..">Home</a>
                     </li>
-                    <li >
-                        <a href="../../item_grader/">ItemGrader</a>
-                    </li>
-                    <li >
-                        <a href="../../string_grader/">StringGrader</a>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../../getting_started/">Getting Started</a>
+</li>
+                            
+<li >
+    <a href="../../item_grader/">ItemGrader</a>
+</li>
+                            
+<li >
+    <a href="../../string_grader/">StringGrader</a>
+</li>
+                        </ul>
                     </li>
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Math <b class="caret"></b></a>
@@ -63,11 +74,15 @@
 </li>
                             
 <li >
-    <a href="../formula_grader/">NumericalGrader</a>
+    <a href="../numerical_grader/">NumericalGrader</a>
 </li>
                             
 <li >
     <a href="../sampling/">Sampling Sets</a>
+</li>
+                            
+<li >
+    <a href="../function_list/">Function List</a>
 </li>
                             
 <li class="active">
@@ -88,6 +103,9 @@
 </li>
                         </ul>
                     </li>
+                    <li >
+                        <a href="../../changelog/">Changelog</a>
+                    </li>
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
@@ -97,7 +115,7 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../sampling/">
+                        <a rel="next" href="../function_list/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
@@ -105,6 +123,9 @@
                         <a rel="prev" href="../../grading_lists/list_grader/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -121,7 +142,7 @@
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="asciimath-renderer-definitions">AsciiMath Renderer Definitions</h1>
+<h1 id="asciimath-renderer-definitions">AsciiMath Renderer Definitions<a class="headerlink" href="#asciimath-renderer-definitions" title="Permanent link"></a></h1>
 <p>When math input is expected from students, edX offers a math preview that attempts to show their expression in normal mathematical notation. There are two ways to provide this preview:</p>
 <pre><code class="XML">&lt;formulaequationinput/&gt;
 or
@@ -131,7 +152,7 @@ or
 <p>The <code>formulaequationinput</code> tag uses server-side parsing and rendering to display the preview to the student. By and large, the preview from <code>formulaequationinput</code> is better than that of <code>textline</code>, as it treats functions correctly, and displays a number of LaTeX symbols natively. The downsides to <code>formulaequationinput</code> are that it doesn't recognize vectors such as <code>vecx</code> or <code>hatx</code>, the factorial and conjugation functions just apply as <code>fact(x)</code> and <code>conj(x)</code>, and because the processing is done server-side, we are unable to enhance the display at all.</p>
 <p>The <code>textline</code> tag treats the student input as AsciiMath for the purpose of generating a preview, using MathJax to render it. While the preview does a reasonably good job, there are many situations where it falls down, even for standard edX functions (for example, try typing in <code>1/arctanh(x)</code> in textline box!). Because this is done client-side through javascript, it's possible to supplement the AsciiMath definitions to handle new situations. We have constructed a series of renderer definitions to supplement the standard AsciiMath definitions in order to provide better previews.</p>
 <p>This article describes how to use our new AsciiMath renderer definitions with a <code>&lt;textline&gt;</code> tag.</p>
-<h2 id="how-it-works">How it works</h2>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link"></a></h2>
 <p>The renderer definitions are located in a javascript file, <code>MJxPrep.js</code>, which should be uploaded to the static assets folder for your course. This javascript file loads two components: symbol definitions and a preprocessor.</p>
 <p>The symbol definitions are used to teach AsciiMath how to display various functions properly, such as <code>re</code>, <code>im</code>, <code>arctanh</code> etc. To load the symbol definitions in a problem, place the following HTML code somewhere in the problem.</p>
 <pre><code class="XML">&lt;script type=&quot;text/javascript&quot; src=&quot;/static/MJxPrep.js&quot;&gt;&lt;/script&gt;
@@ -144,7 +165,7 @@ or
 </code></pre>
 
 <p>If you use the preprocessor in your problem, you get the symbol definitions as well (you don't need to load them separately).</p>
-<h2 id="notes">Notes</h2>
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link"></a></h2>
 <ul>
 <li>
 <p>Note that you don't need to use the grading library to take advantage of the symbol definitions and/or the preprocessor; they work just as well for the normal edX <code>formularesponse</code> problems!</p>
@@ -156,7 +177,7 @@ or
 <p>If you have a display issue with AsciiMath, it's likely that you can extend the symbol definitions and preprocessor to make your expressions display nicely for students.</p>
 </li>
 <li>
-<p>The <a href="function_list.md">function listing</a> article provides the complete list of functions that are corrected by the new AsciiMath renderer definitions.</p>
+<p>The <a href="../function_list/">function listing</a> article provides the complete list of functions that are corrected by the new AsciiMath renderer definitions.</p>
 </li>
 </ul></div>
         </div>

@@ -6,6 +6,11 @@
      <changefreq>daily</changefreq>
     </url>
     <url>
+     <loc>/getting_started/</loc>
+     <lastmod>2018-07-30</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
      <loc>/item_grader/</loc>
      <lastmod>2018-07-30</lastmod>
      <changefreq>daily</changefreq>
@@ -21,12 +26,17 @@
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>/grading_math/formula_grader/</loc>
+     <loc>/grading_math/numerical_grader/</loc>
      <lastmod>2018-07-30</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/sampling/</loc>
+     <lastmod>2018-07-30</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>/grading_math/function_list/</loc>
      <lastmod>2018-07-30</lastmod>
      <changefreq>daily</changefreq>
     </url>
@@ -42,6 +52,11 @@
     </url>
     <url>
      <loc>/grading_lists/single_list_grader/</loc>
+     <lastmod>2018-07-30</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>/changelog/</loc>
      <lastmod>2018-07-30</lastmod>
      <changefreq>daily</changefreq>
     </url>
