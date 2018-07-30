@@ -1,37 +1,37 @@
 {
     "docs": [
         {
-            "location": "/getting_started/", 
+            "location": "/", 
             "text": "MITx Grading Library Documentation\n\n\nThis documentation describes how to use the grading library. In particular, it goes through the syntax required to construct each of the different types of graders.\n\n\nFor information on installation and how to use the library in edX, see \nhere\n.\n\n\nOverview\n\n\nThe basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.\n\n\nUsing Grading Classes\n\n\nAll grading classes are instantiated by calling them. Here, \nGradingClass\n is a generic grading class (\nGradingClass\n does not actually exist).\n\n\ngrader = GradingClass(options)\n\n\n\n\nThe options provided to a grading class may be passed in directly, as\n\n\ngrader = GradingClass(name='value')\n\n\n\n\nYou can also pass in a configuration dictionary. This may be helpful if using the same configuration for multiple problems.\n\n\noptions = {'name': 'value'}\ngrader = GradingClass(options)\n\n\n\n\nYou cannot 'mix and match' these two options. If a configuration dictionary is supplied, any keyword arguments are ignored.\n\n\nOptions\n\n\nThe options passed to a grading class undergo extensive validation and graders will throw\nerrors if instantiated with invalid options.\n\n\nA few error messages serve only as warnings (e.g., that you are attempting to override a default constant like \npi\n). These warning errors can be suppressed by setting\n\n\ngrader = GradingClass(suppress_warnings=True)\n\n\n\n\nEvery grading class also has a debug option. By default, \ndebug=False\n. To receive debug information from a given grader, specify \ndebug=True\n. Some graders will provide more debug information than others.\n\n\ngrader = GradingClass(debug=True)\n\n\n\n\nAll other options are specific to the grading class in question.\n\n\nGrading Classes\n\n\nGrading classes generally fall into two categories: single-input graders and multi-input graders.\n\n\nAll graders that grade a single input are built on a framework we call an ItemGrader. We recommend understanding how ItemGraders work before diving into more specifics. We provide a number of graders built off ItemGrader. A special type of ItemGrader is SingleListGrader, which lets you grade a delimiter-separated list of inputs in a single response.\n\n\nMulti-input graders that are just composed of single-input graders working in concert can be handled by the general ListGrader class. At this stage, ListGrader is the only multi-input grader included in the library, although plugins can be used to construct further examples.\n\n\n\n\nItemGrader\n\n\nStringGrader\n\n\nFormulaGrader and NumericalGrader\n\n\nSingleListGrader\n\n\nListGrader\n\n\n\n\nPlugins\n\n\nAny .py file stored in the \nplugins\n folder will be automatically loaded. All variables in the \nall\n list will be made available when doing \nfrom mitxgraders import *\n. See \ntemplate.py\n for an example.\n\n\nYou can define custom grading classes in your plugin. To learn how this works, we recommend copying the code from \nstringgrader.py\n, renaming the class, and building a simple plugin based on \nStringGrader\n.\n\n\nWe are happy to include user-contributed plugins in the repository for this library. If you have built a plugin that you would like to see combined into this library, please contact the authors through \ngithub\n. We are also willing to consider incorporating good plugins into the library itself.", 
             "title": "Home"
         }, 
         {
-            "location": "/getting_started/#mitx-grading-library-documentation", 
+            "location": "/#mitx-grading-library-documentation", 
             "text": "This documentation describes how to use the grading library. In particular, it goes through the syntax required to construct each of the different types of graders.  For information on installation and how to use the library in edX, see  here .", 
             "title": "MITx Grading Library Documentation"
         }, 
         {
-            "location": "/getting_started/#overview", 
+            "location": "/#overview", 
             "text": "The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.", 
             "title": "Overview"
         }, 
         {
-            "location": "/getting_started/#using-grading-classes", 
+            "location": "/#using-grading-classes", 
             "text": "All grading classes are instantiated by calling them. Here,  GradingClass  is a generic grading class ( GradingClass  does not actually exist).  grader = GradingClass(options)  The options provided to a grading class may be passed in directly, as  grader = GradingClass(name='value')  You can also pass in a configuration dictionary. This may be helpful if using the same configuration for multiple problems.  options = {'name': 'value'}\ngrader = GradingClass(options)  You cannot 'mix and match' these two options. If a configuration dictionary is supplied, any keyword arguments are ignored.", 
             "title": "Using Grading Classes"
         }, 
         {
-            "location": "/getting_started/#options", 
+            "location": "/#options", 
             "text": "The options passed to a grading class undergo extensive validation and graders will throw\nerrors if instantiated with invalid options.  A few error messages serve only as warnings (e.g., that you are attempting to override a default constant like  pi ). These warning errors can be suppressed by setting  grader = GradingClass(suppress_warnings=True)  Every grading class also has a debug option. By default,  debug=False . To receive debug information from a given grader, specify  debug=True . Some graders will provide more debug information than others.  grader = GradingClass(debug=True)  All other options are specific to the grading class in question.", 
             "title": "Options"
         }, 
         {
-            "location": "/getting_started/#grading-classes", 
+            "location": "/#grading-classes", 
             "text": "Grading classes generally fall into two categories: single-input graders and multi-input graders.  All graders that grade a single input are built on a framework we call an ItemGrader. We recommend understanding how ItemGraders work before diving into more specifics. We provide a number of graders built off ItemGrader. A special type of ItemGrader is SingleListGrader, which lets you grade a delimiter-separated list of inputs in a single response.  Multi-input graders that are just composed of single-input graders working in concert can be handled by the general ListGrader class. At this stage, ListGrader is the only multi-input grader included in the library, although plugins can be used to construct further examples.   ItemGrader  StringGrader  FormulaGrader and NumericalGrader  SingleListGrader  ListGrader", 
             "title": "Grading Classes"
         }, 
         {
-            "location": "/getting_started/#plugins", 
+            "location": "/#plugins", 
             "text": "Any .py file stored in the  plugins  folder will be automatically loaded. All variables in the  all  list will be made available when doing  from mitxgraders import * . See  template.py  for an example.  You can define custom grading classes in your plugin. To learn how this works, we recommend copying the code from  stringgrader.py , renaming the class, and building a simple plugin based on  StringGrader .  We are happy to include user-contributed plugins in the repository for this library. If you have built a plugin that you would like to see combined into this library, please contact the authors through  github . We are also willing to consider incorporating good plugins into the library itself.", 
             "title": "Plugins"
         }, 
