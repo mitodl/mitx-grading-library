@@ -1,8 +1,11 @@
 site_name: MITxGraders
+repo_url: 'https://github.com/mitodl/mitx-grading-library'
+edit_uri: ''
 pages:
   - Home: 'index.md'
-  - ItemGrader: 'item_grader.md'
-  - StringGrader: 'string_grader.md'
+  - Getting Started:
+    - ItemGrader: 'item_grader.md'
+    - StringGrader: 'string_grader.md'
   - Grading Math:
     - FormulaGrader: 'grading_math/formula_grader.md'
     - NumericalGrader: 'grading_math/formula_grader.md'
@@ -11,3 +14,8 @@ pages:
   - Grading Lists:
     - ListGrader: 'grading_lists/list_grader.md'
     - SingleListGrader: 'grading_lists/single_list_grader.md'
+  - Changelog: 'changelog.md'
+markdown_extensions:
+    - toc:
+        permalink: 
+    - admonition
