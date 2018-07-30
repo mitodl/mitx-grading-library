@@ -2,7 +2,7 @@
 
 This documentation describes how to use the grading library. In particular, it goes through the syntax required to construct each of the different types of graders.
 
-For information on installation and how to use the library in edX, see [here](../README.md).
+For information on installation and how to use the library in edX, see [Getting Started](getting_started.md).
 
 ## Overview
 
@@ -63,9 +63,10 @@ Multi-input graders that are just composed of single-input graders working in co
 
 - [ItemGrader](item_grader.md)
   - [StringGrader](string_grader.md)
-  - [FormulaGrader and NumericalGrader](formula_grader.md)
-  - [SingleListGrader](single_list_grader.md)
-- [ListGrader](list_grader.md)
+  - [FormulaGrader](grading_math/formula_grader.md)
+  - [NumericalGrader](grading_math/numerical_grader.md)
+  - [SingleListGrader](grading_lists/single_list_grader.md)
+- [ListGrader](grading_lists/list_grader.md)
 
 
 ## Plugins

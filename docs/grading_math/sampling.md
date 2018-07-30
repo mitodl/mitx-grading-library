@@ -151,7 +151,3 @@ You can also generate a non-unary function by specifying the input dimension, an
 # Generate a function that takes in two values and outputs a 3D vector
 functionsampler = RandomFunction(input_dim=2, output_dim=3)
 ````
-
-
-- [FormulaGrader and NumericalGrader](formula_grader.md)
-- [Home](README.md)

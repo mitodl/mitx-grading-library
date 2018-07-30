@@ -187,6 +187,3 @@ grader = ListGrader(
     grouping=list
 )
 ```
-
-
-- [Home](README.md)

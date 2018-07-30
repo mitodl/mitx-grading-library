@@ -126,6 +126,3 @@ grader = SingleListGrader(
     delimiter=string (default ',')
 )
 ```
-
-
-- [Home](README.md)
