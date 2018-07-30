@@ -38,6 +38,3 @@ By default, all of the following functions are made available to students.
 - *conj()* Complex conjugate of a complex expression*
 
 Expressions marked with a * may require our [AsciiMath renderer definitions](renderer.md) to display properly in edX.
-
-- [FormulaGrader and NumericalGrader](formula_grader.md)
-- [Home](README.md)

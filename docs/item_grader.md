@@ -66,6 +66,3 @@ grader = ItemGrader(
     wrong_msg=string (default '')
 )
 ```
-
-
-- [Home](README.md)

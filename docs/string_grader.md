@@ -50,6 +50,3 @@ grader = SingleListGrader(
     strip=bool (default False)
 )
 ```
-
-
-- [Home](README.md)

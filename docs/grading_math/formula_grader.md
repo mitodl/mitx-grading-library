@@ -1,10 +1,10 @@
-# FormulaGrader and NumericalGrader
+# FormulaGrader
 
-FormulaGrader and NumericalGrader are the grading classes that are used to grade numbers and formulas. They closely resemble the edX formularesponse and numericalresponse tags, but with much more versatility.
+FormulaGrader is the grading class used to grade mathematical formulas and closely resembles the behavior of edX's `<formularesponse />` tag, but with much more versatility.
 
-We begin by introducing FormulaGrader. NumericalGrader is a special version of FormulaGrader, described towards the end of this document.
-
-All whitespace is stripped from formulas that are entered. So, `1 + x ^ 2` is equivalent to `1+x^2`.
+!!! Note
+    - All expressions are treated in a case sensitive manner. This means that variables `'m'` and `'M'` are distinct. Case-insensitive FormulaGraders were deprecated in [Version 1.1.0](../changelog.md#version-110)
+    - All whitespace is stripped from formulas that are entered. So, `1 + x ^ 2` is equivalent to `1+x^2`.
 
 
 ## Variables and Sampling
@@ -265,10 +265,6 @@ grader = FormulaGrader(
 Tolerances are necessary because of numerical roundoff error that lead to small differences in evaluations of algebraically equivalent expressions. Zero tolerance should be used sparingly, perhaps only with integer sampling and answers.
 
 
-## Case Sensitive Input
-
-All expressions are treated in a case sensitive manner. This means that variables `m` and `M` are distinct variables. Prior to version 1.1, we had a case-insensitive option available. However, this option is now deprecated, as it was causing issues in the codebase, nobody was using it (that we know of), and the majority of languages are case-sensitive anway.
-
 ## Suffixes
 
 Numbers with a % at the end will be treated as percentages, and converted to the appropriate decimals.
@@ -317,19 +313,6 @@ In the grader configuration, `comparer_params` is a list of strings that are num
   - `utils.tolerance`: The tolerance specified in grader configuration, `0.01%` by default
   - `utils.within_tolerance:` A function with signature `within_tolerance(x, y)` which checks that `y` is within specified tolerance of `x`. Can handle scalars, vectors, and matrices. If tolerance was specified as a percentage, then checks that `|x-y| < tolerance * x`.
 
-## NumericalGrader
-
-When you do not have any random functions or variables, you can use NumericalGrader instead of FormulaGrader. NumericalGrader is a specialized version of FormulaGrader with a different default tolerance (`'5%'`). All of the FormulaGrader options are available, with the following exceptions.
-
-* `failable_evals` is always set to 0
-* `samples` is always set to 1
-* `variables` is always set to `[]` (no variables allowed)
-* `sample_from` is always set to `{}` (no variables allowed)
-* `user_functions` can only define specific functions, with no random functions
-
-If you are grading simple integers (such as 0, 1, 2, -1, etc), you may want to consider using StringGrader instead of NumericalGrader.
-
-
 ## Other Improvements
 
 We have made a number of other improvements over the edX formula graders, including:
@@ -342,6 +325,3 @@ We have made a number of other improvements over the edX formula graders, includ
 * If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the `debug` flag to True, and a more technical message will usually be displayed.
 * Full sampling details are included when the `debug` flag is set to True.
 * Enhancements to the AsciiMath renderer (the preview that students see when using `<textline>` inputs) are available using our [AsciiMath renderer definitions](renderer.md).
-
-
-- [Home](README.md)
