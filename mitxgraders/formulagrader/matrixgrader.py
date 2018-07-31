@@ -62,7 +62,7 @@ class MatrixGrader(FormulaGrader):
     # merge_dicts does not mutate the originals
     default_functions = merge_dicts(FormulaGrader.default_functions,
                                     ARRAY_ONLY_FUNCTIONS)
-    default_variables = merge_dicts(FormulaGrader.default_functions,
+    default_variables = merge_dicts(FormulaGrader.default_variables,
                                     {'I': IdentityMultiple(1)})
 
     @property
