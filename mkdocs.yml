@@ -1,6 +1,8 @@
 site_name: MITxGraders
 repo_url: 'https://github.com/mitodl/mitx-grading-library'
 edit_uri: ''
+theme:
+  name: 'cinder'
 pages:
   - Home: 'index.md'
   - Getting Started:
@@ -20,7 +22,7 @@ pages:
   - Changelog: 'changelog.md'
 markdown_extensions:
     - toc:
-        permalink: "\uF0C1"
+        permalink: '#'
     - admonition
 extra_css:
   - css/extra.css
