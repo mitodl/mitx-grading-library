@@ -575,26 +575,38 @@ class FormulaGrader(ItemGrader):
             self.post_eval_validation(student_input, used_funcs)
         return result
 
-    def generate_variable_list(self, answer, student_input):
+    def get_used_vars(self, expressions):
+        """
+        Get the variables used in expressions
+
+        Arguments:
+            expressions: an iterable collection of expressions
+
+        Returns:
+            vars_used ({str}): set of variables used
+        """
+        is_empty = lambda x: x is None or x.strip() == ''
+        expressions = [expr for expr in expressions if not is_empty(expr)]
+        # Pre-parse all expressions (these all get cached)
+        parsers = [
+            parsercache.get_parser(expr, self.suffixes)
+            for expr in expressions
+            ]
+        # Create a list of all variables used in the expressions
+        vars_used = set().union(*[parser.variables_used for parser in parsers])
+        return vars_used
+
+    def generate_variable_list(self, expressions):
         """
         Generates the list of variables required to perform a comparison and the
         corresponding sampling dictionary, taking into account any numbered variables.
 
         Returns variable_list, sample_from_dict
         """
-        # Pre-parse all expressions (these all get cached)
-        parsers = [
-            parsercache.get_parser(expr, self.suffixes)
-            for expr in answer['expect']['comparer_params']
-            ]
-        # If the student input is not empty, parse that too
-        if not (student_input is None or student_input.strip() == ""):
-            parsers.append(parsercache.get_parser(student_input, self.suffixes))
-        # Create a list of all variables used in the expressions
-        vars_used = set().union(*[parser.variables_used for parser in parsers])
+        vars_used = self.get_used_vars(expressions)
 
-        # Initiate the variables list and sample_from dictionary
-        variable_list = self.config['variables'][:]
+        # Initiate the variables list with a copy and sample_from dictionary
+        variable_list = list(self.config['variables'])
         sample_from_dict = self.config['sample_from'].copy()
 
         # Find all unassigned variables
@@ -619,29 +631,42 @@ class FormulaGrader(ItemGrader):
         return 'sibling_{}'.format(index + 1)
 
     @staticmethod
-    def get_sibling_formulas(siblings):
+    def get_sibling_formulas(siblings, required_siblings):
         """
         Returns a dict sibling formula inputs.
+
+        Arguments:
+            siblings ([dict]): each sibling dict has keys 'grader' and 'input'
+            required_siblings (set): Only include siblings whose varnames are
+                included in this set
 
         Note: siblings are present when a grader is used inside a ListGrader.
         """
         if siblings is None:
             return {}
-        formula_siblings = [(i, sibling['input']) for i, sibling in enumerate(siblings)
+        formula_siblings = [(i, sibling['input']) for i, sibling
+                            in enumerate(siblings)
                             if isinstance(sibling['grader'], FormulaGrader)]
         return {
             FormulaGrader.sibling_varname(i): sibling_input
             for i, sibling_input in formula_siblings
+            if FormulaGrader.sibling_varname(i) in required_siblings
         }
 
     def raw_check(self, answer, student_input, **kwargs):
         """Perform the numerical check of student_input vs answer"""
+        comparer_params = answer['expect']['comparer_params']
 
-        sibling_formulas = self.get_sibling_formulas(kwargs.get('siblings', None))
-        # Generate samples
-        variable_list, sample_from_dict = self.generate_variable_list(answer,
-                                                                      student_input)
-        var_samples = gen_symbols_samples(variable_list,
+        siblings = kwargs.get('siblings', None)
+        required_siblings = self.get_used_vars(comparer_params)
+        # required_siblings might include some extra variable names, but no matter
+        sibling_formulas = self.get_sibling_formulas(siblings, required_siblings)
+
+        # Generate samples; Include siblings to get numbered_vars from them
+        expressions = (comparer_params
+                       + [student_input])
+        variables, sample_from_dict = self.generate_variable_list(expressions)
+        var_samples = gen_symbols_samples(variables,
                                           self.config['samples'],
                                           sample_from_dict,
                                           self.functions,
@@ -682,7 +707,7 @@ class FormulaGrader(ItemGrader):
 
             # Compute expressions
             comparer_params_eval = self.eval_and_validate_comparer_params(
-                scoped_eval, answer['expect']['comparer_params'], siblings_eval)
+                scoped_eval, comparer_params, siblings_eval)
 
             # Before performing student evaluation, scrub the siblings
             # so that students can't use them

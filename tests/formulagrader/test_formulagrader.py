@@ -3,7 +3,7 @@ Tests for FormulaGrader and NumericalGrader
 """
 from __future__ import division
 from pytest import raises
-from mock import Mock
+from mock import Mock, patch
 import numpy as np
 from voluptuous import Error, MultipleInvalid
 from mitxgraders import (
@@ -25,6 +25,7 @@ from mitxgraders.helpers.calc.exceptions import (
     CalcError, UndefinedVariable, UndefinedFunction
 )
 from mitxgraders import ListGrader
+from tests.helpers import log_results
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
@@ -609,6 +610,27 @@ def test_fg_evaluates_siblings_appropriately():
     match='Cannot grade answer, a required input is missing.'
     with raises(MissingInput, match=match):
         result = grader(None, ['', 'x^2 + 2*x + 1', 'x'])
+
+def test_fg_evals_numbered_variables_in_siblings():
+    subgrader = FormulaGrader(
+        numbered_vars=['x']
+    )
+    grader = ListGrader(
+        answers=['x_{1}', 'x_{2} + sibling_1'],
+        subgraders=subgrader,
+        ordered=True
+    )
+
+    results = []
+    side_effect = log_results(results)(subgrader.get_sibling_formulas)
+    with patch.object(subgrader, 'get_sibling_formulas', side_effect=side_effect):
+        grader(None, ['x_{0}+1', 'x_{1} + x_{0}'])
+        # get_sibling_formulas should be called twice, once for each input
+        assert len(results) == 2
+        # the first call should not provide any sibling formulas
+        assert results[0] == {}
+        # The second call should provide only the first sibling formula
+        assert results[1] == {'sibling_1': 'x_{0}+1'}
 
 def test_ng_config():
     """Test that the NumericalGrader config bars unwanted entries"""
