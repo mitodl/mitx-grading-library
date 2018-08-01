@@ -4,21 +4,6 @@ Whenever random variables/functions are involved, they need to be sampled from a
 
 These sampling classes are available for use in FormulaGrader.
 
-**Table of Contents**
-
-- [Variable Names](#variable-names)
-- [Variable Sampling](#variable-sampling)
-  - [RealInterval](#realinterval)
-  - [IntegerRange](#integerrange)
-  - [DiscreteSet](#discreteset)
-  - [ComplexRectangle](#complexrectangle)
-  - [ComplexSector](#complexsector)
-  - [DependentSampler](#dependentsampler)
-- [Function Sampling](#function-sampling)
-  - [SpecificFunctions](#specificfunctions)
-  - [RandomFunction](#randomfunction)
-
-
 ## Variable Names
 
 Variable names must start with a letter, and can continue with letters, numbers, and underscores. Variable names may conclude with an arbitrary number of apostrophes. The same naming conventions apply to user-defined constants.
@@ -32,7 +17,7 @@ It is also possible to have tensor variable names. The following three forms are
 The tensor name itself must start with a letter, and may continue with letters and numbers. The indices may be any combination of letters and numbers. After the indices, you may have apostrophes, such as T^{ijk}'' (tensors can be differentiated too!).
 
 
-## Variable Sampling
+## Variable Sampling: Numbers
 
 These sampling sets generate a random number on demand. It may be real or complex.
 
@@ -65,18 +50,6 @@ sampler = IntegerRange()
 ````
 
 
-### DiscreteSet
-
-Sample from a discrete set of values, specified in a tuple. A single value may also be provided, but this case should usually be specified as a constant instead of as a sampling set.
-
-````python
-# Select random numbers from (1, 3, 5, 7, 9)
-sampler = DiscreteSet((1, 3, 5, 7, 9))
-# Always select 3.5
-sampler = DiscreteSet(3.5)
-````
-
-
 ### ComplexRectangle
 
 Sample complex numbers from a rectangle in the complex plane, specified by a real range and an imaginary range.
@@ -98,6 +71,23 @@ Sample complex numbers from an annular sector in the complex plane, specified by
 sampler = ComplexSector(modulus=[0, 1], argument=[-np.pi, np.pi])
 # The default is modulus=[1, 3], argument=[0, pi/2]
 sampler = ComplexSector()
+````
+
+## Variable Sampling: Vectors and Matrices
+
+<!-- TODO -->
+
+## Variable Sampling: Generic
+
+### DiscreteSet
+
+Sample from a discrete set of values, specified in a tuple. A single value may also be provided, but this case should usually be specified as a constant instead of as a sampling set.
+
+````python
+# Select random numbers from (1, 3, 5, 7, 9)
+sampler = DiscreteSet((1, 3, 5, 7, 9))
+# Always select 3.5
+sampler = DiscreteSet(3.5)
 ````
 
 

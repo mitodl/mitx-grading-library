@@ -35,7 +35,7 @@ A typical use of MatrixGrader might look like
 ... )
 
 ```
-Here, the `RealMatrices` sampling class samples from 2 by 2 matrices by default. See [Sampling](../sampling.md) for more information.
+Here, the `RealMatrices` sampling class samples from 2 by 2 matrices by default. See [Sampling](../sampling.md#variable-sampling-vectors-and-matrices) for more information.
 
 The next few lines call the grader as a check function. The inputs `'4*A*B^2'` and `'4*A*B*B'` are correct:
 ```python
