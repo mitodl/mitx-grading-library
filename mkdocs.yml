@@ -26,3 +26,4 @@ markdown_extensions:
     - admonition
 extra_css:
   - css/extra.css
+  - css/admonition.css
