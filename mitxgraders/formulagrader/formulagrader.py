@@ -664,7 +664,8 @@ class FormulaGrader(ItemGrader):
 
         # Generate samples; Include siblings to get numbered_vars from them
         expressions = (comparer_params
-                       + [student_input])
+                       + [student_input]
+                       + [sibling_formulas[key] for key in sibling_formulas])
         variables, sample_from_dict = self.generate_variable_list(expressions)
         var_samples = gen_symbols_samples(variables,
                                           self.config['samples'],

@@ -624,7 +624,7 @@ def test_fg_evals_numbered_variables_in_siblings():
     results = []
     side_effect = log_results(results)(subgrader.get_sibling_formulas)
     with patch.object(subgrader, 'get_sibling_formulas', side_effect=side_effect):
-        grader(None, ['x_{0}+1', 'x_{1} + x_{0}'])
+        grader(None, ['x_{0}+1', 'x_{1} + 1'])
         # get_sibling_formulas should be called twice, once for each input
         assert len(results) == 2
         # the first call should not provide any sibling formulas
