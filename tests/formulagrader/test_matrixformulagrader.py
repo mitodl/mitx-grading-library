@@ -6,6 +6,16 @@ from mitxgraders.helpers.calc.exceptions import (
     DomainError, MathArrayError,
     MathArrayShapeError as ShapeError, UnableToParse
 )
+from mitxgraders.helpers.calc.math_array import identity, equal_as_arrays
+
+def test_identity_dim_provides_identity():
+    no_identity = MatrixGrader()
+    assert no_identity.constants.get('I', None) is None
+
+    grader = MatrixGrader(
+        identity_dim=4
+    )
+    assert equal_as_arrays(grader.constants['I'], identity(4))
 
 def test_max_array_dim():
     grader = MatrixGrader(
@@ -41,7 +51,8 @@ def test_fg_with_arrays():
             'u': RealVectors(shape=[2]),
             'v': RealVectors(shape=[2]),
             'z': ComplexRectangle()
-        }
+        },
+        identity_dim=2
     )
 
     correct_0 = 'x*A*B*u + z*C^3*v/(u*C*v)'
@@ -65,10 +76,6 @@ def test_fg_with_arrays():
     match = "Cannot add/subtract scalars to a matrix."
     with raises(ShapeError, match=match):
         grader(None, 'B + 5')
-
-    match = "Cannot add/subtract multiples of the identity to a non-square matrix."
-    with raises(ShapeError, match=match):
-        grader(None, 'B + 5*I')
 
     match = ("There was an error evaluating function sin\(...\)<br/>"
              "1st input has an error: received a matrix of shape "

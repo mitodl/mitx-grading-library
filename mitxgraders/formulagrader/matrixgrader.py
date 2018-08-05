@@ -8,7 +8,7 @@ from collections import namedtuple
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from voluptuous import Required, Any
 from mitxgraders.helpers.validatorfuncs import NonNegative
-from mitxgraders.helpers.calc import MathArray, within_tolerance
+from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
 from mitxgraders.helpers.calc.exceptions import (
     CalcError, MathArrayShapeError as ShapeError)
 from mitxgraders.helpers.calc.mathfuncs import (
@@ -28,6 +28,10 @@ class MatrixGrader(FormulaGrader):
     identity operator) and some extra default functions (trans, det, ...)
 
     Configuration options as per FormulaGrader, except:
+        identity_dim (?int): If specified as an integer n, 'I' is automatically
+            added as a variable whose value is the n by n MathArray identity
+            matrix. Defaults to None.
+
         max_array_dim (int): Specify the maximum array dimension that the
             expression parser will accept, defaults to 1 (allows vectors).
             NOTE: Variables can still contain higher dimensional arrays.
@@ -67,6 +71,7 @@ class MatrixGrader(FormulaGrader):
     def schema_config(self):
         schema = super(MatrixGrader, self).schema_config
         return schema.extend({
+            Required('identity_dim', default=None): NonNegative(int),
             Required('max_array_dim', default=1): NonNegative(int),
             Required('negative_powers', default=True): bool,
             Required('shape_errors', default=True): bool,
@@ -78,6 +83,11 @@ class MatrixGrader(FormulaGrader):
                 Required('msg_detail', default='type'): Any(None, 'type', 'shape')
             }
         })
+
+    def __init__(self, config=None, **kwargs):
+        super(MatrixGrader, self).__init__(config, **kwargs)
+        if self.config['identity_dim'] and not self.constants.get('I', None):
+            self.constants['I'] = identity(self.config['identity_dim'])
 
     def check_response(self, answer, student_input, **kwargs):
         try:
