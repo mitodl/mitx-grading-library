@@ -161,7 +161,8 @@ class MatrixGrader(FormulaGrader):
                           within_tolerance=_within_tolerance,
                           validate_shape=_validate_shape)
 
-    def default_equality_comparer(self, comparer_params, student_input, utils):
+    @staticmethod
+    def default_equality_comparer(comparer_params, student_input, utils):
         """
         Default comparer function.
 
