@@ -316,14 +316,17 @@ pauli = {
     ])
 }
 
-def within_tolerance(x, y, tolerance):
+def within_tolerance(x, y, tolerance, hard_tolerance=1e-12):
     """
-    Check that |x-y| <= tolerance with appropriate norm.
+    Check that |x-y| <= tolerance OR hard_tolerance with appropriate norm.
 
     Args:
         x: number or array (np array_like)
         y: number or array (np array_like)
         tolerance: Number or PercentageString
+        hard_tolerance: Number
+            hard_tolerance is intended to combat rounding errors. See usage
+            below.
 
     NOTE: Calculates x - y; may raise an error for incompatible shapes.
 
@@ -350,6 +353,13 @@ def within_tolerance(x, y, tolerance):
     0.223607
     >>> within_tolerance(A, B, 0.25)
     True
+
+    The optional parameter hard_tolerance has default value 1e-12 and is
+    intended to help prevent rounding errors. For example:
+    >>> within_tolerance(0, np.sin(np.pi), '1%', hard_tolerance=0)
+    False
+    >>> within_tolerance(0, np.sin(np.pi), '1%', hard_tolerance=1e-12)
+    True
     """
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
@@ -357,6 +367,7 @@ def within_tolerance(x, y, tolerance):
         # Construct percentage tolerance
         tolerance = tolerance.strip()
         tolerance = np.linalg.norm(x) * float(tolerance[:-1]) * 0.01
+        tolerance = max(tolerance, hard_tolerance)
 
     difference = x - y
 
