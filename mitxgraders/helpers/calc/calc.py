@@ -580,12 +580,15 @@ class FormulaParser(object):
             # Compute the result of this node
             result = action(handled_kids)
 
-            # All actions convert the input to a number or array
+            # All actions convert the input to a number, array, or list.
+            # (Only self.actions['arguments'] returns a list.)
+            as_list = result if isinstance(result, list) else [result]
+
             # Check if there were any infinities or nan
-            if not allow_inf and np.any(np.isinf(result)):
+            if not allow_inf and any(np.any(np.isinf(r)) for r in as_list):
                 raise CalcOverflowError("Numerical overflow occurred. Does your expression "
                                         "generate very large numbers?")
-            if np.any(np.isnan(result)):
+            if any(np.any(np.isnan(r)) for r in as_list):
                 return float('nan')
 
             return result

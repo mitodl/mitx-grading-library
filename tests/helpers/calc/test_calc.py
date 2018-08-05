@@ -12,6 +12,7 @@ from mitxgraders.helpers.calc.exceptions import (
     UnbalancedBrackets, UndefinedVariable,
     ArgumentError, CalcOverflowError, CalcZeroDivisionError
 )
+from mitxgraders.helpers.calc.math_array import equal_as_arrays, MathArray
 
 def test_calcpy():
     """Tests of calc.py that aren't covered elsewhere"""
@@ -103,13 +104,15 @@ def test_calc_functions_multiple_arguments():
     """Tests calc.py handling functions with multiple arguments correctly"""
     def h1(x): return x
 
-    def h2(x, y): return x + y
+    def h2(x, y): return x * y
 
-    def h3(x, y, z): return x + y + z
+    def h3(x, y, z): return x * y * z
 
     assert evaluator("h(2)", {}, {"h": h1}, {})[0] == 2.0
-    assert evaluator("h(1, 2)", {}, {"h": h2}, {})[0] == 3.0
-    assert evaluator("h(1, 2, 3)", {}, {"h": h3}, {})[0] == 6.0
+    assert evaluator("h(2, 3)", {}, {"h": h2}, {})[0] == 6.0
+    assert evaluator("h(2, 3, 4)", {}, {"h": h3}, {})[0] == 24.0
+    assert equal_as_arrays(evaluator("h(2, [1, 2, 3])", {}, {"h": h2})[0],
+                           MathArray([2, 4, 6]))
     with raises(ArgumentError):
         evaluator("h(2, 1)", {}, {"h": h1}, {})
     with raises(UnableToParse):
@@ -124,6 +127,7 @@ def test_calc_functions_multiple_arguments():
         evaluator("h(1)", {}, {"h": h3}, {})
     with raises(ArgumentError):
         evaluator("h(1,2)", {}, {"h": h3}, {})
+
 
 def test_negation():
     """Test that appropriate numbers of +/- signs are accepted"""
