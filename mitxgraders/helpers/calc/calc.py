@@ -33,7 +33,7 @@ from pyparsing import (
 )
 from mitxgraders.exceptions import StudentFacingError
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
-from mitxgraders.helpers.calc.math_array import MathArray, IdentityMultiple
+from mitxgraders.helpers.calc.math_array import MathArray
 from mitxgraders.helpers.calc.robust_pow import robust_pow
 from mitxgraders.helpers.calc.mathfuncs import (
     DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
@@ -580,16 +580,12 @@ class FormulaParser(object):
             # Compute the result of this node
             result = action(handled_kids)
 
-            # All actions convert the input to a number, array or IdentityMultiple
+            # All actions convert the input to a number or array
             # Check if there were any infinities or nan
-            check = result
-            # IdentityMultiple needs to extract the value
-            if isinstance(result, IdentityMultiple):
-                check = result.value
-            if not allow_inf and np.any(np.isinf(check)):
+            if not allow_inf and np.any(np.isinf(result)):
                 raise CalcOverflowError("Numerical overflow occurred. Does your expression "
                                         "generate very large numbers?")
-            if np.any(np.isnan(check)):
+            if np.any(np.isnan(result)):
                 return float('nan')
 
             return result

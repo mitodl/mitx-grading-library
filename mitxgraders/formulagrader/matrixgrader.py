@@ -8,7 +8,7 @@ from collections import namedtuple
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from voluptuous import Required, Any
 from mitxgraders.helpers.validatorfuncs import NonNegative
-from mitxgraders.helpers.calc import IdentityMultiple, MathArray, within_tolerance
+from mitxgraders.helpers.calc import MathArray, within_tolerance
 from mitxgraders.helpers.calc.exceptions import (
     CalcError, MathArrayShapeError as ShapeError)
 from mitxgraders.helpers.calc.mathfuncs import (
@@ -62,8 +62,6 @@ class MatrixGrader(FormulaGrader):
     # merge_dicts does not mutate the originals
     default_functions = merge_dicts(FormulaGrader.default_functions,
                                     ARRAY_ONLY_FUNCTIONS)
-    default_variables = merge_dicts(FormulaGrader.default_variables,
-                                    {'I': IdentityMultiple(1)})
 
     @property
     def schema_config(self):

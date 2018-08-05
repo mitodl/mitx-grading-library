@@ -162,16 +162,6 @@ class MathArray(np.ndarray):
             raise ShapeError("Cannot add/subtract scalars to a {self.shape_name}."
                                  .format(self=self))
 
-        elif isinstance(other, IdentityMultiple):
-            if is_square(self):
-                return super_ADD(other.as_matrix(self.shape[0]))
-            elif self.ndim == 2:
-                raise ShapeError("Cannot add/subtract multiples of the identity "
-                                     "to a non-square matrix.")
-            else:
-                raise ShapeError("Cannot add/subtract multiples of the identity "
-                    "to a {self.shape_name}".format(self=self))
-
         elif isinstance(other, MathArray):
             if self.shape == other.shape:
                 return super_ADD(other)
@@ -198,9 +188,6 @@ class MathArray(np.ndarray):
         super_MUL = super(MathArray, self).__mul__
         if isinstance(other, Number):
             return super_MUL(other)
-
-        elif isinstance(other, IdentityMultiple):
-            return super_MUL(other.value)
 
         elif isinstance(other, MathArray):
             if is_numberlike_array(self):
@@ -234,9 +221,7 @@ class MathArray(np.ndarray):
                         .format(type=type(other), self=self))
 
     def __rmul__(self, other):
-        if isinstance(other, IdentityMultiple):
-            return super(MathArray, self).__rmul__(other.value)
-        elif isinstance(other, Number):
+        if isinstance(other, Number):
             return super(MathArray, self).__rmul__(other)
 
         raise TypeError("Cannot multiply object of type {type} with a {self.shape_name}."
@@ -399,193 +384,3 @@ def random_math_array(shape):
     a, b = -10, 10
     elements = a + (b-a)*np.random.random_sample(shape)
     return MathArray(elements)
-
-class IdentityMultiple(object):
-    """
-    Represents a multiple of the identity matrix.
-
-    Instantiation:
-    ==============
-
-    Instantiate with a single value:
-    >>> IdentityMultiple(5)
-    5*Identity
-
-    If instantiated with 0, the number 0 is returned:
-    >>> IdentityMultiple(0) == 0
-    True
-
-    Comparisons:
-    ============
-    >>> IdentityMultiple(5) == IdentityMultiple(5)
-    True
-    >>> IdentityMultiple(5) == IdentityMultiple(3)
-    False
-    >>> IdentityMultiple(5) == 5
-    False
-
-    Unary Operations:
-    =================
-    They work:
-    >>> +IdentityMultiple(5)
-    5*Identity
-    >>> -IdentityMultiple(5)
-    -5*Identity
-
-    Binary Operations:
-    ==================
-    When IdentityMultiple is involved in any binary operation, it delegates
-    calculation to the other operand except in a few special cases, illustrated
-    below.
-
-    >>> import random
-    >>> a, b = random.uniform(-10, 10), random.uniform(-10, 10)
-    >>> I = IdentityMultiple
-
-    Addition with zero:
-    >>> assert I(a) + 0 == 0 + I(a) == I(a)
-
-    Subtraction with zero:
-    >>> assert I(a) - 0 == I(a)
-    >>> assert 0 - I(a) == -I(a)
-
-    Multiplication with scalars:
-    >>> assert b*I(a) == I(a)*b == I(a*b)
-
-    Division with scalars:
-    >>> assert I(a)/b == I(a/b)
-    >>> b/I(a)
-    Traceback (most recent call last):
-    TypeError: unsupported operand type(s) for /: 'float' and 'IdentityMultiple'
-
-    Scalar powers:
-    >>> c = random.uniform(1, 10) # make sure the base is positive
-    >>> assert I(c)**a == I(c**a)
-
-    Addition, Subtraction, and Multiplication with other IdentityMultiples:
-    >>> assert I(a) + I(b) == I(a + b)
-    >>> assert I(a) - I(b) == I(a - b)
-    >>> assert I(a) * I(b) == I(a*b)
-
-    Since I(0)==0, sums and differences might be scalar 0:
-    >>> assert I(a) - I(a) == 0
-
-    In-place operations work, too:
-    >>> A = IdentityMultiple(8)
-    >>> A += IdentityMultiple(2); A
-    10*Identity
-    >>> A -= IdentityMultiple(2); A
-    8*Identity
-    >>> A /= 2; A
-    4.0*Identity
-    >>> A *= 2; A
-    8.0*Identity
-    >>> A **= 2; A
-    64.0*Identity
-
-    """
-    def __new__(cls, value):
-        if is_number_zero(value):
-            return 0
-        if np.isnan(value):
-            return np.nan
-        return super(IdentityMultiple, cls).__new__(cls, value)
-
-    def as_matrix(self, n):
-        """
-        Returns a multiple of the n by n identity matrix.
-
-        >>> S = IdentityMultiple(4)
-        >>> S_mat2 = S.as_matrix(2)
-        >>> S_mat2.tolist()
-        [[4.0, 0.0], [0.0, 4.0]]
-        >>> isinstance(S_mat2, MathArray)
-        True
-        """
-        elements = (self.value*np.identity(n))
-        return MathArray(elements)
-
-    def __init__(self, value):
-        self.value = value
-
-    def __repr__(self):
-        return "{value}*Identity".format(value=self.value)
-
-    def __eq__(self, other):
-        if isinstance(other, IdentityMultiple):
-            return self.value == other.value
-        return False
-
-    def __pos__(self):
-        return self
-    def __neg__(self):
-        return IdentityMultiple(-self.value)
-
-    def __add__(self, other):
-        if is_number_zero(other):
-            return self
-        elif isinstance(other, IdentityMultiple):
-            return IdentityMultiple(self.value + other.value)
-        return other.__radd__(self)
-
-    def __radd__(self, other):
-        return self.__add__(other)
-
-    def __sub__(self, other):
-        if is_number_zero(other):
-            return self
-        elif isinstance(other, IdentityMultiple):
-            return IdentityMultiple(self.value - other.value)
-        return other.__rsub__(self)
-
-    def __rsub__(self, other):
-        return (-self).__add__(other)
-
-    def __mul__(self, other):
-        if isinstance(other, Number):
-            return IdentityMultiple(self.value*other)
-        elif isinstance(other, IdentityMultiple):
-            return IdentityMultiple(self.value*other.value)
-        return other.__rmul__(self)
-
-    def __rmul__(self, other):
-        return self.__mul__(other)
-
-    def __truediv__(self, other):
-        if isinstance(other, Number):
-            return IdentityMultiple(self.value/other)
-        return other.__rtruediv__(self)
-
-    def __pow__(self, other):
-        if isinstance(other, Number):
-            return IdentityMultiple(self.value**other)
-        return other.__rpow__(self)
-
-    # In-place operations:
-    def __iadd__(self, other):
-        return self.__add__(other)
-
-    def __isub__(self, other):
-        return self.__sub__(other)
-
-    def __imul__(self, other):
-        return self.__mul__(other)
-
-    def __itruediv__(self, other):
-        return self.__truediv__(other)
-
-    def __ipow__(self, other):
-        return self.__pow__(other)
-
-    def __copy__(self):
-        """
-        Used by copy.copy:
-        >>> import copy
-        >>> A = IdentityMultiple(4)
-        >>> B = copy.copy(A)
-        >>> A == B
-        True
-        >>> A is B
-        False
-        """
-        return IdentityMultiple(self.value)
