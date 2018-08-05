@@ -1,3 +1,42 @@
+code {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 2pt;
+}
+
+.admonition code {
+  background-color: rgba(255, 255, 255, 0.75)
+}
+
+h1[id]:before, h2[id]:before,
+h3[id]:before, h4[id]:before,
+h5[id]:before, h6[id]:before {
+  margin-top: 0pt;
+  height: 0pt;
+}
+
+/* Next two rules makes header links only visible when hovering.
+  NOTE: cinder specific; default theme does this automatically
+ */
+.headerlink {
+  visibility:hidden;
+}
+
+h1:hover .headerlink,
+h2:hover .headerlink,
+h3:hover .headerlink,
+h4:hover .headerlink,
+h5:hover .headerlink,
+h6:hover .headerlink,
+/* active is for touchscreens */
+h1:active .headerlink,
+h2:active .headerlink,
+h3:active .headerlink,
+h4:active .headerlink,
+h5:active .headerlink,
+h6:active .headerlink {
+  visibility:visible;
+}
+
 /* Cinder theme does not include css for admonitions
   This css is copied from the base theme:
 

@@ -44,4 +44,4 @@ If you use the preprocessor in your problem, you get the symbol definitions as w
 
 * If you have a display issue with AsciiMath, it's likely that you can extend the symbol definitions and preprocessor to make your expressions display nicely for students.
 
-* The [function listing](function_list.md) article provides the complete list of functions that are corrected by the new AsciiMath renderer definitions.
+* The [mathematical functions](functions.md) article provides the complete list of functions that are corrected by the new AsciiMath renderer definitions.

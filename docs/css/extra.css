@@ -1,30 +1,13 @@
+/* make prompt impossible to select for hljs */
 .hljs-prompt {
+  user-select: none;
+}
+
+/* make prompt impossible to select for pygments */
+.gp {
   user-select: none;
 }
 
 pre, pre code {
   white-space: pre-wrap
-}
-
-/* Next two rules makes header links only visible when hovering.
-  NOTE: cinder specific; default theme does this automatically
- */
-.headerlink {
-  visibility:hidden;
-}
-
-h1:hover .headerlink,
-h2:hover .headerlink,
-h3:hover .headerlink,
-h4:hover .headerlink,
-h5:hover .headerlink,
-h6:hover .headerlink,
-/* active is for touchscreens */
-h1:active .headerlink,
-h2:active .headerlink,
-h3:active .headerlink,
-h4:active .headerlink,
-h5:active .headerlink,
-h6:active .headerlink {
-  visibility:visible;
 }

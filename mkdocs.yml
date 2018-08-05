@@ -14,7 +14,7 @@ pages:
     - NumericalGrader: 'grading_math/numerical_grader.md'
     - MatrixGrader: 'grading_math/matrix_grader/matrix_grader.md'
     - Sampling Sets: 'grading_math/sampling.md'
-    - Function List: 'grading_math/function_list.md'
+    - Function List: 'grading_math/functions.md'
     - AsciiMath Renderer Definitions: 'grading_math/renderer.md'
   - Grading Lists:
     - ListGrader: 'grading_lists/list_grader.md'
@@ -22,8 +22,8 @@ pages:
   - Changelog: 'changelog.md'
 markdown_extensions:
     - toc:
-        permalink: '#'
+        permalink: ' # '
     - admonition
 extra_css:
   - css/extra.css
-  - css/admonition.css
+  - css/cinder_tweaks.css
