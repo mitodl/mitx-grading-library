@@ -5,6 +5,7 @@ Defines a FormulaGrader subtype that handles matrices, too.
 """
 from numbers import Number
 from collections import namedtuple
+import numpy as np
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from voluptuous import Required, Any
 from mitxgraders.helpers.validatorfuncs import NonNegative
@@ -174,3 +175,28 @@ class MatrixGrader(FormulaGrader):
         utils.validate_shape(student_input, shape)
 
         return utils.within_tolerance(expected_input, student_input)
+
+def eigenvector_comparer(comparer_params, student_input, utils):
+    """
+    A comparer function for MatrixGrader.
+
+    Example Usage:
+
+    """
+
+    matrix, eigenvalue = comparer_params
+
+    # matrix is square with shape (n, n); student input should have shape (n, )
+    expected_input_shape = (matrix.shape[0], )
+    utils.validate_shape(student_input, expected_input_shape)
+
+    diff = matrix*student_input - eigenvalue * student_input
+    return utils.within_tolerance(0, np.linalg.norm(diff))
+
+
+
+
+
+
+
+#

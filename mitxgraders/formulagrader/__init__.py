@@ -18,11 +18,15 @@ from mitxgraders.formulagrader.formulagrader import (
     NumericalGrader,
 )
 
-from mitxgraders.formulagrader.matrixgrader import MatrixGrader
+from mitxgraders.formulagrader.matrixgrader import (
+    MatrixGrader,
+    eigenvector_comparer
+)
 
 # Set the objects to be *-imported from package
 __all__ = [
     "NumericalGrader",
     "FormulaGrader",
-    "MatrixGrader"
+    "MatrixGrader",
+    "eigenvector_comparer"
 ]
