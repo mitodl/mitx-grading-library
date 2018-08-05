@@ -24,6 +24,8 @@ markdown_extensions:
     - toc:
         permalink: ' # '
     - admonition
+    - codehilite
 extra_css:
   - css/extra.css
   - css/cinder_tweaks.css
+  - css/readthedocs.css
