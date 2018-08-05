@@ -7,27 +7,28 @@ A typical use of MatrixGrader might look like
 ```pycon
 >>> from mitxgraders import *
 >>> grader1 = MatrixGrader(
-...   answers='4*A*B^2',
-...   variables=['A', 'B', 'v'],
+...   answers='4*A*B*C^2',
+...   variables=['A', 'B', 'C', 'v'],
 ...   sample_from={
-...      'A': RealMatrices(), # samples from 2 by 2 matrices by default
-...      'B': RealMatrices(),
+...      'A': RealMatrices(shape=[3, 2]),
+...      'B': RealMatrices(), # samples from 2 by 2 matrices by default
+...      'C': RealMatrices(),
 ...   }
 ... )
 
 ```
 
-The next few lines call the grader as a check function. The inputs `'4*A*B^2'` and `'4*A*B*B'` are correct:
+The next few lines call the grader as a check function. The inputs `'4*A*B*C^2'` and `'4*A*B*C*C'` are correct:
 ```pycon
->>> grader1(None, '4*A*B^2')
+>>> grader1(None, '4*A*B*C^2')
 {'grade_decimal': 1, 'msg': '', 'ok': True}
->>> grader1(None, '4*A*B*B')
+>>> grader1(None, '4*A*B*C*C')
 {'grade_decimal': 1, 'msg': '', 'ok': True}
 
 ```
-while the input `'4*B^2*A'` is incorrect because the matrix-sampled variables are non-commutative:
+while the input `'4*A*C*B*C'` is incorrect because the matrix-sampled variables are non-commutative:
 ```pycon
->>> grader1(None, '4*B^2*A')
+>>> grader1(None, '4*A*C*B*C')
 {'msg': '', 'grade_decimal': 0, 'ok': False}
 
 ```
@@ -322,10 +323,10 @@ If you want a different name (besides `'I'`) for the identity, or if you encount
 ```pycon
 >>> from mitxgraders import MatrixGrader
 >>> from mitxgraders.helpers.calc import identity
->>> MatrixGrader(
+>>> grader = MatrixGrader(
 ...     answers='[1, 2, 3]',
 ...     user_constants={
-...         'I_2': identity(2)  # the 2 by 2 identity
+...         'I_2': identity(2),  # the 2 by 2 identity
 ...         'I_3': identity(3)  # the 3 by 3 identity
 ...     }
 ... )
