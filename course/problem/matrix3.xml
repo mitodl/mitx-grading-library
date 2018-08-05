@@ -1,0 +1,45 @@
+<problem display_name="MatrixGrader: Cross Product Demo" showanswer="always" weight="10" attempts="">
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import MatrixGrader, RealMatrices, RealVectors
+
+grader = MatrixGrader(
+  answers='abs(cross(vecb-veca, vecc-veca))/abs(vecb-veca)',
+  variables=['veca', 'vecb', 'vecc'],
+  sample_from={
+     'veca': RealVectors(shape=3),
+     'vecb': RealVectors(shape=3),
+     'vecc': RealVectors(shape=3)
+  }
+)
+</script>
+
+<p>A line goes through points \( \vec{a}, \vec{b} \in \mathbb{R}^3 \). Give an expression for the minimum distance from this line to a third point \( \vec{c} \).</p>
+
+<ul>
+  <li>You may enter \(\vec{a}\), \(\vec{b}\), and \(\vec{c}\) as <code>veca</code>, <code>vecb</code>, and <code>vecc</code>.</li>
+  <li>Use <code>cross(a, b)</code> for \( \vec{a} \times \vec{b}\)</li>
+</ul>
+
+<p>This demo problem is primarily intended to show off the cross product. Some suggested inputs:</p>
+
+<ul>
+  <li>
+    <code>abs(cross(vecb-veca, vecc-veca))/abs(vecb-veca)</code> is correct,
+  </li>
+  <li>
+    <code>abs(cross(vecb-veca, vecc-vecb))/abs(vecb-veca)</code> is also correct
+  </li>
+  <li>
+    <code>cross(1, [1, 2, 3])</code> to see hepful error messages. All standard functions (<code>norm</code>, <code>trans</code>, <code>det</code>, ...) provided by the MatrixGrader class give similar error messages when something goes wrong.
+  </li>
+</ul>
+
+<customresponse cfn="grader" expect="abs(cross(vecb - veca, vecc - veca))/abs(vecb - veca)">
+    <textline math="true" size="100" />
+</customresponse>
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix3.xml" target="_blank">View source</a>
+
+
+</problem>

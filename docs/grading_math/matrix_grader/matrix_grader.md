@@ -7,28 +7,29 @@ A typical use of MatrixGrader might look like
 ```pycon
 >>> from mitxgraders import *
 >>> grader1 = MatrixGrader(
-...   answers='4*A*B*C^2',
-...   variables=['A', 'B', 'C', 'v'],
+...   answers='4*A*B^2*v',
+...   variables=['A', 'B', 'v'],
+...   identity_dim=2, # makes 'I' available to students
 ...   sample_from={
-...      'A': RealMatrices(shape=[3, 2]),
-...      'B': RealMatrices(), # samples from 2 by 2 matrices by default
-...      'C': RealMatrices(),
+...      'A': RealMatrices(), # samples from 2 by 2 matrices by default
+...      'B': RealMatrices(),
+...      'v': RealVectors(shape=2), # sample 2-component vectors
 ...   }
 ... )
 
 ```
 
-The next few lines call the grader as a check function. The inputs `'4*A*B*C^2'` and `'4*A*B*C*C'` are correct:
+The next few lines call the grader as a check function. The inputs `'4*A*B^2*v'` and `'4*A*B*B*v'` are correct:
 ```pycon
->>> grader1(None, '4*A*B*C^2')
+>>> grader1(None, '4*A*B^2*v')
 {'grade_decimal': 1, 'msg': '', 'ok': True}
->>> grader1(None, '4*A*B*C*C')
+>>> grader1(None, '4*A*B*B*v')
 {'grade_decimal': 1, 'msg': '', 'ok': True}
 
 ```
-while the input `'4*A*C*B*C'` is incorrect because the matrix-sampled variables are non-commutative:
+while the input `'4*B*A*B*v'` is incorrect because the matrix-sampled variables are non-commutative:
 ```pycon
->>> grader1(None, '4*A*C*B*C')
+>>> grader1(None, '4*B*A*B*v')
 {'msg': '', 'grade_decimal': 0, 'ok': False}
 
 ```
