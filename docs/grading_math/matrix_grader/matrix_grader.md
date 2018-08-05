@@ -314,10 +314,29 @@ MatrixGrader provides all the default functions of `FormulaGrader` (`sin`, `cos`
 
 Since `MatrixGrader` has all of `FormulaGrader`'s configuration options, additional functions can be supplied through the `user_functions` configuration key. If you supply addition matrix functions, you may wish you use the `specify_domain` decorator function. See [Function Listing: Specify Domain](../functions.md#specify-domain) for details.
 
+## Identity Matrix
+
+To make an n by n identity matrix available to students, specify the configuration key `identity_dim=n`. That is, the grader `MatrixGrader(identity_dim=4, ...)` will automatically have a constant `'I'` whose value is the 4 by 4 identity matrix.
+
+If you want a different name (besides `'I'`) for the identity, or if you encounter situations where identity matrices of different sizes are required, `mitxgraders.helpers.calc` provides an `identity` function. For example:
+```pycon
+>>> from mitxgraders import MatrixGrader
+>>> from mitxgraders.helpers.calc import identity
+>>> MatrixGrader(
+...     answers='[1, 2, 3]',
+...     user_constants={
+...         'I_2': identity(2)  # the 2 by 2 identity
+...         'I_3': identity(3)  # the 3 by 3 identity
+...     }
+... )
+
+```
+
 ## Configuration Options
 
 `MatrixGrader` has all of [`FormulaGrader`](../formula_grader.md)'s configuration options, plus some extras. The extras are:
 
+- `idenity_dim`: If specified as a positive integer `n`, then an n by n identity matrix is added to the available constants with name `'I'`. Defaults to `None`.
 - `max_array_dim` (nonnegative int): Controls the maximum [dimension](#dimension-and-shape) of arrays that students can enter entry-by-entry. Default is `1`: vectors can be entered entry-by-entry, but not matrices.
 - `negative_powers` (bool): whether negative powers are enabled for square matrices (which calculate powers of matrix inverse). Defaults to `True`.
 - `shape_errors` (bool): See [Handling Errors: Shape-mismatch errors during evaluation](#shape-mismatch-errors-during-evaluation). Defaults to `True`.
