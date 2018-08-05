@@ -5,7 +5,6 @@ import numpy as np
 from numbers import Number
 from mitxgraders.helpers.calc.math_array import (
     MathArray,
-    IdentityMultiple as IdMult,
     equal_as_arrays,
     approx_equal_as_arrays,
     random_math_array
@@ -416,7 +415,7 @@ def test_scalar_special_cases():
 ##########     Test in-place operations     ##########
 def test_in_place_addition():
 
-    amounts = [0, IdMult(4), random_math_array([2, 2])]
+    amounts = [0, random_math_array([2, 2])]
     for amount in amounts:
         A = random_math_array([2, 2])
         A_copy = A.copy()
@@ -425,7 +424,7 @@ def test_in_place_addition():
 
 def test_in_place_subtraction():
 
-    amounts = [0, IdMult(4), random_math_array([2, 2])]
+    amounts = [0, random_math_array([2, 2])]
     for amount in amounts:
         A = random_math_array([2, 2])
         A_copy = A.copy()
@@ -434,7 +433,7 @@ def test_in_place_subtraction():
 
 def test_in_place_multiplication():
 
-    amounts = [5, IdMult(4), random_math_array(tuple()), random_math_array([2, 2])]
+    amounts = [5, random_math_array(tuple()), random_math_array([2, 2])]
     for amount in amounts:
         A = random_math_array([2, 2])
         A_copy = A.copy()
@@ -457,94 +456,6 @@ def test_in_place_powers():
         A_copy = A.copy()
         A **= amount
         assert equal_as_arrays(A, A_copy ** amount)
-
-##########     Test Binary Operations with IdentityMultiple     ##########
-
-def test_addition_subtraction_with_identity_multiple():
-    # Explicit identity matrices:
-    I2 = MathArray([
-        [1, 0],
-        [0, 1]
-    ])
-    I3 = MathArray([
-        [1, 0, 0],
-        [0, 1, 0],
-        [0, 0, 1]
-    ])
-    a = random.uniform(-10, 10)
-
-    # Addition: IdMult works with 2 by 2, 3 by 3, or any dimension:
-    sample_2_2 = random_math_array([2, 2])
-    sample_3_3 = random_math_array([3, 3])
-    assert equal_as_arrays(sample_2_2 + IdMult(a), sample_2_2 + a*I2)
-    assert equal_as_arrays(IdMult(a) + sample_2_2, sample_2_2 + a*I2)
-    assert equal_as_arrays(sample_3_3 + IdMult(a), sample_3_3 + a*I3)
-    assert equal_as_arrays(IdMult(a) + sample_3_3, sample_3_3 + a*I3)
-
-    # Subtraction: IdMult works with 2 by 2, 3 by 3, or any dimension:
-    assert equal_as_arrays(sample_2_2 - IdMult(a), sample_2_2 - a*I2)
-    assert equal_as_arrays(IdMult(a) - sample_2_2, a*I2 - sample_2_2)
-    assert equal_as_arrays(sample_3_3 - IdMult(a), sample_3_3 - a*I3)
-    assert equal_as_arrays(IdMult(a) - sample_3_3, a*I3 - sample_3_3)
-
-    # IdentityMultiple raises an error when added to non-rectangular matrices
-    sample_2_3 = random_math_array([2, 3])
-    match = "Cannot add/subtract multiples of the identity to a non-square matrix"
-    with raises(ShapeError, match=match):
-        sample_2_3 + IdMult(a)
-    with raises(ShapeError, match=match):
-        IdMult(a) + sample_2_3
-    with raises(ShapeError, match=match):
-        sample_2_3 - IdMult(a)
-    with raises(ShapeError, match=match):
-        IdMult(a) - sample_2_3
-
-    sample_4 = random_math_array([2])
-    match = "Cannot add/subtract multiples of the identity to a vector"
-    with raises(ShapeError, match=match):
-        sample_4 + IdMult(a)
-    with raises(ShapeError, match=match):
-        IdMult(a) + sample_4
-    with raises(ShapeError, match=match):
-        sample_4 - IdMult(a)
-    with raises(ShapeError, match=match):
-        IdMult(a) - sample_4
-
-def test_multiplication_with_identity_multiple():
-    I2 = MathArray([
-        [1, 0],
-        [0, 1]
-    ])
-    I3 = MathArray([
-        [1, 0, 0],
-        [0, 1, 0],
-        [0, 0, 1]
-    ])
-    a = random.uniform(-10, 10)
-    sample_3 = random_math_array([3])
-    sample_2_3 = random_math_array([2, 3])
-
-    assert equal_as_arrays(IdMult(a) * sample_3, a*sample_3 )
-    assert equal_as_arrays(sample_3*IdMult(a), a*sample_3 )
-
-    assert equal_as_arrays(sample_2_3 * IdMult(a), sample_2_3 * a )
-    assert equal_as_arrays(sample_2_3 * IdMult(a), sample_2_3 * (a*I3) )
-    assert equal_as_arrays(IdMult(a)*sample_2_3, sample_2_3 * a )
-    assert equal_as_arrays(IdMult(a)*sample_2_3, (a*I2)*sample_2_3 )
-
-
-
-def test_identity_div_pow_fallback_to_right_operand():
-    class Foo(object):
-        def __rtruediv__(self, other): return "Bar"
-        def __rpow__(self, other): return "Baz"
-
-    # Left methods works if right operand is a number
-    assert IdMult(5)/2 == IdMult(2.5)
-    assert IdMult(6)**2 == IdMult(36)
-    # otherwise, they fall back to the right operand's rdiv and rpow:
-    assert IdMult(5)/Foo() == "Bar"
-    assert IdMult(5)**Foo() == "Baz"
 
 ##########     Miscellaneous     ##########
 

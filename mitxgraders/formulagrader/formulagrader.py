@@ -17,8 +17,8 @@ from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.helpers.calc import (evaluator, within_tolerance, MathArray,
-                                      IdentityMultiple, DEFAULT_VARIABLES,
-                                      DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
+                                      DEFAULT_VARIABLES, DEFAULT_FUNCTIONS,
+                                      DEFAULT_SUFFIXES)
 from mitxgraders.helpers.calc.calc import parsercache
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NonNegative, is_callable, PercentageString, all_unique,
@@ -419,7 +419,7 @@ class FormulaGrader(ItemGrader):
         return schema.extend({
             Required('user_functions', default={}): schema_user_functions,
             Required('user_constants', default={}): validate_user_constants(
-                Number, MathArray, IdentityMultiple),
+                Number, MathArray),
             # Blacklist/Whitelist have additional validation that can't happen here, because
             # their validation is correlated with each other
             Required('blacklist', default=[]): [str],

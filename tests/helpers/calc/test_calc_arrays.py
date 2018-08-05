@@ -1,7 +1,7 @@
 from __future__ import division
 from pytest import raises
 import numpy as np
-from mitxgraders import evaluator, MathArray, IdentityMultiple
+from mitxgraders import evaluator, MathArray
 from mitxgraders.helpers.calc.math_array import equal_as_arrays
 from mitxgraders.helpers.calc.exceptions import UnableToParse
 
@@ -54,21 +54,3 @@ def test_math_arrays():
     expr = '(z*[[1, 5], [4, -2]]^n + 10*A/x)*v'
     result = evaluator(expr, variables, max_array_dim=2)[0]
     assert equal_as_arrays(result, (z*A**n + 10*A/x)*v)
-
-def test_identity_multiple():
-    I5 = IdentityMultiple(5)
-    n = 3
-    x = 4.2
-    z = 2 + 3j
-    variables = {
-        'I5': I5,
-        'n': n,
-        'x': x,
-        'z': z
-    }
-
-    expr = 'z*I5^n + 10*I5/x'
-    result = evaluator(expr, variables, max_array_dim=2)[0]
-    assert result == z*I5**n + 10*I5/x
-
-    assert np.isnan(IdentityMultiple(float('nan')))
