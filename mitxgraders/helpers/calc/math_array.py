@@ -384,3 +384,20 @@ def random_math_array(shape):
     a, b = -10, 10
     elements = a + (b-a)*np.random.random_sample(shape)
     return MathArray(elements)
+
+def identity(n):
+    """
+    Returns the n by n MathArray identity matrix.
+
+    Usage:
+
+    >>> identity(2)
+    MathArray([[ 1.,  0.],
+           [ 0.,  1.]])
+    >>> identity(3)
+    MathArray([[ 1.,  0.,  0.],
+           [ 0.,  1.,  0.],
+           [ 0.,  0.,  1.]])
+    """
+
+    return MathArray(np.identity(n))
