@@ -7,3 +7,4 @@
 *.DS_Store
 course/course.tar.gz
 site/
+mitxgraders-js/node_modules
