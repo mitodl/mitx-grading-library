@@ -36,8 +36,14 @@ grader = MatrixGrader(
   <textline math="true" size="40" />
 </customresponse>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix5.xml" target="_blank">View source</a>
-
-<a href="https://mitodl.github.io/mitx-grading-library/grading_math/comparer_functions" target="_blank">Documentation for <code>comparer_function</code>s</a>
+<h3>Resources</h3>
+<ul>
+  <li>
+    <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix5.xml" target="_blank">View source</a>
+  </li>
+  <li>
+    <a href="https://mitodl.github.io/mitx-grading-library/grading_math/comparer_functions" target="_blank">Documentation for <code>comparer_function</code>s</a>
+  </li>
+</ul>
 
 </problem>

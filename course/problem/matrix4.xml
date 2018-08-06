@@ -54,4 +54,6 @@ grader_2 = MatrixGrader(
 <h3>Avoiding Confusion</h3>
 <p>In "real" problems, we strongly recommend disallowing entry-by-entry matrix input (which is the default) unless it is needed, to avoid potential confusion between <code>[1, 2]</code> and <code>[[1, 2]]</code></p>
 
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix4.xml" target="_blank">View source</a>
+
 </problem>
