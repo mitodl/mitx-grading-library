@@ -193,8 +193,9 @@ if (window.MJxPrep) {
   }
 
   // Try to update AsciiMath
-  var checkExist = setInterval(200);
   // Check for the AsciiMath object every 200ms
+  var checkExist = setInterval(updateMathJax, 200);
+
   function findClosingBrace(expr, startIdx) {
     var braces = { "[": "]", "<": ">", "(": ")", "{": "}" };
 
