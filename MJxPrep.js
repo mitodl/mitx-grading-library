@@ -83,3 +83,39 @@ else {
         }
     }, 200); // Check for the AsciiMath object every 200ms
 }
+
+function findClosingBrace(expr, startIdx) {
+  var braces = {
+    '[': ']',
+    '<': '>',
+    '(': ')',
+    '{': '}'
+  }
+
+  var openingBrace = expr[startIdx]
+
+  var closingBrace = braces[openingBrace]
+
+  if (closingBrace === undefined) {
+    throw Error(expr +  ' does not contain an opening brace at position ' + startIdx + '.')
+  }
+
+  var stack = 1
+
+  for (var j = startIdx + 1; j < expr.length; j++) {
+    if (expr[j] === openingBrace) {
+      stack += +1
+    }
+    else if (expr[j] === closingBrace) {
+      stack += -1
+    }
+    if (stack === 0) {
+      return j
+    }
+  }
+
+  // stack !== 0
+  throw Error(expr +' has a brace that opens at position ' + startIdx + ' but does not close.')
+}
+
+window.findClosingBrace = findClosingBrace
