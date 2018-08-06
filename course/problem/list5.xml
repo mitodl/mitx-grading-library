@@ -50,12 +50,12 @@ grader = ListGrader(
       1 &amp; x \\
       x &amp; -1
     \end{bmatrix}
-  ]
+  \]
 
   <p>Answer: (pairs may be in any order, but correct vector must go with correct value)</p>
   <ul>
-    <li>First pair: <code>+sqrt(1+x^2)</code>, <code>[1+sqrt(1+x^2), x]</code></li>
-    <li>First pair: <code>-sqrt(1+x^2)</code>, <code>[1-sqrt(1+x^2), x]</code></li>
+    <li>1st pair: <code>+sqrt(1+x^2)</code>, <code>[1+sqrt(1+x^2), x]</code></li>
+    <li>2nd pair: <code>-sqrt(1+x^2)</code>, <code>[1-sqrt(1+x^2), x]</code></li>
   </ul>
 
 <customresponse cfn="grader">
@@ -67,12 +67,12 @@ grader = ListGrader(
       <th>Eigenvector</th>
     </tr>
     <tr>
-      <th>First Eigenpair</th>
+      <th>1st Eigenpair</th>
       <td><textline math="true"/></td>
       <td><textline math="true" size="40"/></td>
     </tr>
     <tr>
-      <th>Second Eigenpair</th>
+      <th>2nd Eigenpair</th>
       <td><textline math="true"/></td>
       <td><textline math="true" size="40"/></td>
     </tr>
