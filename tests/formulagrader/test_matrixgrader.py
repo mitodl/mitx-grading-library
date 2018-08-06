@@ -26,12 +26,13 @@ def test_max_array_dim():
     with raises(UnableToParse, match=match):
         grader(None, "[[1, 2, 3]]")
 
-    # by default, author cannot enter matrices entry-by-entry
-    # But it's not caught till grading occurs
+    # But authors can. This allows authors to specify a matrix in comparer_params
+    # when students are required to input an eigenvector
     grader = MatrixGrader(
         answers="[[1, 2, 3]]"
     )
-    with raises(UnableToParse, match=match):
+    match = "Expected answer to be a matrix, but input is a scalar"
+    with raises(InputTypeError, match=match):
         grader(None, "0")
 
     grader = MatrixGrader(

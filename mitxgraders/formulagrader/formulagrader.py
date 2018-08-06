@@ -693,11 +693,12 @@ class FormulaGrader(ItemGrader):
             funclist.update(func_samples[i])
             varlist.update(var_samples[i])
 
-            scoped_eval = lambda expr: evaluator(expr,
-                                                 variables=varlist,
-                                                 functions=funclist,
-                                                 suffixes=self.suffixes,
-                                                 max_array_dim=self.config['max_array_dim'])
+            def scoped_eval(expression,
+                            variables=varlist,
+                            functions=funclist,
+                            suffixes=self.suffixes,
+                            max_array_dim=self.config['max_array_dim']):
+                return evaluator(expression, variables, functions, suffixes, max_array_dim)
 
             # Compute the sibling values, and add them to varlist
             siblings_eval = {
@@ -747,13 +748,14 @@ class FormulaGrader(ItemGrader):
         Arguments
         =========
         - scoped_eval (func): a unary function to evaluate math expressions.
-        Basically, calc.py's evaluator but with variables/functions/suffixes
-        already passed in.
+            Same keyword arguments as calc.py's evaluator, but with appropriate
+            default variables, functions, suffixes
         - comparer_params ([str]): unevaluated expressions
         - siblings_eval (dict): evaluated expressions
         """
 
-        results = [scoped_eval(param) for param in comparer_params]
+        results = [scoped_eval(param, max_array_dim=float('inf'))
+                   for param in comparer_params]
         # results is a list of (value, ScopeUsage) pairs
         comparer_params_eval = [value for value, _ in results]
         used_variables = set().union(*[used.variables for _, used in results])
