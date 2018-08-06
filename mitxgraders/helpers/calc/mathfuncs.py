@@ -277,7 +277,7 @@ ARRAY_ONLY_FUNCTIONS = {
     'abs': array_abs,
     'trans': np.transpose,
     'det': has_one_square_input('det')(np.linalg.det),
-    'tr': has_one_square_input('tr')(np.trace),
+    'trace': has_one_square_input('trace')(np.trace),
     'ctrans': lambda x: np.conj(np.transpose(x)),
     'adj': lambda x: np.conj(np.transpose(x)),
     'cross': cross

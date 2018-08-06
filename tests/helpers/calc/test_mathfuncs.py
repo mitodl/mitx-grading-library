@@ -64,8 +64,8 @@ def test_det_and_tr_raise_error_if_not_square():
     with raises(DomainError, match=match):
         det(random_math_array((2, 3)))
 
-    tr = ARRAY_ONLY_FUNCTIONS['tr']
-    match = ("There was an error evaluating function tr\(...\)\n"
+    tr = ARRAY_ONLY_FUNCTIONS['trace']
+    match = ("There was an error evaluating function trace\(...\)\n"
              "1st input has an error: received a matrix of shape "
              "\(rows: 2, cols: 3\), expected a square matrix")
     with raises(DomainError, match=match):

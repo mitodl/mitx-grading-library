@@ -67,6 +67,7 @@ else {
             AM.newsymbol({input:"re", tag:"mi", output:"Re", tex:null, ttype:AM.TOKEN.UNARY, func:true});
             AM.newsymbol({input:"im", tag:"mi", output:"Im", tex:null, ttype:AM.TOKEN.UNARY, func:true});
             AM.newsymbol({input:"conj", tag:"mover", output:"\u00AF", tex:null, ttype:AM.TOKEN.UNARY, acc:true});
+            AM.newsymbol({input:"trace", tag:"mi", output:"Tr", tex:null, ttype:AM.TOKEN.UNARY, func:true});
 
             // Add special functions: fact and factorial
             AM.newsymbol({input:"fact", tag:"mo", output:"fact", tex:null, ttype:AM.TOKEN.UNARY, rewriteleftright:["","!"]});
