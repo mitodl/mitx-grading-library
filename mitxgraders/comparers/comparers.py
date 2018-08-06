@@ -1,3 +1,5 @@
+import numpy as np
+
 # TODO: document comparer structure here. Might be written in FormulaGrader already.
 
 def eigenvector_comparer(comparer_params, student_input, utils):
@@ -22,6 +24,12 @@ def eigenvector_comparer(comparer_params, student_input, utils):
     True
     >>> grader(None, '[1+sqrt(1+x^2), 1]')['ok']
     False
+    >>> grader(None, '[0, 0]') == {
+    ...     'ok': False,
+    ...     'msg': 'Eigenvectors must be nonzero.',
+    ...     'grade_decimal': 0
+    ... }
+    True
 
     """
 
@@ -33,4 +41,12 @@ def eigenvector_comparer(comparer_params, student_input, utils):
 
     expected = eigenvalue * student_input
     actual = matrix * student_input
+
+    if utils.within_tolerance(0, np.linalg.norm(student_input)):
+        return {
+            'ok': False,
+            'grade_decimal': 0,
+            'msg': 'Eigenvectors must be nonzero.'
+        }
+
     return utils.within_tolerance(actual, expected)
