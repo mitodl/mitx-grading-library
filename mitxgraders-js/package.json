@@ -1,0 +1,25 @@
+{
+  "name": "mitxgraders",
+  "version": "1.0.0",
+  "description": "Javascript files to accompany mitxgraders Python library",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mitodl/mitx-grading-library.git"
+  },
+  "author": "Jolyon Bloomfield and Chris Chudzicki",
+  "bugs": {
+    "url": "https://github.com/mitodl/mitx-grading-library/issues"
+  },
+  "homepage": "https://github.com/mitodl/mitx-grading-library#readme",
+  "devDependencies": {
+    "jest": "^23.4.2"
+  },
+  "jest": {
+    "verbose": true,
+    "testURL": "http://localhost/"
+  }
+}
