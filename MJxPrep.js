@@ -78,6 +78,11 @@ if (window.MJxPrep) {
       return '{:' + groupExpr(args[0]) + '^dagger:}'
     } )
 
+    eqn = replaceFunctionCalls(eqn, 'cross', function(funcName, args) {
+      validateArgsLength(funcName, args, 2)
+      return '{:' + groupExpr(args[0]) + ' times ' + groupExpr(args[1]) + ':}'
+    } )
+
     // Conjugate as star
     // Replace conj(...) -> {:(...)^*:}, with parentheses added as necessary
     if (window.MJxPrepOptions.conj_as_star) {

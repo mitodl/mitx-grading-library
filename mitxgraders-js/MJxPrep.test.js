@@ -91,6 +91,11 @@ describe('preProcessEqn', () => {
     expect(result).toBe('{:DeltaE:} + {:deltasomething:} + delta + Delta')
   } )
 
+  it('replaces cross products', () => {
+    const eqn = 'x + cross(a + b, c) + y'
+    expect(preProcessEqn(eqn)).toBe('x + {:(a + b) times c:} + y')
+  } )
+
   it('raises an error appropriately given an incomplete expression', () => {
     const expr = 'sin(1 + fact(n'
     const badfunc = () => preProcessEqn(expr)
