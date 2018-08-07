@@ -93,10 +93,18 @@ if (window.MJxPrep) {
       } )
     }
 
+    // Display vectors as columns, if the option is turned on
     if (window.MJxPrepOptions.vectors_as_columns) {
       eqn = columnizeVectors(eqn)
     }
 
+    /*
+     * If you want to do any custom preprocessing, here is the place to do it
+     */
+
+
+
+    // Return the preprocessed equation
     return eqn;
   }
 
@@ -213,8 +221,42 @@ if (window.MJxPrep) {
         tex:null,
         ttype:AM.TOKEN.CONST
       });
+      // This is hbar, often used in physics
+      AM.newsymbol({
+        input:"hbar",
+        tag:"mo",
+        output:"\u210F",
+        tex:null,
+        ttype:AM.TOKEN.CONST});
+      // These next few are taken directly from the AsciiMath repository;
+      // the revision is too new for MathJax to incorporate however
+      // Here is the github discussion: https://github.com/asciimath/asciimathml/issues/58
+      // They simply add some extra bracketing symbols, which sometimes come in handy
+      AM.newsymbol({
+        input:"|:",
+        tag:"mo",
+        output:"|",
+        tex:null,
+        ttype:AM.TOKEN.LEFTBRACKET
+      });
+      AM.newsymbol({
+        input:":|",
+        tag:"mo",
+        output:"|",
+        tex:null,
+        ttype:AM.TOKEN.RIGHTBRACKET
+      });
+      AM.newsymbol({
+        input:":|:",
+        tag:"mo",
+        output:"|",
+        tex:null,
+        ttype:AM.TOKEN.CONST
+      });
 
       // Add special function: conj
+      // If the preprocessor is used and the option conj_as_star is true,
+      // conj will be transformed to a star, and this definition won't apply
       AM.newsymbol({
         input: "conj",
         tag: "mover",
