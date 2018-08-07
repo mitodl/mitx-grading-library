@@ -327,7 +327,16 @@ if (window.MJxPrep) {
 
   }
 
+  /**
+   * Trim leading/trailing whitespace from expr and wrap expr in parens unless
+   * it is already a single group (e.g., already wrapped in parens, or a single
+   * character)
+   *
+   * @param  {string} expr
+   * @return {string}
+   */
   function groupExpr(expr) {
+    expr = expr.trim()
     var atomic = ['alpha', 'beta', 'chi', 'delta', 'Delta', 'epsi', 'varepsilon', 'eta', 'gamma', 'Gamma', 'iota', 'kappa', 'lambda', 'Lambda', 'lamda', 'Lamda', 'mu', 'nu', 'omega', 'Omega', 'phi', 'varphi', 'Phi', 'pi', 'Pi', 'psi', 'Psi', 'rho', 'sigma', 'Sigma', 'tau', 'theta', 'vartheta', 'Theta', 'upsilon', 'xi', 'Xi', 'zeta']
     var temp = expr.startsWith('hat') || expr.startsWith('vec')
       ? expr.substring(3)

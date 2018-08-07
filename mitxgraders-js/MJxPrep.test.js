@@ -5,7 +5,7 @@ const {
   replaceFunctionCalls,
   groupExpr,
   splitList,
-  preProcessEqn
+  preProcessEqn,
 } = window.MJxPrepExports
 
 describe('findClosingBrace', () => {
@@ -98,4 +98,28 @@ describe('preProcessEqn', () => {
       `${expr} has a brace that opens at position 12 but does not close.`
     )
   } )
+} )
+
+describe('groupExpr', () => {
+  it('does not wrap single characters or greek letters', () => {
+    expect(groupExpr('x')).toBe('x')
+    expect(groupExpr('delta')).toBe('delta')
+  } )
+  it('does not wrap vec or hat followed by single chars or greek letters', () =>{
+    expect(groupExpr('vecx')).toBe('vecx')
+    expect(groupExpr('hatx')).toBe('hatx')
+    expect(groupExpr('vecdelta')).toBe('vecdelta')
+    expect(groupExpr('hatdelta')).toBe('hatdelta')
+  } )
+  it('does not expression if already wrapped', () => {
+    expect(groupExpr('(1)')).toBe('(1)')
+    // But:
+    expect(groupExpr('(1)*(2)')).toBe('((1)*(2))')
+  } )
+  it('removes extra whitespace before checking if already wrapped', () => {
+    expect(groupExpr('  (1)  ')).toBe('(1)')
+    // But:
+    expect(groupExpr('  (1)*(2)  ')).toBe('((1)*(2))')
+  } )
+
 } )
