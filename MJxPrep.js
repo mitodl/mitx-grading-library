@@ -48,28 +48,33 @@ if (window.MJxPrep) {
     // Factorial: We want fact(n) -> n!, but fact(2n) -> (2n)!
     // Replace fact(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'fact', function(funcName, args) {
+      validateArgsLength(funcName, args, 1)
       return '{:factAsciiMath(' + groupExpr(args[0]) + '):}'
     } )
     // Replace factorial(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'factorial', function(funcName, args) {
+      validateArgsLength(funcName, args, 1)
       return '{:factAsciiMath(' + groupExpr(args[0]) + '):}'
     } )
 
     // Transpose: trans(x) -> x^T
     // Replace trans(...) -> {:(...)^T:}, with parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'trans', function(funcName, args) {
+      validateArgsLength(funcName, args, 1)
       return '{:' + groupExpr(args[0]) + '^T:}'
     } )
 
     // Adjoint: adj(x) -> x^dagger
     // Replace adj(...) -> {:(...)^dagger:}, with parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'adj', function(funcName, args) {
+      validateArgsLength(funcName, args, 1)
       return '{:' + groupExpr(args[0]) + '^dagger:}'
     } )
 
     // Complex Transpose: ctrans(x) -> x^dagger
     // Replace ctrans(...) -> {:(...)^dagger:}, with parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'ctrans', function(funcName, args) {
+      validateArgsLength(funcName, args, 1)
       return '{:' + groupExpr(args[0]) + '^dagger:}'
     } )
 
@@ -77,6 +82,7 @@ if (window.MJxPrep) {
     // Replace conj(...) -> {:(...)^*:}, with parentheses added as necessary
     if (window.MJxPrepOptions.conj_as_star) {
       eqn = replaceFunctionCalls(eqn, 'conj', function(funcName, args) {
+        validateArgsLength(funcName, args, 1)
         return '{:' + groupExpr(args[0]) + '^**:}'
       } )
     }
@@ -355,6 +361,12 @@ if (window.MJxPrep) {
     }
     return "(" + expr + ")"
 
+  }
+
+  function validateArgsLength(funcName, args, expectedLength) {
+    if (args.length !== expectedLength) {
+      throw Error('Function ' + funcName + ' must be called with exactly ' + expectedLength + ' arguments' )
+    }
   }
 
   // Hacky exports for test file since we aren't transpiling
