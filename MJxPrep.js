@@ -301,25 +301,18 @@ if (window.MJxPrep) {
     var startingAt = startingAt ? startingAt : 0
 
     // Find the first instance of 'funcName(<args>)' we care about
-    do {
-      // Find the index
-      var funcStart = expr.indexOf(funcName + '(', startingAt);
+    var funcStart = expr.indexOf(funcName + '(', startingAt);
 
-      // If we found nothing, get out
-      if (funcStart < 0) return expr;
+    // If we found nothing, get out
+    if (funcStart < 0) return expr;
 
-      // Make sure the previous character isn't an alpha character
-      // (don't match the end of a function name we don't want to match)
-      // This will allow us to replace "f(...)" without replacing "diff(...)"
-      if( funcStart > 0 && /[a-zA-Z]/.test(expr.substr(funcStart-1, 1)) ) {
-        // Look further
-        startingAt = funcStart + 1;
-        continue;
-      }
-
-      // Looks good!
-      break;
-    } while (true);
+    // Make sure the previous character isn't an alpha character
+    // (don't match the end of a function name we don't want to match)
+    // This will allow us to replace "f(...)" without replacing "diff(...)"
+    if( funcStart > 0 && /[a-zA-Z]/.test(expr.substr(funcStart-1, 1)) ) {
+      // False positive. Keep on looking!
+      return replaceFunctionCalls(expr, funcName, action, funcStart + 1);
+    }
 
     var openCallParens = funcStart + funcName.length
     var closeCallParens = findClosingBrace(expr, openCallParens)
