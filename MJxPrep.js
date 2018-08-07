@@ -12,12 +12,17 @@
 // Make sure that this script only loads once
 if (window.MJxPrep) {
 } else {
+  // Specify options
+  window.MJxPrepOptions = {
+    'conj_as_star': true
+  }
+
   // Define the preprocessor
   window.MJxPrep = function() {
-    /*-----------------------------------------------------
-         *This is the preprocessor, used for translating inputs
-         *-----------------------------------------------------
-         */
+    /*------------------------------------------------------
+     * This is the preprocessor, used for translating inputs
+     *------------------------------------------------------
+     */
     this.fn = function(eqn) {
       try {
         return preProcessEqn(eqn)
@@ -36,23 +41,45 @@ if (window.MJxPrep) {
     // log2(x) -> log_2(x)
     eqn = eqn.replace(/log2\(/g, "log_2(");
 
-    // Note that fact(x) renders as x!, while fact(n-1) renders as n-1! (not good!)
-    // To make it look right, we need to use fact((n-1))
-    // This means that fact(10) renders as (10)!, but that's pretty benign
-    // Same applies to factorial
-    var replace_fact = function(match, substr1, substr2) {
-      if (substr2.length == 1)
-        return substr1 + "(" + substr2 + ")";
-      else
-        return substr1 + "((" + substr2 + "))";
-    };
-    eqn = eqn.replace(
-      /(fact|factorial)\((.+?)\)/g,
-      replace_fact
-    );
+    // Match Deltaxyz and deltaxyz and wrap in invisible brackets for display
+    // So, DeltaE -> {:DeltaE:}, deltasomething -> {:deltasomething:}
+    eqn = eqn.replace(/([Dd]elta)([a-zA-Z]+)/g, "{:$1$2:}");
+
+    // Factorial: We want fact(n) -> n!, but fact(2n) -> (2n)!
+    // Replace fact(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
+    eqn = replaceFunctionCalls(eqn, 'fact', function(funcName, args) {
+      return '{:factAsciiMath(' + groupExpr(args[0]) + '):}'
+    } )
+    // Replace factorial(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
+    eqn = replaceFunctionCalls(eqn, 'factorial', function(funcName, args) {
+      return '{:factAsciiMath(' + groupExpr(args[0]) + '):}'
+    } )
+
+    // Transpose: trans(x) -> x^T
+    // Replace trans(...) -> {:(...)^T:}, with parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'trans', function(funcName, args) {
       return '{:' + groupExpr(args[0]) + '^T:}'
     } )
+
+    // Adjoint: adj(x) -> x^dagger
+    // Replace adj(...) -> {:(...)^dagger:}, with parentheses added as necessary
+    eqn = replaceFunctionCalls(eqn, 'adj', function(funcName, args) {
+      return '{:' + groupExpr(args[0]) + '^dagger:}'
+    } )
+
+    // Complex Transpose: ctrans(x) -> x^dagger
+    // Replace ctrans(...) -> {:(...)^dagger:}, with parentheses added as necessary
+    eqn = replaceFunctionCalls(eqn, 'ctrans', function(funcName, args) {
+      return '{:' + groupExpr(args[0]) + '^dagger:}'
+    } )
+
+    // Conjugate as star
+    // Replace conj(...) -> {:(...)^*:}, with parentheses added as necessary
+    if (window.MJxPrepOptions.conj_as_star) {
+      eqn = replaceFunctionCalls(eqn, 'conj', function(funcName, args) {
+        return '{:' + groupExpr(args[0]) + '^**:}'
+      } )
+    }
 
     return eqn;
   }
@@ -155,14 +182,6 @@ if (window.MJxPrep) {
         func: true
       });
       AM.newsymbol({
-        input: "conj",
-        tag: "mover",
-        output: "\xAF",
-        tex: null,
-        ttype: AM.TOKEN.UNARY,
-        acc: true
-      });
-      AM.newsymbol({
         input: "trace",
         tag: "mi",
         output: "Tr",
@@ -170,24 +189,35 @@ if (window.MJxPrep) {
         ttype: AM.TOKEN.UNARY,
         func: true
       });
-
-      // Add special functions: fact and factorial
+      // This is the dagger symbol, used in the Hermitian conjugate/adjoint
       AM.newsymbol({
-        input: "fact",
+        input:"dagger",
+        tag:"mi",
+        output:"\u2020",
+        tex:null,
+        ttype:AM.TOKEN.CONST
+      });
+
+      // Add special function: factAsciiMath
+      AM.newsymbol({
+        input: "factAsciiMath",
         tag: "mo",
         output: "fact",
         tex: null,
         ttype: AM.TOKEN.UNARY,
         rewriteleftright: [ "", "!" ]
       });
+
+      // Add special function: conj
       AM.newsymbol({
-        input: "factorial",
-        tag: "mo",
-        output: "factorial",
+        input: "conj",
+        tag: "mover",
+        output: "\xAF",
         tex: null,
         ttype: AM.TOKEN.UNARY,
-        rewriteleftright: [ "", "!" ]
+        acc: true
       });
+
 
       // Ask MathJax to reprocess all input boxes, as saved answers may have rendered
       // before these definitions went through
@@ -270,10 +300,18 @@ if (window.MJxPrep) {
     // default value for startingAt
     var startingAt = startingAt ? startingAt : 0
 
-    // Replace the first instance of 'funcName(<args>)'
-    var funcStart = expr.indexOf(funcName, startingAt)
-    if (funcStart < 0) {
-      return expr
+    // Find the first instance of 'funcName(<args>)' we care about
+    var funcStart = expr.indexOf(funcName + '(', startingAt);
+
+    // If we found nothing, get out
+    if (funcStart < 0) return expr;
+
+    // Make sure the previous character isn't an alpha character
+    // (don't match the end of a function name we don't want to match)
+    // This will allow us to replace "f(...)" without replacing "diff(...)"
+    if( funcStart > 0 && /[a-zA-Z]/.test(expr.substr(funcStart-1, 1)) ) {
+      // False positive. Keep on looking!
+      return replaceFunctionCalls(expr, funcName, action, funcStart + 1);
     }
 
     var openCallParens = funcStart + funcName.length
@@ -315,6 +353,7 @@ if (window.MJxPrep) {
     findClosingBrace: findClosingBrace,
     replaceFunctionCalls: replaceFunctionCalls,
     groupExpr: groupExpr,
-    splitList: splitList
+    splitList: splitList,
+    preProcessEqn: preProcessEqn
   }
 }
