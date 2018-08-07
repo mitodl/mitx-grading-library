@@ -48,49 +48,31 @@ if (window.MJxPrep) {
 
     // Factorial: We want fact(n) -> n!, but fact(2n) -> (2n)!
     // Replace fact(...) -> with {:...!:}, wrap with parens as needed
-    eqn = replaceFunctionCalls(eqn, 'fact', function(funcName, args) {
-      validateArgsLength(funcName, args, 1)
-      return '{:' + groupExpr(args[0]) + '!:}'
-    } )
+    eqn = replaceFunctionCalls(eqn, 'fact', funcToPostfix('!') )
     // Replace factorial(...) -> with {:...!:}, wrap with parens as needed
-    eqn = replaceFunctionCalls(eqn, 'factorial', function(funcName, args) {
-      validateArgsLength(funcName, args, 1)
-      return '{:' + groupExpr(args[0]) + '!:}'
-    } )
+    eqn = replaceFunctionCalls(eqn, 'factorial', funcToPostfix('!') )
 
     // Transpose: trans(x) -> x^T
     // Replace trans(...) -> {:(...)^T:}, with parentheses added as necessary
-    eqn = replaceFunctionCalls(eqn, 'trans', function(funcName, args) {
-      validateArgsLength(funcName, args, 1)
-      return '{:' + groupExpr(args[0]) + '^T:}'
-    } )
+    eqn = replaceFunctionCalls(eqn, 'trans', funcToPostfix('^T') )
 
     // Adjoint: adj(x) -> x^dagger
     // Replace adj(...) -> {:(...)^dagger:}, with parentheses added as necessary
-    eqn = replaceFunctionCalls(eqn, 'adj', function(funcName, args) {
-      validateArgsLength(funcName, args, 1)
-      return '{:' + groupExpr(args[0]) + '^dagger:}'
-    } )
+    eqn = replaceFunctionCalls(eqn, 'adj', funcToPostfix('^dagger') )
 
     // Complex Transpose: ctrans(x) -> x^dagger
     // Replace ctrans(...) -> {:(...)^dagger:}, with parentheses added as necessary
-    eqn = replaceFunctionCalls(eqn, 'ctrans', function(funcName, args) {
-      validateArgsLength(funcName, args, 1)
-      return '{:' + groupExpr(args[0]) + '^dagger:}'
-    } )
+    eqn = replaceFunctionCalls(eqn, 'ctrans', funcToPostfix('^dagger') )
 
     eqn = replaceFunctionCalls(eqn, 'cross', function(funcName, args) {
-      validateArgsLength(funcName, args, 2)
+      if (args.length !== 2) {return funcToSelf(funcName, args) ;}
       return '{:' + groupExpr(args[0]) + ' times ' + groupExpr(args[1]) + ':}'
     } )
 
     // Conjugate as star
     // Replace conj(...) -> {:(...)^*:}, with parentheses added as necessary
     if (window.MJxPrepOptions.conj_as_star) {
-      eqn = replaceFunctionCalls(eqn, 'conj', function(funcName, args) {
-        validateArgsLength(funcName, args, 1)
-        return '{:' + groupExpr(args[0]) + '^**:}'
-      } )
+      eqn = replaceFunctionCalls(eqn, 'conj', funcToPostfix('^**') )
     }
 
     if (window.MJxPrepOptions.vectors_as_columns) {
@@ -244,10 +226,18 @@ if (window.MJxPrep) {
   // Check for the AsciiMath object every 200ms
   var checkExist = setInterval(updateMathJax, 200);
 
-  function findClosingBrace(expr, startIdx) {
+  /**
+   * get index at which the brace at braceIdx in expr is closed, or null if it
+   * does not close.
+   *
+   * @param  {string} expr
+   * @param  {number} openIdx index of opening brace
+   * @return {?number}          [description]
+   */
+  function findClosingBrace(expr, openIdx) {
     var braces = { "[": "]", "<": ">", "(": ")", "{": "}" };
 
-    var openingBrace = expr[startIdx];
+    var openingBrace = expr[openIdx];
 
     var closingBrace = braces[openingBrace];
 
@@ -255,14 +245,14 @@ if (window.MJxPrep) {
       throw Error(
         expr +
           " does not contain an opening brace at position " +
-          startIdx +
+          openIdx +
           "."
       );
     }
 
     var stack = 1;
 
-    for (var j = startIdx + 1; j < expr.length; j++) {
+    for (var j = openIdx + 1; j < expr.length; j++) {
       if (expr[j] === openingBrace) {
         stack += +1;
       } else if (expr[j] === closingBrace) {
@@ -274,11 +264,7 @@ if (window.MJxPrep) {
     }
 
     // stack !== 0
-    throw Error(
-      expr + " has a brace that opens at position " +
-        startIdx +
-        " but does not close."
-    );
+    return null
   }
 
   /**
@@ -290,7 +276,7 @@ if (window.MJxPrep) {
    * @return {string[]} array of string arguments
    */
   function shallowListSplit(str) {
-    var openers = { '[': true }
+    var openers = { '[': true, '(': true }
     var argStartPositions = [0]
 
     // Scan through str
@@ -298,6 +284,7 @@ if (window.MJxPrep) {
     while (j < str.length) {
       if (openers[str[j]]) {
         j = findClosingBrace(str, j)
+        if (j === null) { return str } // happens if brace does not close
         continue;
       }
       if (str[j] === ',') {
@@ -355,6 +342,11 @@ if (window.MJxPrep) {
 
     var openCallParens = funcStart + funcName.length
     var closeCallParens = findClosingBrace(expr, openCallParens)
+    if (closeCallParens === null) {
+      // if opening parens does not close, skip this instance and process the
+      // remaining string
+      return replaceFunctionCalls(expr, funcName, action, openCallParens + 1)
+    }
     var argsString = expr.substring(openCallParens + 1, closeCallParens)
 
     // replace any function calls that appear inside the arguments
@@ -376,6 +368,7 @@ if (window.MJxPrep) {
     var openedAt = expr.indexOf('[', startingAt)
     if (openedAt < 0) { return expr; }
     var closedAt = findClosingBrace(expr, openedAt)
+    if (closedAt === null) { return expr } // happens if opening brace is not closed
     // Get the array string, including opening/closing brackets
     var array = expr.substring(openedAt, closedAt + 1)
 
@@ -428,6 +421,7 @@ if (window.MJxPrep) {
     // If expression is already wrapped in parens or brackets, don't add extra
     if (expr.startsWith("(") || expr.startsWith("[")) {
       var closedAt = findClosingBrace(expr, 0)
+      if (closedAt === null) {return expr} // happens if opening brace is not closed
       if (closedAt === expr.length - 1) {
         return expr
       }
@@ -436,9 +430,13 @@ if (window.MJxPrep) {
 
   }
 
-  function validateArgsLength(funcName, args, expectedLength) {
-    if (args.length !== expectedLength) {
-      throw Error('Function ' + funcName + ' must be called with exactly ' + expectedLength + ' arguments but was called with ' + args )
+  function funcToSelf(funcName, args) {
+    return funcName + '(' + args + ')';
+  }
+  function funcToPostfix(postfix){
+    return function(funcName, args) {
+      if (args.length !== 1) { return funcToSelf(funcName, args) }
+      return "{:" + groupExpr(args[0]) + postfix + ":}"
     }
   }
 
@@ -449,6 +447,7 @@ if (window.MJxPrep) {
     groupExpr: groupExpr,
     shallowListSplit: shallowListSplit,
     preProcessEqn: preProcessEqn,
-    columnizeVectors: columnizeVectors
+    columnizeVectors: columnizeVectors,
+    funcToPostfix: funcToPostfix
   }
 }
