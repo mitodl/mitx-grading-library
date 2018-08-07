@@ -1,4 +1,10 @@
+// Hacky imports since we aren't transpiling
 require("./MJxPrep.js")
+const {
+  findClosingBrace,
+  replaceFunctionCalls,
+  groupExpr
+} = window.MJxPrepExports
 
 describe('findClosingBrace', () => {
   it('finds the closing brace', () => {
@@ -28,4 +34,14 @@ describe('findClosingBrace', () => {
     )
   } )
 
+} )
+
+describe('replaceFunctionCalls', () => {
+  it('detects arguments', () => {
+    const expr = "1 + cat(2, 3 + cat(1) +1 ) + 4*cat(2,3,4)"
+
+    const action = (funcName, args) => `${funcName.toUpperCase()}(${args})`
+    const result = replaceFunctionCalls(expr, 'cat', action)
+    expect(result).toBe('1 + CAT(2, 3 + CAT(1) +1 ) + 4*CAT(2,3,4)')
+  } )
 } )

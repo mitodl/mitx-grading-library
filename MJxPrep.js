@@ -19,32 +19,45 @@ if (window.MJxPrep) {
          *-----------------------------------------------------
          */
     this.fn = function(eqn) {
-      // Note that /pattern/flags is shorthand for a regex parser
-      // g is global - makes all changes
-      // log10(x) -> log_10(x)
-      eqn = eqn.replace(/log10\(/g, "log_10(");
-      // log2(x) -> log_2(x)
-      eqn = eqn.replace(/log2\(/g, "log_2(");
-
-      // Note that fact(x) renders as x!, while fact(n-1) renders as n-1! (not good!)
-      // To make it look right, we need to use fact((n-1))
-      // This means that fact(10) renders as (10)!, but that's pretty benign
-      // Same applies to factorial
-      var replace_fact = function(match, substr1, substr2) {
-        if (substr2.length == 1)
-          return substr1 + "(" + substr2 + ")";
-        else
-          return substr1 + "((" + substr2 + "))";
-      };
-      eqn = eqn.replace(
-        /(fact|factorial)\((.+?)\)/g,
-        replace_fact
-      );
-
-      return eqn;
+      try {
+        return preProcessEqn(eqn)
+      }
+      catch (err) {
+        return eqn
+      }
     };
   };
 
+  function preProcessEqn(eqn) {
+    // Note that /pattern/flags is shorthand for a regex parser
+    // g is global - makes all changes
+    // log10(x) -> log_10(x)
+    eqn = eqn.replace(/log10\(/g, "log_10(");
+    // log2(x) -> log_2(x)
+    eqn = eqn.replace(/log2\(/g, "log_2(");
+
+    // Note that fact(x) renders as x!, while fact(n-1) renders as n-1! (not good!)
+    // To make it look right, we need to use fact((n-1))
+    // This means that fact(10) renders as (10)!, but that's pretty benign
+    // Same applies to factorial
+    var replace_fact = function(match, substr1, substr2) {
+      if (substr2.length == 1)
+        return substr1 + "(" + substr2 + ")";
+      else
+        return substr1 + "((" + substr2 + "))";
+    };
+    eqn = eqn.replace(
+      /(fact|factorial)\((.+?)\)/g,
+      replace_fact
+    );
+    eqn = replaceFunctionCalls(eqn, 'trans', function(funcName, args) {
+      return '{:' + groupExpr(args[0]) + '^T:}'
+    } )
+
+    return eqn;
+  }
+
+  // Try to update AsciiMath
   function updateMathJax() {
     if (MathJax.InputJax.AsciiMath) {
       // Grab the AsciiMath object
@@ -192,7 +205,6 @@ if (window.MJxPrep) {
     }
   }
 
-  // Try to update AsciiMath
   // Check for the AsciiMath object every 200ms
   var checkExist = setInterval(updateMathJax, 200);
 
@@ -233,5 +245,76 @@ if (window.MJxPrep) {
     );
   }
 
-  window.findClosingBrace = findClosingBrace;
+  /**
+   * TODO: for splitting delimited lists, such as arguments of a function
+   *
+   * @param  {string} str [description]
+   * @return {string}     [description]
+   */
+  function splitList(str) {
+    return [str]
+  }
+
+  /**
+   * Recursively replace each instance of 'funcName(<args>)' that occurs after
+   * startingAt in a string with the return value of action(funcName, args)
+   *
+   * @param  {string} expr expression we're processing
+   * @param  {string} funcName name of function we're looking for
+   * @param  {function} action a callback with signature
+   *                           (funcName: string, args: [str]) => string
+   * @param  {?number} startingAt index after which replacements occur, defaults to 0
+   * @return {[type]}          [description]
+   */
+  function replaceFunctionCalls(expr, funcName, action, startingAt) {
+    // default value for startingAt
+    var startingAt = startingAt ? startingAt : 0
+
+    // Replace the first instance of 'funcName(<args>)'
+    var funcStart = expr.indexOf(funcName, startingAt)
+    if (funcStart < 0) {
+      return expr
+    }
+
+    var openCallParens = funcStart + funcName.length
+    var closeCallParens = findClosingBrace(expr, openCallParens)
+    var argsString = expr.substring(openCallParens + 1, closeCallParens)
+    var args = splitList(argsString)
+    var newExpr = expr.substring(0, funcStart) +
+      action(funcName, args) +
+      expr.substring(closeCallParens + 1)
+
+    // Recursively replace the remaining instances of 'funcName(<args>)'
+    return replaceFunctionCalls(newExpr, funcName, action, funcStart + 1)
+
+  }
+
+  function groupExpr(expr) {
+    var atomic = ['alpha', 'beta', 'chi', 'delta', 'Delta', 'epsi', 'varepsilon', 'eta', 'gamma', 'Gamma', 'iota', 'kappa', 'lambda', 'Lambda', 'lamda', 'Lamda', 'mu', 'nu', 'omega', 'Omega', 'phi', 'varphi', 'Phi', 'pi', 'Pi', 'psi', 'Psi', 'rho', 'sigma', 'Sigma', 'tau', 'theta', 'vartheta', 'Theta', 'upsilon', 'xi', 'Xi', 'zeta']
+    var temp = expr.startsWith('hat') || expr.startsWith('vec')
+      ? expr.substring(3)
+      : expr
+
+    if (temp.length == 1 || atomic.includes(temp)) {
+      return expr
+    }
+
+    // If expression is already wrapped in parens or brackets, don't add extra
+    if (expr.startsWith("(") || expr.startsWith("[")) {
+      var closedAt = findClosingBrace(expr, 0)
+      if (closedAt === expr.length - 1) {
+        return expr
+      }
+    }
+    return "(" + expr + ")"
+
+  }
+
+  // Hacky exports for test file since we aren't transpiling
+  window.MJxPrepExports = {
+    findClosingBrace: findClosingBrace,
+    replaceFunctionCalls: replaceFunctionCalls,
+    groupExpr: groupExpr,
+    splitList: splitList
+  }
 }
