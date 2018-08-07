@@ -85,6 +85,12 @@ describe('preProcessEqn', () => {
     expect(result2).toBe('conj(psi)')
   } )
 
+  it('wraps delta and Delta appropriately', () => {
+    const expr = 'DeltaE + deltasomething + delta + Delta'
+    const result = preProcessEqn(expr)
+    expect(result).toBe('{:DeltaE:} + {:deltasomething:} + delta + Delta')
+  } )
+
   it('raises an error appropriately given an incomplete expression', () => {
     const expr = 'sin(1 + fact(n'
     const badfunc = () => preProcessEqn(expr)

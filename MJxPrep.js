@@ -41,6 +41,10 @@ if (window.MJxPrep) {
     // log2(x) -> log_2(x)
     eqn = eqn.replace(/log2\(/g, "log_2(");
 
+    // Match Deltaxyz and deltaxyz and wrap in invisible brackets for display
+    // So, DeltaE -> {:DeltaE:}, deltasomething -> {:deltasomething:}
+    eqn = eqn.replace(/([Dd]elta)([a-zA-Z]+)/g, "{:$1$2:}");
+
     // Factorial: We want fact(n) -> n!, but fact(2n) -> (2n)!
     // Replace fact(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'fact', function(funcName, args) {
