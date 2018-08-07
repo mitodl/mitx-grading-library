@@ -3,7 +3,9 @@ require("./MJxPrep.js")
 const {
   findClosingBrace,
   replaceFunctionCalls,
-  groupExpr
+  groupExpr,
+  splitList,
+  preProcessEqn
 } = window.MJxPrepExports
 
 describe('findClosingBrace', () => {
@@ -43,5 +45,51 @@ describe('replaceFunctionCalls', () => {
     const action = (funcName, args) => `${funcName.toUpperCase()}(${args})`
     const result = replaceFunctionCalls(expr, 'cat', action)
     expect(result).toBe('1 + CAT(2, 3 + CAT(1) +1 ) + 4*CAT(2,3,4)')
+  } )
+
+  it('only affects the desired functions', () => {
+    const expr = "1 + acat(2, 3 + cat(1) +1 ) + 4*cats(2,3,4)"
+
+    const action = (funcName, args) => `${funcName.toUpperCase()}(${args})`
+    const result = replaceFunctionCalls(expr, 'cat', action)
+    expect(result).toBe('1 + acat(2, 3 + CAT(1) +1 ) + 4*cats(2,3,4)')
+  } )
+} )
+
+describe('preProcessEqn', () => {
+  it('replaces log10 and log2', () => {
+    const expr = 'log10(1 + log2(x))'
+    const result = preProcessEqn(expr)
+    expect(result).toBe('log_10(1 + log_2(x))')
+  } )
+
+  it('replaces fact and factorial', () => {
+    const expr = 'fact(n) + factorial(2n)'
+    const result = preProcessEqn(expr)
+    expect(result).toBe('{:factAsciiMath(n):} + {:factAsciiMath((2n)):}')
+  } )
+
+  it('replaces ctrans, adj and trans', () => {
+    const expr = 'ctrans(x) + adj(x+1) + trans([x^2])'
+    const result = preProcessEqn(expr)
+    expect(result).toBe('{:x^dagger:} + {:(x+1)^dagger:} + {:[x^2]^T:}')
+  } )
+
+  it('replaces conj based on the options', () => {
+    const expr = 'conj(psi)'
+    const result = preProcessEqn(expr)
+    expect(result).toBe('{:psi^**:}')
+
+    window.MJxPrepOptions.conj_as_star = false;
+    const result2 = preProcessEqn(expr)
+    expect(result2).toBe('conj(psi)')
+  } )
+
+  it('raises an error appropriately given an incomplete expression', () => {
+    const expr = 'sin(1 + fact(n'
+    const badfunc = () => preProcessEqn(expr)
+    expect(badfunc).toThrow(
+      `${expr} has a brace that opens at position 12 but does not close.`
+    )
   } )
 } )
