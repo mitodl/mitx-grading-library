@@ -13,48 +13,51 @@ describe('findClosingBrace', () => {
   it('finds the closing brace', () => {
     //                  01234567890123456789012345678901234567890123456789
     const expression = '4 + ( sin( 3^(1) - 7^2 ) + 5 ) + exp(8 - (4*3) )'
-    const startIdx = 4
-    expect(findClosingBrace(expression, startIdx)).toBe(29)
+    const openIdx = 4
+    expect(findClosingBrace(expression, openIdx)).toBe(29)
   } )
 
   it('throws an error if no opening brace at specified location', () => {
     //                  0123456789
     const expression = '4 + sin(x)'
-    const startIdx = 2
-    const badfunc = () => findClosingBrace(expression, startIdx)
+    const openIdx = 2
+    const badfunc = () => findClosingBrace(expression, openIdx)
     expect(badfunc).toThrow(
-      `${expression} does not contain an opening brace at position ${startIdx}.`
+      `${expression} does not contain an opening brace at position ${openIdx}.`
     )
   } )
 
-  it('throws an error if brace opens but does not close', () => {
+  it('returns null if brace opens but does not close', () => {
     //                  012345678901234
     const expression = '4 + sin( e^(2t)'
-    const startIdx = 7
-    const badfunc = () => findClosingBrace(expression, startIdx)
-    expect(badfunc).toThrow(
-      `${expression} has a brace that opens at position ${startIdx} but does not close.`
-    )
+    const openIdx = 7
+    expect(findClosingBrace(expression, openIdx)).toBe(null)
   } )
 
 } )
 
 describe('replaceFunctionCalls', () => {
+
+  const action = (funcName, args) => `${funcName.toUpperCase()}(${args})^*`
+
   it('detects arguments', () => {
     const expr = "1 + cat(2, 3 + cat(1) +1 ) + 4*cat(2,3,4)"
-
-    const action = (funcName, args) => `${funcName.toUpperCase()}(${args})`
     const result = replaceFunctionCalls(expr, 'cat', action)
-    expect(result).toBe('1 + CAT(2, 3 + CAT(1) +1 ) + 4*CAT(2,3,4)')
+    expect(result).toBe('1 + CAT(2, 3 + CAT(1)^* +1 )^* + 4*CAT(2,3,4)^*')
   } )
 
   it('only affects the desired functions', () => {
     const expr = "1 + acat(2, 3 + cat(1) +1 ) + 4*cats(2,3,4)"
-
-    const action = (funcName, args) => `${funcName.toUpperCase()}(${args})`
     const result = replaceFunctionCalls(expr, 'cat', action)
-    expect(result).toBe('1 + acat(2, 3 + CAT(1) +1 ) + 4*cats(2,3,4)')
+    expect(result).toBe('1 + acat(2, 3 + CAT(1)^* +1 ) + 4*cats(2,3,4)')
   } )
+
+  it('replaces closed calls, even if some func calls not closed', () => {
+    const expr = 'cat(1) + cat(2, cat(3), 4'
+    const result = replaceFunctionCalls(expr, 'cat', action)
+    expect(result).toBe('CAT(1)^* + cat(2, CAT(3)^*, 4')
+  } )
+
 } )
 
 describe('preProcessEqn', () => {
@@ -96,14 +99,6 @@ describe('preProcessEqn', () => {
     const eqn = 'x + cross(a + b, c) + y'
     expect(preProcessEqn(eqn)).toBe('x + {:(a + b) times c:} + y')
   } )
-
-  it('raises an error appropriately given an incomplete expression', () => {
-    const expr = 'sin(1 + fact(n'
-    const badfunc = () => preProcessEqn(expr)
-    expect(badfunc).toThrow(
-      `${expr} has a brace that opens at position 12 but does not close.`
-    )
-  } )
 } )
 
 describe('shallowListSplit', () => {
@@ -111,6 +106,11 @@ describe('shallowListSplit', () => {
     const expr = '0, 1 + (x*[2, 3]), [[4, 5], [6, 7]]zz, 8  f'
     const expected = ['0', ' 1 + (x*[2, 3])', ' [[4, 5], [6, 7]]zz', ' 8  f']
     expect(shallowListSplit(expr)).toEqual(expected)
+  } )
+
+  it('returns the original list if it is not balanced', () => {
+    const expr = '[[1, 2, 3], [1, 2, 3]'
+    expect(shallowListSplit(expr)).toBe(expr)
   } )
 } )
 
@@ -140,9 +140,14 @@ describe('groupExpr', () => {
 
 describe('columnizeVectors', () => {
   it('turns vectors into column matrices and leaves matrices alone', () => {
-    const expr = 'x + [1, 2, 3] + [[1, 2], [3, 4]]'
+    const expr = 'x + [1, f(a, b), 3] + [[1, 2], [3, 4]]'
     expect(columnizeVectors(expr)).toBe(
-      'x + [[1], [ 2], [ 3]] + [[1, 2], [3, 4]]'
+      'x + [[1], [ f(a, b)], [ 3]] + [[1, 2], [3, 4]]'
     )
+  } )
+
+  it("columnizes vectors, even when some vectors haven't been closed", () => {
+    const expr = '[1, 2, 3] + [1, 2,'
+    expect(columnizeVectors(expr)).toBe('[[1], [ 2], [ 3]] + [1, 2,')
   } )
 } )
