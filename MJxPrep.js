@@ -47,12 +47,12 @@ if (window.MJxPrep) {
     eqn = eqn.replace(/([Dd]elta)([a-zA-Z]+)/g, "{:$1$2:}");
 
     // Factorial: We want fact(n) -> n!, but fact(2n) -> (2n)!
-    // Replace fact(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
+    // Replace fact(...) -> with {:...!:}, wrap with parens as needed
     eqn = replaceFunctionCalls(eqn, 'fact', function(funcName, args) {
       validateArgsLength(funcName, args, 1)
       return '{:' + groupExpr(args[0]) + '!:}'
     } )
-    // Replace factorial(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
+    // Replace factorial(...) -> with {:...!:}, wrap with parens as needed
     eqn = replaceFunctionCalls(eqn, 'factorial', function(funcName, args) {
       validateArgsLength(funcName, args, 1)
       return '{:' + groupExpr(args[0]) + '!:}'
