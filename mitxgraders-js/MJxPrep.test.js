@@ -6,6 +6,7 @@ const {
   groupExpr,
   shallowListSplit,
   preProcessEqn,
+  columnizeVectors
 } = window.MJxPrepExports
 
 describe('findClosingBrace', () => {
@@ -70,9 +71,9 @@ describe('preProcessEqn', () => {
   } )
 
   it('replaces ctrans, adj and trans', () => {
-    const expr = 'ctrans(x) + adj(x+1) + trans([x^2])'
+    const expr = 'ctrans(x) + adj(x+1) + trans([x, x^2])'
     const result = preProcessEqn(expr)
-    expect(result).toBe('{:x^dagger:} + {:(x+1)^dagger:} + {:[x^2]^T:}')
+    expect(result).toBe('{:x^dagger:} + {:(x+1)^dagger:} + {:[[x], [ x^2]]^T:}')
   } )
 
   it('replaces conj based on the options', () => {
@@ -135,4 +136,13 @@ describe('groupExpr', () => {
     expect(groupExpr('  (1)*(2)  ')).toBe('((1)*(2))')
   } )
 
+} )
+
+describe('columnizeVectors', () => {
+  it('turns vectors into column matrices and leaves matrices alone', () => {
+    const expr = 'x + [1, 2, 3] + [[1, 2], [3, 4]]'
+    expect(columnizeVectors(expr)).toBe(
+      'x + [[1], [ 2], [ 3]] + [[1, 2], [3, 4]]'
+    )
+  } )
 } )

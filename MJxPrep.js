@@ -14,7 +14,8 @@ if (window.MJxPrep) {
 } else {
   // Specify options
   window.MJxPrepOptions = {
-    'conj_as_star': true
+    conj_as_star: true,
+    vectors_as_columns: true
   }
 
   // Define the preprocessor
@@ -90,6 +91,10 @@ if (window.MJxPrep) {
         validateArgsLength(funcName, args, 1)
         return '{:' + groupExpr(args[0]) + '^**:}'
       } )
+    }
+
+    if (window.MJxPrepOptions.vectors_as_columns) {
+      eqn = columnizeVectors(eqn)
     }
 
     return eqn;
@@ -361,13 +366,53 @@ if (window.MJxPrep) {
     var openCallParens = funcStart + funcName.length
     var closeCallParens = findClosingBrace(expr, openCallParens)
     var argsString = expr.substring(openCallParens + 1, closeCallParens)
-    var args = shallowListSplit(argsString)
-    var newExpr = expr.substring(0, funcStart) +
-      action(funcName, args) +
-      expr.substring(closeCallParens + 1)
 
-    // Recursively replace the remaining instances of 'funcName(<args>)'
-    return replaceFunctionCalls(newExpr, funcName, action, funcStart + 1)
+    // replace any function calls that appear inside the arguments
+    // this will bail out without further recursion if argsString has no
+    // function calls
+    var processedArgsString = replaceFunctionCalls(argsString, funcName, action)
+    var args = shallowListSplit(processedArgsString)
+
+    // perform the action
+    var finished = expr.substring(0, funcStart) + action(funcName, args)
+    var unfinished = expr.substring(closeCallParens + 1)
+
+    // Recursively process the unfinished string
+    return replaceFunctionCalls(finished + unfinished, funcName, action, finished.length + 1)
+
+  }
+
+  function columnizeVectors(expr, startingAt) {
+    var openedAt = expr.indexOf('[', startingAt)
+    if (openedAt < 0) { return expr; }
+    var closedAt = findClosingBrace(expr, openedAt)
+    // Get the array string, including opening/closing brackets
+    var array = expr.substring(openedAt, closedAt + 1)
+
+    var finished = expr.substring(0, openedAt) + columnizeSingleVector(array)
+    var unfinished = expr.substring(closedAt + 1)
+
+    return columnizeVectors(finished + unfinished, finished.length + 1)
+  }
+
+  function columnizeSingleVector(expr) {
+    if (!expr.startsWith('[') || !expr.endsWith(']')) {
+      throw Error('Cannot columnize vector ' + expr + ' , it must start and end with square brackets.')
+    }
+    var content = expr.substring(1, expr.length - 1)
+    var items = shallowListSplit(content)
+
+    // make sure items are not already rendering as vectors
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i]
+      if (item.indexOf('[') > 0 || item.indexOf(']') > 0 ) {
+        // abort! do not columnize! The items contain arrays, this appears to
+        // be a matrix.
+        return expr
+      }
+    }
+
+    return '[[' + items.join('], [') + ']]'
 
   }
 
@@ -413,6 +458,7 @@ if (window.MJxPrep) {
     replaceFunctionCalls: replaceFunctionCalls,
     groupExpr: groupExpr,
     shallowListSplit: shallowListSplit,
-    preProcessEqn: preProcessEqn
+    preProcessEqn: preProcessEqn,
+    columnizeVectors: columnizeVectors
   }
 }
