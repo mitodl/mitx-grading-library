@@ -6,7 +6,8 @@ const {
   groupExpr,
   shallowListSplit,
   preProcessEqn,
-  columnizeVectors
+  columnizeVectors,
+  funcToPostfix
 } = window.MJxPrepExports
 
 describe('findClosingBrace', () => {
@@ -96,8 +97,8 @@ describe('preProcessEqn', () => {
   } )
 
   it('replaces cross products', () => {
-    const eqn = 'x + cross(a + b, c) + y'
-    expect(preProcessEqn(eqn)).toBe('x + {:(a + b) times c:} + y')
+    const eqn = 'cross(x) + cross(a + b, c) + y'
+    expect(preProcessEqn(eqn)).toBe('cross(x) + {:(a + b) times c:} + y')
   } )
 } )
 
@@ -149,5 +150,15 @@ describe('columnizeVectors', () => {
   it("columnizes vectors, even when some vectors haven't been closed", () => {
     const expr = '[1, 2, 3] + [1, 2,'
     expect(columnizeVectors(expr)).toBe('[[1], [ 2], [ 3]] + [1, 2,')
+  } )
+} )
+
+describe('callback returned by funcToPostfix', () => {
+
+  it('converts unary calls, leaves other calls alone', () => {
+    const daggerize = funcToPostfix('^dagger')
+    const expr = 'adj(x, y) + adj(z) + 5'
+    const result = replaceFunctionCalls(expr, 'adj', daggerize)
+    expect(result).toBe('adj(x, y) + {:z^dagger:} + 5')
   } )
 } )

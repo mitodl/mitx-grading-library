@@ -48,49 +48,31 @@ if (window.MJxPrep) {
 
     // Factorial: We want fact(n) -> n!, but fact(2n) -> (2n)!
     // Replace fact(...) -> with {:...!:}, wrap with parens as needed
-    eqn = replaceFunctionCalls(eqn, 'fact', function(funcName, args) {
-      validateArgsLength(funcName, args, 1)
-      return '{:' + groupExpr(args[0]) + '!:}'
-    } )
+    eqn = replaceFunctionCalls(eqn, 'fact', funcToPostfix('!') )
     // Replace factorial(...) -> with {:...!:}, wrap with parens as needed
-    eqn = replaceFunctionCalls(eqn, 'factorial', function(funcName, args) {
-      validateArgsLength(funcName, args, 1)
-      return '{:' + groupExpr(args[0]) + '!:}'
-    } )
+    eqn = replaceFunctionCalls(eqn, 'factorial', funcToPostfix('!') )
 
     // Transpose: trans(x) -> x^T
     // Replace trans(...) -> {:(...)^T:}, with parentheses added as necessary
-    eqn = replaceFunctionCalls(eqn, 'trans', function(funcName, args) {
-      validateArgsLength(funcName, args, 1)
-      return '{:' + groupExpr(args[0]) + '^T:}'
-    } )
+    eqn = replaceFunctionCalls(eqn, 'trans', funcToPostfix('^T') )
 
     // Adjoint: adj(x) -> x^dagger
     // Replace adj(...) -> {:(...)^dagger:}, with parentheses added as necessary
-    eqn = replaceFunctionCalls(eqn, 'adj', function(funcName, args) {
-      validateArgsLength(funcName, args, 1)
-      return '{:' + groupExpr(args[0]) + '^dagger:}'
-    } )
+    eqn = replaceFunctionCalls(eqn, 'adj', funcToPostfix('^dagger') )
 
     // Complex Transpose: ctrans(x) -> x^dagger
     // Replace ctrans(...) -> {:(...)^dagger:}, with parentheses added as necessary
-    eqn = replaceFunctionCalls(eqn, 'ctrans', function(funcName, args) {
-      validateArgsLength(funcName, args, 1)
-      return '{:' + groupExpr(args[0]) + '^dagger:}'
-    } )
+    eqn = replaceFunctionCalls(eqn, 'ctrans', funcToPostfix('^dagger') )
 
     eqn = replaceFunctionCalls(eqn, 'cross', function(funcName, args) {
-      validateArgsLength(funcName, args, 2)
+      if (args.length !== 2) {return funcToSelf(funcName, args) ;}
       return '{:' + groupExpr(args[0]) + ' times ' + groupExpr(args[1]) + ':}'
     } )
 
     // Conjugate as star
     // Replace conj(...) -> {:(...)^*:}, with parentheses added as necessary
     if (window.MJxPrepOptions.conj_as_star) {
-      eqn = replaceFunctionCalls(eqn, 'conj', function(funcName, args) {
-        validateArgsLength(funcName, args, 1)
-        return '{:' + groupExpr(args[0]) + '^**:}'
-      } )
+      eqn = replaceFunctionCalls(eqn, 'conj', funcToPostfix('^**') )
     }
 
     if (window.MJxPrepOptions.vectors_as_columns) {
@@ -448,9 +430,13 @@ if (window.MJxPrep) {
 
   }
 
-  function validateArgsLength(funcName, args, expectedLength) {
-    if (args.length !== expectedLength) {
-      throw Error('Function ' + funcName + ' must be called with exactly ' + expectedLength + ' arguments but was called with ' + args )
+  function funcToSelf(funcName, args) {
+    return funcName + '(' + args + ')';
+  }
+  function funcToPostfix(postfix){
+    return function(funcName, args) {
+      if (args.length !== 1) { return funcToSelf(funcName, args) }
+      return "{:" + groupExpr(args[0]) + postfix + ":}"
     }
   }
 
@@ -461,6 +447,7 @@ if (window.MJxPrep) {
     groupExpr: groupExpr,
     shallowListSplit: shallowListSplit,
     preProcessEqn: preProcessEqn,
-    columnizeVectors: columnizeVectors
+    columnizeVectors: columnizeVectors,
+    funcToPostfix: funcToPostfix
   }
 }
