@@ -67,7 +67,7 @@ describe('preProcessEqn', () => {
   it('replaces fact and factorial', () => {
     const expr = 'fact(n) + factorial(2n)'
     const result = preProcessEqn(expr)
-    expect(result).toBe('{:factAsciiMath(n):} + {:factAsciiMath((2n)):}')
+    expect(result).toBe('{:n!:} + {:(2n)!:}')
   } )
 
   it('replaces ctrans, adj and trans', () => {
@@ -125,7 +125,7 @@ describe('groupExpr', () => {
     expect(groupExpr('vecdelta')).toBe('vecdelta')
     expect(groupExpr('hatdelta')).toBe('hatdelta')
   } )
-  it('does not expression if already wrapped', () => {
+  it('does not wrap expression if already wrapped', () => {
     expect(groupExpr('(1)')).toBe('(1)')
     // But:
     expect(groupExpr('(1)*(2)')).toBe('((1)*(2))')

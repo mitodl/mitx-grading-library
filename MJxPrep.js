@@ -50,12 +50,12 @@ if (window.MJxPrep) {
     // Replace fact(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'fact', function(funcName, args) {
       validateArgsLength(funcName, args, 1)
-      return '{:factAsciiMath(' + groupExpr(args[0]) + '):}'
+      return '{:' + groupExpr(args[0]) + '!:}'
     } )
     // Replace factorial(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'factorial', function(funcName, args) {
       validateArgsLength(funcName, args, 1)
-      return '{:factAsciiMath(' + groupExpr(args[0]) + '):}'
+      return '{:' + groupExpr(args[0]) + '!:}'
     } )
 
     // Transpose: trans(x) -> x^T
@@ -212,16 +212,6 @@ if (window.MJxPrep) {
         output:"\u2020",
         tex:null,
         ttype:AM.TOKEN.CONST
-      });
-
-      // Add special function: factAsciiMath
-      AM.newsymbol({
-        input: "factAsciiMath",
-        tag: "mo",
-        output: "fact",
-        tex: null,
-        ttype: AM.TOKEN.UNARY,
-        rewriteleftright: [ "", "!" ]
       });
 
       // Add special function: conj
