@@ -14,7 +14,8 @@ if (window.MJxPrep) {
 } else {
   // Specify options
   window.MJxPrepOptions = {
-    'conj_as_star': true
+    conj_as_star: true,
+    vectors_as_columns: true
   }
 
   // Define the preprocessor
@@ -46,39 +47,54 @@ if (window.MJxPrep) {
     eqn = eqn.replace(/([Dd]elta)([a-zA-Z]+)/g, "{:$1$2:}");
 
     // Factorial: We want fact(n) -> n!, but fact(2n) -> (2n)!
-    // Replace fact(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
+    // Replace fact(...) -> with {:...!:}, wrap with parens as needed
     eqn = replaceFunctionCalls(eqn, 'fact', function(funcName, args) {
-      return '{:factAsciiMath(' + groupExpr(args[0]) + '):}'
+      validateArgsLength(funcName, args, 1)
+      return '{:' + groupExpr(args[0]) + '!:}'
     } )
-    // Replace factorial(...) -> {:factAsciiMath((...)):}, with inner parentheses added as necessary
+    // Replace factorial(...) -> with {:...!:}, wrap with parens as needed
     eqn = replaceFunctionCalls(eqn, 'factorial', function(funcName, args) {
-      return '{:factAsciiMath(' + groupExpr(args[0]) + '):}'
+      validateArgsLength(funcName, args, 1)
+      return '{:' + groupExpr(args[0]) + '!:}'
     } )
 
     // Transpose: trans(x) -> x^T
     // Replace trans(...) -> {:(...)^T:}, with parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'trans', function(funcName, args) {
+      validateArgsLength(funcName, args, 1)
       return '{:' + groupExpr(args[0]) + '^T:}'
     } )
 
     // Adjoint: adj(x) -> x^dagger
     // Replace adj(...) -> {:(...)^dagger:}, with parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'adj', function(funcName, args) {
+      validateArgsLength(funcName, args, 1)
       return '{:' + groupExpr(args[0]) + '^dagger:}'
     } )
 
     // Complex Transpose: ctrans(x) -> x^dagger
     // Replace ctrans(...) -> {:(...)^dagger:}, with parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'ctrans', function(funcName, args) {
+      validateArgsLength(funcName, args, 1)
       return '{:' + groupExpr(args[0]) + '^dagger:}'
+    } )
+
+    eqn = replaceFunctionCalls(eqn, 'cross', function(funcName, args) {
+      validateArgsLength(funcName, args, 2)
+      return '{:' + groupExpr(args[0]) + ' times ' + groupExpr(args[1]) + ':}'
     } )
 
     // Conjugate as star
     // Replace conj(...) -> {:(...)^*:}, with parentheses added as necessary
     if (window.MJxPrepOptions.conj_as_star) {
       eqn = replaceFunctionCalls(eqn, 'conj', function(funcName, args) {
+        validateArgsLength(funcName, args, 1)
         return '{:' + groupExpr(args[0]) + '^**:}'
       } )
+    }
+
+    if (window.MJxPrepOptions.vectors_as_columns) {
+      eqn = columnizeVectors(eqn)
     }
 
     return eqn;
@@ -198,16 +214,6 @@ if (window.MJxPrep) {
         ttype:AM.TOKEN.CONST
       });
 
-      // Add special function: factAsciiMath
-      AM.newsymbol({
-        input: "factAsciiMath",
-        tag: "mo",
-        output: "fact",
-        tex: null,
-        ttype: AM.TOKEN.UNARY,
-        rewriteleftright: [ "", "!" ]
-      });
-
       // Add special function: conj
       AM.newsymbol({
         input: "conj",
@@ -276,13 +282,46 @@ if (window.MJxPrep) {
   }
 
   /**
-   * TODO: for splitting delimited lists, such as arguments of a function
+   * Splits a stringified list at top level only.
    *
-   * @param  {string} str [description]
-   * @return {string}     [description]
+   * "1 + 2, 2*[3, 4], 1" => ["1 + 2", "2*[3, 4]", "1"]
+   *
+   * @param  {string} str stringified list, WITHOUT opening/closing bracket
+   * @return {string[]} array of string arguments
    */
-  function splitList(str) {
-    return [str]
+  function shallowListSplit(str) {
+    var openers = { '[': true }
+    var argStartPositions = [0]
+
+    // Scan through str
+    var j = 0
+    while (j < str.length) {
+      if (openers[str[j]]) {
+        j = findClosingBrace(str, j)
+        continue;
+      }
+      if (str[j] === ',') {
+        // argument starts at j+1, not at j (which is a comma)
+        argStartPositions.push(j+1)
+      }
+      j++ // increment index
+    }
+
+    var argsList = []
+    argStartPositions.forEach(function(current, index, array) {
+      if (index + 1 < array.length) {
+        // array[index + 1] is start of next argument, we want to stop at
+        // the comma just before it
+        var stopAt = array[index + 1] - 1
+        argsList.push(str.substring(current, stopAt))
+      }
+      else {
+        argsList.push(str.substring(current))
+      }
+
+    } )
+
+    return argsList
   }
 
   /**
@@ -317,17 +356,66 @@ if (window.MJxPrep) {
     var openCallParens = funcStart + funcName.length
     var closeCallParens = findClosingBrace(expr, openCallParens)
     var argsString = expr.substring(openCallParens + 1, closeCallParens)
-    var args = splitList(argsString)
-    var newExpr = expr.substring(0, funcStart) +
-      action(funcName, args) +
-      expr.substring(closeCallParens + 1)
 
-    // Recursively replace the remaining instances of 'funcName(<args>)'
-    return replaceFunctionCalls(newExpr, funcName, action, funcStart + 1)
+    // replace any function calls that appear inside the arguments
+    // this will bail out without further recursion if argsString has no
+    // function calls
+    var processedArgsString = replaceFunctionCalls(argsString, funcName, action)
+    var args = shallowListSplit(processedArgsString)
+
+    // perform the action
+    var finished = expr.substring(0, funcStart) + action(funcName, args)
+    var unfinished = expr.substring(closeCallParens + 1)
+
+    // Recursively process the unfinished string
+    return replaceFunctionCalls(finished + unfinished, funcName, action, finished.length + 1)
 
   }
 
+  function columnizeVectors(expr, startingAt) {
+    var openedAt = expr.indexOf('[', startingAt)
+    if (openedAt < 0) { return expr; }
+    var closedAt = findClosingBrace(expr, openedAt)
+    // Get the array string, including opening/closing brackets
+    var array = expr.substring(openedAt, closedAt + 1)
+
+    var finished = expr.substring(0, openedAt) + columnizeSingleVector(array)
+    var unfinished = expr.substring(closedAt + 1)
+
+    return columnizeVectors(finished + unfinished, finished.length + 1)
+  }
+
+  function columnizeSingleVector(expr) {
+    if (!expr.startsWith('[') || !expr.endsWith(']')) {
+      throw Error('Cannot columnize vector ' + expr + ' , it must start and end with square brackets.')
+    }
+    var content = expr.substring(1, expr.length - 1)
+    var items = shallowListSplit(content)
+
+    // make sure items are not already rendering as vectors
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i]
+      if (item.indexOf('[') > 0 || item.indexOf(']') > 0 ) {
+        // abort! do not columnize! The items contain arrays, this appears to
+        // be a matrix.
+        return expr
+      }
+    }
+
+    return '[[' + items.join('], [') + ']]'
+
+  }
+
+  /**
+   * Trim leading/trailing whitespace from expr and wrap expr in parens unless
+   * it is already a single group (e.g., already wrapped in parens, or a single
+   * character)
+   *
+   * @param  {string} expr
+   * @return {string}
+   */
   function groupExpr(expr) {
+    expr = expr.trim()
     var atomic = ['alpha', 'beta', 'chi', 'delta', 'Delta', 'epsi', 'varepsilon', 'eta', 'gamma', 'Gamma', 'iota', 'kappa', 'lambda', 'Lambda', 'lamda', 'Lamda', 'mu', 'nu', 'omega', 'Omega', 'phi', 'varphi', 'Phi', 'pi', 'Pi', 'psi', 'Psi', 'rho', 'sigma', 'Sigma', 'tau', 'theta', 'vartheta', 'Theta', 'upsilon', 'xi', 'Xi', 'zeta']
     var temp = expr.startsWith('hat') || expr.startsWith('vec')
       ? expr.substring(3)
@@ -348,12 +436,19 @@ if (window.MJxPrep) {
 
   }
 
+  function validateArgsLength(funcName, args, expectedLength) {
+    if (args.length !== expectedLength) {
+      throw Error('Function ' + funcName + ' must be called with exactly ' + expectedLength + ' arguments but was called with ' + args )
+    }
+  }
+
   // Hacky exports for test file since we aren't transpiling
   window.MJxPrepExports = {
     findClosingBrace: findClosingBrace,
     replaceFunctionCalls: replaceFunctionCalls,
     groupExpr: groupExpr,
-    splitList: splitList,
-    preProcessEqn: preProcessEqn
+    shallowListSplit: shallowListSplit,
+    preProcessEqn: preProcessEqn,
+    columnizeVectors: columnizeVectors
   }
 }

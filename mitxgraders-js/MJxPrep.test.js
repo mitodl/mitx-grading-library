@@ -4,8 +4,9 @@ const {
   findClosingBrace,
   replaceFunctionCalls,
   groupExpr,
-  splitList,
-  preProcessEqn
+  shallowListSplit,
+  preProcessEqn,
+  columnizeVectors
 } = window.MJxPrepExports
 
 describe('findClosingBrace', () => {
@@ -66,13 +67,13 @@ describe('preProcessEqn', () => {
   it('replaces fact and factorial', () => {
     const expr = 'fact(n) + factorial(2n)'
     const result = preProcessEqn(expr)
-    expect(result).toBe('{:factAsciiMath(n):} + {:factAsciiMath((2n)):}')
+    expect(result).toBe('{:n!:} + {:(2n)!:}')
   } )
 
   it('replaces ctrans, adj and trans', () => {
-    const expr = 'ctrans(x) + adj(x+1) + trans([x^2])'
+    const expr = 'ctrans(x) + adj(x+1) + trans([x, x^2])'
     const result = preProcessEqn(expr)
-    expect(result).toBe('{:x^dagger:} + {:(x+1)^dagger:} + {:[x^2]^T:}')
+    expect(result).toBe('{:x^dagger:} + {:(x+1)^dagger:} + {:[[x], [ x^2]]^T:}')
   } )
 
   it('replaces conj based on the options', () => {
@@ -91,11 +92,57 @@ describe('preProcessEqn', () => {
     expect(result).toBe('{:DeltaE:} + {:deltasomething:} + delta + Delta')
   } )
 
+  it('replaces cross products', () => {
+    const eqn = 'x + cross(a + b, c) + y'
+    expect(preProcessEqn(eqn)).toBe('x + {:(a + b) times c:} + y')
+  } )
+
   it('raises an error appropriately given an incomplete expression', () => {
     const expr = 'sin(1 + fact(n'
     const badfunc = () => preProcessEqn(expr)
     expect(badfunc).toThrow(
       `${expr} has a brace that opens at position 12 but does not close.`
+    )
+  } )
+} )
+
+describe('shallowListSplit', () => {
+  it('splits a stringified list at commas where brackets are balanced', () => {
+    const expr = '0, 1 + (x*[2, 3]), [[4, 5], [6, 7]]zz, 8  f'
+    const expected = ['0', ' 1 + (x*[2, 3])', ' [[4, 5], [6, 7]]zz', ' 8  f']
+    expect(shallowListSplit(expr)).toEqual(expected)
+  } )
+} )
+
+describe('groupExpr', () => {
+  it('does not wrap single characters or greek letters', () => {
+    expect(groupExpr('x')).toBe('x')
+    expect(groupExpr('delta')).toBe('delta')
+  } )
+  it('does not wrap vec or hat followed by single chars or greek letters', () =>{
+    expect(groupExpr('vecx')).toBe('vecx')
+    expect(groupExpr('hatx')).toBe('hatx')
+    expect(groupExpr('vecdelta')).toBe('vecdelta')
+    expect(groupExpr('hatdelta')).toBe('hatdelta')
+  } )
+  it('does not wrap expression if already wrapped', () => {
+    expect(groupExpr('(1)')).toBe('(1)')
+    // But:
+    expect(groupExpr('(1)*(2)')).toBe('((1)*(2))')
+  } )
+  it('removes extra whitespace before checking if already wrapped', () => {
+    expect(groupExpr('  (1)  ')).toBe('(1)')
+    // But:
+    expect(groupExpr('  (1)*(2)  ')).toBe('((1)*(2))')
+  } )
+
+} )
+
+describe('columnizeVectors', () => {
+  it('turns vectors into column matrices and leaves matrices alone', () => {
+    const expr = 'x + [1, 2, 3] + [[1, 2], [3, 4]]'
+    expect(columnizeVectors(expr)).toBe(
+      'x + [[1], [ 2], [ 3]] + [[1, 2], [3, 4]]'
     )
   } )
 } )
