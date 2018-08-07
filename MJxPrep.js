@@ -282,13 +282,46 @@ if (window.MJxPrep) {
   }
 
   /**
-   * TODO: for splitting delimited lists, such as arguments of a function
+   * Splits a stringified list at top level only.
    *
-   * @param  {string} str [description]
-   * @return {string}     [description]
+   * "1 + 2, 2*[3, 4], 1" => ["1 + 2", "2*[3, 4]", "1"]
+   *
+   * @param  {string} str stringified list, WITHOUT opening/closing bracket
+   * @return {string[]} array of string arguments
    */
-  function splitList(str) {
-    return [str]
+  function shallowListSplit(str) {
+    var openers = { '[': true }
+    var argStartPositions = [0]
+
+    // Scan through str
+    var j = 0
+    while (j < str.length) {
+      if (openers[str[j]]) {
+        j = findClosingBrace(str, j)
+        continue;
+      }
+      if (str[j] === ',') {
+        // argument starts at j+1, not at j (which is a comma)
+        argStartPositions.push(j+1)
+      }
+      j++ // increment index
+    }
+
+    var argsList = []
+    argStartPositions.forEach(function(current, index, array) {
+      if (index + 1 < array.length) {
+        // array[index + 1] is start of next argument, we want to stop at
+        // the comma just before it
+        var stopAt = array[index + 1] - 1
+        argsList.push(str.substring(current, stopAt))
+      }
+      else {
+        argsList.push(str.substring(current))
+      }
+
+    } )
+
+    return argsList
   }
 
   /**
@@ -323,7 +356,7 @@ if (window.MJxPrep) {
     var openCallParens = funcStart + funcName.length
     var closeCallParens = findClosingBrace(expr, openCallParens)
     var argsString = expr.substring(openCallParens + 1, closeCallParens)
-    var args = splitList(argsString)
+    var args = shallowListSplit(argsString)
     var newExpr = expr.substring(0, funcStart) +
       action(funcName, args) +
       expr.substring(closeCallParens + 1)
@@ -365,7 +398,7 @@ if (window.MJxPrep) {
 
   function validateArgsLength(funcName, args, expectedLength) {
     if (args.length !== expectedLength) {
-      throw Error('Function ' + funcName + ' must be called with exactly ' + expectedLength + ' arguments' )
+      throw Error('Function ' + funcName + ' must be called with exactly ' + expectedLength + ' arguments but was called with ' + args )
     }
   }
 
@@ -374,7 +407,7 @@ if (window.MJxPrep) {
     findClosingBrace: findClosingBrace,
     replaceFunctionCalls: replaceFunctionCalls,
     groupExpr: groupExpr,
-    splitList: splitList,
+    shallowListSplit: shallowListSplit,
     preProcessEqn: preProcessEqn
   }
 }

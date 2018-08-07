@@ -4,7 +4,7 @@ const {
   findClosingBrace,
   replaceFunctionCalls,
   groupExpr,
-  splitList,
+  shallowListSplit,
   preProcessEqn,
 } = window.MJxPrepExports
 
@@ -97,6 +97,14 @@ describe('preProcessEqn', () => {
     expect(badfunc).toThrow(
       `${expr} has a brace that opens at position 12 but does not close.`
     )
+  } )
+} )
+
+describe('shallowListSplit', () => {
+  it('splits a stringified list at commas where brackets are balanced', () => {
+    const expr = '0, 1 + (x*[2, 3]), [[4, 5], [6, 7]]zz, 8  f'
+    const expected = ['0', ' 1 + (x*[2, 3])', ' [[4, 5], [6, 7]]zz', ' 8  f']
+    expect(shallowListSplit(expr)).toEqual(expected)
   } )
 } )
 
