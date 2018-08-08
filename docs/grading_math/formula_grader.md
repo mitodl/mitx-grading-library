@@ -176,7 +176,7 @@ grader = FormulaGrader(
 ```
 will raise an error
 
-> ConfigError: Warning: 'user_functions' contains entries '['sin']' which will override default values. If you intend to override to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
+> ConfigError: Warning: 'user_functions' contains entries '['sin']' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
 
 The error can be suppressed by setting `suppress_warnings=True`.
 

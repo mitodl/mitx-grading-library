@@ -326,7 +326,7 @@ def warn_if_override(config, key, defaults):
     if duplicates and not config.get('suppress_warnings', False):
         sorted_dups = list(sorted(duplicates))
         msg = ("Warning: '{key}' contains entries '{duplicates}' which will override default "
-               "values. If you intend to override to override defaults, you may suppress "
+               "values. If you intend to override defaults, you may suppress "
                "this warning by adding 'suppress_warnings=True' to the grader configuration.")
         raise ConfigError(msg.format(key=key, duplicates=sorted_dups))
     return config
