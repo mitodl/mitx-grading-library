@@ -283,6 +283,8 @@ grader = FormulaGrader(
 
 We strongly recommend _not_ doing this when using the following variable names: k, M, G, T, m, u, n, and p.
 
+## Sibling Variables
+
 ## Comparer Functions
 By default, FormulaGrader compares the numerically sampled author formula and student formula for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. For example, if grading angles in degrees, it may be useful to compare formulas modulo 360.
 

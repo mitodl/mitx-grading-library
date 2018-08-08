@@ -1,0 +1,78 @@
+<problem display_name="Sibling Variables" showanswer="always" weight="10" attempts="">
+
+<script type="loncapa/python">
+from mitxgraders import ListGrader, NumericalGrader
+
+initial_subgrader = NumericalGrader(tolerance=2)
+iteration_subgrader = NumericalGrader(
+    tolerance=1e-6,
+    user_functions={
+        # these are just for convenience when specifying answer above.
+        # Students could use them, but we will not announce their existence
+        'f' : lambda x: x**2 - 9,           # square root
+        'df': lambda x: 2*x                 # derivative of square root
+    }
+)
+
+grader = ListGrader(
+    ordered=True,
+    answers=[
+        '5', # anything between 4 and 6 accepted
+        'sibling_1 - f(sibling_1)/df(sibling_1)',
+        'sibling_2 - f(sibling_2)/df(sibling_2)',
+    ],
+    subgraders=[
+        initial_subgrader,
+        iteration_subgrader,
+        iteration_subgrader
+    ]
+)
+</script>
+
+  <p>
+    When a student inputs several mathematical inputs as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This problem uses sibling variables to score subsequent answers based off of the previous one. Sibling variables are available to <code>FormulaGrader</code>s, <code>NumericalGrader</code>s, and <code>MatrixGrader</code>s when used inside an <strong>ordered</strong> <code>ListGrader</code>.
+  </p>
+
+  <p>
+    Use Newton's Method on \(f(x)=x^2 - 9\) to calculate the square root of 9. Use anything in the interval \( (4, 6) \) as your starting value. Round answers to no fewer than 6 decimal places.
+  </p>
+
+  <p>Suggested inputs:</p>
+  <ul>
+    <li><code>[5, 3.4, 3.0235294]</code> is a correct input</li>
+    <li><code>[4.5, 3.25, 3.0096154]</code> is a correct input</li>
+    <li>Try changing one or two values in the lists above.</li>
+  </ul>
+
+  <customresponse cfn="grader">
+    <table>
+      <tr>
+        <th></th>
+        <th>value</th>
+      </tr>
+      <tr>
+        <td>\(x_0\)</td>
+        <td><textline /></td>
+      </tr>
+      <tr>
+        <td>\(x_1\)</td>
+        <td><textline /></td>
+      </tr>
+      <tr>
+        <td>\(x_2\)</td>
+        <td><textline /></td>
+      </tr>
+    </table>
+  </customresponse>
+
+  <h3>Resources</h3>
+  <ul>
+    <li>
+      <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list6.xml" target="_blank">View source</a>
+    </li>
+    <li>
+      <a href="https://mitodl.github.io/mitx-grading-library/grading_math/formula_grader/#sibling-variables" target="_blank">Documentation for sibling variables</a>
+    </li>
+  </ul>
+
+</problem>
