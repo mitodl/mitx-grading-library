@@ -958,6 +958,12 @@ class FormulaParser(object):
         Traceback (most recent call last):
         CalcError: Unexpected symbol + in eval_product
         """
+        num_vectors = sum([isinstance(operand, MathArray) and operand.ndim == 1
+                           for operand in parse_result])
+        if num_vectors >= 3:
+            raise CalcError("Multiplying three or more vectors is ambiguous. "
+                            "Please place parentheses around vector multiplications.")
+
         result = parse_result[0]
         data = parse_result[1:]
         while data:
