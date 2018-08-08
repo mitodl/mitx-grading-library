@@ -34,6 +34,7 @@
         <problem url_name="matrix3"/>
         <problem url_name="matrix4"/>
         <problem url_name="matrix5"/>
+        <problem url_name="matrix6"/>
       </vertical>
     </sequential>
     <sequential url_name="singlelistgrader" display_name="SingleListGrader">
