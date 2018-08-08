@@ -30,7 +30,7 @@ grader = ListGrader(
 </script>
 
   <p>
-    When a student inputs several mathematical inputs as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This problem uses sibling variables to score subsequent answers based off of the previous one. Sibling variables are available to <code>FormulaGrader</code>s, <code>NumericalGrader</code>s, and <code>MatrixGrader</code>s when used inside an <strong>ordered</strong> <code>ListGrader</code>.
+    When a student submits several mathematical inputs as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This problem uses sibling variables to score subsequent answers based off of the previous one. Sibling variables are available to <code>FormulaGrader</code>s, <code>NumericalGrader</code>s, and <code>MatrixGrader</code>s when used inside an <strong>ordered</strong> <code>ListGrader</code>.
   </p>
 
   <p>

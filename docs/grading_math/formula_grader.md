@@ -284,6 +284,47 @@ grader = FormulaGrader(
 We strongly recommend _not_ doing this when using the following variable names: k, M, G, T, m, u, n, and p.
 
 ## Sibling Variables
+When a student submits several mathematical expressions as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This can be done using *sibling variables*, which are available when `FormulaGrader` is used as a subgrader in **ordered** `ListGrader` problems.
+
+For example:
+```pycon
+>>> from mitxgraders import ListGrader, FormulaGrader
+
+>>> grader = ListGrader(
+...     answers=[
+...         ('x', '2*x','3*x'),     # first input can be any of these 3 answers
+...         'sibling_1^2',          # second input must be first input squared
+...         'sibling_2^2'           # third input must be second input squared
+...     ],
+...     ordered=True,
+...     subgraders=FormulaGrader(variables=['x'])
+... )
+
+```
+Note that in this example, the sequence of inputs `['2*x', 4*x^2, 16*x^4]` is correct, and so is `['3*x', 9*x^2, 81*x^4]`, but `['3*x', 4*x^2, 16*x^4]` receives only two-third credit.
+
+```pycon
+>>> student_inputs = ['2*x','4*x^2', '16*x^4']
+>>> result1, result2, result3 = grader(None, student_inputs)['input_list']
+>>> result1['ok'], result2['ok'], result3['ok']
+(True, True, True)
+
+>>> student_inputs = ['3*x','9*x^2', '81*x^4']
+>>> result1, result2, result3 = grader(None, student_inputs)['input_list']
+>>> result1['ok'], result2['ok'], result3['ok']
+(True, True, True)
+
+>>> student_inputs = ['3*x','4*x^2', '16*x^4']
+>>> result1, result2, result3 = grader(None, student_inputs)['input_list']
+>>> result1['ok'], result2['ok'], result3['ok']
+(True, False, True)
+
+```
+
+Other things:
+
+- Sibling variables are available to `FormulaGrader`, `NumericalGrader`, and `MatrixGrader`, but only in **ordered** `ListGrader` problems.
+- The jth student input is referenced as `sibling_j`. (Exception: If nesting `ListGraders` with grouping, `sibling_j` refers to the jth member of any particular group.)
 
 ## Comparer Functions
 By default, FormulaGrader compares the numerically sampled author formula and student formula for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. For example, if grading angles in degrees, it may be useful to compare formulas modulo 360.
