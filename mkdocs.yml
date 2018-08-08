@@ -4,9 +4,8 @@ edit_uri: ''
 theme:
   name: 'cinder'
 pages:
-  - Home: 'index.md'
   - Getting Started:
-    - Getting Started: 'getting_started.md'
+    - Overview: 'index.md'
     - ItemGrader: 'item_grader.md'
     - StringGrader: 'string_grader.md'
   - Grading Math:

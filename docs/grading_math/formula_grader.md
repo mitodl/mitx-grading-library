@@ -13,18 +13,18 @@ FormulaGrader grades a formula by numerical sampling. That is, random values are
 
 Variables are configured by including a list of strings of each variable name as follows.
 
-````python
+```python
 grader = FormulaGrader(
     answers='1+x^2+y',
     variables=['x', 'y']
 )
-````
+```
 
 Note that the `answers` parameter follows all of the usual allowances from ItemGrader.
 
 The variables need to have numbers randomly assigned to them. Each is sampled from a [sampling set](sampling.md), which is RealInterval() by default (random numbers from 1 to 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the `sample_from` key.
 
-````python
+```python
 grader = FormulaGrader(
     answers='1+x^2+y+z/2',
     variables=['x', 'y', 'z'],
@@ -34,7 +34,7 @@ grader = FormulaGrader(
         'z': (1, 3, 4, 8)
     }
 )
-````
+```
 
 The `sample_from` key must be a dictionary of 'variable_name': sampling_set pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.
 
@@ -43,7 +43,7 @@ The `sample_from` key must be a dictionary of 'variable_name': sampling_set pair
 
 You can also specify special variables that are numbered. For example, if you specify that `a` is a numbered variable, students can include `a_{0}`, `a_{5}`, `a_{-2}`, etc, using any integer. All entries for a numbered variable will use the sampling set specified by the base name.
 
-````python
+```python
 grader = FormulaGrader(
     answers='a_{0} + a_{1}*x + 1/2*a_{2}*x^2',
     variables=['x'],
@@ -53,7 +53,7 @@ grader = FormulaGrader(
         'a': [-10, 10]
     }
 )
-````
+```
 
 If you have a variable name that would clash with a numbered variable (say, you defined `a_{0}` and also a numbered variable `a`), then the specific variable has precedence.
 
@@ -62,26 +62,26 @@ If you have a variable name that would clash with a numbered variable (say, you 
 
 To control the number of samples that are checked to ensure correctness, you can modify the `samples` key.
 
-````python
+```python
 grader = FormulaGrader(
     answers='1+x^2',
     variables=['x'],
     samples=10
 )
-````
+```
 
 The default for `samples` is 5.
 
 You may want to allow for a certain number of comparisons to fail before the student is marked incorrect. To do this, set `failable_evals`. This should be used very sparingly!
 
-````python
+```python
 grader = FormulaGrader(
     answers='1+x^2',
     variables=['x'],
     samples=10,
     failable_evals=1
 )
-````
+```
 
 
 ## Functions
