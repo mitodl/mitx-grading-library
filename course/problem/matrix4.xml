@@ -40,12 +40,12 @@ grader_2 = MatrixGrader(
   <tr>
     <td>
       <customresponse cfn="grader_1" expect="[1, 2]">
-        <textline math="true" size="40" />
+        <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" />
       </customresponse>
     </td>
     <td>
       <customresponse cfn="grader_2" expect="[1, 2]">
-        <textline math="true" size="40" />
+        <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" />
       </customresponse>
     </td>
   </tr>

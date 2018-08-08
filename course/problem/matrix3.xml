@@ -36,7 +36,7 @@ grader = MatrixGrader(
 </ul>
 
 <customresponse cfn="grader" expect="abs(cross(vecb - veca, vecc - veca))/abs(vecb - veca)">
-    <textline math="true" size="100" />
+    <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="100" />
 </customresponse>
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix3.xml" target="_blank">View source</a>

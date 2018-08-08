@@ -33,7 +33,7 @@ grader = MatrixGrader(
 </ul>
 
 <customresponse cfn="grader">
-  <textline math="true" size="40" />
+  <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" />
 </customresponse>
 
 <h3>Resources</h3>
