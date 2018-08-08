@@ -45,6 +45,7 @@ NOTE: doctests in this module show how the comparer function would be used
 """
 from numbers import Number
 import numpy as np
+from mitxgraders.exceptions import InputTypeError
 
 def equality_comparer(comparer_params_evals, student_eval, utils):
     """
@@ -80,8 +81,17 @@ def between_comparer(comparer_params_evals, student_eval, utils):
     False
     >>> grader(None, '5e7')['ok']
     True
+
+    Input must be real:
+    >>> grader(None, '5e8+2e6*i')['ok']
+    Traceback (most recent call last):
+    InputTypeError: Input must be real.
+
     """
     start, stop = comparer_params_evals
+
+    if not np.isreal(student_eval):
+        raise InputTypeError("Input must be real.")
 
     return start <= student_eval <= stop
 

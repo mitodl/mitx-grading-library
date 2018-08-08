@@ -6,6 +6,7 @@ Defines a FormulaGrader subtype that handles matrices, too.
 from numbers import Number
 from collections import namedtuple
 from voluptuous import Required, Any
+from mitxgraders.exceptions import InputTypeError
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from mitxgraders.helpers.validatorfuncs import NonNegative
 from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
@@ -13,12 +14,6 @@ from mitxgraders.helpers.calc.exceptions import (
     CalcError, MathArrayShapeError as ShapeError)
 from mitxgraders.helpers.calc.mathfuncs import (
     merge_dicts, ARRAY_ONLY_FUNCTIONS)
-
-class InputTypeError(CalcError):
-    """
-    Indicates that student's input has evaluated to an object of the wrong
-    type (or shape).
-    """
 
 class MatrixGrader(FormulaGrader):
     """

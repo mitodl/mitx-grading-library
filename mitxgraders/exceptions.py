@@ -39,6 +39,12 @@ class InvalidInput(StudentFacingError):
     """
     pass
 
+class InputTypeError(InvalidInput):
+    """
+    Indicates that student's input has evaluated to an object of the wrong
+    type (or shape).
+    """
+
 class MissingInput(StudentFacingError):
     """
     Raised when a required input has been left blank.
