@@ -9,8 +9,8 @@ iteration_subgrader = NumericalGrader(
     user_functions={
         # these are just for convenience when specifying answer above.
         # Students could use them, but we will not announce their existence
-        'f' : lambda x: x**2 - 9,           # square root
-        'df': lambda x: 2*x                 # derivative of square root
+        'f' : lambda x: x**2 - 9,           # root is x = sqrt(9)
+        'df': lambda x: 2*x                 # derivative of f
     }
 )
 
