@@ -14,7 +14,7 @@ It is also possible to have tensor variable names. The following three forms are
 - `T_{ijk}`
 - `T_{ijk}^{123}` (note that lowered indices must come first)
 
-The tensor name itself must start with a letter, and may continue with letters and numbers. The indices may be any combination of letters and numbers. After the indices, you may have apostrophes, such as T^{ijk}'' (tensors can be differentiated too!).
+The tensor name itself must start with a letter, and may continue with letters and numbers. The indices may be any combination of letters and numbers. After the indices, you may have apostrophes, such as `T^{ijk}''` (tensors can be differentiated too!).
 
 
 ## Variable Sampling: Numbers

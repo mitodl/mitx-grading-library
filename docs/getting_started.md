@@ -5,7 +5,7 @@ Download [python_lib.zip](python_lib.zip) and place it in your static folder (XM
 
 ## MITxGraders: Reusable CustomResponse Check Functions
 
-A custom response problem is defined using the `<customresponse>` tag. It needs to be supplied with a particular type of Python function that edX calls a check function (or "cfn"). The mitxgraders library provides reusable check functions. The basic usage pattern is:
+A custom response problem is defined using the `<customresponse>` tag. It needs to be supplied with a particular type of Python function that edX calls a check function (or "cfn"). The `mitxgraders` library provides reusable check functions. The basic usage pattern is:
 
 ```xml
 <script type="text/python" system_path="python_lib">

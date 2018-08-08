@@ -25,7 +25,7 @@ The symbol definitions are used to teach AsciiMath how to display various functi
 <script type="text/javascript" src="/static/MJxPrep.js"></script>
 ```
 
-Some functions are too complex for a symbol definition, and need the student's input to be preprocessed into AsciiMath before rendering. These functions are `log10`, `log2`, `fact` and `factorial`. To use these, you need to add `preprocessorClassName` and `preprocessorSrc` properties to any textline tags that use the preprocessor.
+Some functions are too complex for a symbol definition, and need the student's input to be preprocessed into AsciiMath before rendering. These functions are `log10`, `log2`, `fact` and `factorial`. To use these, you need to add `preprocessorClassName` and `preprocessorSrc` properties to any `<textline/>` tags that use the preprocessor.
 
 ```XML
 <customresponse cfn="grader">
