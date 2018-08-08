@@ -1,5 +1,47 @@
 """
 Defines comparer functions used by FormulaGrader and its subclasses.
+
+Comparer Functions
+==================
+
+A comparer function must have signature
+`comparer_func(comparer_params_evals, student_eval, utils)`.
+When `FormulaGrader` (or its subclasses) call your custom comparer function,
+`comparer_func`'s argument values are:
+
+-`comparer_params_evals`: The `comparer_params` list, numerically evaluated
+  according to variable and function sampling.
+- `student_eval`: The student's input, numerically evaluated according to
+  variable and function sampling
+- `utils`: A convenience object that may be helpful when writing custom
+  comparer functions. It has attributes:
+
+    - `utils.tolerance`: The tolerance specified in grader configuration,
+      `0.01%` by default
+    - `utils.within_tolerance(x, y)`: checks that `y` is within specified
+      tolerance of `x`. Can handle scalars, vectors, and matrices.
+      If tolerance was specified as a percentage, then checks that
+      `|x-y| < tolerance * x`.
+
+    Comparer functions used inside `MatrixGrader` have the following additional
+    `utils` method:
+
+    - `utils.validate_shape(student_eval, shape)`: Checks that `student_eval`
+      has specified `shape`, where `shape` is a Numpy shape tuple.
+
+A comparer function must return either:
+
+  - a boolean, or
+  - a dictionary with keys:
+      - `'grade_decimal'`: number between 0 and 1 (required)
+      - `'ok'`: `True` or `False` or `'partial'`(optional, inferred from
+        grade_decimal by default)
+      - `'msg'`: a feedback message (defaults to `''`)
+
+
+NOTE: doctests in this module show how the comparer function would be used
+      inside a grader
+
 """
 from numbers import Number
 import numpy as np
@@ -20,7 +62,7 @@ def equality_comparer(comparer_params_evals, student_eval, utils):
 
     return utils.within_tolerance(expected_input, student_eval)
 
-def within_range_comparer(comparer_params_evals, student_eval, utils):
+def between_comparer(comparer_params_evals, student_eval, utils):
     """
     comparer_params: ['start', 'stop']
 
@@ -28,7 +70,7 @@ def within_range_comparer(comparer_params_evals, student_eval, utils):
     >>> from mitxgraders import NumericalGrader
     >>> grader = NumericalGrader(
     ...     answers={
-    ...         'comparer': within_range_comparer,
+    ...         'comparer': between_comparer,
     ...         'comparer_params': ['1e6', '1e9']
     ...     }
     ... )

@@ -327,34 +327,7 @@ Other things:
 - The jth student input is referenced as `sibling_j`. (Exception: If nesting `ListGraders` with grouping, `sibling_j` refers to the jth member of any particular group.)
 
 ## Comparer Functions
-By default, FormulaGrader compares the numerically sampled author formula and student formula for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. For example, if grading angles in degrees, it may be useful to compare formulas modulo 360.
-
-To use an alternate comparer, specify the `answers` key as a dictionary with keys `comparer` and `comparer_params` rather than a single string. For example, to compare formulas modulo 360:
-
-```python
-def is_coterminal(comparer_params_evals, student_eval, utils):
-    answer = comparer_params_evals[0]
-    reduced = student_eval % (360)
-    return utils.within_tolerance(answer, reduced)
-
-grader = FormulaGrader(
-    answers={
-        'comparer': is_coterminal,
-        'comparer_params': ['b^2/a'],
-    },
-    variables=['a', 'b'],
-    tolerance='1%'
-)
-```
-
-This grader would accept `'b^2/a'` as well as `'b^2/a + 360'`, `'b^2/a + 720'`, etc.
-
-In the grader configuration, `comparer_params` is a list of strings that are numerically evaluated and passed to the comparer function. The `comparer` function is a user-specified function with signature `comparer(comparer_params_evals, student_eval, utils)`. When `FormulaGrader` calls the comparer function, `comparer` the argument values are:
-- `comparer_params_evals`: The `comparer_params` list, numerically evaluated according to variable and function sampling.
-- `student_eval`: The student's input, numerically evaluated according to variable and function sampling
-- `utils`: A convenience object that may be helpful when writing custom comparer functions. Has properties:
-  - `utils.tolerance`: The tolerance specified in grader configuration, `0.01%` by default
-  - `utils.within_tolerance:` A function with signature `within_tolerance(x, y)` which checks that `y` is within specified tolerance of `x`. Can handle scalars, vectors, and matrices. If tolerance was specified as a percentage, then checks that `|x-y| < tolerance * x`.
+Comparer functions allow you to compare the student input to the author's expectation using aspects other than equality. See [Comparer Functions](comparer_functions.md) for details.
 
 ## Other Improvements
 
@@ -362,9 +335,9 @@ We have made a number of other improvements over the edX formula graders, includ
 
 * Square roots and other functions have a wider domain: with edX's default FormulaResponse, authors need to be careful that expressions like `sqrt(x-1)` or `(x-1)^0.5` always pass nonnegative inputs to the square root and power functions. Our square root, power, logarithm, and inverse trigonometric functions accept a wider array of inputs (the entire complex plane, minus poles). For this reason, authors can feel safe using the default sample range in most cases.
 * Our parser uses a parsing cache, and hence runs much more efficiently than the edX graders.
-* If students input an expression with mismatched parentheses, this generates an intelligible error message that points to the exact issue.
+* If a student inputs an expression with mismatched parentheses, this generates an intelligible error message that points to the exact issue.
 * When students use an unknown variable, the resulting error message highlights that the unknown quantity was interpreted as a variable.
 * Similarly, when students use an unknown function, the resulting error message highlights that the unknown quantity was interpreted as a function. If a variable of that name exists, the error message suggests that a multiplication symbol was missing.
-* If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the `debug` flag to True, and a more technical message will usually be displayed.
-* Full sampling details are included when the `debug` flag is set to True.
-* Enhancements to the AsciiMath renderer (the preview that students see when using `<textline>` inputs) are available using our [AsciiMath renderer definitions](renderer.md).
+* If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the `debug` flag to `True`, and a more technical message will usually be displayed.
+* Full sampling details are included when the `debug` flag is set to `True`.
+* Enhancements to the AsciiMath renderer (the preview that students see when using `<textline />` inputs) are available using our [AsciiMath renderer definitions](renderer.md).
