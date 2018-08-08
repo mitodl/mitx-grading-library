@@ -151,6 +151,11 @@ describe('columnizeVectors', () => {
     const expr = '[1, 2, 3] + [1, 2,'
     expect(columnizeVectors(expr)).toBe('[[1], [ 2], [ 3]] + [1, 2,')
   } )
+
+  it("does nothing to 1-component or 0-component vectors", () => {
+    expect(columnizeVectors('[]')).toBe('[]')
+    expect(columnizeVectors('[1]')).toBe('[1]')
+  } )
 } )
 
 describe('callback returned by funcToPostfix', () => {
