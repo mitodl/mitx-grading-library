@@ -7,6 +7,13 @@ code {
   background-color: rgba(255, 255, 255, 0.75)
 }
 
+/* make the sidebar nav scrollable when window too small */
+.bs-sidebar.affix {
+  overflow-y:scroll;
+  max-height: 95%;
+}
+
+/* cinder has weird extra space before headers. Get rid of it */
 h1[id]:before, h2[id]:before,
 h3[id]:before, h4[id]:before,
 h5[id]:before, h6[id]:before {
