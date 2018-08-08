@@ -426,6 +426,9 @@ if (window.MJxPrep) {
     }
     var content = expr.substring(1, expr.length - 1)
     var items = shallowListSplit(content)
+    if (items.length <= 1) {
+      return expr
+    }
 
     // make sure items are not already rendering as vectors
     for (var i = 0; i < items.length; i++) {
