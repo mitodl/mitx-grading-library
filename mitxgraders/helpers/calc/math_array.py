@@ -68,6 +68,10 @@ def is_numberlike_zero_array(obj):
 def is_square(array):
     return array.ndim == 2 and array.shape[0] == array.shape[1]
 
+def is_vector(obj):
+    """Tests if obj is a vector MathArray"""
+    return isinstance(obj, MathArray) and obj.ndim == 1
+
 class MathArray(np.ndarray):
     """
     A modification of numpy's ndarray class that behaves more like a mathematician would expect.
