@@ -10,6 +10,7 @@ import re
 import itertools
 import numpy as np
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
+from mitxgraders.comparers import equality_comparer
 from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
                                   gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes,
@@ -451,15 +452,6 @@ class FormulaGrader(ItemGrader):
         return self.Utils(tolerance=self.config['tolerance'],
                           within_tolerance=_within_tolerance)
 
-    @staticmethod
-    def default_equality_comparer(comparer_params, student_input, utils):
-        """
-        Default comparer function.
-
-        Assumes comparer_params is just the single expected answer wrapped in a list.
-        """
-        return utils.within_tolerance(comparer_params[0], student_input)
-
     schema_expect = Schema({
         Required('comparer_params'): [str],
         # Functions seem not to be usable as default values, so the default comparer is added later.
@@ -474,14 +466,14 @@ class FormulaGrader(ItemGrader):
         >>> result = FormulaGrader().validate_expect('mc^2')
         >>> expected = {
         ... 'comparer_params': ['mc^2'],
-        ... 'comparer': FormulaGrader.default_equality_comparer
+        ... 'comparer': equality_comparer
         ... }
         >>> result == expected
         True
         """
         if isinstance(expect, str):
             return self.schema_expect({
-                'comparer': self.default_equality_comparer,
+                'comparer': equality_comparer,
                 'comparer_params': [expect]
                 })
 

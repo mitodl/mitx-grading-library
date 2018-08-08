@@ -1,5 +1,13 @@
-from comparers import eigenvector_comparer
+from comparers import (
+    equality_comparer,
+    congruence_comparer,
+    eigenvector_comparer,
+    within_range_comparer
+)
 
 __all__ = [
-    'eigenvector_comparer'
+    'equality_comparer',
+    'congruence_comparer',
+    'eigenvector_comparer',
+    'within_range_comparer'
 ]
