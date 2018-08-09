@@ -54,7 +54,7 @@ class ArgumentError(DomainError):
     """
     pass
 
-class MathArrayError(StudentFacingError):
+class MathArrayError(CalcError):
     """
     Thrown by MathArray when anticipated errors are made.
     """

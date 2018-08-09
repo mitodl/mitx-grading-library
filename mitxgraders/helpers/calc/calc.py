@@ -33,7 +33,7 @@ from pyparsing import (
 )
 from mitxgraders.exceptions import StudentFacingError
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
-from mitxgraders.helpers.calc.math_array import MathArray
+from mitxgraders.helpers.calc.math_array import MathArray, is_vector
 from mitxgraders.helpers.calc.robust_pow import robust_pow
 from mitxgraders.helpers.calc.mathfuncs import (
     DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
@@ -342,6 +342,45 @@ def evaluator(formula,
                        suffixes=math_interpreter.suffixes_used)
     return result, usage
 
+def cast_np_numeric_as_builtin(obj, map_across_lists=False):
+    """
+    Cast numpy numeric types as builtin python types.
+
+    NOTE: We do this because instances of np.number behave badly with MathArray.
+    See https://github.com/mitodl/mitx-grading-library/issues/124
+
+    Examples:
+    >>> import numpy as np
+    >>> x = 1.0
+    >>> x64 = np.float64(x)
+    >>> y = 5
+    >>> y64 = np.int64(y)
+    >>> z = 3 + 2j
+    >>> z128 = np.complex128(z)
+    >>> examples = [x, x64, y, y64, z, z128]
+    >>> [type(cast_np_numeric_as_builtin(example)) for example in examples]
+    [<type 'float'>, <type 'float'>, <type 'int'>, <type 'int'>, <type 'complex'>, <type 'complex'>]
+
+    Leaves MathArrays alone:
+    >>> from mitxgraders.helpers.calc.math_array import MathArray
+    >>> A = MathArray([1, 2, 3])
+    >>> cast_np_numeric_as_builtin(A)
+    MathArray([1, 2, 3])
+
+    Optionally, map across a list:
+    >>> target = [np.float64(1.0), np.float64(2.0)]
+    >>> result = cast_np_numeric_as_builtin(target, map_across_lists=True)
+    >>> [type(item) for item in result]
+    [<type 'float'>, <type 'float'>]
+
+    """
+    if isinstance(obj, np.number):
+        return np.asscalar(obj)
+    if map_across_lists and isinstance(obj, list):
+        return [np.asscalar(item) if isinstance(item, np.number) else item
+                for item in obj]
+    return obj
+
 class FormulaParser(object):
     """
     Parses a mathematical expression into a tree that can subsequently be evaluated
@@ -564,7 +603,7 @@ class FormulaParser(object):
             if not isinstance(node, ParseResults):
                 # Entry is either a (python) number or a string.
                 # Return it directly to the next level up.
-                return node
+                return cast_np_numeric_as_builtin(node)
 
             node_name = node.getName()
             if node_name not in self.actions:  # pragma: no cover
@@ -591,7 +630,7 @@ class FormulaParser(object):
             if any(np.any(np.isnan(r)) for r in as_list):
                 return float('nan')
 
-            return result
+            return cast_np_numeric_as_builtin(result, map_across_lists=True)
 
         # Find the value of the entire tree
         # Catch math errors that may arise
@@ -949,6 +988,9 @@ class FormulaParser(object):
             parse_result: A list of numbers to combine, separated by "*" and "/"
             [a, "*", b, "/", c] = a*b/c
 
+        Has some extra logic to avoid ambiguous vector tirple products.
+        See https://github.com/mitodl/mitx-grading-library/issues/108
+
         Usage
         =====
         >>> parser = FormulaParser("1", {"%": 0.01})
@@ -958,23 +1000,33 @@ class FormulaParser(object):
         Traceback (most recent call last):
         CalcError: Unexpected symbol + in eval_product
         """
-        num_vectors = sum([isinstance(operand, MathArray) and operand.ndim == 1
-                           for operand in parse_result])
-        if num_vectors >= 3:
-            raise CalcError("Multiplying three or more vectors is ambiguous. "
-                            "Please place parentheses around vector multiplications.")
+        double_vector_mult_has_occured = False
+        triple_vector_mult_error = CalcError(
+            "Multiplying three or more vectors is ambiguous. "
+            "Please place parentheses around vector multiplications."
+            )
 
         result = parse_result[0]
         data = parse_result[1:]
         while data:
             op = data.pop(0)
-            num = data.pop(0)
-            if op == '*':
-                result *= num
-            elif op == '/':
-                result /= num
+            value = data.pop(0)
+            if op == '/':
+                result /= value
+            elif op == '*':
+                if is_vector(value):
+                    if double_vector_mult_has_occured:
+                        raise triple_vector_mult_error
+                    elif is_vector(result):
+                        double_vector_mult_has_occured = True
+                result *= value
             else:
                 raise CalcError("Unexpected symbol {} in eval_product".format(op))
+
+            # Need to cast np numerics as builtins here (in addition to during
+            # handle_node) because the result is changing shape
+            result = cast_np_numeric_as_builtin(result)
+
         return result
 
     def eval_sum(self, parse_result):
