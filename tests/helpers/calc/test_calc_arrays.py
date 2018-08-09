@@ -77,6 +77,11 @@ def test_triple_vector_product_raises_error():
     with raises(CalcError, match=match):
         evaluator("i*2*i*3*j", variables)[0]
 
+    # Next example should raise an operator shape error, not a triple vec error
+    match='Cannot divide by a vector'
+    with raises(CalcError, match=match):
+        evaluator("i*j/i*i*j", variables)[0]
+
 def test_matharray_errors_make_it_through():
     """
     There is some overlap between this test and the tests in test_math_array.
@@ -99,5 +104,5 @@ def test_matharray_errors_make_it_through():
     with raises(CalcError, match="Cannot add/subtract"):
         evaluator('v*v - v', variables)
 
-    with raises(CalcError, match="Cannot add/subtract"):
-        evaluator('(v*v)/v', variables)
+    with raises(CalcError, match="Cannot divide"):
+        evaluator('v*v/v', variables)
