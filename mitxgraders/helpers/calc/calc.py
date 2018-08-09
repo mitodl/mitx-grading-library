@@ -342,6 +342,36 @@ def evaluator(formula,
                        suffixes=math_interpreter.suffixes_used)
     return result, usage
 
+def cast_np_numeric_as_builtin(obj):
+    """
+    Cast numpy numeric types as builtin python types.
+
+    NOTE: We do this because instances of np.number have their own __radd__
+    method for handling arrays, which circumvents MathArray's type/shape
+    checking.
+
+    Examples:
+    >>> import numpy as np
+    >>> x = 1.0
+    >>> x64 = np.float64(x)
+    >>> y = 5
+    >>> y64 = np.int64(y)
+    >>> z = 3 + 2j
+    >>> z128 = np.complex128(z)
+    >>> examples = [x, x64, y, y64, z, z128]
+    >>> [type(cast_np_numeric_as_builtin(example)) for example in examples]
+    [<type 'float'>, <type 'float'>, <type 'int'>, <type 'int'>, <type 'complex'>, <type 'complex'>]
+
+    Leaves MathArrays alone:
+    >>> from mitxgraders.helpers.calc.math_array import MathArray
+    >>> A = MathArray([1, 2, 3])
+    >>> cast_np_numeric_as_builtin(A)
+    MathArray([1, 2, 3])
+    """
+    if isinstance(obj, np.number):
+        return np.asscalar(obj)
+    return obj
+
 class FormulaParser(object):
     """
     Parses a mathematical expression into a tree that can subsequently be evaluated
@@ -564,7 +594,7 @@ class FormulaParser(object):
             if not isinstance(node, ParseResults):
                 # Entry is either a (python) number or a string.
                 # Return it directly to the next level up.
-                return node
+                return cast_np_numeric_as_builtin(node)
 
             node_name = node.getName()
             if node_name not in self.actions:  # pragma: no cover
@@ -591,7 +621,7 @@ class FormulaParser(object):
             if any(np.any(np.isnan(r)) for r in as_list):
                 return float('nan')
 
-            return result
+            return cast_np_numeric_as_builtin(result)
 
         # Find the value of the entire tree
         # Catch math errors that may arise

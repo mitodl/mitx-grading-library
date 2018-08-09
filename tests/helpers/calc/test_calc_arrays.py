@@ -76,3 +76,28 @@ def test_triple_vector_product_raises_error():
 
     with raises(CalcError, match=match):
         evaluator("i*2*i*3*j", variables)[0]
+
+def test_matharray_errors_make_it_through():
+    """
+    There is some overlap between this test and the tests in test_math_array.
+
+    Main goal here is to make sure numpy numerics are not introduced during
+    evaluator(...) calls, because
+
+    np.float64(1.0) + MathArray([1, 2, 3])
+
+    does not throw an error.
+    """
+
+    v = MathArray([1, 2, 3])
+    variables = {
+        'v': v
+    }
+    with raises(CalcError, match="Cannot add/subtract"):
+        evaluator('v*v + v', variables)
+
+    with raises(CalcError, match="Cannot add/subtract"):
+        evaluator('v*v - v', variables)
+
+    with raises(CalcError, match="Cannot add/subtract"):
+        evaluator('(v*v)/v', variables)
