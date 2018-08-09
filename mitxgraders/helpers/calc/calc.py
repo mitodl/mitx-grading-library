@@ -342,7 +342,7 @@ def evaluator(formula,
                        suffixes=math_interpreter.suffixes_used)
     return result, usage
 
-def cast_np_numeric_as_builtin(obj):
+def cast_np_numeric_as_builtin(obj, map_across_lists=False):
     """
     Cast numpy numeric types as builtin python types.
 
@@ -366,9 +366,19 @@ def cast_np_numeric_as_builtin(obj):
     >>> A = MathArray([1, 2, 3])
     >>> cast_np_numeric_as_builtin(A)
     MathArray([1, 2, 3])
+
+    Optionally, map across a list:
+    >>> target = [np.float64(1.0), np.float64(2.0)]
+    >>> result = cast_np_numeric_as_builtin(target, map_across_lists=True)
+    >>> [type(item) for item in result]
+    [<type 'float'>, <type 'float'>]
+
     """
     if isinstance(obj, np.number):
         return np.asscalar(obj)
+    if map_across_lists and isinstance(obj, list):
+        return [np.asscalar(item) if isinstance(item, np.number) else item
+                for item in obj]
     return obj
 
 class FormulaParser(object):
@@ -620,7 +630,7 @@ class FormulaParser(object):
             if any(np.any(np.isnan(r)) for r in as_list):
                 return float('nan')
 
-            return cast_np_numeric_as_builtin(result)
+            return cast_np_numeric_as_builtin(result, map_across_lists=True)
 
         # Find the value of the entire tree
         # Catch math errors that may arise
