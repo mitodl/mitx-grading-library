@@ -33,7 +33,7 @@ from pyparsing import (
 )
 from mitxgraders.exceptions import StudentFacingError
 from mitxgraders.helpers.validatorfuncs import get_number_of_args
-from mitxgraders.helpers.calc.math_array import MathArray
+from mitxgraders.helpers.calc.math_array import MathArray, is_vector
 from mitxgraders.helpers.calc.robust_pow import robust_pow
 from mitxgraders.helpers.calc.mathfuncs import (
     DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
@@ -958,21 +958,26 @@ class FormulaParser(object):
         Traceback (most recent call last):
         CalcError: Unexpected symbol + in eval_product
         """
-        num_vectors = sum([isinstance(operand, MathArray) and operand.ndim == 1
-                           for operand in parse_result])
-        if num_vectors >= 3:
-            raise CalcError("Multiplying three or more vectors is ambiguous. "
-                            "Please place parentheses around vector multiplications.")
+        double_vector_mult_has_occured = False
+        triple_vector_mult_error = CalcError(
+            "Multiplying three or more vectors is ambiguous. "
+            "Please place parentheses around vector multiplications."
+            )
 
         result = parse_result[0]
         data = parse_result[1:]
         while data:
             op = data.pop(0)
-            num = data.pop(0)
-            if op == '*':
-                result *= num
-            elif op == '/':
-                result /= num
+            value = data.pop(0)
+            if op == '/':
+                result /= value
+            elif op == '*':
+                if is_vector(value):
+                    if double_vector_mult_has_occured:
+                        raise triple_vector_mult_error
+                    elif is_vector(result):
+                        double_vector_mult_has_occured = True
+                result *= value
             else:
                 raise CalcError("Unexpected symbol {} in eval_product".format(op))
         return result

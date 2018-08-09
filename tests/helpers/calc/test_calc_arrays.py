@@ -76,3 +76,7 @@ def test_triple_vector_product_raises_error():
 
     with raises(CalcError, match=match):
         evaluator("i*2*i*3*j", variables)[0]
+
+    match = 'cat'
+    with raises(CalcError, match=match):
+        evaluator("i*j/i*i*j", variables)[0]
