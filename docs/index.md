@@ -1,72 +1,137 @@
-# MITx Grading Library Documentation
+# MITx Grading Library: An Overview
 
-This documentation describes how to use the grading library. In particular, it goes through the syntax required to construct each of the different types of graders.
+The `mitxgraders` Python library provides a number of configurable Python classes that can be used as graders in edX custom response problems.
 
-For information on installation and how to use the library in edX, see [Getting Started](getting_started.md).
+## Why use MITxGraders
 
-## Overview
+Use MITxGraders because it:
+
+ - is reliable (extensively tested)
+ - is highly configuration but with *sensible defaults*
+ - provides useful error messages
+      - to students (when submitting answers&mdash; for example, formula parsing errors)
+      - to problem authors (when configuring a grader)
+ - is open source (BSD-3 license, [our Github repo](https://github.com/mitodl/mitx-grading-library))
+
+## Two Typical Examples
+
+Typical usage in an edX course looks like:
+```XML
+<!-- First Example -->
+<problem>
+<script type="loncapa/python">
+from mitxgraders import FormulaGrader, RandomFunction
+grader = FormulaGrader(
+    answers="e^(f(x)) * f'(x^2) * 2*x",
+    variables=["x"],
+    # allows students to use generic functions f and f' in their input
+    user_functions={ "f": RandomFunction(), "f'":RandomFunction() }
+)
+</script>
+
+  <p>Enter the derivative of \(g(x) = e^{f(x^2)} \).</p>
+  <customresponse cfn="grader">
+    <!-- correct_answer is shown to student when they press [Show Answer]
+         its value is not used for grading purposes -->
+    <textline math="true" correct_answer="e^(f(x)) * f'(x^2) * 2*x" />
+  </customresponse>
+
+</problem>
+```
+The resulting problem would be similar to an edX `<formularesponse />` problem, but allows students to use an addition generic functions `f(x)` and `f'(x)` in their submissions.
+
+The next example grader would grade an unordered list of mathematical expressions.
+
+```XML
+<problem>
+<script type="loncapa/python">
+from mitxgraders import FormulaGrader, ListGrader
+grader = FormulaGrader(
+    answers=['x-2', 'x+2'],
+    ordered=False,
+    subgraders=FormulaGrader(variables=['x'])
+)
+</script>
+
+  <p>What are the linear factors of \((x^2 - 4)\)?</p>
+  <customresponse cfn="grader">
+    <!-- correct_answer is shown to student when they press [Show Answer]
+         its value is not used for grading purposes -->
+    <textline math="true" correct_answer="x - 2" />
+    <textline math="true" correct_answer="x + 2" />
+  </customresponse>
+
+</problem>
+```
+
+## Loading in edX
+Download [python_lib.zip](python_lib.zip) and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip. If you want to use our AsciiMath renderer definitions, place the [MjxPrep.js](MjxPrep.js) file in your static folder (XML) or upload the file to your course (Studio).
 
 The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.
-
-
-## Using Grading Classes
-
-All grading classes are instantiated by calling them. Here, `GradingClass` is a generic grading class (`GradingClass` does not actually exist).
-
-````python
-grader = GradingClass(options)
-````
-
-The options provided to a grading class may be passed in directly, as
-
-````python
-grader = GradingClass(name='value')
-````
-
-You can also pass in a configuration dictionary. This may be helpful if using the same configuration for multiple problems.
-
-````python
-options = {'name': 'value'}
-grader = GradingClass(options)
-````
-
-You cannot 'mix and match' these two options. If a configuration dictionary is supplied, any keyword arguments are ignored.
-
-
-## Options
-
-The options passed to a grading class undergo extensive validation and graders will throw
-errors if instantiated with invalid options.
-
-A few error messages serve only as warnings (e.g., that you are attempting to override a default constant like `pi`). These warning errors can be suppressed by setting
-
-````python
-grader = GradingClass(suppress_warnings=True)
-````
-
-Every grading class also has a debug option. By default, `debug=False`. To receive debug information from a given grader, specify `debug=True`. Some graders will provide more debug information than others.
-
-````python
-grader = GradingClass(debug=True)
-````
-
-All other options are specific to the grading class in question.
-
 
 ## Grading Classes
 
 Grading classes generally fall into two categories: single-input graders and multi-input graders.
 
-All graders that grade a single input are built on a framework we call an ItemGrader. We recommend understanding how ItemGraders work before diving into more specifics. We provide a number of graders built off ItemGrader. A special type of ItemGrader is SingleListGrader, which lets you grade a delimiter-separated list of inputs in a single response.
-
-Multi-input graders that are just composed of single-input graders working in concert can be handled by the general ListGrader class. At this stage, ListGrader is the only multi-input grader included in the library, although plugins can be used to construct further examples.
+**Single-input graders** grade a single input. All single-input graders are built on a framework we call an `ItemGrader`. We recommend understanding how `ItemGrader`s work before diving into more specifics.
 
 - [ItemGrader](item_grader.md)
-  - [StringGrader](string_grader.md)
-  - [FormulaGrader](grading_math/formula_grader.md)
-  - [NumericalGrader](grading_math/numerical_grader.md)
-  - [SingleListGrader](grading_lists/single_list_grader.md)
-- [ListGrader](grading_lists/list_grader.md)
+    - [StringGrader](string_grader.md) for grading simple strings
+    - [FormulaGrader](grading_math/formula_grader.md) for grading scalar formulas
+    - [NumericalGrader](grading_math/numerical_grader.md) for grading numbers
+    - [MatrixGrader](grading_math/matrix_grader/matrix_grader.md) for grading formulas with scalars, vectors, and matrices
+    - [SingleListGrader](grading_lists/single_list_grader.md) for grading a delimiter-separated (default: comma-separated) list of inputs in a single response box.
+
+**Multi-input graders** are for grading multiple input boxes at once. that are just composed of single-input graders working in concert can be handled by the general ListGrader class. At this stage, ListGrader is the only multi-input grader included in the library, although plugins can be used to construct further examples.
+
+- [ListGrader](grading_lists/list_grader.md) for grading a list of inputs. Examples:
+    - grade an ordered list of strings using
+    - grade an unordered list of mathematical expressions
+    - grade a list of eigenvalue-eigenvector pairs
+
+## Using Grading Classes
+
+All grading classes are instantiated by calling them. Options can be provided using keyword arguments
+
+```python
+grader = FakeGradingClass(option_1=value_1, option_2=value2)
+# FakeGradingClass is not real! It's just a placeholder
+```
+or with a configuration dictionary:
+```python
+config = {'option_1': value_1, 'option_2': value_2}
+grader = FakeGradingClass(config)
+```
+Passing the configuration as a dictionary can be useful if you are using the same configuration for multiple problems. However, 'mix and match' these two options: if a configuration dictionary is supplied, any keyword arguments are ignored.
+
+Most configuration options are specific to their grading classes. For example, `FormulaGrader` has a `variables` configuration key, but `NumericalGrader` does not.
+
+A few configuration options are accessible to all grading classes.
+
+### Debugging
+
+Every grading class also has a debug option. By default, `debug=False`. To receive debug information from a given grader, specify `debug=True`. Some graders will provide more debug information than others.
+
+```python
+grader = GradingClass(debug=True)
+```
+
+### Validation
+
+Every grading class also has a `suppress_warnings` key.
+
+The options passed to a grading class undergo extensive validation and graders will throw errors if instantiated with invalid options.
+
+A few error messages serve only as warnings. For example, if you attempt to configure a `FormulaGrader` with `pi` as a variable, you will receive a warning:
+
+```pycon
+>>> from mitxgraders import FormulaGrader
+>>> grader = FormulaGrader(variables=['pi'])
+Traceback (most recent call last):
+ConfigError: Warning: 'variables' contains entries '['pi']' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
+```
+
+As the warning message says, if you really want to override the default value of `'pi'` (not recommended!) then you can suppress this warning by setting `suppress_warnings=True`.
 
 
 ## Plugins

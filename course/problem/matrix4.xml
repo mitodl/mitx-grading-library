@@ -1,0 +1,59 @@
+<problem display_name="MatrixGrader: Vectors vs single-row/column matrix" showanswer="always" weight="10" attempts="">
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import MatrixGrader
+
+grader_1 = MatrixGrader(
+  answers='[1, 2]',
+  max_array_dim=1 # this is the default, so we did not really need to set it
+)
+
+grader_2 = MatrixGrader(
+  answers='[1, 2]',
+  max_array_dim=2 # students may enter vectors or matrices
+)
+</script>
+
+<p>This pair of graders is intended to display how MatrixGrader treats vectors, single-row matriecs, and single-column matrices as different objects.  The problems are identical, except that the second problem allows entry-by-entry matrix input.</p>
+
+<p>Suggested inputs:</p>
+
+<ul>
+  <li>
+    Correct answers:
+    <ul>
+      <li><code>[1, 2]</code></li>
+      <li><code>trans([1, 2])</code>, transpose does nothing to vectors</li>
+      <li><code>[[1, 0], [0, 1]] * [1, 2]</code></li>
+      <li><code>[1,2] * [[1, 0], [0, 1]]</code></li>
+    </ul>
+  </li>
+  <li><code>[[1, 2]]</code>, single-row matrix, incorrect</li>
+  <li><code>[[1], [2]]</code>, single-column matrix, incorrect</li>
+</ul>
+
+<table>
+  <tr>
+    <th style="width:40%">Only vector input is allowed</th>
+    <th style="width:40%">Vector and matrix input allowed</th>
+  </tr>
+  <tr>
+    <td>
+      <customresponse cfn="grader_1" expect="[1, 2]">
+        <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" />
+      </customresponse>
+    </td>
+    <td>
+      <customresponse cfn="grader_2" expect="[1, 2]">
+        <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" />
+      </customresponse>
+    </td>
+  </tr>
+</table>
+
+<h3>Avoiding Confusion</h3>
+<p>In "real" problems, we strongly recommend disallowing entry-by-entry matrix input (which is the default) unless it is needed, to avoid potential confusion between <code>[1, 2]</code> and <code>[[1, 2]]</code></p>
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix4.xml" target="_blank">View source</a>
+
+</problem>

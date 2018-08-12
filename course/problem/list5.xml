@@ -1,44 +1,82 @@
 <problem display_name="Eigensystem Example" showanswer="always" weight="10" attempts="">
-
-  <p>Here is the jewel in the crown of ListGrader: the ability to nest ListGraders.</p>
-
-  <p>Here is a matrix.</p>
-
-  \[M = \left[\begin{array}{cc}1 &amp; 0 \\ 0 &amp; -1\end{array}\right]\]
-
-  <p>Compute the eigenvalues and corresponding eigenvectors of this matrix. You may enter the eigenvalues in any order, but the eigenvectors must be corresponding to the appropriate eigenvalue. The eigenvectors should be normalized; the grader will accept either sign of the eigenvectors though. (Answers: Eigenvalue 1 = 1, Eigenvector 1 = (1, 0). Eigenvector 2 = -1, Eigenvector 2 = (0, 1))</p>
-
-
 <script type="text/python" system_path="python_lib">
-from mitxgraders import *
+from mitxgraders import MatrixGrader, FormulaGrader, ListGrader
+from mitxgraders.comparers import eigenvector_comparer
+
+# A simple answer that will be passed to FormulaGrader
+expect_value_0 = '-sqrt(1+x^2)'
+# A custom comparer that will be passed to MatrixGrader
+expect_vector_0 = {
+    'comparer_params': [
+        '[[1, x], [x, -1]]',
+        expect_value_0
+    ],
+    'comparer': eigenvector_comparer
+}
+
+expect_value_1 = 'sqrt(1+x^2)'
+expect_vector_1 = {
+    'comparer_params': [
+        '[[1, x], [x, -1]]',
+        expect_value_1
+    ],
+    'comparer': eigenvector_comparer
+}
+
 grader = ListGrader(
     answers=[
-        ['1', (['1', '0'], ['-1', '0'])],
-        ['-1', (['0', '1'], ['0', '-1'])],
+        [expect_value_0, expect_vector_0],
+        [expect_value_1, expect_vector_1]
     ],
+    # group the first two inputs together, and the last two inputs together
+    grouping=[1, 1, 2, 2],
+    # Each group wil be passed to the ListGrader below
     subgraders=ListGrader(
-        subgraders=[
-            NumericalGrader(),
-            ListGrader(
-                subgraders=NumericalGrader(),
-                ordered=True
-            )
-        ],
         ordered=True,
-        grouping=[1, 2, 2]
-    ),
-    grouping=[1, 1, 1, 2, 2, 2]
+        subgraders=[
+            FormulaGrader(variables=['x']),
+            MatrixGrader(variables=['x'])
+        ]
+    )
 )
 </script>
 
-<customresponse cfn="grader" inline="1">
-  <p style="display:inline">Eigenvalue 1: </p><textline inline="1" correct_answer="1"/>
-  <br/>
-  <p style="display:inline">Eigenvector 1: </p><textline inline="1" correct_answer="1"/><textline inline="1" correct_answer="0"/>
-  <br/>
-  <p style="display:inline">Eigenvalue 2: </p><textline inline="1" correct_answer="-1"/>
-  <br/>
-  <p style="display:inline">Eigenvector 2: </p><textline inline="1" correct_answer="0"/><textline inline="1" correct_answer="1"/>
+  <p>Here is the jewel in the crown of ListGrader: the ability to nest ListGraders.</p>
+
+  <p>Find the eigenvalues and eigenvectors of the matrix</p>
+
+  \[M =
+    \begin{bmatrix}
+      1 &amp; x \\
+      x &amp; -1
+    \end{bmatrix}
+  \]
+
+  <p>Answer: (pairs may be in any order, but correct vector must go with correct value)</p>
+  <ul>
+    <li>1st pair: <code>+sqrt(1+x^2)</code>, <code>[1+sqrt(1+x^2), x]</code></li>
+    <li>2nd pair: <code>-sqrt(1+x^2)</code>, <code>[1-sqrt(1+x^2), x]</code></li>
+  </ul>
+
+<customresponse cfn="grader">
+
+  <table>
+    <tr>
+      <th></th>
+      <th>Eigenvalue</th>
+      <th>Eigenvector</th>
+    </tr>
+    <tr>
+      <th>1st Eigenpair</th>
+      <td><textline math="true"/></td>
+      <td><textline math="true" size="40"/></td>
+    </tr>
+    <tr>
+      <th>2nd Eigenpair</th>
+      <td><textline math="true"/></td>
+      <td><textline math="true" size="40"/></td>
+    </tr>
+  </table>
 </customresponse>
 
 

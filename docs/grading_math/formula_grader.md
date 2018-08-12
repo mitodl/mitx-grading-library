@@ -13,18 +13,18 @@ FormulaGrader grades a formula by numerical sampling. That is, random values are
 
 Variables are configured by including a list of strings of each variable name as follows.
 
-````python
+```python
 grader = FormulaGrader(
     answers='1+x^2+y',
     variables=['x', 'y']
 )
-````
+```
 
 Note that the `answers` parameter follows all of the usual allowances from ItemGrader.
 
 The variables need to have numbers randomly assigned to them. Each is sampled from a [sampling set](sampling.md), which is RealInterval() by default (random numbers from 1 to 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the `sample_from` key.
 
-````python
+```python
 grader = FormulaGrader(
     answers='1+x^2+y+z/2',
     variables=['x', 'y', 'z'],
@@ -34,7 +34,7 @@ grader = FormulaGrader(
         'z': (1, 3, 4, 8)
     }
 )
-````
+```
 
 The `sample_from` key must be a dictionary of 'variable_name': sampling_set pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.
 
@@ -43,7 +43,7 @@ The `sample_from` key must be a dictionary of 'variable_name': sampling_set pair
 
 You can also specify special variables that are numbered. For example, if you specify that `a` is a numbered variable, students can include `a_{0}`, `a_{5}`, `a_{-2}`, etc, using any integer. All entries for a numbered variable will use the sampling set specified by the base name.
 
-````python
+```python
 grader = FormulaGrader(
     answers='a_{0} + a_{1}*x + 1/2*a_{2}*x^2',
     variables=['x'],
@@ -53,7 +53,7 @@ grader = FormulaGrader(
         'a': [-10, 10]
     }
 )
-````
+```
 
 If you have a variable name that would clash with a numbered variable (say, you defined `a_{0}` and also a numbered variable `a`), then the specific variable has precedence.
 
@@ -62,31 +62,31 @@ If you have a variable name that would clash with a numbered variable (say, you 
 
 To control the number of samples that are checked to ensure correctness, you can modify the `samples` key.
 
-````python
+```python
 grader = FormulaGrader(
     answers='1+x^2',
     variables=['x'],
     samples=10
 )
-````
+```
 
 The default for `samples` is 5.
 
 You may want to allow for a certain number of comparisons to fail before the student is marked incorrect. To do this, set `failable_evals`. This should be used very sparingly!
 
-````python
+```python
 grader = FormulaGrader(
     answers='1+x^2',
     variables=['x'],
     samples=10,
     failable_evals=1
 )
-````
+```
 
 
 ## Functions
 
-By default, a large array of mathematical functions are available for use. See the full list [here](function_list.md). Note that functions for manipulating complex variables are available, which allows you to grade complex expressions. In the following example, `z*z` is recognized to be different from `abs(z)^2`.
+By default, a large array of mathematical functions are available for use. See the full list [here](functions.md). Note that functions for manipulating complex variables are available, which allows you to grade complex expressions. In the following example, `z*z` is recognized to be different from `abs(z)^2`.
 
 ```python
 grader = FormulaGrader(
@@ -176,7 +176,7 @@ grader = FormulaGrader(
 ```
 will raise an error
 
-> ConfigError: Warning: 'user_functions' contains entries '['sin']' which will override default values. If you intend to override to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
+> ConfigError: Warning: 'user_functions' contains entries '['sin']' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
 
 The error can be suppressed by setting `suppress_warnings=True`.
 
@@ -283,35 +283,51 @@ grader = FormulaGrader(
 
 We strongly recommend _not_ doing this when using the following variable names: k, M, G, T, m, u, n, and p.
 
-## Comparer Functions
-By default, FormulaGrader compares the numerically sampled author formula and student formula for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. For example, if grading angles in degrees, it may be useful to compare formulas modulo 360.
+## Sibling Variables
+When a student submits several mathematical expressions as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This can be done using *sibling variables*, which are available when `FormulaGrader` is used as a subgrader in **ordered** `ListGrader` problems.
 
-To use an alternate comparer, specify the `answers` key as a dictionary with keys `comparer` and `comparer_params` rather than a single string. For example, to compare formulas modulo 360:
+For example:
+```pycon
+>>> from mitxgraders import ListGrader, FormulaGrader
 
-```python
-def is_coterminal(comparer_params_evals, student_eval, utils):
-    answer = comparer_params_evals[0]
-    reduced = student_eval % (360)
-    return utils.within_tolerance(answer, reduced)
+>>> grader = ListGrader(
+...     answers=[
+...         ('x', '2*x','3*x'),     # first input can be any of these 3 answers
+...         'sibling_1^2',          # second input must be first input squared
+...         'sibling_2^2'           # third input must be second input squared
+...     ],
+...     ordered=True,
+...     subgraders=FormulaGrader(variables=['x'])
+... )
 
-grader = FormulaGrader(
-    answers={
-        'comparer': is_coterminal,
-        'comparer_params': ['b^2/a'],
-    },
-    variables=['a', 'b'],
-    tolerance='1%'
-)
+```
+Note that in this example, the sequence of inputs `['2*x', 4*x^2, 16*x^4]` is correct, and so is `['3*x', 9*x^2, 81*x^4]`, but `['3*x', 4*x^2, 16*x^4]` receives only two-third credit.
+
+```pycon
+>>> student_inputs = ['2*x','4*x^2', '16*x^4']
+>>> result1, result2, result3 = grader(None, student_inputs)['input_list']
+>>> result1['ok'], result2['ok'], result3['ok']
+(True, True, True)
+
+>>> student_inputs = ['3*x','9*x^2', '81*x^4']
+>>> result1, result2, result3 = grader(None, student_inputs)['input_list']
+>>> result1['ok'], result2['ok'], result3['ok']
+(True, True, True)
+
+>>> student_inputs = ['3*x','4*x^2', '16*x^4']
+>>> result1, result2, result3 = grader(None, student_inputs)['input_list']
+>>> result1['ok'], result2['ok'], result3['ok']
+(True, False, True)
+
 ```
 
-This grader would accept `'b^2/a'` as well as `'b^2/a + 360'`, `'b^2/a + 720'`, etc.
+Other things:
 
-In the grader configuration, `comparer_params` is a list of strings that are numerically evaluated and passed to the comparer function. The `comparer` function is a user-specified function with signature `comparer(comparer_params_evals, student_eval, utils)`. When `FormulaGrader` calls the comparer function, `comparer` the argument values are:
-- `comparer_params_evals`: The `comparer_params` list, numerically evaluated according to variable and function sampling.
-- `student_eval`: The student's input, numerically evaluated according to variable and function sampling
-- `utils`: A convenience object that may be helpful when writing custom comparer functions. Has properties:
-  - `utils.tolerance`: The tolerance specified in grader configuration, `0.01%` by default
-  - `utils.within_tolerance:` A function with signature `within_tolerance(x, y)` which checks that `y` is within specified tolerance of `x`. Can handle scalars, vectors, and matrices. If tolerance was specified as a percentage, then checks that `|x-y| < tolerance * x`.
+- Sibling variables are available to `FormulaGrader`, `NumericalGrader`, and `MatrixGrader`, but only in **ordered** `ListGrader` problems.
+- The jth student input is referenced as `sibling_j`. (Exception: If nesting `ListGraders` with grouping, `sibling_j` refers to the jth member of any particular group.)
+
+## Comparer Functions
+Comparer functions allow you to compare the student input to the author's expectation using aspects other than equality. See [Comparer Functions](comparer_functions.md) for details.
 
 ## Other Improvements
 
@@ -319,9 +335,9 @@ We have made a number of other improvements over the edX formula graders, includ
 
 * Square roots and other functions have a wider domain: with edX's default FormulaResponse, authors need to be careful that expressions like `sqrt(x-1)` or `(x-1)^0.5` always pass nonnegative inputs to the square root and power functions. Our square root, power, logarithm, and inverse trigonometric functions accept a wider array of inputs (the entire complex plane, minus poles). For this reason, authors can feel safe using the default sample range in most cases.
 * Our parser uses a parsing cache, and hence runs much more efficiently than the edX graders.
-* If students input an expression with mismatched parentheses, this generates an intelligible error message that points to the exact issue.
+* If a student inputs an expression with mismatched parentheses, this generates an intelligible error message that points to the exact issue.
 * When students use an unknown variable, the resulting error message highlights that the unknown quantity was interpreted as a variable.
 * Similarly, when students use an unknown function, the resulting error message highlights that the unknown quantity was interpreted as a function. If a variable of that name exists, the error message suggests that a multiplication symbol was missing.
-* If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the `debug` flag to True, and a more technical message will usually be displayed.
-* Full sampling details are included when the `debug` flag is set to True.
-* Enhancements to the AsciiMath renderer (the preview that students see when using `<textline>` inputs) are available using our [AsciiMath renderer definitions](renderer.md).
+* If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the `debug` flag to `True`, and a more technical message will usually be displayed.
+* Full sampling details are included when the `debug` flag is set to `True`.
+* Enhancements to the AsciiMath renderer (the preview that students see when using `<textline />` inputs) are available using our [AsciiMath renderer definitions](renderer.md).

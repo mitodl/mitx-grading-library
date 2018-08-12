@@ -5,21 +5,15 @@ Defines a FormulaGrader subtype that handles matrices, too.
 """
 from numbers import Number
 from collections import namedtuple
-from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from voluptuous import Required, Any
+from mitxgraders.exceptions import InputTypeError
+from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from mitxgraders.helpers.validatorfuncs import NonNegative
 from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
 from mitxgraders.helpers.calc.exceptions import (
     CalcError, MathArrayShapeError as ShapeError)
 from mitxgraders.helpers.calc.mathfuncs import (
     merge_dicts, ARRAY_ONLY_FUNCTIONS)
-from mitxgraders.helpers.calc.formatters import get_description
-
-class InputTypeError(CalcError):
-    """
-    Indicates that student's input has evaluated to an object of the wrong
-    type (or shape).
-    """
 
 class MatrixGrader(FormulaGrader):
     """
@@ -160,16 +154,3 @@ class MatrixGrader(FormulaGrader):
         return self.Utils(tolerance=self.config['tolerance'],
                           within_tolerance=_within_tolerance,
                           validate_shape=_validate_shape)
-
-    def default_equality_comparer(self, comparer_params, student_input, utils):
-        """
-        Default comparer function.
-
-        Assumes comparer_params is just the single expected answer wrapped in a list.
-        """
-        expected_input = comparer_params[0]
-        # in numpy, scalars have empty tuples as their shapes
-        shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
-        utils.validate_shape(student_input, shape)
-
-        return utils.within_tolerance(expected_input, student_input)

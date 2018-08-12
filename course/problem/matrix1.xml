@@ -1,0 +1,42 @@
+<problem display_name="MatrixGrader: First Example" showanswer="always" weight="10" attempts="">
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import MatrixGrader, RealMatrices, RealVectors
+
+grader = MatrixGrader(
+  answers='4*A*B^2*v',
+  variables=['A', 'B', 'v'],
+  sample_from={
+     'A': RealMatrices(), # samples from 2 by 2 matrices by default
+     'B': RealMatrices(),
+     'v': RealVectors(shape=2)
+  },
+  identity_dim=2
+)
+</script>
+
+<p>This is a demo problem with 3 variables: <code>A</code> and <code>B</code> are 2 by 2 matrices, while <code>v</code> is a vector of length 2.</p>
+
+<p>Try inputting different forms of the correct answer, as well as different incorrect answers:</p>
+<ul>
+  <li><code>4*A*B^2*v</code> is correct</li>
+  <li><code>A*(2*B^2 + 2*B*I*B)*v</code> is also correct; here <code>I</code> is the 2 by 2 identity matrix.</li>
+  <li><code>4*B*A*B*v</code> is incorrect (non-commutative)</li>
+  <li>The following answers will raise interesting errors:
+    <ul>
+      <li><code>A + v</code></li>
+      <li><code>v^2</code></li>
+      <li><code>A^2.5</code></li>
+      <li><code>4*A*B^2</code></li>
+    </ul>
+  </li>
+</ul>
+
+<customresponse cfn="grader" expect="4*A*B^2*v">
+    <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" />
+</customresponse>
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix1.xml" target="_blank">View source</a>
+
+
+</problem>

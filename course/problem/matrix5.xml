@@ -1,0 +1,49 @@
+<problem display_name="MatrixGrader: Grading Eigenvectors" showanswer="always" weight="10" attempts="">
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import MatrixGrader
+from mitxgraders.comparers import eigenvector_comparer
+
+grader = MatrixGrader(
+    answers={
+        'comparer_params': [
+            '[[1, x], [x, -1]]',
+            'sqrt(1+x^2)'
+        ],
+        'comparer': eigenvector_comparer
+    },
+    variables=['x'],
+    max_array_dim=2
+)
+
+</script>
+
+<p>Enter an eigenvector of \(
+  \begin{bmatrix}
+    1 &amp; x \\
+    x &amp; -1
+  \end{bmatrix}
+\) with positive eigenvalue?</p>
+
+<p>This problem uses the <code>eigenvector_comparer</code> comparer function shipped with <code>mitxgraders</code> to check that the student's input is an eigenvector of author-specified matrix. Suggested inputs:</p>
+
+<ul>
+  <li>Correct answers: any nonzero scalar multiple of <code>[1+sqrt(1+x^2), x]</code></li>
+  <li>The zero vector, <code>[0, 0]</code></li>
+</ul>
+
+<customresponse cfn="grader">
+  <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" />
+</customresponse>
+
+<h3>Resources</h3>
+<ul>
+  <li>
+    <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix5.xml" target="_blank">View source</a>
+  </li>
+  <li>
+    <a href="https://mitodl.github.io/mitx-grading-library/grading_math/comparer_functions" target="_blank">Documentation for <code>comparer_function</code>s</a>
+  </li>
+</ul>
+
+</problem>

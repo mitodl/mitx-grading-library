@@ -24,6 +24,18 @@
         <problem url_name="formula7"/>
         <problem url_name="formula8"/>
         <problem url_name="formula9"/>
+        <problem url_name="formula10"/>
+      </vertical>
+    </sequential>
+    <sequential url_name="matrixgrader" display_name="MatrixGrader">
+      <vertical url_name="v-matrixgrader" display_name="MatrixGrader">
+        <html url_name="matrixinfo"/>
+        <problem url_name="matrix1"/>
+        <problem url_name="matrix2"/>
+        <problem url_name="matrix3"/>
+        <problem url_name="matrix4"/>
+        <problem url_name="matrix5"/>
+        <problem url_name="matrix6"/>
       </vertical>
     </sequential>
     <sequential url_name="singlelistgrader" display_name="SingleListGrader">

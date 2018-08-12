@@ -555,7 +555,7 @@ def test_fg_debug_log():
     "    'z': (2.205526752143288+2.0897663659937935j)}}<br/>\n"
     "Student Eval: (14.7111745179+2.08976636599j)<br/>\n"
     "Compare to:  [(14.711174517877566+2.0897663659937935j)]<br/>\n"
-    "Comparer Function: <function default_equality_comparer at 0x...><br/>\n"
+    "Comparer Function: <function equality_comparer at 0x...><br/>\n"
     "Comparison Result: {{   'grade_decimal': 1.0, 'msg': '', 'ok': True}}<br/>\n"
     "<br/>\n"
     "<br/>\n"
@@ -572,7 +572,7 @@ def test_fg_debug_log():
     "    'z': (1.875174422525385+2.7835460015641598j)}}<br/>\n"
     "Student Eval: (11.9397106851+2.78354600156j)<br/>\n"
     "Compare to:  [(11.93971068506166+2.7835460015641598j)]<br/>\n"
-    "Comparer Function: <function default_equality_comparer at 0x...><br/>\n"
+    "Comparer Function: <function equality_comparer at 0x...><br/>\n"
     "Comparison Result: {{   'grade_decimal': 1.0, 'msg': '', 'ok': True}}<br/>\n"
     "</pre>"
     ).format(version=VERSION)

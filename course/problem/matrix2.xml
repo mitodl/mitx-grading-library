@@ -1,0 +1,30 @@
+<problem display_name="MatrixGrader: Entry-by-entry input" showanswer="always" weight="10" attempts="">
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import MatrixGrader, RealMatrices, RealVectors
+
+grader = MatrixGrader(
+  answers='[[-cos(theta), -sin(theta)], [-sin(theta), cos(theta)]]',
+  variables=['theta'],
+  max_array_dim=2
+)
+</script>
+
+<p>A linear transformation \(\mathcal{T}: \mathbb{R}^2 \rightarrow \mathbb{R}^2\) rotates vectors counter-clockwise by angle \(\theta\) then reflects them over the \(y\)-axis. Enter the matrix representation of \(\mathcal{T}\).</p>
+
+<p>This problem requires entry-by-entry input of a matrix. Suggested inputs:</p>
+
+<ul>
+  <li><code>[[-cos(theta), -sin(theta)], [-sin(theta), cos(theta)]]</code>, correct answers</li>
+  <li><code>-[[cos(theta), sin(theta)], [sin(theta), -cos(theta)]]</code>, also correct</li>
+  <li>Try inputting ill-formed matrices such as <code>[[1, 2], [3]]</code></li>
+</ul>
+
+<customresponse cfn="grader" expect="[[-cos(theta), -sin(theta)], [-sin(theta), cos(theta)]]">
+    <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="100" />
+</customresponse>
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix2.xml" target="_blank">View source</a>
+
+
+</problem>

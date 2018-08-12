@@ -10,6 +10,7 @@ import re
 import itertools
 import numpy as np
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
+from mitxgraders.comparers import equality_comparer
 from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
                                   gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes,
@@ -325,7 +326,7 @@ def warn_if_override(config, key, defaults):
     if duplicates and not config.get('suppress_warnings', False):
         sorted_dups = list(sorted(duplicates))
         msg = ("Warning: '{key}' contains entries '{duplicates}' which will override default "
-               "values. If you intend to override to override defaults, you may suppress "
+               "values. If you intend to override defaults, you may suppress "
                "this warning by adding 'suppress_warnings=True' to the grader configuration.")
         raise ConfigError(msg.format(key=key, duplicates=sorted_dups))
     return config
@@ -451,15 +452,6 @@ class FormulaGrader(ItemGrader):
         return self.Utils(tolerance=self.config['tolerance'],
                           within_tolerance=_within_tolerance)
 
-    @staticmethod
-    def default_equality_comparer(comparer_params, student_input, utils):
-        """
-        Default comparer function.
-
-        Assumes comparer_params is just the single expected answer wrapped in a list.
-        """
-        return utils.within_tolerance(comparer_params[0], student_input)
-
     schema_expect = Schema({
         Required('comparer_params'): [str],
         # Functions seem not to be usable as default values, so the default comparer is added later.
@@ -474,14 +466,14 @@ class FormulaGrader(ItemGrader):
         >>> result = FormulaGrader().validate_expect('mc^2')
         >>> expected = {
         ... 'comparer_params': ['mc^2'],
-        ... 'comparer': FormulaGrader.default_equality_comparer
+        ... 'comparer': equality_comparer
         ... }
         >>> result == expected
         True
         """
         if isinstance(expect, str):
             return self.schema_expect({
-                'comparer': self.default_equality_comparer,
+                'comparer': equality_comparer,
                 'comparer_params': [expect]
                 })
 
@@ -693,11 +685,12 @@ class FormulaGrader(ItemGrader):
             funclist.update(func_samples[i])
             varlist.update(var_samples[i])
 
-            scoped_eval = lambda expr: evaluator(expr,
-                                                 variables=varlist,
-                                                 functions=funclist,
-                                                 suffixes=self.suffixes,
-                                                 max_array_dim=self.config['max_array_dim'])
+            def scoped_eval(expression,
+                            variables=varlist,
+                            functions=funclist,
+                            suffixes=self.suffixes,
+                            max_array_dim=self.config['max_array_dim']):
+                return evaluator(expression, variables, functions, suffixes, max_array_dim)
 
             # Compute the sibling values, and add them to varlist
             siblings_eval = {
@@ -747,13 +740,14 @@ class FormulaGrader(ItemGrader):
         Arguments
         =========
         - scoped_eval (func): a unary function to evaluate math expressions.
-        Basically, calc.py's evaluator but with variables/functions/suffixes
-        already passed in.
+            Same keyword arguments as calc.py's evaluator, but with appropriate
+            default variables, functions, suffixes
         - comparer_params ([str]): unevaluated expressions
         - siblings_eval (dict): evaluated expressions
         """
 
-        results = [scoped_eval(param) for param in comparer_params]
+        results = [scoped_eval(param, max_array_dim=float('inf'))
+                   for param in comparer_params]
         # results is a list of (value, ScopeUsage) pairs
         comparer_params_eval = [value for value, _ in results]
         used_variables = set().union(*[used.variables for _, used in results])

@@ -18,7 +18,9 @@ from mitxgraders.formulagrader.formulagrader import (
     NumericalGrader,
 )
 
-from mitxgraders.formulagrader.matrixgrader import MatrixGrader
+from mitxgraders.formulagrader.matrixgrader import (
+    MatrixGrader,
+)
 
 # Set the objects to be *-imported from package
 __all__ = [

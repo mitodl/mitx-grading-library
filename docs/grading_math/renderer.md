@@ -25,7 +25,7 @@ The symbol definitions are used to teach AsciiMath how to display various functi
 <script type="text/javascript" src="/static/MJxPrep.js"></script>
 ```
 
-Some functions are too complex for a symbol definition, and need the student's input to be preprocessed into AsciiMath before rendering. These functions are `log10`, `log2`, `fact` and `factorial`. To use these, you need to add `preprocessorClassName` and `preprocessorSrc` properties to any textline tags that use the preprocessor.
+Some functions are too complex for a symbol definition, and need the student's input to be preprocessed into AsciiMath before rendering. These functions are `log10`, `log2`, `fact` and `factorial`. To use these, you need to add `preprocessorClassName` and `preprocessorSrc` properties to any `<textline/>` tags that use the preprocessor.
 
 ```XML
 <customresponse cfn="grader">
@@ -44,4 +44,4 @@ If you use the preprocessor in your problem, you get the symbol definitions as w
 
 * If you have a display issue with AsciiMath, it's likely that you can extend the symbol definitions and preprocessor to make your expressions display nicely for students.
 
-* The [function listing](function_list.md) article provides the complete list of functions that are corrected by the new AsciiMath renderer definitions.
+* The [mathematical functions](functions.md) article provides the complete list of functions that are corrected by the new AsciiMath renderer definitions.
