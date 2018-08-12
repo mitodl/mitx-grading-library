@@ -316,6 +316,18 @@ pauli = {
     ])
 }
 
+cartesian_xyz = {
+    'hatx': MathArray([1, 0, 0]),
+    'haty': MathArray([0, 1, 0]),
+    'hatz': MathArray([0, 0, 1])
+}
+
+cartesian_ijk = {
+    'hati': MathArray([1, 0, 0]),
+    'hatj': MathArray([0, 1, 0]),
+    'hatk': MathArray([0, 0, 1])
+}
+
 def within_tolerance(x, y, tolerance):
     """
     Check that |x-y| <= tolerance with appropriate norm.
