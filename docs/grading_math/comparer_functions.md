@@ -2,7 +2,7 @@
 
 By default, `FormulaGrader`, `NumericalGrader`, and `MatrixGrader` compare the numerically-sampled author formula and student formula for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. To use an alternate comparer, specify the `answers` key as a dictionary with keys `comparer` and `comparer_params` rather than a single string.
 
- For example, if grading angles in degrees, it may be useful to compare formulas modulo 2&#960;. You can write your own comparer functions, but for this we can use the `congruent_modulo` comparer from `mitxgraders.comparers`. This grader will accept any input congruent to `'b^2/a'` modulo `2*pi`
+ For example, if grading angles in degrees, it may be useful to compare formulas modulo 2&#960;. You can write your own comparer functions, but for this we can use the `congruent_modulo` comparer from `mitxgraders.comparers`. This grader will accept any input congruent to `'b^2/a'` modulo `2*pi`.
 
 ```pycon
 >>> from mitxgraders import FormulaGrader

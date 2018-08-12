@@ -11,20 +11,22 @@ grader = StringGrader(
 
 The `answers` key can be used to specify correct answers, specific feedback messages, and to assign partial credit. It accepts a few formats:
 
-1. A single dictionary can be used to specify an answer, feedback, correctness, and partial credit:
+- A single dictionary can be used to specify an answer, feedback, correctness, and partial credit. The dictionary keys are:
+
+    - `'expect'` (required): compared against student answer. Most ItemGraders use strings to specify the `'expect'` value.
+    - `'grade_decimal'` (optional, a number between `0` and `1`): The credit associated with this answer; default value is `1`.
+    - `'ok'` (optional, `True`, `False`, or `'partial'`): The answer's correctness; determines icon used by edX. The default value is inferred from `grade_decimal`.
+    - `'msg'` (optional, string): A feedback message associated with this answer.
+
 ```python
 grader = StringGrader(
     answers={'expect': 'zebra', 'ok': True, 'grade_decimal': 1, 'msg': 'Yay!'},
     wrong_msg='Try again!'
 )
 ```
-  The dictionary keys are:
-  - `'expect'` (required): compared against student answer. Most ItemGraders use strings to specify the `'expect'` value.
-  - `'grade_decimal'` (optional, a number between `0` and `1`): The credit associated with this answer; default value is `1`.
-  - `'ok'` (optional, `True`, `False`, or `'partial'`): The answer's correctness; determines icon used by edX. The default value is inferred from `grade_decimal`.
-  - `'msg'` (optional, string): A feedback message associated with this answer.
 
-2. A single `'expect'` value: can be used to specify the correct answer. For example,
+- A single `'expect'` value: can be used to specify the correct answer. For example,
+
 ```python
 grader = StringGrader(
     answers='cat',
@@ -33,9 +35,11 @@ grader = StringGrader(
     wrong_msg='Try again!'
 )
 ```
-Again, most ItemGraders use strings to store `'expect'` values.
 
-3. A tuple of dictionaries or strings:
+  Again, most ItemGraders use strings to store `'expect'` values.
+
+- A tuple of dictionaries or strings:
+
 ```python
 grader = StringGrader(
     answers=(

@@ -284,14 +284,14 @@ grader = FormulaGrader(
 
 The included suffixes are:
 
-* `'k': 1e3`
-* `'M': 1e6`
-* `'G': 1e9`
-* `'T': 1e12`
-* `'m': 1e-3`
-* `'u': 1e-6`
-* `'n': 1e-9`
-* `'p': 1e-12`
+* `k`: 1e3
+* `M`: 1e6
+* `G`: 1e9
+* `T`: 1e12
+* `m`: 1e-3
+* `u`: 1e-6
+* `n`: 1e-9
+* `p`: 1e-12
 
 We strongly recommend _not_ combining these suffixes with the variables names `k`, `M`, `G`, `T`, `m`, `u`, `n` or `p`, as `2m` and `2*m` will then represent two very different things, which can lead to much student confusion.
 
