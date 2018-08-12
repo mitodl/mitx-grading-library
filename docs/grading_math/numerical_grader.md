@@ -1,6 +1,6 @@
 # NumericalGrader
 
-When grading math expressions without functions or variables, you can use NumericalGrader instead of FormulaGrader. NumericalGrader is a specialized version of FormulaGrader whose behavior resembles the edX `<numericalresponse/>` tag.
+When grading math expressions without functions or variables, you can use `NumericalGrader` instead of `FormulaGrader`. NumericalGrader is a specialized version of FormulaGrader whose behavior resembles the edX `<numericalresponse/>` tag.
 
 ## Configuration
 

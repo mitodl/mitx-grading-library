@@ -10,7 +10,7 @@ or
 
 The `formulaequationinput` tag uses server-side parsing and rendering to display the preview to the student. By and large, the preview from `formulaequationinput` is better than that of `textline`, as it treats functions correctly, and displays a number of LaTeX symbols natively. The downsides to `formulaequationinput` are that it doesn't recognize vectors such as `vecx` or `hatx`, the factorial and conjugation functions just apply as `fact(x)` and `conj(x)`, and because the processing is done server-side, we are unable to enhance the display at all.
 
-The `textline` tag treats the student input as AsciiMath for the purpose of generating a preview, using MathJax to render it. While the preview does a reasonably good job, there are many situations where it falls down, even for standard edX functions (for example, try typing in `1/arctanh(x)` in textline box!). Because this is done client-side through javascript, it's possible to supplement the AsciiMath definitions to handle new situations. We have constructed a series of renderer definitions to supplement the standard AsciiMath definitions in order to provide better previews.
+The `textline` tag treats the student input as AsciiMath for the purpose of generating a preview, using MathJax to render it. While the preview does a reasonably good job, there are many situations where it falls down, even for standard edX functions (for example, try typing in `1/arctanh(x)` in a textline box!). Because this is done client-side through javascript, it's possible to supplement the AsciiMath definitions to handle new situations. We have constructed a series of renderer definitions to supplement the standard AsciiMath definitions in order to provide better previews.
 
 This article describes how to use our new AsciiMath renderer definitions with a `<textline>` tag.
 
@@ -25,7 +25,11 @@ The symbol definitions are used to teach AsciiMath how to display various functi
 <script type="text/javascript" src="/static/MJxPrep.js"></script>
 ```
 
-Some functions are too complex for a symbol definition, and need the student's input to be preprocessed into AsciiMath before rendering. These functions are `log10`, `log2`, `fact` and `factorial`. To use these, you need to add `preprocessorClassName` and `preprocessorSrc` properties to any `<textline/>` tags that use the preprocessor.
+Some functions are too complex for a symbol definition, and need the student's input to be preprocessed into AsciiMath before rendering. These functions are `log10`, `log2`, `fact`/`factorial`, `trans`, `adj`/`ctrans` and `cross`.
+
+It is quite common to have a variable name begin with `delta` or `Delta`, such as `Deltax`. Unfortunately, AsciiMath treats such variables as two separate entries, and can sometimes split them inopportunely, such as for the expression `1/Deltax`. The preprocessor detects such variable names and ensures that AsciiMath displays them correctly.
+
+To use these features, you need to add `preprocessorClassName` and `preprocessorSrc` properties to any `<textline/>` tags that use the preprocessor.
 
 ```XML
 <customresponse cfn="grader">
@@ -34,6 +38,15 @@ Some functions are too complex for a symbol definition, and need the student's i
 ```
 
 If you use the preprocessor in your problem, you get the symbol definitions as well (you don't need to load them separately).
+
+
+### Options
+
+There are a few configurable options for the preprocessor in `MJxPrep.js`.
+
+By default, `conj()` displays as a bar over the argument to the function. However, you may wish for complex conjugates to be displayed as a superscript star. If so, you can set `conj_as_star: true` at the start of the file.
+
+By default, vectors `[1, 2, 3]` display as a row vector. If you would instead like them to display as a column vector, you can set the option `vectors_as_columns: true` at the start of the file.
 
 
 ## Notes

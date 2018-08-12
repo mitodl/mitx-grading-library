@@ -9,7 +9,7 @@ FormulaGrader is the grading class used to grade mathematical formulas and close
 
 ## Variables and Sampling
 
-FormulaGrader grades a formula by numerical sampling. That is, random values are  assigned to each of the unknown variables and unknown functions, then the numerical value of the student's input expression and author's answer are calculated. The sampling process is repeated, and if the student answer and author answer compare within the desired tolerance enough times, the student input is graded as correct.
+FormulaGrader grades a formula by numerical sampling. That is, random values are assigned to each of the unknown variables and unknown functions, then the numerical value of the student's input expression and author's answer are calculated. The sampling process is repeated, and if the student answer and author answer compare within the desired tolerance enough times, the student input is graded as correct.
 
 Variables are configured by including a list of strings of each variable name as follows.
 
@@ -20,9 +20,9 @@ grader = FormulaGrader(
 )
 ```
 
-Note that the `answers` parameter follows all of the usual allowances from ItemGrader.
+Note that the `answers` parameter follows all of the usual allowances from `ItemGrader`.
 
-The variables need to have numbers randomly assigned to them. Each is sampled from a [sampling set](sampling.md), which is RealInterval() by default (random numbers from 1 to 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the `sample_from` key.
+The variables need to have numbers randomly assigned to them. Each is sampled from a [sampling set](sampling.md), which is `RealInterval()` by default (random numbers from 1 to 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the `sample_from` key.
 
 ```python
 grader = FormulaGrader(
@@ -86,7 +86,7 @@ grader = FormulaGrader(
 
 ## Functions
 
-By default, a large array of mathematical functions are available for use. See the full list [here](functions.md). Note that functions for manipulating complex variables are available, which allows you to grade complex expressions. In the following example, `z*z` is recognized to be different from `abs(z)^2`.
+By default, a large array of mathematical functions are available for use. See the full list [here](functions.md). Note that all functions are capable of handling complex expressions. In the following example, `z*z` is recognized to be different from `abs(z)^2`.
 
 ```python
 grader = FormulaGrader(
@@ -110,7 +110,7 @@ grader = FormulaGrader(
 )
 ```
 
-This defines a function `f(x) = x^2`. User-defined function names must start with a letter, and can use numbers and underscores, such as `my_func2`. They are also allowed to have apostrophes (primes) at the end of the name, such as to indicate derivatives. Eg, `f''`. Be careful about using quotation marks appropriately when using primes in function names!
+This defines a function `f(x) = x^2` that students may use. User-defined function names must start with a letter, and can use numbers and underscores, such as `my_func2`. They are also allowed to have apostrophes (primes) at the end of the name, such as to indicate derivatives. Eg, `f''`. Be careful about using quotation marks appropriately when using primes in function names, as in the following example.
 
 ```python
 grader = FormulaGrader(
@@ -120,9 +120,12 @@ grader = FormulaGrader(
 )
 ```
 
+### Choosing a function randomly
+
 You can also specify random functions by specifying a sampling set for a function. You can provide a list of functions to randomly choose from as follows.
 
 ```python
+import numpy as np
 grader = FormulaGrader(
     answers="f(x)",
     variables=['x'],
@@ -132,7 +135,7 @@ grader = FormulaGrader(
 
 Each time this formula is checked, the function `f` will be sampled from the list of available functions.
 
-You can also specify a random well-behaved function by using the RandomFunction() sampling set.
+You can also specify a random well-behaved function by using the `RandomFunction()` sampling set.
 
 ```python
 grader = FormulaGrader(
@@ -165,7 +168,7 @@ grader = FormulaGrader(
 Constants are like variables that only ever have one value.
 
 ## Overriding Default Functions and Constants
-You can override default functions and constants if you really want, although this is discouraged and requires suppressing warnings with `suppress_warnings=True`. The grader
+You can override default functions and constants if you really want, although this is discouraged and requires suppressing warnings with `suppress_warnings=True`. The following grader
 
 ```python
 grader = FormulaGrader(
@@ -179,6 +182,7 @@ will raise an error
 > ConfigError: Warning: 'user_functions' contains entries '['sin']' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
 
 The error can be suppressed by setting `suppress_warnings=True`.
+
 
 ## Restricting Student Input
 
@@ -199,7 +203,7 @@ grader = FormulaGrader(
 )
 ```
 
-If a student tries to use one of these strings, then they receive the `forbidden_message`, without giving away what the forbidden string is. We recommend using this sparingly, as students will find it confusing. The default `forbidden_message` is "Invalid Input: This particular answer is forbidden".
+If a student tries to use one of these strings, then they receive the `forbidden_message`, without giving away what the forbidden string is. We recommend using this sparingly, as students may find it confusing. The default `forbidden_message` is "Invalid Input: This particular answer is forbidden".
 
 Forbidden strings and student answers are stripped of whitespace before being compared. Thus, if `x + y` is forbidden, then answers containing `x+y` or `x   +   y` will be rejected.
 
@@ -208,6 +212,7 @@ Forbidden strings and student answers are stripped of whitespace before being co
 You can disallow specific functions by adding them to the blacklist of functions as a list of disallowed function names. In the following example, `sin` is disallowed in correct answers.
 
 ```python
+import numpy as np
 grader = FormulaGrader(
     answers='sqrt(1 - cos(x)^2)',
     variables=['x'],
@@ -232,7 +237,7 @@ If you want to exclude all functions, use `whitelist=[None]`:
 grader = FormulaGrader(
     answers='pi/2-x',
     variables=['x'],
-    whitelist=[None] # no functions are allowed
+    whitelist=[None]  # no functions are allowed
 )
 ```
 
@@ -267,21 +272,29 @@ Tolerances are necessary because of numerical roundoff error that lead to small 
 
 ## Suffixes
 
-Numbers with a % at the end will be treated as percentages, and converted to the appropriate decimals.
-
-edX also defines a number of metric suffixes (k, M, G, T, m, u, n, and p) that modify a number appropriately. However, in our experience, these metric suffixes lead to more confusion than use. For example, `2M`, which one would expect should be rejected as an error when `2*M` was intended, is accepted by edX, interpreted as `2*10^6`, marked incorrect, and eats a student's attempt. Similarly for all of the other metric suffixes.
-
-We have therefore made the decision to disable metric suffixes by default. If you want to enable them, you can do so using the following.
+Numbers with a % at the end will be treated as percentages, and converted to the appropriate decimals. If you desire, you can also enable the use of metric suffixes by setting the appropriate setting as follows.
 
 ```python
 grader = FormulaGrader(
-    answers='2*m',
-    variables=['m'],
+    answers='2m*a',  # Equivalent to '0.002*a'
+    variables=['a'],
     metric_suffixes=True
 )
 ```
 
-We strongly recommend _not_ doing this when using the following variable names: k, M, G, T, m, u, n, and p.
+The included suffixes are:
+
+* `'k': 1e3`
+* `'M': 1e6`
+* `'G': 1e9`
+* `'T': 1e12`
+* `'m': 1e-3`
+* `'u': 1e-6`
+* `'n': 1e-9`
+* `'p': 1e-12`
+
+We strongly recommend _not_ combining these suffixes with the variables names `k`, `M`, `G`, `T`, `m`, `u`, `n` or `p`, as `2m` and `2*m` will then represent two very different things, which can lead to much student confusion.
+
 
 ## Sibling Variables
 When a student submits several mathematical expressions as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This can be done using *sibling variables*, which are available when `FormulaGrader` is used as a subgrader in **ordered** `ListGrader` problems.
@@ -301,7 +314,7 @@ For example:
 ... )
 
 ```
-Note that in this example, the sequence of inputs `['2*x', 4*x^2, 16*x^4]` is correct, and so is `['3*x', 9*x^2, 81*x^4]`, but `['3*x', 4*x^2, 16*x^4]` receives only two-third credit.
+Note that in this example, the sequence of inputs `['2*x', 4*x^2, 16*x^4]` is correct, and so is `['3*x', 9*x^2, 81*x^4]`, but `['3*x', 4*x^2, 16*x^4]` receives only two-thirds credit (from the first entry matching a given answer, and the last entry being the square of the second entry).
 
 ```pycon
 >>> student_inputs = ['2*x','4*x^2', '16*x^4']
@@ -321,13 +334,15 @@ Note that in this example, the sequence of inputs `['2*x', 4*x^2, 16*x^4]` is co
 
 ```
 
-Other things:
+Notes:
 
 - Sibling variables are available to `FormulaGrader`, `NumericalGrader`, and `MatrixGrader`, but only in **ordered** `ListGrader` problems.
 - The jth student input is referenced as `sibling_j`. (Exception: If nesting `ListGraders` with grouping, `sibling_j` refers to the jth member of any particular group.)
 
+
 ## Comparer Functions
 Comparer functions allow you to compare the student input to the author's expectation using aspects other than equality. See [Comparer Functions](comparer_functions.md) for details.
+
 
 ## Other Improvements
 

@@ -9,7 +9,7 @@ A typical use of MatrixGrader might look like
 >>> grader1 = MatrixGrader(
 ...   answers='4*A*B^2*v',
 ...   variables=['A', 'B', 'v'],
-...   identity_dim=2, # makes 'I' available to students
+...   identity_dim=2, # makes 'I' available to students as the 2x2 identity matrix
 ...   sample_from={
 ...      'A': RealMatrices(), # samples from 2 by 2 matrices by default
 ...      'B': RealMatrices(),
@@ -53,7 +53,7 @@ By default, students can only input vectors and **not matrices**. This is config
 
 - `max_array_dim=1`: This (the default) allows students to enter vectors entry-by-entry but not matrices.
     - entering vector `[x, y + 1, z]` is OK.
-    - entering matrix `[[1, x], [y, 2]]` raises an error
+    - entering matrix `[[1, x], [y, 2]]` raises an error.
 - `max_array_dim=2`: This allows student to vectors and matrices.
     - entering vector `[x, y + 1, z]` is OK.
     - entering matrix `[[1, x], [y, 2]]` is OK.
@@ -63,7 +63,7 @@ The decision to disable matrix-entry by default is intended to prevent students 
 
 ## Matrix Operations and MathArrays
 
-`MatrixGrader` uses a custom subclass of [`numpy.ndarray`](https://docs.scipy.org/doc/numpy-1.14.0/reference/generated/numpy.ndarray.html) to internally represent matrices. Understanding how the `MathArray` class behaves is useful for creating `MatrixGrader` problems, and `MathArray` can be used directly by problem-authors to add extra constant matrices to a problem.
+`MatrixGrader` uses a custom subclass of [`numpy.ndarray`](https://docs.scipy.org/doc/numpy-1.14.0/reference/generated/numpy.ndarray.html) to internally represent matrices. Understanding how the `MathArray` class behaves is useful for creating `MatrixGrader` problems, and `MathArray` can be used directly by problem-authors to add extra matrices to a problem.
 
 ### How MatrixGrader uses MathArrays
 
@@ -129,9 +129,9 @@ Tensor math arrays (dimension 3+) currently have very little support.
     |---|---|---|---|---|
     | `vector * vector`     | `(k1, )`   | `(k2, )`   | `k1=k2` | `number` (dot product of two vectors)  |
     | `MathArray * number`  | any        | -          | -       | `MathArray` (elementwise multiplication) |
-    | `number * MathArray`  | -          | Any        | -       | `MathArray` (elementwise multiplication) |
-    | `matrix * vector`     | `(m, n)`   | `(k)`      | `n=k`   | `vector` with `n` components |
-    | `vector * matrix`     | `(k, )`    | `(m, n)`   | `m=k`   | `vector` with `m` components |
+    | `number * MathArray`  | -          | any        | -       | `MathArray` (elementwise multiplication) |
+    | `matrix * vector`     | `(m, n)`   | `(k)`      | `n=k`   | `vector` with `m` components |
+    | `vector * matrix`     | `(k, )`    | `(m, n)`   | `m=k`   | `vector` with `n` components |
     | `matrix * matrix`     | `(m1, n1)` | `(m2, n2)` | `n1=m2` | `matrix` of shape `(m1, n2)`  |
 
   - **Division**: Division either raises an error, or is performed elementwise:
@@ -239,7 +239,7 @@ For example, student enters `'[[1, 2],[3] ]'`, a matrix missing an entry in seco
 
 ```
 
-Such parse errors are **always raised** to students.
+Such parse errors are **always** displayed to students.
 
 ### Shape-mismatch errors during evaluation
 
@@ -288,13 +288,16 @@ If the author's answer is a 3-component vector, and the student submits a differ
 
 ```
 
-The default handing shape errors that arise when comparing student input to author's answer is:
+The default handling of shape errors that arise when comparing student input to author's answer is:
+
   - raise an error (do not mark student incorrect), and
   - reveal the desired type (above, a vector) but not the desired shape (above, 3-components)
 
-This behavior can be configured through the `answer_shape_mismatch` key. For example, to:
+This behavior can be configured through the `answer_shape_mismatch` key. For example, to
+
   - mark students wrong instead of raising an error, and
   - reveal the shape and the type
+
 we can use:
 ```pycon
 >>> grader = MatrixGrader(
@@ -314,7 +317,7 @@ we can use:
 
 MatrixGrader provides all the default functions of `FormulaGrader` (`sin`, `cos`, etc.) plus some extras such as `trans(A)` (transpose) and `det(A)` (determinant). See [Mathematical Functions]('../functions.md') for full list.
 
-Since `MatrixGrader` has all of `FormulaGrader`'s configuration options, additional functions can be supplied through the `user_functions` configuration key. If you supply addition matrix functions, you may wish you use the `specify_domain` decorator function. See [Function Listing: Specify Domain](../functions.md#specify-domain) for details.
+Since `MatrixGrader` has all of `FormulaGrader`'s configuration options, additional functions can be supplied through the `user_functions` configuration key. If you supply addition matrix functions, you may wish you use the `specify_domain` decorator function. See [Function Listing: Specify Domain](../matrixfunctions.md) for details.
 
 ## Identity Matrix
 

@@ -12,11 +12,11 @@ This version includes a number of new features and documentation updates.
 * Improvements to balanced bracket validator.
 * Added new class `MatrixGrader` (see [MatrixGrader documentation](grading_math/matrix_grader/matrix_grader.md)) along with supporting sampling classes `RealMatrices` and `RealVectors`
 * When `FormulaGrader` (and its subclasses) are used inside an ordered `ListGrader`, authors can now grade multiple student inputs in comparison to each other by specifying answers in terms of [sibling variables](grading_math/formula_grader.md/#sibling-variables)
-* `FormulaGrader` (and its subclasses) now support [comparer functions](grading_math/comparer_functions.md) that can be used to grade student input more flexibly. For example, rather than checking checking that the student input and author input are equal, check that they are equal modulo a certain number. Builtin comparers:
-  ** equality_comparer
-  ** congruence_comparer
-  ** between_comparer
-  ** eigenvector_comparer
+* `FormulaGrader` (and its subclasses) now support [comparer functions](grading_math/comparer_functions.md) that can be used to grade student input more flexibly. For example, rather than checking checking that the student input and author input are equal, check that they are equal modulo a certain number. Built-in comparers:
+  * equality_comparer
+  * congruence_comparer
+  * between_comparer
+  * eigenvector_comparer
 
 
 ## Version 1.1.x

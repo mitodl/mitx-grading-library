@@ -14,8 +14,8 @@ if (window.MJxPrep) {
 } else {
   // Specify options
   window.MJxPrepOptions = {
-    conj_as_star: true,
-    vectors_as_columns: true
+    conj_as_star: false,
+    vectors_as_columns: false
   }
 
   // Define the preprocessor
@@ -64,6 +64,7 @@ if (window.MJxPrep) {
     // Replace ctrans(...) -> {:(...)^dagger:}, with parentheses added as necessary
     eqn = replaceFunctionCalls(eqn, 'ctrans', funcToPostfix('^dagger') )
 
+    // Cross product: cross(a, b) -> a times b
     eqn = replaceFunctionCalls(eqn, 'cross', function(funcName, args) {
       if (args.length !== 2) {return funcToSelf(funcName, args) ;}
       return '{:' + groupExpr(args[0]) + ' times ' + groupExpr(args[1]) + ':}'

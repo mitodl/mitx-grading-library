@@ -12,6 +12,7 @@ pages:
     - FormulaGrader: 'grading_math/formula_grader.md'
     - NumericalGrader: 'grading_math/numerical_grader.md'
     - MatrixGrader: 'grading_math/matrix_grader/matrix_grader.md'
+    - User-Defined Matrix Functions: 'grading_math/matrixfunctions.md'
     - Sampling Sets: 'grading_math/sampling.md'
     - Function List: 'grading_math/functions.md'
     - Comparer Functions: 'grading_math/comparer_functions.md'

@@ -76,12 +76,17 @@ describe('preProcessEqn', () => {
 
   it('replaces ctrans, adj and trans', () => {
     const expr = 'ctrans(x) + adj(x+1) + trans([x, x^2])'
+    window.MJxPrepOptions.vectors_as_columns = true;
     const result = preProcessEqn(expr)
     expect(result).toBe('{:x^dagger:} + {:(x+1)^dagger:} + {:[[x], [ x^2]]^T:}')
+    window.MJxPrepOptions.vectors_as_columns = false;
+    const result2 = preProcessEqn(expr)
+    expect(result2).toBe('{:x^dagger:} + {:(x+1)^dagger:} + {:[x, x^2]^T:}')
   } )
 
   it('replaces conj based on the options', () => {
     const expr = 'conj(psi)'
+    window.MJxPrepOptions.conj_as_star = true;
     const result = preProcessEqn(expr)
     expect(result).toBe('{:psi^**:}')
 

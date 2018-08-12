@@ -441,8 +441,6 @@ class FormulaGrader(ItemGrader):
             Required('max_array_dim', default=0): NonNegative(int)
         })
 
-
-
     Utils = namedtuple('Utils', ['tolerance', 'within_tolerance'])
 
     def get_comparer_utils(self):
