@@ -1,7 +1,7 @@
 """
 MITx Grading Library
 https://github.com/mitodl/mitx-grading-library
-Copyright (c) 2017 Jolyon Bloomfield and Chris Chudzicki
+Copyright (c) 2017-2018 Jolyon Bloomfield and Chris Chudzicki
 All Rights Reserved
 
 See version.py for version number

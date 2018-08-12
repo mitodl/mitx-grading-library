@@ -8,7 +8,7 @@ This version includes a number of new features and documentation updates.
 
 * A new [documentation website](https://mitodl.github.io/mitx-grading-library/)
 * Math parser now supports multivariable functions and array input (vector, matrix, etc).
-* many improvements to our mathjax preprocessor
+* Many improvements to our mathjax preprocessor
 * Improvements to balanced bracket validator.
 * Added new class `MatrixGrader` (see [MatrixGrader documentation](grading_math/matrix_grader/matrix_grader.md)) along with supporting sampling classes `RealMatrices` and `RealVectors`
 * When `FormulaGrader` (and its subclasses) are used inside an ordered `ListGrader`, authors can now grade multiple student inputs in comparison to each other by specifying answers in terms of [sibling variables](grading_math/formula_grader.md/#sibling-variables)

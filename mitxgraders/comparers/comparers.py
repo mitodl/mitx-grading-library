@@ -9,10 +9,10 @@ A comparer function must have signature
 When `FormulaGrader` (or its subclasses) call your custom comparer function,
 `comparer_func`'s argument values are:
 
--`comparer_params_evals`: The `comparer_params` list, numerically evaluated
+- `comparer_params_evals`: The `comparer_params` list, numerically evaluated
   according to variable and function sampling.
 - `student_eval`: The student's input, numerically evaluated according to
-  variable and function sampling
+  variable and function sampling.
 - `utils`: A convenience object that may be helpful when writing custom
   comparer functions. It has attributes:
 
@@ -34,14 +34,13 @@ A comparer function must return either:
   - a boolean, or
   - a dictionary with keys:
       - `'grade_decimal'`: number between 0 and 1 (required)
-      - `'ok'`: `True` or `False` or `'partial'`(optional, inferred from
+      - `'ok'`: `True` or `False` or `'partial'` (optional, inferred from
         grade_decimal by default)
-      - `'msg'`: a feedback message (defaults to `''`)
+      - `'msg'`: a feedback message (optional, defaults to `''`)
 
 
 NOTE: doctests in this module show how the comparer function would be used
       inside a grader
-
 """
 from numbers import Number
 import numpy as np
@@ -50,7 +49,7 @@ from mitxgraders.exceptions import InputTypeError
 def equality_comparer(comparer_params_evals, student_eval, utils):
     """
     Default comparer function used by FormulaGrader, NumericalGrader,
-    and MatrixGrader.
+    and MatrixGrader. Checks for equality.
 
     comparer_params: ['expected_input']
     """
@@ -65,6 +64,8 @@ def equality_comparer(comparer_params_evals, student_eval, utils):
 
 def between_comparer(comparer_params_evals, student_eval, utils):
     """
+    Used to check that input is real and between two parameters.
+
     comparer_params: ['start', 'stop']
 
     Example:
@@ -86,7 +87,6 @@ def between_comparer(comparer_params_evals, student_eval, utils):
     >>> grader(None, '5e8+2e6*i')['ok']
     Traceback (most recent call last):
     InputTypeError: Input must be real.
-
     """
     start, stop = comparer_params_evals
 
@@ -97,6 +97,9 @@ def between_comparer(comparer_params_evals, student_eval, utils):
 
 def congruence_comparer(comparer_params_evals, student_eval, utils):
     """
+    Compares the student input to a target, moduli a given modulus.
+    Will often set modulus to 2*pi in order to compare angles.
+
     comparer_params: [target, modulus]
 
     Example usage:
@@ -126,6 +129,9 @@ def congruence_comparer(comparer_params_evals, student_eval, utils):
 
 def eigenvector_comparer(comparer_params_evals, student_eval, utils):
     """
+    Used to check that a student's answer is an eigenvector of a matrix
+    with a given eigenvalue. Ignores scaling of the eigenvector.
+
     comparer_params: [matrix, eigenvalue]
 
     Example Usage:
