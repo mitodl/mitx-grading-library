@@ -1,8 +1,8 @@
 # StringGrader
 
-The StringGrader class does a letter-for-letter comparison of the student's answer with the expected answer. It is the simplest grading class, both in code and in usage.
+The `StringGrader` class does a letter-for-letter comparison of the student's answer with the expected answer. It is the simplest grading class, both in code and in usage.
 
-To use a StringGrader, simply pass in the set of answers you want to grade, as described in the [ItemGrader documentation](item_grader.md).
+To use a `StringGrader`, simply pass in the set of answers you want to grade, as described in the [ItemGrader documentation](item_grader.md).
 
 ```python
 grader = StringGrader(

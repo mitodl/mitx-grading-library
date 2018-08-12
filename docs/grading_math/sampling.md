@@ -2,13 +2,13 @@
 
 Whenever random variables/functions are involved, they need to be sampled from an appropriate distribution. In this library, distributions are defined in classes that are called _sampling sets_. We have defined a number of sampling sets for various common situations, but you can also create your own by using plugins.
 
-These sampling classes are available for use in FormulaGrader.
+These sampling classes are available for use in `FormulaGrader`, `MatrixGrader`, etc.
 
 ## Variable Names
 
 Variable names must start with a letter, and can continue with letters, numbers, and underscores. Variable names may conclude with an arbitrary number of apostrophes. The same naming conventions apply to user-defined constants.
 
-It is also possible to have tensor variable names. The following three forms are available:
+It is also possible to have "tensor" variable names. The following three forms are available:
 
 - `T^{ijk}`
 - `T_{ijk}`
@@ -34,9 +34,10 @@ Sample from a real interval defined by a `start` and a `stop` value. RealInterva
 >>> sampler = RealInterval([3, 7])
 >>> # The default is [1, 5]
 >>> sampler = RealInterval()
+>>> # A list can also be used to specify an interval
+>>> sampler = [3, 7]
 
 ```
-
 
 ### IntegerRange
 
@@ -106,6 +107,8 @@ Sample real matrices of a specific shape and norm. (`RealMatrices` uses the Frob
 
 ```
 
+If you want to sample a matrix in a way that depends on a scalar, see `DependentSampler` below.
+
 
 ## Variable Sampling: Generic
 
@@ -118,6 +121,8 @@ Sample from a discrete set of values, specified in a tuple. A single value may a
 >>> sampler = DiscreteSet((1, 3, 5, 7, 9))
 >>> # Always select 3.5
 >>> sampler = DiscreteSet(3.5)
+>>> # A tuple can also be used to specify a discrete set
+>>> sampler = (1, 3, 5, 7, 9)
 
 ```
 
@@ -129,6 +134,8 @@ Compute a value for a variable based on the values of other variables. The sampl
 ```python
 >>> # Set radius based on the random values of x, y and z
 >>> sampler = DependentSampler(depends=["x", "y", "z"], formula="sqrt(x^2+y^2+z^2)")
+>>> # Construct a matrix that depends on a variable
+>>> sampler = DependentSampler(depends=["x"], formula="[[x,0],[0,-x^2]]")
 
 ```
 
@@ -173,7 +180,7 @@ You can control how many random sinusoids are added together by specifying `num_
 You can also generate a non-unary function by specifying the input dimension, and generate vector output by specifying the output dimension.
 
 ```python
->>> # Generate a function that takes in two values and outputs a 3D vector
+>>> # Generate a function that takes in two scalar values and outputs a 3D vector
 >>> functionsampler = RandomFunction(input_dim=2, output_dim=3)
 
 ```
