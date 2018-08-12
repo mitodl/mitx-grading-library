@@ -1,32 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="None">
-        
-        
-        <link rel="shortcut icon" href="./img/favicon.ico">
-        <title>MITxGraders</title>
-        <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="./css/font-awesome-4.5.0.css" rel="stylesheet">
-        <link href="./css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="./css/highlight.css">
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <link rel="shortcut icon" href="./img/favicon.ico">
+
+    <title>Overview - MITxGraders</title>
+
+    <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="./css/base.css" rel="stylesheet">
+    <link href="./css/cinder.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/highlight.css">
+
+
+    <link href="./css/extra.css" rel="stylesheet">
+
+
+    <link href="./css/cinder_tweaks.css" rel="stylesheet">
+
+
+    <link href="./css/readthedocs.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
 
-        <script src="./js/jquery-1.10.2.min.js"></script>
-        <script src="./js/bootstrap-3.0.3.min.js"></script>
-        <script src="./js/highlight.pack.js"></script> 
-    </head>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
+    <script>
+    WebFont.load({
+        google: {
+            families: ['Open Sans', 'PT Sans']
+        }
+    });
+    </script>
 
-    <body class="homepage">
+    
+</head>
 
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+<body class="homepage" >
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
 
         <!-- Collapsed navigation -->
@@ -38,6 +59,10 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
+            
+
+            <!-- Main title -->
+
             <a class="navbar-brand" href=".">MITxGraders</a>
         </div>
 
@@ -45,82 +70,133 @@
         <div class="navbar-collapse collapse">
                 <!-- Main navigation -->
                 <ul class="nav navbar-nav">
-                    <li class="active">
-                        <a href=".">Home</a>
-                    </li>
-                    <li class="dropdown">
+                
+                
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
                             
-<li >
-    <a href="getting_started/">Getting Started</a>
+<li class="active">
+    <a href=".">Overview</a>
 </li>
+
+                        
                             
 <li >
     <a href="item_grader/">ItemGrader</a>
 </li>
+
+                        
                             
 <li >
     <a href="string_grader/">StringGrader</a>
 </li>
+
+                        
                         </ul>
                     </li>
+                
+                
+                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Math <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
                             
 <li >
     <a href="grading_math/formula_grader/">FormulaGrader</a>
 </li>
+
+                        
                             
 <li >
     <a href="grading_math/numerical_grader/">NumericalGrader</a>
 </li>
+
+                        
+                            
+<li >
+    <a href="grading_math/matrix_grader/matrix_grader/">MatrixGrader</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="grading_math/matrixfunctions/">User-Defined Matrix Functions</a>
+</li>
+
+                        
                             
 <li >
     <a href="grading_math/sampling/">Sampling Sets</a>
 </li>
+
+                        
                             
 <li >
-    <a href="grading_math/function_list/">Function List</a>
+    <a href="grading_math/functions/">Function List</a>
 </li>
+
+                        
+                            
+<li >
+    <a href="grading_math/comparer_functions/">Comparer Functions</a>
+</li>
+
+                        
                             
 <li >
     <a href="grading_math/renderer/">AsciiMath Renderer Definitions</a>
 </li>
+
+                        
                         </ul>
                     </li>
+                
+                
+                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Lists <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
                             
 <li >
     <a href="grading_lists/list_grader/">ListGrader</a>
 </li>
+
+                        
                             
 <li >
     <a href="grading_lists/single_list_grader/">SingleListGrader</a>
 </li>
+
+                        
                         </ul>
                     </li>
+                
+                
+                
                     <li >
                         <a href="changelog/">Changelog</a>
                     </li>
+                
+                
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                        <i class="fa fa-search"></i> Search
-                    </a>
-                </li>
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fa fa-search"></i> Search
+                        </a>
+                    </li>
                     <li class="disabled">
                         <a rel="next" >
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="getting_started/">
+                        <a rel="prev" href="item_grader/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -132,147 +208,203 @@
     </div>
 </div>
 
-        <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <div class="container">
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#mitx-grading-library-documentation">MITx Grading Library Documentation</a></li>
-            <li><a href="#overview">Overview</a></li>
-            <li><a href="#using-grading-classes">Using Grading Classes</a></li>
-            <li><a href="#options">Options</a></li>
-            <li><a href="#grading-classes">Grading Classes</a></li>
-            <li><a href="#plugins">Plugins</a></li>
+        <li class="first-level active"><a href="#mitx-grading-library-an-overview">MITx Grading Library: An Overview</a></li>
+            <li class="second-level"><a href="#why-use-mitxgraders">Why use MITxGraders</a></li>
+                
+            <li class="second-level"><a href="#two-typical-examples">Two Typical Examples</a></li>
+                
+            <li class="second-level"><a href="#loading-in-edx">Loading in edX</a></li>
+                
+            <li class="second-level"><a href="#grading-classes">Grading Classes</a></li>
+                
+            <li class="second-level"><a href="#using-grading-classes">Using Grading Classes</a></li>
+                
+                <li class="third-level"><a href="#debugging">Debugging</a></li>
+                <li class="third-level"><a href="#validation">Validation</a></li>
+            <li class="second-level"><a href="#plugins">Plugins</a></li>
+                
     </ul>
 </div></div>
-                <div class="col-md-9" role="main">
+        <div class="col-md-9" role="main">
 
-<h1 id="mitx-grading-library-documentation">MITx Grading Library Documentation<a class="headerlink" href="#mitx-grading-library-documentation" title="Permanent link"></a></h1>
-<p>This documentation describes how to use the grading library. In particular, it goes through the syntax required to construct each of the different types of graders.</p>
-<p>For information on installation and how to use the library in edX, see <a href="getting_started/">Getting Started</a>.</p>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link"></a></h2>
-<p>The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.</p>
-<h2 id="using-grading-classes">Using Grading Classes<a class="headerlink" href="#using-grading-classes" title="Permanent link"></a></h2>
-<p>All grading classes are instantiated by calling them. Here, <code>GradingClass</code> is a generic grading class (<code>GradingClass</code> does not actually exist).</p>
-<pre><code class="python">grader = GradingClass(options)
-</code></pre>
-
-<p>The options provided to a grading class may be passed in directly, as</p>
-<pre><code class="python">grader = GradingClass(name='value')
-</code></pre>
-
-<p>You can also pass in a configuration dictionary. This may be helpful if using the same configuration for multiple problems.</p>
-<pre><code class="python">options = {'name': 'value'}
-grader = GradingClass(options)
-</code></pre>
-
-<p>You cannot 'mix and match' these two options. If a configuration dictionary is supplied, any keyword arguments are ignored.</p>
-<h2 id="options">Options<a class="headerlink" href="#options" title="Permanent link"></a></h2>
-<p>The options passed to a grading class undergo extensive validation and graders will throw
-errors if instantiated with invalid options.</p>
-<p>A few error messages serve only as warnings (e.g., that you are attempting to override a default constant like <code>pi</code>). These warning errors can be suppressed by setting</p>
-<pre><code class="python">grader = GradingClass(suppress_warnings=True)
-</code></pre>
-
-<p>Every grading class also has a debug option. By default, <code>debug=False</code>. To receive debug information from a given grader, specify <code>debug=True</code>. Some graders will provide more debug information than others.</p>
-<pre><code class="python">grader = GradingClass(debug=True)
-</code></pre>
-
-<p>All other options are specific to the grading class in question.</p>
-<h2 id="grading-classes">Grading Classes<a class="headerlink" href="#grading-classes" title="Permanent link"></a></h2>
-<p>Grading classes generally fall into two categories: single-input graders and multi-input graders.</p>
-<p>All graders that grade a single input are built on a framework we call an ItemGrader. We recommend understanding how ItemGraders work before diving into more specifics. We provide a number of graders built off ItemGrader. A special type of ItemGrader is SingleListGrader, which lets you grade a delimiter-separated list of inputs in a single response.</p>
-<p>Multi-input graders that are just composed of single-input graders working in concert can be handled by the general ListGrader class. At this stage, ListGrader is the only multi-input grader included in the library, although plugins can be used to construct further examples.</p>
+<h1 id="mitx-grading-library-an-overview">MITx Grading Library: An Overview<a class="headerlink" href="#mitx-grading-library-an-overview" title="Permanent link"> # </a></h1>
+<p>The <code>mitxgraders</code> Python library provides a number of configurable Python classes that can be used as graders in edX custom response problems.</p>
+<h2 id="why-use-mitxgraders">Why use MITxGraders<a class="headerlink" href="#why-use-mitxgraders" title="Permanent link"> # </a></h2>
+<p>Use MITxGraders because it:</p>
 <ul>
-<li><a href="item_grader/">ItemGrader</a></li>
-<li><a href="string_grader/">StringGrader</a></li>
-<li><a href="grading_math/formula_grader/">FormulaGrader</a></li>
-<li><a href="grading_math/numerical_grader/">NumericalGrader</a></li>
-<li><a href="grading_lists/single_list_grader/">SingleListGrader</a></li>
-<li><a href="grading_lists/list_grader/">ListGrader</a></li>
+<li>has many capabilities beyond the standard edX options</li>
+<li>is highly configuration but with <em>sensible defaults</em></li>
+<li>provides useful error messages<ul>
+<li>to students (when submitting answers &mdash; for example, formula parsing errors)</li>
+<li>to problem authors (when configuring a grader)</li>
 </ul>
-<h2 id="plugins">Plugins<a class="headerlink" href="#plugins" title="Permanent link"></a></h2>
-<p>Any .py file stored in the <code>plugins</code> folder will be automatically loaded. All variables in the <strong>all</strong> list will be made available when doing <code>from mitxgraders import *</code>. See <code>template.py</code> for an example.</p>
+</li>
+<li>is reliable (extensively tested)</li>
+<li>is open source (BSD-3 license, <a href="https://github.com/mitodl/mitx-grading-library">our Github repo</a>)</li>
+</ul>
+<h2 id="two-typical-examples">Two Typical Examples<a class="headerlink" href="#two-typical-examples" title="Permanent link"> # </a></h2>
+<p>Typical usage in an edX course looks like:</p>
+<pre class="codehilite"><code class="language-XML">&lt;!-- First Example --&gt;
+&lt;problem&gt;
+&lt;script type=&quot;loncapa/python&quot;&gt;
+from mitxgraders import FormulaGrader, RandomFunction
+grader = FormulaGrader(
+    answers=&quot;e^(f(x)) * f'(x^2) * 2*x&quot;,
+    variables=[&quot;x&quot;],
+    # allows students to use generic functions f and f' in their input
+    user_functions={ &quot;f&quot;: RandomFunction(), &quot;f'&quot;:RandomFunction() }
+)
+&lt;/script&gt;
+
+  &lt;p&gt;Enter the derivative of \(g(x) = e^{f(x^2)} \).&lt;/p&gt;
+  &lt;customresponse cfn=&quot;grader&quot;&gt;
+    &lt;!-- correct_answer is shown to student when they press [Show Answer].
+         Its value is not used for grading purposes --&gt;
+    &lt;textline math=&quot;true&quot; correct_answer=&quot;e^(f(x)) * f'(x^2) * 2*x&quot; /&gt;
+  &lt;/customresponse&gt;
+
+&lt;/problem&gt;</code></pre>
+
+
+<p>The resulting problem would be similar to an edX <code>&lt;formularesponse /&gt;</code> problem, but allows students to use additional generic functions <code>f(x)</code> and <code>f'(x)</code> in their submissions.</p>
+<p>The next example grader would grade an unordered list of mathematical expressions.</p>
+<pre class="codehilite"><code class="language-XML">&lt;problem&gt;
+&lt;script type=&quot;loncapa/python&quot;&gt;
+from mitxgraders import FormulaGrader, ListGrader
+grader = FormulaGrader(
+    answers=['x-2', 'x+2'],
+    ordered=False,
+    subgraders=FormulaGrader(variables=['x'])
+)
+&lt;/script&gt;
+
+  &lt;p&gt;What are the linear factors of \((x^2 - 4)\)?&lt;/p&gt;
+  &lt;customresponse cfn=&quot;grader&quot;&gt;
+    &lt;!-- correct_answer is shown to student when they press [Show Answer].
+         Its value is not used for grading purposes --&gt;
+    &lt;textline math=&quot;true&quot; correct_answer=&quot;x - 2&quot; /&gt;
+    &lt;textline math=&quot;true&quot; correct_answer=&quot;x + 2&quot; /&gt;
+  &lt;/customresponse&gt;
+
+&lt;/problem&gt;</code></pre>
+
+
+<h2 id="loading-in-edx">Loading in edX<a class="headerlink" href="#loading-in-edx" title="Permanent link"> # </a></h2>
+<p>Download <a href="./python_lib.zip">python_lib.zip</a> and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip. If you want to use our AsciiMath renderer definitions, place the <a href="./MjxPrep.js">MjxPrep.js</a> file in your static folder (XML) or upload the file to your course assets (Studio).</p>
+<p>The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.</p>
+<h2 id="grading-classes">Grading Classes<a class="headerlink" href="#grading-classes" title="Permanent link"> # </a></h2>
+<p>Grading classes generally fall into two categories: single-input graders and multi-input graders.</p>
+<p><strong>Single-input graders</strong> grade a single input. All single-input graders are built on a framework we call an <code>ItemGrader</code>. We recommend understanding how <code>ItemGrader</code>s work before diving into more specifics.</p>
+<ul>
+<li><a href="item_grader/">ItemGrader</a><ul>
+<li><a href="string_grader/">StringGrader</a> for grading simple strings of text</li>
+<li><a href="grading_math/formula_grader/">FormulaGrader</a> for grading scalar formulas</li>
+<li><a href="grading_math/numerical_grader/">NumericalGrader</a> for grading numbers</li>
+<li><a href="grading_math/matrix_grader/matrix_grader/">MatrixGrader</a> for grading formulas with vectors and matrices</li>
+<li><a href="grading_lists/single_list_grader/">SingleListGrader</a> for grading a delimiter-separated (default: comma-separated) list of inputs in a single response box</li>
+</ul>
+</li>
+</ul>
+<p><strong>Multi-input graders</strong> are for grading multiple input boxes at once. They are composed of single-input graders working in concert, handled by the general <code>ListGrader</code> class. At this stage, <code>ListGrader</code> is the only multi-input grader included in the library, although plugins can be used to construct further examples.</p>
+<ul>
+<li><a href="grading_lists/list_grader/">ListGrader</a> for grading a list of inputs. Examples:<ul>
+<li>grade an ordered list of strings</li>
+<li>grade an unordered list of mathematical expressions</li>
+<li>grade a list of eigenvalue-eigenvector pairs</li>
+</ul>
+</li>
+</ul>
+<h2 id="using-grading-classes">Using Grading Classes<a class="headerlink" href="#using-grading-classes" title="Permanent link"> # </a></h2>
+<p>All grading classes are instantiated by calling them. Options can be provided using keyword arguments as</p>
+<pre class="codehilite"><code class="language-python">grader = FakeGradingClass(option_1=value_1, option_2=value2)
+# FakeGradingClass is not real! It's just a placeholder</code></pre>
+
+
+<p>or with a configuration dictionary:</p>
+<pre class="codehilite"><code class="language-python">config = {'option_1': value_1, 'option_2': value_2}
+grader = FakeGradingClass(config)</code></pre>
+
+
+<p>Passing the configuration as a dictionary can be useful if you are using the same configuration for multiple problems. However, you cannot 'mix and match' these two options: if a configuration dictionary is supplied, any keyword arguments are ignored.</p>
+<p>Most configuration options are specific to their grading classes. For example, <code>FormulaGrader</code> has a <code>variables</code> configuration key, but <code>NumericalGrader</code> does not.</p>
+<p>A few configuration options are accessible to all grading classes.</p>
+<h3 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Permanent link"> # </a></h3>
+<p>Every grading class has a debug option. By default, <code>debug=False</code>. To receive debug information from a given grader, specify <code>debug=True</code>. Some graders will provide more debug information than others. Debug information can be used by authors to check to make sure that the graders are behaving as expected, but shouldn't be made available to students.</p>
+<pre class="codehilite"><code class="language-python">grader = GradingClass(debug=True)</code></pre>
+
+
+<h3 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link"> # </a></h3>
+<p>Every grading class has a <code>suppress_warnings</code> key.</p>
+<p>The options passed to a grading class undergo extensive validation and graders will throw errors if instantiated with invalid options.</p>
+<p>A few error messages serve only as warnings. For example, if you attempt to configure a <code>FormulaGrader</code> with <code>pi</code> as a variable, you will receive a warning:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import FormulaGrader
+&gt;&gt;&gt; grader = FormulaGrader(variables=['pi'])
+Traceback (most recent call last):
+ConfigError: Warning: 'variables' contains entries '['pi']' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</code></pre>
+
+
+<p>As the warning message says, if you really want to override the default value of <code>'pi'</code> (not recommended!) then you can suppress this warning by setting <code>suppress_warnings=True</code>.</p>
+<h2 id="plugins">Plugins<a class="headerlink" href="#plugins" title="Permanent link"> # </a></h2>
+<p>Any <code>.py</code> file stored in the <code>plugins</code> folder will be automatically loaded. All variables in the <code>__all__</code> list will be made available when doing <code>from mitxgraders import *</code>. See <code>template.py</code> for an example.</p>
 <p>You can define custom grading classes in your plugin. To learn how this works, we recommend copying the code from <code>stringgrader.py</code>, renaming the class, and building a simple plugin based on <code>StringGrader</code>.</p>
 <p>We are happy to include user-contributed plugins in the repository for this library. If you have built a plugin that you would like to see combined into this library, please contact the authors through <a href="https://github.com/mitodl/mitx-grading-library">github</a>. We are also willing to consider incorporating good plugins into the library itself.</p></div>
-        </div>
+        
+    </div>
 
-        <footer class="col-md-12">
-            <hr>
-            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
-        </footer>
-        <script>var base_url = '.';</script>
-        <script src="./js/base.js"></script>
-        <script src="./search/require.js"></script>
-        <script src="./search/search.js"></script>
+    <footer class="col-md-12 text-center">
+        <hr>
+        <p>
+        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
+    </footer>
 
-        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-            </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form role="form">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
-            </div>
-            <div class="modal-footer">
+    <script src="./js/jquery-1.10.2.min.js"></script>
+    <script src="./js/bootstrap-3.0.3.min.js"></script>
+    <script src="./js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+    var base_url = '.';
+    </script>
+    <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
+    <script src="./js/base.js"></script>
+    <script src="./search/require.js"></script>
+    <script src="./search/search.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        From here you can search these documents. Enter your search terms below.
+                    </p>
+                    <form role="form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                        </div>
+                    </form>
+                    <div id="mkdocs-search-results"></div>
+                </div>
+                <div class="modal-footer">
+                </div>
             </div>
         </div>
     </div>
-</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td><kbd>&larr;</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td><kbd>&rarr;</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div>
-
 
     </body>
+
 </html>
 
 <!--
-MkDocs version : 0.17.5
-Build Date UTC : 2018-07-30 20:58:45
+MkDocs version : 0.17.0
+Build Date UTC : 2018-08-12 22:48:15
 -->

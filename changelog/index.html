@@ -1,32 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        
-        
-        <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>Changelog - MITxGraders</title>
-        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
-        <link href="../css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="../css/highlight.css">
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <link rel="shortcut icon" href="../img/favicon.ico">
+
+    <title>Changelog - MITxGraders</title>
+
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../css/base.css" rel="stylesheet">
+    <link href="../css/cinder.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+
+
+    <link href="../css/extra.css" rel="stylesheet">
+
+
+    <link href="../css/cinder_tweaks.css" rel="stylesheet">
+
+
+    <link href="../css/readthedocs.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
 
-        <script src="../js/jquery-1.10.2.min.js"></script>
-        <script src="../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../js/highlight.pack.js"></script> 
-    </head>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
+    <script>
+    WebFont.load({
+        google: {
+            families: ['Open Sans', 'PT Sans']
+        }
+    });
+    </script>
 
-    <body>
+    
+</head>
 
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
 
         <!-- Collapsed navigation -->
@@ -38,6 +59,10 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
+            
+
+            <!-- Main title -->
+
             <a class="navbar-brand" href="..">MITxGraders</a>
         </div>
 
@@ -45,75 +70,126 @@
         <div class="navbar-collapse collapse">
                 <!-- Main navigation -->
                 <ul class="nav navbar-nav">
-                    <li >
-                        <a href="..">Home</a>
-                    </li>
+                
+                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
                             
 <li >
-    <a href="../getting_started/">Getting Started</a>
+    <a href="..">Overview</a>
 </li>
+
+                        
                             
 <li >
     <a href="../item_grader/">ItemGrader</a>
 </li>
+
+                        
                             
 <li >
     <a href="../string_grader/">StringGrader</a>
 </li>
+
+                        
                         </ul>
                     </li>
+                
+                
+                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Math <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
                             
 <li >
     <a href="../grading_math/formula_grader/">FormulaGrader</a>
 </li>
+
+                        
                             
 <li >
     <a href="../grading_math/numerical_grader/">NumericalGrader</a>
 </li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/matrix_grader/matrix_grader/">MatrixGrader</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/matrixfunctions/">User-Defined Matrix Functions</a>
+</li>
+
+                        
                             
 <li >
     <a href="../grading_math/sampling/">Sampling Sets</a>
 </li>
+
+                        
                             
 <li >
-    <a href="../grading_math/function_list/">Function List</a>
+    <a href="../grading_math/functions/">Function List</a>
 </li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/comparer_functions/">Comparer Functions</a>
+</li>
+
+                        
                             
 <li >
     <a href="../grading_math/renderer/">AsciiMath Renderer Definitions</a>
 </li>
+
+                        
                         </ul>
                     </li>
+                
+                
+                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Lists <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
                             
 <li >
     <a href="../grading_lists/list_grader/">ListGrader</a>
 </li>
+
+                        
                             
 <li >
     <a href="../grading_lists/single_list_grader/">SingleListGrader</a>
 </li>
+
+                        
                         </ul>
                     </li>
+                
+                
+                
                     <li class="active">
                         <a href="./">Changelog</a>
                     </li>
+                
+                
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                        <i class="fa fa-search"></i> Search
-                    </a>
-                </li>
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fa fa-search"></i> Search
+                        </a>
+                    </li>
                     <li >
                         <a rel="next" href="../grading_lists/single_list_grader/">
                             <i class="fa fa-arrow-left"></i> Previous
@@ -132,25 +208,57 @@
     </div>
 </div>
 
-        <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <div class="container">
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#change-log">Change Log</a></li>
-            <li><a href="#version-11x">Version 1.1.x</a></li>
-            <li><a href="#version-10x">Version 1.0.x</a></li>
+        <li class="first-level active"><a href="#change-log">Change Log</a></li>
+            <li class="second-level"><a href="#version-12">Version 1.2</a></li>
+                
+                <li class="third-level"><a href="#version-120">Version 1.2.0</a></li>
+            <li class="second-level"><a href="#version-11x">Version 1.1.x</a></li>
+                
+                <li class="third-level"><a href="#version-112">Version 1.1.2</a></li>
+                <li class="third-level"><a href="#version-111">Version 1.1.1</a></li>
+                <li class="third-level"><a href="#version-110">Version 1.1.0</a></li>
+            <li class="second-level"><a href="#version-10x">Version 1.0.x</a></li>
+                
+                <li class="third-level"><a href="#version-105">Version 1.0.5</a></li>
+                <li class="third-level"><a href="#version-104">Version 1.0.4</a></li>
+                <li class="third-level"><a href="#version-103">Version 1.0.3</a></li>
+                <li class="third-level"><a href="#version-102">Version 1.0.2</a></li>
+                <li class="third-level"><a href="#version-101">Version 1.0.1</a></li>
     </ul>
 </div></div>
-                <div class="col-md-9" role="main">
+        <div class="col-md-9" role="main">
 
-<h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link"></a></h1>
-<h2 id="version-11x">Version 1.1.x<a class="headerlink" href="#version-11x" title="Permanent link"></a></h2>
-<h3 id="version-112">Version 1.1.2<a class="headerlink" href="#version-112" title="Permanent link"></a></h3>
+<h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link"> # </a></h1>
+<h2 id="version-12">Version 1.2<a class="headerlink" href="#version-12" title="Permanent link"> # </a></h2>
+<h3 id="version-120">Version 1.2.0<a class="headerlink" href="#version-120" title="Permanent link"> # </a></h3>
+<p>This version includes a number of new features and documentation updates.</p>
+<ul>
+<li>A new <a href="https://mitodl.github.io/mitx-grading-library/">documentation website</a></li>
+<li>Math parser now supports multivariable functions and array input (vector, matrix, etc).</li>
+<li>Many improvements to our mathjax preprocessor</li>
+<li>Improvements to balanced bracket validator.</li>
+<li>Added new class <code>MatrixGrader</code> (see <a href="../grading_math/matrix_grader/matrix_grader/">MatrixGrader documentation</a>) along with supporting sampling classes <code>RealMatrices</code> and <code>RealVectors</code></li>
+<li>When <code>FormulaGrader</code> (and its subclasses) are used inside an ordered <code>ListGrader</code>, authors can now grade multiple student inputs in comparison to each other by specifying answers in terms of <a href="../grading_math/formula_grader.md/#sibling-variables">sibling variables</a></li>
+<li><code>FormulaGrader</code> (and its subclasses) now support <a href="../grading_math/comparer_functions/">comparer functions</a> that can be used to grade student input more flexibly. For example, rather than checking checking that the student input and author input are equal, check that they are equal modulo a certain number. Built-in comparers:<ul>
+<li>equality_comparer</li>
+<li>congruence_comparer</li>
+<li>between_comparer</li>
+<li>eigenvector_comparer</li>
+</ul>
+</li>
+</ul>
+<h2 id="version-11x">Version 1.1.x<a class="headerlink" href="#version-11x" title="Permanent link"> # </a></h2>
+<h3 id="version-112">Version 1.1.2<a class="headerlink" href="#version-112" title="Permanent link"> # </a></h3>
 <ul>
 <li>This version includes an internal change to the way that errors are handled during check.</li>
 <li>If you only use builtin graders (FormulaGrader, ListGrader...) or public plugins (IntegralGrader) you should not notice any difference.</li>
 <li>If you have previously written your own grading class, this change could affect what errors messages are displayed to students. In particular, only exceptions inheriting from <code>MITxError</code> will display their messages to students; other errors will be replaced with a generic error message.</li>
 </ul>
-<h3 id="version-111">Version 1.1.1<a class="headerlink" href="#version-111" title="Permanent link"></a></h3>
+<h3 id="version-111">Version 1.1.1<a class="headerlink" href="#version-111" title="Permanent link"> # </a></h3>
 <ul>
 <li>Added AsciiMath renderer definitions</li>
 <li>We now check for naming collisions in your configuration</li>
@@ -159,7 +267,7 @@
 <li>Removed .pyc files from the zip file</li>
 <li>Minor bug fixes</li>
 </ul>
-<h3 id="version-110">Version 1.1.0<a class="headerlink" href="#version-110" title="Permanent link"></a></h3>
+<h3 id="version-110">Version 1.1.0<a class="headerlink" href="#version-110" title="Permanent link"> # </a></h3>
 <ul>
 <li>Added numbered variables to FormulaGrader</li>
 <li>
@@ -175,113 +283,86 @@
 </div>
 </li>
 </ul>
-<h2 id="version-10x">Version 1.0.x<a class="headerlink" href="#version-10x" title="Permanent link"></a></h2>
-<h3 id="version-105">Version 1.0.5<a class="headerlink" href="#version-105" title="Permanent link"></a></h3>
+<h2 id="version-10x">Version 1.0.x<a class="headerlink" href="#version-10x" title="Permanent link"> # </a></h2>
+<h3 id="version-105">Version 1.0.5<a class="headerlink" href="#version-105" title="Permanent link"> # </a></h3>
 <ul>
 <li>Improved debugging information for FormulaGrader</li>
 <li>FormulaGrader and IntegralGrader perform whitelist, blacklist, and forbidden_string checks after determining answer correctness. Incorrect answers using forbidden strings / functions are now marked incorrect, while correct answers using forbidden strings / functions raise errors.</li>
 <li>Minor improvements to existing unit tests</li>
 </ul>
-<h3 id="version-104">Version 1.0.4<a class="headerlink" href="#version-104" title="Permanent link"></a></h3>
+<h3 id="version-104">Version 1.0.4<a class="headerlink" href="#version-104" title="Permanent link"> # </a></h3>
 <ul>
 <li>Authors can now specify a custom comparer function for FormulaGrader</li>
 <li>IntegralGrader now handles complex integrands, and gives meaningful error messages
   for complex limits.</li>
 <li>Miscellaneous bug fixes for tensor variable name parsing</li>
 </ul>
-<h3 id="version-103">Version 1.0.3<a class="headerlink" href="#version-103" title="Permanent link"></a></h3>
+<h3 id="version-103">Version 1.0.3<a class="headerlink" href="#version-103" title="Permanent link"> # </a></h3>
 <ul>
 <li>Added tensor variable names</li>
 </ul>
-<h3 id="version-102">Version 1.0.2<a class="headerlink" href="#version-102" title="Permanent link"></a></h3>
+<h3 id="version-102">Version 1.0.2<a class="headerlink" href="#version-102" title="Permanent link"> # </a></h3>
 <ul>
 <li>Added error messages for overflow, division-by-zero, and out-of-domain errors in formulas</li>
 <li>Added tests to reach 100% coverage</li>
 <li>Removed redundant code</li>
 <li>Fixed some bugs in unused code</li>
 </ul>
-<h3 id="version-101">Version 1.0.1<a class="headerlink" href="#version-101" title="Permanent link"></a></h3>
+<h3 id="version-101">Version 1.0.1<a class="headerlink" href="#version-101" title="Permanent link"> # </a></h3>
 <ul>
 <li>Added DependentSampler</li>
 <li>Fixed issue with zip file tests</li>
 <li>Added doctests to test suite</li>
 <li>Fixed bug in FormulaGrader when given an empty string</li>
 </ul></div>
-        </div>
+        
+    </div>
 
-        <footer class="col-md-12">
-            <hr>
-            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
-        </footer>
-        <script>var base_url = '..';</script>
-        <script src="../js/base.js"></script>
-        <script src="../search/require.js"></script>
-        <script src="../search/search.js"></script>
+    <footer class="col-md-12 text-center">
+        <hr>
+        <p>
+        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
+    </footer>
 
-        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-            </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form role="form">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
-            </div>
-            <div class="modal-footer">
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap-3.0.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+    var base_url = '..';
+    </script>
+    <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+    <script src="../js/base.js"></script>
+    <script src="../search/require.js"></script>
+    <script src="../search/search.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        From here you can search these documents. Enter your search terms below.
+                    </p>
+                    <form role="form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                        </div>
+                    </form>
+                    <div id="mkdocs-search-results"></div>
+                </div>
+                <div class="modal-footer">
+                </div>
             </div>
         </div>
     </div>
-</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td><kbd>&larr;</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td><kbd>&rarr;</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div>
-
 
     </body>
+
 </html>
