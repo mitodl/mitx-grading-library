@@ -23,7 +23,7 @@ grader = MatrixGrader(
     1 &amp; x \\
     x &amp; -1
   \end{bmatrix}
-\) with positive eigenvalue?</p>
+\) with positive eigenvalue.</p>
 
 <p>This problem uses the <code>eigenvector_comparer</code> comparer function shipped with <code>mitxgraders</code> to check that the student's input is an eigenvector of author-specified matrix. Suggested inputs:</p>
 

@@ -54,4 +54,8 @@ grader = StringGrader(
     &lt;textline correct_answer=&quot;cat&quot;/&gt;
 &lt;/customresponse&gt;}</pre>
 
+<p>You can also use the edXabox command as follows:</p>
+
+<pre>\edXabox{type="custom" expect="something" cfn="grader"}</pre>
+
 </html>

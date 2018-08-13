@@ -2,7 +2,7 @@
 
   <p>If you have a system that contains a large or infinite number of numbered coefficients such as \(a_1\), \(a_2\), etc, it can be a pain to initialize all of these variables as independent variables that the grader should accept. Numbered variables allows you to specify that "a" is a numbered variable, and the system will then accept any entry of the form "a_{##}" where ## is an integer.</p>
 
-  <p>The answer to the problem below is "a_{0} + a_{1} + a_{-1}". Try including "a_{42}" in your expression -- the grader should be happy to parse your expression and grade you appropriately.</p>
+  <p>The answer to the problem below is <code>a_{0} + a_{1} + a_{-1}</code>. Try including <code>a_{42}</code> in your expression. The grader will be happy to parse your expression and grade you appropriately.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import FormulaGrader

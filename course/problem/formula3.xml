@@ -1,6 +1,6 @@
 <problem display_name="Complex Sampling" showanswer="always" weight="10" attempts="">
 
-  <p>We have expanded the function evaluations to return complex numbers where appropriate. This means that you no longer need to be very careful about ensuring you set your ranges so that that square roots never act on a negative number! Here's an example where the answer is "sqrt(1-x)", and x is sampled from 0 to 10. edX will basically always grade the student wrong in this situation. Here's our take.</p>
+  <p>We have expanded the function evaluations to return complex numbers where appropriate. This means that you no longer need to be very careful about ensuring you set your ranges so that that square roots never act on a negative number! Here's an example where the answer is <code>sqrt(1-x)</code>, and x is sampled from 0 to 10. edX will basically always grade the student wrong in this situation. Here's our take.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
@@ -17,7 +17,7 @@ grader = FormulaGrader(
   <textline math="1" correct_answer="sqrt(1-x)"/>
 </customresponse>
 
-  <p>You can also specify that a variable to be sampled is complex. We have added functions re, im, abs and conj to allow for manipulating complex expressions. Here is an example that asks for the modulus of z squared. You can enter "abs(z)^2", "z*conj(z)", "re(z)^2+im(z)^2", or whatever else does the job. Note that "z^2" will be graded incorrect.</p>
+  <p>You can also specify that a variable to be sampled is complex. We have added functions re, im, abs and conj to allow for manipulating complex expressions. Here is an example that asks for the modulus of z squared. You can enter <code>abs(z)^2</code>, <code>z*conj(z)</code>, <code>re(z)^2+im(z)^2</code>, or whatever else does the job. Note that <code>z^2</code> will be graded incorrect.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
@@ -34,7 +34,7 @@ grader2 = FormulaGrader(
   <textline math="1" correct_answer="abs(z)^2"/>
 </customresponse>
 
-<p>Note that "re" and "im" display correctly as functions, and "conj" displays with a nice overline. To accomplish this, we use AsciiMath renderer definitions loaded as a javascript file. See the documentation for details.</p>
+<p>Note that "re" and "im" display correctly as functions, and "conj" displays with a nice overline. To accomplish this, we use AsciiMath renderer definitions loaded as a javascript file. There is also an option to display "conj" with a star instead of a bar. See the documentation for details.</p>
 
 <script type="text/javascript" src="/static/MJxPrep.js"></script>
 

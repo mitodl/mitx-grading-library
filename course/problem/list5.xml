@@ -57,9 +57,9 @@ grader = ListGrader(
     <li>1st pair: <code>+sqrt(1+x^2)</code>, <code>[1+sqrt(1+x^2), x]</code></li>
     <li>2nd pair: <code>-sqrt(1+x^2)</code>, <code>[1-sqrt(1+x^2), x]</code></li>
   </ul>
+  <p>The eigenvectors can be multiplied by any constant. Try using <code>5*[1-sqrt(1+x^2), x]</code> for the second eigenvector, for example.</p>
 
 <customresponse cfn="grader">
-
   <table>
     <tr>
       <th></th>
@@ -78,7 +78,6 @@ grader = ListGrader(
     </tr>
   </table>
 </customresponse>
-
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list5.xml" target="_blank">View source</a>
 

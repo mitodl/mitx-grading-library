@@ -13,6 +13,7 @@ Use MITxGraders because it:
       - to problem authors (when configuring a grader)
  - is reliable (extensively tested)
  - is open source (BSD-3 license, [our Github repo](https://github.com/mitodl/mitx-grading-library))
+ - has an [excellent example edX course](https://edge.edx.org/courses/course-v1:MITx+grading-library+examples/)
 
 ## Two Typical Examples
 

@@ -1,6 +1,6 @@
 <problem display_name="More General Names" showanswer="always" weight="10" attempts="">
 
-  <p>Variable names can now include primes at the end! Here, the answer is "x'+v*t" (a Galilean change of coordinate).</p>
+  <p>Variable names can now include primes at the end! Here, the answer is <code>x'+v*t</code> (a Galilean change of coordinate).</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
@@ -15,7 +15,7 @@ grader = FormulaGrader(
   <textline math="1" inline="1" correct_answer="x'+v*t"/>
 </customresponse>
 
-  <p>You can also use tensor notation for variable names. Here, the answer is "T_{x}^{13} + 2*T_{y}^{13}". Notice that the preview box styles these correctly. The caret to indicate raised indices is not confused with the caret to indicate powers.</p>
+  <p>You can also use tensor notation for variable names. Here, the answer is <code>T_{x}^{13} + 2*T_{y}^{13}</code>. Notice that the preview box styles these correctly. The caret to indicate raised indices is not confused with the caret to indicate powers.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
@@ -29,6 +29,8 @@ grader2 = FormulaGrader(
 <customresponse cfn="grader2" inline="1">
   <textline math="1" inline="1" correct_answer="T_{x}^{13}+2*T_{y}^{13}"/>
 </customresponse>
+
+<p>Update: These enhancements have now been added to edX!</p>
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula4.xml" target="_blank">View source</a>
 
