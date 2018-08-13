@@ -1,10 +1,12 @@
 <course>
-  <chapter url_name="examples" display_name="Live Examples">
-    <sequential url_name="intro" display_name="Introduction">
-      <vertical url_name="v-intro" display_name="Introduction">
+  <chapter url_name="about" display_name="About">
+    <sequential url_name="intro" display_name="About">
+      <vertical url_name="v-intro" display_name="MITx Grading Library">
         <html url_name="introduction"/>
       </vertical>
     </sequential>
+  </chapter>
+  <chapter url_name="examples" display_name="Live Examples">
     <sequential url_name="stringgrader" display_name="StringGrader">
       <vertical url_name="v-string" display_name="StringGrader">
         <html url_name="stringinfo"/>
@@ -36,6 +38,7 @@
         <problem url_name="matrix4"/>
         <problem url_name="matrix5"/>
         <problem url_name="matrix6"/>
+        <problem url_name="matrix7"/>
       </vertical>
     </sequential>
     <sequential url_name="singlelistgrader" display_name="SingleListGrader">

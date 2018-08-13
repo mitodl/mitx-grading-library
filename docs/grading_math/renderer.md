@@ -46,7 +46,7 @@ There are a few configurable options for the preprocessor in `MJxPrep.js`.
 
 By default, `conj()` displays as a bar over the argument to the function. However, you may wish for complex conjugates to be displayed as a superscript star. If so, you can set `conj_as_star: true` at the start of the file.
 
-By default, vectors `[1, 2, 3]` display as a row vector. If you would instead like them to display as a column vector, you can set the option `vectors_as_columns: true` at the start of the file.
+By default, vectors `[1, 2, 3]` display as a column vector when the preprocessor is loaded (without the preprocessor, it will display as a row). If you would instead like them to display as a row vector, you can set the option `vectors_as_columns: false` at the start of the file.
 
 
 ## Notes

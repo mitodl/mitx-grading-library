@@ -15,7 +15,7 @@ if (window.MJxPrep) {
   // Specify options
   window.MJxPrepOptions = {
     conj_as_star: false,
-    vectors_as_columns: false
+    vectors_as_columns: true
   }
 
   // Define the preprocessor

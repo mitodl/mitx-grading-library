@@ -19,16 +19,27 @@ grader = ListGrader(
 </script>
 
 <customresponse cfn="grader" inline="1">
-  <p style="display:inline">First animal: </p><textline inline="1" correct_answer="dog"/>
-  <p style="display:inline">Number: </p><textline inline="1" correct_answer="2"/>
-  <br/>
-  <p style="display:inline">Second animal: </p><textline inline="1" correct_answer="bird"/>
-  <p style="display:inline">Number: </p><textline inline="1" correct_answer="1"/>
-  <br/>
-  <p style="display:inline">Third animal: </p><textline inline="1" correct_answer="lion"/>
-  <p style="display:inline">Number: </p><textline inline="1" correct_answer="3"/>
+  <table>
+    <tr>
+      <th>Animal</th>
+      <th>Number</th>
+    </tr>
+    <tr>
+      <td><textline correct_answer="dog"/></td>
+      <td><textline correct_answer="2"/></td>
+    </tr>
+    <tr>
+      <td><textline correct_answer="bird"/></td>
+      <td><textline inline="1" correct_answer="1"/></td>
+    </tr>
+    <tr>
+      <td><textline inline="1" correct_answer="lion"/></td>
+      <td><textline inline="1" correct_answer="3"/></td>
+    </tr>
+  </table>
 </customresponse>
 
+<p>Note that such questions are often most cleanly presented using an HTML table, as shown here.</p>
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list3.xml" target="_blank">View source</a>
 

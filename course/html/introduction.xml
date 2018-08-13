@@ -1,6 +1,9 @@
-<html display_name="Introduction">
+<html display_name="MITx Grading Library">
 
-<h1>MITx Grading Library</h1>
+<p>This course exists as a demonstration course to show off the features and capabilities of the MITx Grading Library. Please feel free to explore the course.</p>
+
+<p>The MITx Grading Library is an open source python grading library for edX. The full source code (as well as the source code for this demonstration course) <a href="https://github.com/mitodl/mitx-grading-library" target="_blank">can be found on github</a>, while comprehensive documentation can be found <a href="https://mitodl.github.io/mitx-grading-library/" target="_blank">here</a>.</p>
+
 
 <h2>About</h2>
 
@@ -18,13 +21,13 @@
 
 <h2>Where can I get it?</h2>
 
-<p>This library is made freely available on <a href="https://github.com/mitodl/mitx-grading-library">github</a>, where you can see the full source code, documentation, and also the source for this demonstration course. We have endeavoured to make this library as simple as possible to set up and use. Just download the <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a> file and start using it!</p>
+<p>This library is made freely available on <a href="https://github.com/mitodl/mitx-grading-library" target="_blank">github</a>, where you can see the full source code, including the source for this demonstration course. Comprehensive documentation is available <a href="https://mitodl.github.io/mitx-grading-library/" target="_blank">here</a>. We have endeavoured to make this library as simple as possible to set up and use. Just download the <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a> file and start using it!</p>
 
 
 <h2>Legal details and Credit</h2>
 
 <p>This library is released for use under the BSD-3 license. See the github repository for full license details.</p>
 
-<p>The MITx Grading Library was created by <a href="mailto:jolyon@mit.edu">Jolyon Bloomfield</a> and Christopher Chudzicki. Copyright 2017</p>
+<p>The MITx Grading Library was created by <a href="mailto:jolyon@mit.edu">Jolyon Bloomfield</a> and Christopher Chudzicki. Copyright 2017-2018.</p>
 
 </html>

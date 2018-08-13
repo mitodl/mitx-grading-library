@@ -1,5 +1,5 @@
 <html display_name="IntegralGrader">
 
-<p>The library is quite extensible, and contains a plugin framework. IntegralGrader is an example of such a grader, which was custom-built for a very specific purpose. Take a look at the example problem to see how it works!</p>
+<p>The library is quite extensible, and contains a plugin framework. <code>IntegralGrader</code> is an example of such a grader, which was custom-built for a very specific purpose. Take a look at the example problem to see how it works!</p>
 
 </html>

@@ -1,6 +1,6 @@
 <problem display_name="User Functions and Constants" showanswer="always" weight="10" attempts="">
 
-  <p>It is possible to specify user-defined constants and functions. Here, we add a constant tau (= 2*pi), and also define the Heaviside step function H(x). You can also specify an unknown function, for which we sample a well-behaved random function. In the following example, the answer is "H(x)*f''(tau)", where f'' is a random function.</p>
+  <p>It is possible to specify user-defined constants and functions. Here, we add a constant tau (= 2*pi), and also define the Heaviside step function H(x). You can also specify an unknown function, for which we sample a well-behaved random function. In the following example, the answer is <code>H(x)*f''(tau)</code>, where f'' is a random function.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
@@ -28,7 +28,7 @@ grader = FormulaGrader(
   <textline math="1" inline="1" correct_answer="H(x)*f''(tau)"/>
 </customresponse>
 
-<p>User-defined functions often don't render quite right when using textline inputs. For example, try typing in "1/H(x)" in the box above. If you make extensive use of user-defined functions, we suggest incorporating those functions into the AsciiMath renderer definitions file we provide. See the documentation for details.</p>
+<p>User-defined functions often don't render quite right when using textline inputs. For example, try typing in <code>1/H(x)</code> in the box above. If you make extensive use of user-defined functions, we suggest incorporating those functions into the AsciiMath renderer definitions file we provide. See the documentation for details.</p>
 
 <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula5.xml" target="_blank">View source</a>
 

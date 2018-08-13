@@ -2,12 +2,21 @@
 
 <script type="loncapa/python">
 from mitxgraders import ListGrader, NumericalGrader
+from mitxgraders.comparers import between_comparer
 
-initial_subgrader = NumericalGrader(tolerance=2)
+# The grader for the first box: a number between 4 and 6
+initial_subgrader = NumericalGrader(
+    answers={
+        'comparer': between_comparer,
+        'comparer_params': ['4', '6']
+    }
+)
+
+# The grader for the second and third boxes: apply Newton's iterations
 iteration_subgrader = NumericalGrader(
     tolerance=1e-6,
     user_functions={
-        # these are just for convenience when specifying answer above.
+        # These are just for convenience when specifying the answer for these boxes
         # Students could use them, but we will not announce their existence
         'f' : lambda x: x**2 - 9,           # root is x = sqrt(9)
         'df': lambda x: 2*x                 # derivative of f
@@ -30,11 +39,11 @@ grader = ListGrader(
 </script>
 
   <p>
-    When a student submits several mathematical inputs as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This problem uses sibling variables to score subsequent answers based off of the previous one. Sibling variables are available to <code>FormulaGrader</code>s, <code>NumericalGrader</code>s, and <code>MatrixGrader</code>s when used inside an <strong>ordered</strong> <code>ListGrader</code>.
+    When a student submits several mathematical inputs as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This problem uses sibling variables to score subsequent answers based off of the previous one. Sibling variables are available to FormulaGraders, NumericalGraders, and MatrixGraders when used inside an <strong>ordered</strong> ListGrader.
   </p>
 
   <p>
-    Use Newton's Method on \(f(x)=x^2 - 9\) to calculate the square root of 9. Use anything in the interval \( (4, 6) \) as your starting value. Round answers to no fewer than 6 decimal places.
+    Use Newton's Method on \(f(x)=x^2 - 9\) to calculate the square root of 9. Use anything in the interval \( (4, 6) \) as your starting value, \(x_0\). Round answers to no fewer than 6 decimal places.
   </p>
 
   <p>Suggested inputs:</p>
@@ -48,7 +57,7 @@ grader = ListGrader(
     <table>
       <tr>
         <th></th>
-        <th>value</th>
+        <th>Value</th>
       </tr>
       <tr>
         <td>\(x_0\)</td>

@@ -1,18 +1,18 @@
 <problem display_name="Improvements over edX" showanswer="always" weight="10" attempts="">
 
-  <p>The following is a simple formularesponse problem, except that we're using our library instead of edX. There is a variable "m", and the answer is "m*(1-sin(2*m))".</p>
+  <p>The following is a simple formularesponse problem, except that we're using our library instead of edX. There is a variable <code>m</code>, and the answer is <code>m*(1-sin(2*m))</code>.</p>
 
   <p>The interesting part is what happens when you have a mistake in your input. Try the following:</p>
 
   <ul>
-    <li>m*(1-sin(2*m) (missing closing parentheses)</li>
-    <li>m*(1-sin(2*m))) (extra closing parentheses)</li>
-    <li>m*(1-Sin(2*m)) (wrong capitalization for function name)</li>
-    <li>m(1-sin(2*m)) (forgot multiplication before brackets)</li>
-    <li>m*(1-sin(2m)) (forgot multiplication in 2*m)</li>
-    <li>x*(1-sin(2*m)) (unknown variable x)</li>
-    <li>1/0 (division by zero)</li>
-    <li>10^400 (overflow)</li>
+    <li><code>m*(1-sin(2*m)</code> (missing closing parentheses)</li>
+    <li><code>m*(1-sin(2*m)))</code> (extra closing parentheses)</li>
+    <li><code>m*(1-Sin(2*m))</code> (wrong capitalization for function name)</li>
+    <li><code>m(1-sin(2*m))</code> (forgot multiplication before brackets)</li>
+    <li><code>m*(1-sin(2m))</code> (forgot multiplication in 2*m)</li>
+    <li><code>x*(1-sin(2*m))</code> (unknown variable x)</li>
+    <li><code>1/0</code> (division by zero)</li>
+    <li><code>10^400</code> (overflow)</li>
   </ul>
 
 <script type="text/python" system_path="python_lib">

@@ -2,7 +2,7 @@
 
   <p>Often, there are multiple ways of writing a result, depending on the variables you use. Sometimes, you want students to have flexibility in the use of variables. This is particularly common in the case of polar coordinates, where you may want \(x\), \(y\) and \(r\) to appear.</p>
 
-  <p>The answer to the below question is "x/r". You can also enter "x/sqrt(x^2+y^2)".</p>
+  <p>The answer to the below question is <code>x/r</code>. You can also enter <code>x/sqrt(x^2+y^2)</code>.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
