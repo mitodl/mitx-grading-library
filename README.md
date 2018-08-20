@@ -9,6 +9,8 @@ Version 1.2.0 ([changelog](docs/changelog.md))
 
 Copyright 2017-2018 Jolyon Bloomfield and Chris Chudzicki
 
+Licensed under the [BSD-3 License](LICENSE).
+
 We thank the MIT Office of Digital Learning for their support.
 
 **Table of Contents**
