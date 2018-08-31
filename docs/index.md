@@ -2,6 +2,12 @@
 
 The `mitxgraders` Python library provides a number of configurable Python classes that can be used as graders in edX custom response problems.
 
+## Relevant Links
+
+* A [complete example course](https://edge.edx.org/courses/course-v1:MITx+grading-library+examples/) that demonstrates most of the features of this library is available on edX edge
+* [Complete source code](https://github.com/mitodl/mitx-grading-library) for the library and the aforementioned example course is available on github
+
+
 ## Why use MITxGraders
 
 Use MITxGraders because it:
