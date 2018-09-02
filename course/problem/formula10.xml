@@ -74,6 +74,8 @@ grader = ListGrader(
     </table>
   </customresponse>
 
+  <p>We envisage that this functionality will be particularly useful in multi-part exam problems, where if students make a mistake in an early part, partial credit can be awarded for carrying that mistake forwards to subsequent parts.</p>
+
   <h3>Resources</h3>
   <ul>
     <li>
