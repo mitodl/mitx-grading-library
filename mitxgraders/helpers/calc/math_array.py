@@ -295,7 +295,14 @@ class MathArray(np.ndarray):
         else:
             # just in case it had been an integer-like float
             exponent = int(exponent)
-            return np.linalg.matrix_power(self, exponent)
+            try:
+                return np.linalg.matrix_power(self, exponent)
+            except np.linalg.linalg.LinAlgError as error:
+                if error.message.startswith('Singular'):
+                    raise MathArrayError('Cannot raise singular matrix to negative powers.')
+                else:
+                    # Not sure what could cause this...
+                    raise # pragma: no cover
 
     _default_negative_powers = True
     _negative_powers = True
