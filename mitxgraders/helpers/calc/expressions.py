@@ -414,7 +414,7 @@ class MathParser(object):
         #   subscripts (optional):
         #       any combination of alphanumeric and underscores
         #   lower_indices (optional):
-        #       Of form "_{(-)<alaphnumeric>}"
+        #       Of form "_{(-)<alphanumeric>}"
         #   upper_indices (optional):
         #       Of form "^{(-)<alphanumeric>}"
         #   tail (optional):
@@ -608,7 +608,7 @@ class MathExpression(object):
         bad_suffixes = set(suff for suff in self.suffixes_used if suff not in suffixes)
         if bad_suffixes:
             bad_suff_names = ', '.join(sorted(bad_suffixes))
-            message = "Invalid Input: {} not permitted directly after a number."
+            message = "Invalid Input: {} not permitted directly after a number"
 
             # Check to see if there is a corresponding variable name
             if any(suff in variables for suff in bad_suffixes):
@@ -627,6 +627,21 @@ class MathExpression(object):
             raise UndefinedFunction(message.format(bad_suff_names))
 
     def eval(self, variables, functions, suffixes, allow_inf=False):
+        """
+        Numerically evaluate a MathExpression's tree, returning a tuple of the
+        numeric result and evaluation metadata.
+
+        Also recasts some errors as CalcExceptions (which are student-facing).
+
+        Arguments:
+            variables (dict): maps variable names to values
+            functions (dict): maps function names to values
+            suffixes (dict): maps suffix names to values
+            allow_inf (bool): If true, any node evaluating to inf will throw
+                a CalcOverflowError
+
+        See class-level docstring for example usage.
+        """
         self.check_scope(variables, functions, suffixes)
 
         # metadata_dict['max_array_dim_used'] is updated by eval_array
@@ -670,8 +685,8 @@ class MathExpression(object):
     @staticmethod
     def eval_node(node, actions, allow_inf):
         """
-        Recursively evaluates a node, calling itself on the nodes children. Delegates to one of the provided actions,
-        passing evaluated child nodes as arguments.
+        Recursively evaluates a node, calling itself on the node's children.
+        Delegates to one of the provided actions, passing evaluated child nodes as arguments.
         """
 
         if not isinstance(node, ParseResults):
@@ -1096,6 +1111,7 @@ class MathExpression(object):
         return result
 
 PARSER = MathParser()
+
 def evaluator(formula,
               variables=DEFAULT_VARIABLES,
               functions=DEFAULT_FUNCTIONS,

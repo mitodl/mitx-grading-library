@@ -199,6 +199,6 @@ def test_suffix_capitalization_error():
     variables = {}
     functions = {}
     suffixes = {'M'}
-    match = "Invalid Input: m not permitted directly after a number. \(did you mean M\?\)"
+    match = "Invalid Input: m not permitted directly after a number \(did you mean M\?\)"
     with raises(CalcError, match=match):
         evaluator('5m', variables, functions, suffixes)

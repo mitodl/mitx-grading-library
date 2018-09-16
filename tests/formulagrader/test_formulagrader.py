@@ -94,11 +94,11 @@ def test_fg_invalid_input():
     with raises(CalcError, match=expect):
         grader(None, "R")
 
-    expect = "Invalid Input: pp not permitted directly after a number."
+    expect = "Invalid Input: pp not permitted directly after a number"
     with raises(CalcError, match=expect):
         grader(None, "5pp")
 
-    expect = "Invalid Input: m not permitted directly after a number. \(did you forget to use \* for multiplication\?\)"
+    expect = "Invalid Input: m not permitted directly after a number \(did you forget to use \* for multiplication\?\)"
     with raises(CalcError, match=expect):
         grader(None, "5m")
 
@@ -169,7 +169,7 @@ def test_fg_percent():
     )
     assert grader(None, "2%")['ok']
     assert grader(None, "0.02")['ok']
-    with raises(CalcError, match="Invalid Input: m not permitted directly after a number."):
+    with raises(CalcError, match="Invalid Input: m not permitted directly after a number"):
         grader(None, "20m")
 
 def test_fg_metric():
