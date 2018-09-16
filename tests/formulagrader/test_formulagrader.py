@@ -74,7 +74,7 @@ def test_fg_expressions():
     assert not grader(None, "0.02+(cos(3/2) + sin(3/2))/cos(3/2 + 2*pi)")['ok']
 
 def test_fg_invalid_input():
-    grader = FormulaGrader(answers='2')
+    grader = FormulaGrader(answers='2', variables=['m'])
 
     expect = 'Invalid Input: pi not permitted in answer as a function ' + \
              '\(did you forget to use \* for multiplication\?\)'
@@ -94,9 +94,13 @@ def test_fg_invalid_input():
     with raises(CalcError, match=expect):
         grader(None, "R")
 
-    expect = "Invalid Input: Could not parse '5pp' as a formula"
+    expect = "Invalid Input: pp not permitted directly after a number."
     with raises(CalcError, match=expect):
         grader(None, "5pp")
+
+    expect = "Invalid Input: m not permitted directly after a number. \(did you forget to use \* for multiplication?"
+    with raises(CalcError, match=expect):
+        grader(None, "5m")
 
     expect = ("There was an error evaluating csc\(...\). "
               "Its input does not seem to be in its domain.")
@@ -165,7 +169,7 @@ def test_fg_percent():
     )
     assert grader(None, "2%")['ok']
     assert grader(None, "0.02")['ok']
-    with raises(CalcError, match="Invalid Input: Could not parse '20m' as a formula"):
+    with raises(CalcError, match="Invalid Input: m not permitted directly after a number."):
         grader(None, "20m")
 
 def test_fg_metric():

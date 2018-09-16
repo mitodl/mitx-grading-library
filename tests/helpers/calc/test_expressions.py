@@ -1,5 +1,5 @@
 """
-Tests of calc.py
+Tests of expression.py that arent covered elsewhere
 """
 from __future__ import division
 import re
@@ -28,16 +28,22 @@ def test_calcpy():
     # Test formula with None
     value, used = evaluator(None, {}, {}, {})
     assert value == approx(float('nan'), nan_ok=True)
-    assert (used.functions, used.variables, used.suffixes) == (set(), set(), set())
+    assert used.functions_used == set()
+    assert used.variables_used == set()
+    assert used.suffixes_used == set()
 
     # Test formulae with parallel operator
     value, used = evaluator("1 || 1 || 1", {}, {}, {})
     assert value == 1/3
-    assert (used.functions, used.variables, used.suffixes) == (set(), set(), set())
+    assert used.functions_used == set()
+    assert used.variables_used == set()
+    assert used.suffixes_used == set()
 
     value, used = evaluator("1 || 1 || 0", {}, {}, {})
     assert value == approx(float('nan'), nan_ok=True)
-    assert (used.functions, used.variables, used.suffixes) == (set(), set(), set())
+    assert used.functions_used == set()
+    assert used.variables_used == set()
+    assert used.suffixes_used == set()
 
     # Test incorrect case variables
     msg = r"Invalid Input: X not permitted in answer as a variable \(did you mean x\?\)"
@@ -128,7 +134,6 @@ def test_calc_functions_multiple_arguments():
     with raises(ArgumentError):
         evaluator("h(1,2)", {}, {"h": h3}, {})
 
-
 def test_negation():
     """Test that appropriate numbers of +/- signs are accepted"""
     assert evaluator("1+-1")[0] == 0
@@ -189,3 +194,11 @@ def test_div_by_zero():
         evaluator("1/0")
     with raises(CalcZeroDivisionError, match=msg):
         evaluator("0^-1")
+
+def test_suffix_capitalization_error():
+    variables = {}
+    functions = {}
+    suffixes = {'M'}
+    match = "Invalid Input: m not permitted directly after a number. \(did you mean M\?\)"
+    with raises(CalcError, match=match):
+        evaluator('5m', variables, functions, suffixes)

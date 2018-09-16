@@ -3,7 +3,7 @@ calc module
 
 Exports frequently used objects for convenience
 """
-from mitxgraders.helpers.calc.calc import evaluator
+from mitxgraders.helpers.calc.expressions import evaluator, PARSER
 from mitxgraders.helpers.calc.mathfuncs import (
     DEFAULT_VARIABLES,
     DEFAULT_FUNCTIONS,

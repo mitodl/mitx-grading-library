@@ -1,3 +1,6 @@
+"""
+tests of expression.py with arrays
+"""
 from __future__ import division
 from pytest import raises
 import numpy as np

@@ -485,7 +485,7 @@ class IntegralGrader(AbstractGrader):
                                       suffixes={},
                                       allow_inf=True)
 
-        used_funcs = lower_used.functions.union(upper_used.functions).union(integrand_used.functions)
+        used_funcs = lower_used.functions_used.union(upper_used.functions_used, integrand_used.functions_used)
 
         return lower, upper, used_funcs
 

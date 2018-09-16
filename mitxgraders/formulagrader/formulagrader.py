@@ -17,10 +17,9 @@ from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet
                                   schema_user_functions, validate_user_constants)
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.baseclasses import ItemGrader
-from mitxgraders.helpers.calc import (evaluator, within_tolerance, MathArray,
-                                      DEFAULT_VARIABLES, DEFAULT_FUNCTIONS,
-                                      DEFAULT_SUFFIXES)
-from mitxgraders.helpers.calc.calc import parsercache
+from mitxgraders.helpers.calc import (
+    PARSER, evaluator, within_tolerance, MathArray,
+    DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NonNegative, is_callable, PercentageString, all_unique,
     is_callable_with_args)
@@ -578,12 +577,9 @@ class FormulaGrader(ItemGrader):
         is_empty = lambda x: x is None or x.strip() == ''
         expressions = [expr for expr in expressions if not is_empty(expr)]
         # Pre-parse all expressions (these all get cached)
-        parsers = [
-            parsercache.get_parser(expr, self.suffixes)
-            for expr in expressions
-            ]
+        parsed_expressions = [PARSER.parse(expr) for expr in expressions]
         # Create a list of all variables used in the expressions
-        vars_used = set().union(*[parser.variables_used for parser in parsers])
+        vars_used = set().union(*[p.variables_used for p in parsed_expressions])
         return vars_used
 
     def generate_variable_list(self, expressions):
@@ -720,14 +716,14 @@ class FormulaGrader(ItemGrader):
             if not comparer_result['ok']:
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
-                    return comparer_result, used.functions
+                    return comparer_result, used.functions_used
 
         # This response appears to agree with the expected answer
         return {
             'ok': answer['ok'],
             'grade_decimal': answer['grade_decimal'],
             'msg': answer['msg']
-        }, used.functions
+        }, used.functions_used
 
     @staticmethod
     def eval_and_validate_comparer_params(scoped_eval, comparer_params, siblings_eval):
@@ -746,9 +742,9 @@ class FormulaGrader(ItemGrader):
 
         results = [scoped_eval(param, max_array_dim=float('inf'))
                    for param in comparer_params]
-        # results is a list of (value, ScopeUsage) pairs
+        # results is a list of (value, EvalMetaData) pairs
         comparer_params_eval = [value for value, _ in results]
-        used_variables = set().union(*[used.variables for _, used in results])
+        used_variables = set().union(*[used.variables_used for _, used in results])
 
         for variable in used_variables:
             if variable in siblings_eval and np.isnan(siblings_eval[variable]):
