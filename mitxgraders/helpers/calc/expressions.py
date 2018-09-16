@@ -1,7 +1,9 @@
 """
 expressions.py
 
-Defines classes to parse and evaluate mathematical expressions.
+Defines classes to parse and evaluate mathematical expressions. Implements
+similar functionality and API as edX's calc.py, but re-written with enhancements
+and to betterseparate parsing and evaluation.
 
 To evaluate a mathematical expression like '2^a + [x, 2]*[y, 4]', we proceed
 in two steps:
