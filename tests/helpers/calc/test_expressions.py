@@ -1,5 +1,5 @@
 """
-Tests of calc.py
+Tests of expressions.py that aren't covered elsewhere
 """
 from __future__ import division
 import re
@@ -14,8 +14,8 @@ from mitxgraders.helpers.calc.exceptions import (
 )
 from mitxgraders.helpers.calc.math_array import equal_as_arrays, MathArray
 
-def test_calcpy():
-    """Tests of calc.py that aren't covered elsewhere"""
+def test_expressions_py():
+    """Tests of expressions.py that aren't covered elsewhere"""
 
     # Test unhandled exception
     def badfunc(a):
@@ -28,16 +28,16 @@ def test_calcpy():
     # Test formula with None
     value, used = evaluator(None, {}, {}, {})
     assert value == approx(float('nan'), nan_ok=True)
-    assert (used.functions, used.variables, used.suffixes) == (set(), set(), set())
+    assert used.functions_used == set()
+    assert used.variables_used == set()
+    assert used.suffixes_used == set()
 
     # Test formulae with parallel operator
     value, used = evaluator("1 || 1 || 1", {}, {}, {})
     assert value == 1/3
-    assert (used.functions, used.variables, used.suffixes) == (set(), set(), set())
-
-    value, used = evaluator("1 || 1 || 0", {}, {}, {})
-    assert value == approx(float('nan'), nan_ok=True)
-    assert (used.functions, used.variables, used.suffixes) == (set(), set(), set())
+    assert used.functions_used == set()
+    assert used.variables_used == set()
+    assert used.suffixes_used == set()
 
     # Test incorrect case variables
     msg = r"Invalid Input: X not permitted in answer as a variable \(did you mean x\?\)"
@@ -45,7 +45,7 @@ def test_calcpy():
         evaluator("X", {"x": 1}, {}, {})
 
 def test_varnames():
-    """Test variable names in calc.py"""
+    """Test parsing of variable names"""
     # Tensor variable names
     assert evaluator("U^{ijk}", {"U^{ijk}": 2}, {}, {})[0] == 2
     assert evaluator("U_{ijk}/2", {"U_{ijk}": 2}, {}, {})[0] == 1
@@ -101,7 +101,7 @@ def test_brackets_closed_by_wrong_type_raise_error():
         evaluator("5 + (1+2] + 3")
 
 def test_calc_functions_multiple_arguments():
-    """Tests calc.py handling functions with multiple arguments correctly"""
+    """Tests parse/eval handling functions with multiple arguments correctly"""
     def h1(x): return x
 
     def h2(x, y): return x * y
@@ -127,7 +127,6 @@ def test_calc_functions_multiple_arguments():
         evaluator("h(1)", {}, {"h": h3}, {})
     with raises(ArgumentError):
         evaluator("h(1,2)", {}, {"h": h3}, {})
-
 
 def test_negation():
     """Test that appropriate numbers of +/- signs are accepted"""
@@ -189,3 +188,11 @@ def test_div_by_zero():
         evaluator("1/0")
     with raises(CalcZeroDivisionError, match=msg):
         evaluator("0^-1")
+
+def test_suffix_capitalization_error():
+    variables = {}
+    functions = {}
+    suffixes = {'M'}
+    match = "Invalid Input: m not permitted directly after a number \(did you mean M\?\)"
+    with raises(CalcError, match=match):
+        evaluator('5m', variables, functions, suffixes)

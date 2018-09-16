@@ -3,7 +3,7 @@ import numpy as np
 Contains the power function used by MathArray and parsing.py
 """
 
-# This is used in calc.py's eval_power function also.
+# This is used in expressions.py's eval_power function also.
 def robust_pow(base, exponent):
     """
     Calculates __pow__, and tries other approachs if that doesn't work.

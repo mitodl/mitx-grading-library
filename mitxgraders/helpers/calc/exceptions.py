@@ -1,7 +1,7 @@
 from mitxgraders.exceptions import StudentFacingError
 
 class CalcError(StudentFacingError):
-    """Base class for errors originating in calc.py"""
+    """Base class for errors originating in calc module"""
     pass
 
 class UndefinedVariable(CalcError):
