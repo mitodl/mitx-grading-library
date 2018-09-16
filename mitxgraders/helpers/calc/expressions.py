@@ -3,7 +3,7 @@ expressions.py
 
 Defines classes to parse and evaluate mathematical expressions. Implements
 similar functionality and API as edX's calc.py, but re-written with enhancements
-and to betterseparate parsing and evaluation.
+and to better separate parsing and evaluation.
 
 To evaluate a mathematical expression like '2^a + [x, 2]*[y, 4]', we proceed
 in two steps:
@@ -1005,7 +1005,7 @@ class MathExpression(object):
         """
         Operator associated with parallel resistors (it's commutative).
 
-        Return NaN if there is a zero among the inputs.
+        Return 0 if there is a zero among the inputs.
 
         Arguments:
             parse_result: A list of numbers to combine appropriately
