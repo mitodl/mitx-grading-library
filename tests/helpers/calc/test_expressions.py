@@ -39,12 +39,6 @@ def test_expressions_py():
     assert used.variables_used == set()
     assert used.suffixes_used == set()
 
-    value, used = evaluator("1 || 1 || 0", {}, {}, {})
-    assert value == approx(float('nan'), nan_ok=True)
-    assert used.functions_used == set()
-    assert used.variables_used == set()
-    assert used.suffixes_used == set()
-
     # Test incorrect case variables
     msg = r"Invalid Input: X not permitted in answer as a variable \(did you mean x\?\)"
     with raises(UndefinedVariable, match=msg):

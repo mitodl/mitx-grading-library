@@ -1020,10 +1020,10 @@ class MathExpression(object):
         >>> MathExpression.eval_parallel([1,1])
         0.5
         >>> MathExpression.eval_parallel([1,0])
-        nan
+        0
         """
         if 0 in parse_result:
-            return float('nan') # Thinking about circuits, should x || 0 = 0 ?
+            return 0
         reciprocals = [1. / num for num in parse_result]
         return 1. / sum(reciprocals)
 
