@@ -392,7 +392,6 @@ class MathParser(object):
             Combine(
                 inner_number +
                 Optional(CaselessLiteral("E") + Optional(plus_minus) + number_part),
-                adjacent=False
             )("num")
             + Optional(suffix)("suffix")
         )("number")
