@@ -1,5 +1,5 @@
 """
-Tests of expression.py that arent covered elsewhere
+Tests of expressions.py that aren't covered elsewhere
 """
 from __future__ import division
 import re
@@ -14,8 +14,8 @@ from mitxgraders.helpers.calc.exceptions import (
 )
 from mitxgraders.helpers.calc.math_array import equal_as_arrays, MathArray
 
-def test_calcpy():
-    """Tests of calc.py that aren't covered elsewhere"""
+def test_expressions_py():
+    """Tests of expressions.py that aren't covered elsewhere"""
 
     # Test unhandled exception
     def badfunc(a):
@@ -51,7 +51,7 @@ def test_calcpy():
         evaluator("X", {"x": 1}, {}, {})
 
 def test_varnames():
-    """Test variable names in calc.py"""
+    """Test parsing of variable names"""
     # Tensor variable names
     assert evaluator("U^{ijk}", {"U^{ijk}": 2}, {}, {})[0] == 2
     assert evaluator("U_{ijk}/2", {"U_{ijk}": 2}, {}, {})[0] == 1
@@ -107,7 +107,7 @@ def test_brackets_closed_by_wrong_type_raise_error():
         evaluator("5 + (1+2] + 3")
 
 def test_calc_functions_multiple_arguments():
-    """Tests calc.py handling functions with multiple arguments correctly"""
+    """Tests parse/eval handling functions with multiple arguments correctly"""
     def h1(x): return x
 
     def h2(x, y): return x * y

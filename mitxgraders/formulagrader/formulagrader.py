@@ -734,7 +734,7 @@ class FormulaGrader(ItemGrader):
         Arguments
         =========
         - scoped_eval (func): a unary function to evaluate math expressions.
-            Same keyword arguments as calc.py's evaluator, but with appropriate
+            Same keyword arguments as calc's evaluator, but with appropriate
             default variables, functions, suffixes
         - comparer_params ([str]): unevaluated expressions
         - siblings_eval (dict): evaluated expressions

@@ -9,7 +9,7 @@ from mitxgraders.helpers.calc.math_array import equal_as_arrays
 from mitxgraders.helpers.calc.exceptions import UnableToParse, CalcError
 
 def test_array_input():
-    """Test that vectors/matrices can be inputted into calc.py"""
+    """Test that vectors/matrices can be inputted into calc's evaluator"""
     result = evaluator("[1, 2, 3]", {}, {}, {}, max_array_dim=1)[0]
     assert equal_as_arrays(result, MathArray([1, 2, 3]))
 

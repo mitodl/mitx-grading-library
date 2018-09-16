@@ -1,5 +1,5 @@
 """
-calc.py
+expressions.py
 
 Defines classes to parse and evaluate mathematical expressions.
 
@@ -27,11 +27,18 @@ in two steps:
     2. Next, the tree is evaluated from the leaves upwards.
 
 This file defines two main classes:
+
  - MathParser, used to parse mathematical strings into a tree
  - MathExpression, holds the parse tree for a given mathematical expression
    and can be used to evaluate the tree with a given scope.
 and a function:
+
+and also:
+ - PARSER: global MathParser instance that should be used throughout mitxgraders
  - evaluator: a convenience function that parses and evaluates strings.
+
+
+
 """
 from __future__ import division
 import copy
@@ -321,13 +328,13 @@ class MathParser(object):
 
     def function_parse_action(self, tokens):
         """
-        When pyparsing encounters a function, store it in variables_used
+        When pyparsing encounters a function, store it in functions_used
         """
         self.functions_used.add(tokens[0][0])
 
     def suffix_parse_action(self, tokens):
         """
-        When pyparsing encounters a suffix, store it in variables_used
+        When pyparsing encounters a suffix, store it in suffixes_used
         """
         self.suffixes_used.add(tokens[0])
 

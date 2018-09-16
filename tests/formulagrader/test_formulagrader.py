@@ -98,7 +98,7 @@ def test_fg_invalid_input():
     with raises(CalcError, match=expect):
         grader(None, "5pp")
 
-    expect = "Invalid Input: m not permitted directly after a number. \(did you forget to use \* for multiplication?"
+    expect = "Invalid Input: m not permitted directly after a number. \(did you forget to use \* for multiplication\?\)"
     with raises(CalcError, match=expect):
         grader(None, "5m")
 
