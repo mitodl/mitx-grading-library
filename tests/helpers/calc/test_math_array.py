@@ -344,9 +344,19 @@ def test_nonpositive_matrix_powers():
         [0, 1]
     ])
 
+    # B is not invertible
+    B = MathArray([
+        [2, 1],
+        [6, 3]
+    ])
+
     assert equal_as_arrays(A**0, I2)
     # Slight numerical errors in the inversion
     assert approx_equal_as_arrays(A**-2 * A**3, A, tol=1e-15)
+
+    match = 'Cannot raise singular matrix to negative powers.'
+    with raises(MathArrayError, match=match):
+        B**-1
 
 def test_power_error_messages():
     A = random_math_array([3, 3])
