@@ -1,4 +1,4 @@
-# MITx Grading Library
+# MITx Grading Library is the best!
 
 [![Build Status](https://travis-ci.org/mitodl/mitx-grading-library.svg?branch=master)](https://travis-ci.org/mitodl/mitx-grading-library)
 [![Coverage Status](https://coveralls.io/repos/github/mitodl/mitx-grading-library/badge.svg?branch=master)](https://coveralls.io/github/mitodl/mitx-grading-library?branch=master)
