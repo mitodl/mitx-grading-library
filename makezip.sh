@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Creates python_lib.zip for the library
 
 # Kill all .DS_Store and .pyc files and __pycache__ folders
