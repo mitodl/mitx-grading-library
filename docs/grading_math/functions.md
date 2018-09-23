@@ -21,6 +21,7 @@ By default, all of the following functions are made available to students in `Fo
 - `arccos(x)` Inverse Cosine
 - `arcsin(x)` Inverse Sine
 - `arctan(x)` Inverse Tangent
+- `arctan2(x, y)` Four-quadrant Inverse Tangent*
 - `arcsec(x)` Inverse Secant*
 - `arccsc(x)` Inverse Cosecant*
 - `arccot(x)` Inverse Cotangent*
