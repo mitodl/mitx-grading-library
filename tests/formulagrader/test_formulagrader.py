@@ -518,6 +518,7 @@ def test_fg_debug_log():
     "    'arcsin': <function arcsin at 0x...>,<br/>\n"
     "    'arcsinh': <function arcsinh at 0x...>,<br/>\n"
     "    'arctan': <function arctan at 0x...>,<br/>\n"
+    "    'arctan2': <function arctan2 at 0x...>,<br/>\n"
     "    'arctanh': <function arctanh at 0x...>,<br/>\n"
     "    'conj': <ufunc 'conjugate'>,<br/>\n"
     "    'cosh': <function cosh at 0x...>,<br/>\n"

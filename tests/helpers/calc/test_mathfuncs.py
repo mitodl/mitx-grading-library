@@ -1,8 +1,10 @@
 import random
 import math
+import numpy as np
 from pytest import approx, raises
 from mitxgraders.helpers.calc.exceptions import DomainError, FunctionEvalError
 from mitxgraders.helpers.calc.mathfuncs import (
+    arctan2,
     cot, arccot,
     csc, arccsc,
     sec, arcsec,
@@ -108,3 +110,18 @@ def test_cross():
              "2nd input is ok: received a vector of length 3 as expected")
     with raises(DomainError, match=match):
         cross(vec_4, vec_3)
+
+def test_arctan2():
+    assert arctan2(-1, 1) == 3*np.pi/4
+    assert arctan2(-1, -1) == -3*np.pi/4
+    assert arctan2(1, -1) == -np.pi/4
+    assert arctan2(1, 1) == np.pi/4
+    assert arctan2(-1, 0) == np.pi
+
+    for (x, y) in np.random.rand(20, 2):
+        # We reversed the order compared to numpy
+        assert np.arctan2(y, x) == arctan2(x, y)
+
+    match = 'arctan2\(0, 0\) is undefined'
+    with raises(FunctionEvalError, match=match):
+        arctan2(0, 0)

@@ -13,11 +13,9 @@ Defines:
 * METRIC_SUFFIXES
 """
 from __future__ import division
-import math  # Used in doctests
 import numpy as np
 import scipy.special as special
 from mitxgraders.helpers.calc.specify_domain import SpecifyDomain
-from mitxgraders.exceptions import StudentFacingError
 from mitxgraders.helpers.calc.exceptions import FunctionEvalError
 from mitxgraders.helpers.calc.math_array import MathArray
 
@@ -76,6 +74,19 @@ def arccsch(val):
 def arccoth(val):
     """Inverse hyperbolic cotangent"""
     return np.arctanh(1. / val)
+
+# NOTE: tests are in a separate file, NOT doctests.
+# see https://bugs.python.org/issue6835
+@SpecifyDomain.make_decorator((1,), (1,))
+def arctan2(x, y):
+    """
+    Returns the an angle in range (-pi, pi] whose tangent is y/x, taking into
+    account the quadrant that (x, y) is in.
+    """
+    if x == 0 and y == 0:
+        raise FunctionEvalError("arctan2(0, 0) is undefined")
+
+    return np.arctan2(y, x)
 
 def content_if_0d_array(obj):
     """
@@ -141,13 +152,14 @@ def factorial(z):
     24.0
 
     Floats and complex numbers use scipy's gamma function:
+    >>> import math
     >>> factorial(0.5) # doctest: +ELLIPSIS
     0.8862269...
-    >>> math.sqrt(math.pi)/2
+    >>> math.sqrt(math.pi)/2 # doctest: +ELLIPSIS
     0.8862269...
-    >>> factorial(3.2+4.1j)
+    >>> factorial(3.2+4.1j) # doctest: +ELLIPSIS
     (1.0703272...-0.3028032...j)
-    >>> factorial(2.2+4.1j)*(3.2+4.1j)
+    >>> factorial(2.2+4.1j)*(3.2+4.1j) # doctest: +ELLIPSIS
     (1.0703272...-0.3028032...j)
 
     Works with numpy arrays:
@@ -247,6 +259,8 @@ def has_one_scalar_input(display_name):
 
 SCALAR_FUNCTIONS = {key: has_one_scalar_input(key)(ELEMENTWISE_FUNCTIONS[key])
                     for key in ELEMENTWISE_FUNCTIONS}
+
+SCALAR_FUNCTIONS['arctan2'] = arctan2
 
 ARRAY_FUNCTIONS = {
     're': real,

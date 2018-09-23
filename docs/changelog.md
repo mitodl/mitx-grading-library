@@ -2,6 +2,11 @@
 
 ## Version 1.2
 
+### Version 1.2.1
+
+* Added `arctan2(x, y)` function that returns angle between +x axis and the point (x, y); available by default for students to use in FormulaGrader problems.
+* Rewrote the expression parser and evaluator. Among other things, new parser provides better error messages when explicit multiplication is forgotten in expressions like `'5x + 3'`
+
 ### Version 1.2.0
 
 This version includes a number of new features and documentation updates.
