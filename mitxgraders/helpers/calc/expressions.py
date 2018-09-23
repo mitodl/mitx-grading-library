@@ -113,12 +113,14 @@ class BracketValidator(object):
     =====
 
     >>> BV = BracketValidator
-    >>> expr = '1 + ( ( x + 1 )^2 + ( + [2'
+    >>> expr = '1 + ( ( x + 1 )^2 + ( + [T_{1'
     >>> BV.validate(expr)                           # doctest: +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
-    UnbalancedBrackets: Invalid Input: 2 parentheses and 1 square brackets were
-    opened without being closed, highlighted below.
-    <code>1 + <mark>(</mark> ( x + 1 )^2 + <mark>(</mark> + <mark>[</mark>2</code>
+    UnbalancedBrackets: Invalid Input:
+    1 curly brace were opened without being closed (highlighted below)
+    2 parenthesis were opened without being closed (highlighted below)
+    1 square bracket were opened without being closed (highlighted below)
+    <code>1 + <mark>(</mark> ( x + 1 )^2 + <mark>(</mark> + <mark>[</mark>T_<mark>{</mark>1</code>
 
     NOTE: This class only contains class variables and static methods.
     It could just as well be a separate file/module.
@@ -129,6 +131,8 @@ class BracketValidator(object):
 
     # The brackets that we care about
     bracket_registry = {
+        '{': Bracket(char='{', partner='}', is_closer=False, name='curly brace'),
+        '}': Bracket(char='}', partner='{', is_closer=True, name='curly brace'),
         '(': Bracket(char='(', partner=')', is_closer=False, name='parenthesis'),
         ')': Bracket(char=')', partner='(', is_closer=True, name='parenthesis'),
         '[': Bracket(char='[', partner=']', is_closer=False, name='square bracket'),
@@ -203,24 +207,28 @@ class BracketValidator(object):
         example: "(1 + 2) + ( 3 + (".
         - stack is the remaining stack
         """
-        p_count = sum([entry.bracket.char == '(' for entry in stack])
-        b_count = sum([entry.bracket.char == '[' for entry in stack])
+        bracket_registry = BracketValidator.bracket_registry
+        still_open = {}
+        for key in sorted(bracket_registry):
+            if bracket_registry[key].is_closer:
+                continue
+            num_opened = sum([entry.bracket.char == bracket_registry[key].char for entry in stack])
+            if num_opened:
+                still_open[key] = num_opened
 
-        if p_count and b_count:
-            msg = ("Invalid Input: {p_count} parentheses and {b_count} "
-                   "square brackets were opened without being closed, "
-                   "highlighted below.\n{highlight}")
-        elif p_count:
-            msg = ("Invalid Input: {p_count} parentheses were opened without "
-                   "being closed, highlighted below.\n{highlight}")
-        else:
-            msg = ("Invalid Input: {b_count} square brackets were opened "
-                   "without being closed, highlighted below.\n{highlight}")
+        # sort so error messages come in definite order, for testing purposes
+        sorted_still_open = sorted(still_open.keys(), key=lambda x: bracket_registry[x].name)
+
+        if still_open:
+            message = "Invalid Input:\n"
+            for key in sorted_still_open:
+                message += ('{count} {name} were opened without being closed (highlighted below)\n'
+                        .format(count=still_open[key], name=bracket_registry[key].name))
 
         indices = [entry.index for entry in stack]
         highlight = BracketValidator.highlight_formula(formula, indices)
-        formatted = msg.format(p_count=p_count, b_count=b_count, highlight=highlight)
-        raise UnbalancedBrackets(formatted)
+        message += highlight
+        raise UnbalancedBrackets(message)
 
     @staticmethod
     def highlight_formula(formula, unsorted_indices):
