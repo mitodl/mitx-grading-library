@@ -67,22 +67,22 @@ def test_bracket_balancing_open_without_close_raises_error():
 
     # parens only
     match = ("Invalid Input:\n"
-             "2 parenthesis were opened without being closed (highlighted below)\n"
+             "2 parentheses were opened without being closed (highlighted below)\n"
              "<code>5 + <mark>(</mark>(1) + <mark>(</mark></code>")
     with raises(UnbalancedBrackets, match=re.escape(match)):
         evaluator("5 + ((1) + (")
 
     # brackets only
     match = ("Invalid Input:\n"
-             "1 square bracket were opened without being closed (highlighted below)\n"
+             "1 square bracket was opened without being closed (highlighted below)\n"
              "<code>5 + <mark>[</mark>1, (1 + 2),</code>")
     with raises(UnbalancedBrackets, match=re.escape(match)):
         evaluator("5 + [1, (1 + 2), ")
 
     # parens and brackets
     match = ("Invalid Input:\n"
-             "1 parenthesis were opened without being closed (highlighted below)\n"
-             "1 square bracket were opened without being closed (highlighted below)\n"
+             "1 parenthesis was opened without being closed (highlighted below)\n"
+             "1 square bracket was opened without being closed (highlighted below)\n"
              "<code>5 + <mark>(</mark>(1) + <mark>[</mark></code>")
     with raises(UnbalancedBrackets, match=re.escape(match)):
         evaluator("5 + ((1) + [")

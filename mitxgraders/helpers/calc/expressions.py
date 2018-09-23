@@ -117,9 +117,9 @@ class BracketValidator(object):
     >>> BV.validate(expr)                           # doctest: +NORMALIZE_WHITESPACE
     Traceback (most recent call last):
     UnbalancedBrackets: Invalid Input:
-    1 curly brace were opened without being closed (highlighted below)
-    2 parenthesis were opened without being closed (highlighted below)
-    1 square bracket were opened without being closed (highlighted below)
+    1 curly brace was opened without being closed (highlighted below)
+    2 parentheses were opened without being closed (highlighted below)
+    1 square bracket was opened without being closed (highlighted below)
     <code>1 + <mark>(</mark> ( x + 1 )^2 + <mark>(</mark> + <mark>[</mark>T_<mark>{</mark>1</code>
 
     NOTE: This class only contains class variables and static methods.
@@ -127,16 +127,16 @@ class BracketValidator(object):
     """
 
     # Stores bracket metadata
-    Bracket = namedtuple('Bracket', ['char', 'partner', 'is_closer', 'name'])
+    Bracket = namedtuple('Bracket', ['char', 'partner', 'is_closer', 'name', 'plural'])
 
     # The brackets that we care about
     bracket_registry = {
-        '{': Bracket(char='{', partner='}', is_closer=False, name='curly brace'),
-        '}': Bracket(char='}', partner='{', is_closer=True, name='curly brace'),
-        '(': Bracket(char='(', partner=')', is_closer=False, name='parenthesis'),
-        ')': Bracket(char=')', partner='(', is_closer=True, name='parenthesis'),
-        '[': Bracket(char='[', partner=']', is_closer=False, name='square bracket'),
-        ']': Bracket(char=']', partner='[', is_closer=True, name='square bracket')
+        '{': Bracket(char='{', partner='}', is_closer=False, name='curly brace', plural='curly braces'),
+        '}': Bracket(char='}', partner='{', is_closer=True, name='curly brace', plural='curly braces'),
+        '(': Bracket(char='(', partner=')', is_closer=False, name='parenthesis', plural='parentheses'),
+        ')': Bracket(char=')', partner='(', is_closer=True, name='parenthesis', plural='parentheses'),
+        '[': Bracket(char='[', partner=']', is_closer=False, name='square bracket', plural='square brackets'),
+        ']': Bracket(char=']', partner='[', is_closer=True, name='square bracket', plural='square brackets')
     }
 
     # Stores information about a bracket instance
@@ -222,8 +222,14 @@ class BracketValidator(object):
         if still_open:
             message = "Invalid Input:\n"
             for key in sorted_still_open:
-                message += ('{count} {name} were opened without being closed (highlighted below)\n'
-                        .format(count=still_open[key], name=bracket_registry[key].name))
+                if still_open[key] == 1:
+                    message += ('{count} {name} was opened without being closed '
+                                '(highlighted below)\n'
+                                .format(count=still_open[key], name=bracket_registry[key].name))
+                else:
+                    message += ('{count} {plural} were opened without being closed '
+                                '(highlighted below)\n'
+                                .format(count=still_open[key], plural=bracket_registry[key].plural))
 
         indices = [entry.index for entry in stack]
         highlight = BracketValidator.highlight_formula(formula, indices)
