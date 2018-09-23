@@ -2,72 +2,72 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
      <loc>/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/item_grader/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/string_grader/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/formula_grader/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/numerical_grader/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/matrix_grader/matrix_grader/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/matrixfunctions/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/sampling/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/functions/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/comparer_functions/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/renderer/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_lists/list_grader/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_lists/single_list_grader/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/changelog/</loc>
-     <lastmod>2018-09-21</lastmod>
+     <lastmod>2018-09-22</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>
