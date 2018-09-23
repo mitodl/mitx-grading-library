@@ -101,6 +101,14 @@ if (window.MJxPrep) {
       // See https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js
       // Add functions, including some edX functions that don't exist in AsciiMath
       AM.newsymbol({
+        input: "arctan2",
+        tag: "mi",
+        output: "arctan",
+        tex: null,
+        ttype: AM.TOKEN.UNARY,
+        func: true
+      });
+      AM.newsymbol({
         input: "arcsec",
         tag: "mi",
         output: "arcsec",
