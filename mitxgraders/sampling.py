@@ -399,7 +399,7 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
         A = np.random.rand(output_dim, num_terms, input_dim) / 2 + 0.5
         # If we're complex, multiply the amplitude by a complex phase
         if self.config['complex']:
-            complexphases = np.random.rand(output_dim, num_terms, input_dim) * np.pi * 1j
+            complexphases = np.random.rand(output_dim, num_terms, input_dim) * np.pi * 2j
             A = A * np.exp(complexphases)
         # Angular frequencies B range from -pi to pi
         B = 2 * np.pi * (np.random.rand(output_dim, num_terms, input_dim) - 0.5)
