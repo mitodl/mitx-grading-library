@@ -344,7 +344,8 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
 
     Currently implemented as a sum of trigonometric functions with random amplitude,
     frequency and phase. You can control the center and amplitude of the resulting
-    oscillations by specifying center and amplitude.
+    oscillations by specifying center and amplitude. The complex flag allows you to
+    generate complex random functions.
 
     Config:
         input_dim (int): Number of input arguments. 1 is a unary function (default 1)
@@ -353,6 +354,7 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
         num_terms (int): Number of random sinusoid terms to add together (default 3)
         center (float): Center around which oscillations occur (default 0)
         amplitude (float): Maximum amplitude of the function (default 10)
+        complex (bool): Generate a complex random function (default False)
 
     Usage
     =====
@@ -374,7 +376,8 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
         Required('output_dim', default=1): Positive(int),
         Required('num_terms', default=3): Positive(int),
         Required('center', default=0): Number,
-        Required('amplitude', default=10): Positive(Number)
+        Required('amplitude', default=10): Positive(Number),
+        Required('complex', default=False): bool
     })
 
     def gen_sample(self):
@@ -394,6 +397,10 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
         num_terms = self.config['num_terms']
         # Amplitudes A range from 0.5 to 1
         A = np.random.rand(output_dim, num_terms, input_dim) / 2 + 0.5
+        # If we're complex, multiply the amplitude by a complex phase
+        if self.config['complex']:
+            complexphases = np.random.rand(output_dim, num_terms, input_dim) * np.pi * 2j
+            A = A * np.exp(complexphases)
         # Angular frequencies B range from -pi to pi
         B = 2 * np.pi * (np.random.rand(output_dim, num_terms, input_dim) - 0.5)
         # Phases C range from 0 to 2*pi

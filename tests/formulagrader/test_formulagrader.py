@@ -669,8 +669,7 @@ def test_ng_config():
         )
 
     expect = "not a valid value for dictionary value @ data\['user_functions'\]\['f'\]. " + \
-             "Got RandomFunction\({'input_dim': 1, 'output_dim': 1, 'num_terms': 3, " + \
-             "'amplitude': 10, 'center': 0}\)"
+             "Got RandomFunction"
     with raises(Error, match=expect):
         NumericalGrader(
             answers="1",

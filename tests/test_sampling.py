@@ -134,6 +134,16 @@ def test_random_func():
         x = random.uniform(-10, 10)
         assert func(x) == func(x)
         assert center - amplitude <= func(x) <= center + amplitude
+        assert not np.iscomplex(func(x))
+
+    rf = RandomFunction(center=center, amplitude=amplitude, complex=True)
+
+    func = rf.gen_sample()
+
+    for i in range(20):
+        x = random.uniform(-10, 10)
+        assert func(x) == func(x)
+        assert np.iscomplex(func(x))
 
     with raises(Exception, match="Expected 2 arguments, but received 1"):
         RandomFunction(input_dim=2).gen_sample()(1)
