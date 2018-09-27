@@ -184,3 +184,9 @@ You can also generate a non-unary function by specifying the input dimension, an
 >>> functionsampler = RandomFunction(input_dim=2, output_dim=3)
 
 ```
+
+Finally, if you want to generate a complex random function, simply set `complex=True`. In this situation, the randomly generated function works as previously, but the sinusoid coefficients are complex numbers.
+
+```python
+>>> functionsampler = RandomFunction(complex=True)
+```
