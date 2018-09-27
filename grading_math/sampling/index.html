@@ -355,7 +355,11 @@
 
 <p>You can also generate a non-unary function by specifying the input dimension, and generate vector output by specifying the output dimension.</p>
 <pre class="codehilite"><code class="language-python">&gt;&gt;&gt; # Generate a function that takes in two scalar values and outputs a 3D vector
-&gt;&gt;&gt; functionsampler = RandomFunction(input_dim=2, output_dim=3)</code></pre></div>
+&gt;&gt;&gt; functionsampler = RandomFunction(input_dim=2, output_dim=3)</code></pre>
+
+
+<p>Finally, if you want to generate a complex random function, simply set <code>complex=True</code>. In this situation, the randomly generated function works as previously, but the sinusoid coefficients are complex numbers.</p>
+<pre class="codehilite"><code class="language-python">&gt;&gt;&gt; functionsampler = RandomFunction(complex=True)</code></pre></div>
         
     </div>
 
