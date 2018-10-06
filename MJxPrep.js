@@ -81,6 +81,12 @@ if (window.MJxPrep) {
       eqn = columnizeVectors(eqn)
     }
 
+    // Wrap invisibrackets around variables/functions with primes in their name
+    var wrap_primes = function(match, substr) {
+        return '{:' + substr + ':}';
+    };
+    eqn = eqn.replace(/([a-zA-Z0-9^_{}]'+)/g, wrap_primes);
+
     /*
      * If you want to do any custom preprocessing, here is the place to do it
      */
