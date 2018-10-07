@@ -105,6 +105,12 @@ describe('preProcessEqn', () => {
     const eqn = 'cross(x) + cross(a + b, c) + y'
     expect(preProcessEqn(eqn)).toBe('cross(x) + {:(a + b) times c:} + y')
   } )
+
+  it('wraps primed expressions in unbreakable invisible brackets', () => {
+    const expr = "f''(x)/f(x) + g_a'(y) "
+    expect(preProcessEqn(expr)).toBe("{:f''(x):}/f(x) + {:g_a'(y):}")
+  } )
+
 } )
 
 describe('shallowListSplit', () => {
