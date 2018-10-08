@@ -37,14 +37,14 @@ if (window.MJxPrep) {
   function preProcessEqn(eqn) {
     // Note that /pattern/flags is shorthand for a regex parser
     // g is global - makes all changes
+
+    // Strip spaces, which can confuse the regex matching we're about to do
+    eqn = eqn.replace(/ /g, '');
+
     // log10(x) -> log_10(x)
     eqn = eqn.replace(/log10\(/g, "log_10(");
     // log2(x) -> log_2(x)
     eqn = eqn.replace(/log2\(/g, "log_2(");
-
-    // Match Deltaxyz and deltaxyz and wrap in invisible brackets for display
-    // So, DeltaE -> {:DeltaE:}, deltasomething -> {:deltasomething:}
-    eqn = eqn.replace(/([Dd]elta)([a-zA-Z]+)/g, "{:$1$2:}");
 
     // Factorial: We want fact(n) -> n!, but fact(2n) -> (2n)!
     // Replace fact(...) -> with {:...!:}, wrap with parens as needed
@@ -81,17 +81,50 @@ if (window.MJxPrep) {
       eqn = columnizeVectors(eqn)
     }
 
-    // Wrap invisibrackets around variables/functions with primes in their name
-    var wrap_primes = function(match, substr) {
-        return '{:' + substr + ':}';
-    };
-    eqn = eqn.replace(/([a-zA-Z0-9^_{}]'+)/g, wrap_primes);
-
     /*
      * If you want to do any custom preprocessing, here is the place to do it
      */
 
 
+
+    // Wrap invisibrackets around variables and functions
+    // This is done last, so that it doesn't mess up subsequent processing
+    var wrap_group = function(match, substr) {
+        return '{:' + substr + ':}';
+    };
+    // Do variables first
+    // Need a regex to match any possible variable name
+    // This regex matches all valid expressions in the python parser
+    // If invalid expressions are given, this is less predictable, but the wrapping shouldn't hurt anything
+    var_expr = /(?=([a-zA-Z][a-zA-Z0-9]*(?:(?:_{-?[a-zA-Z0-9]+}(?:\^{-?[a-zA-Z0-9]+})?|\^{-?[a-zA-Z0-9]+})|[\w]*)'*))\1(?![(}])/g
+    // Explanation:
+    // We really need atomic groups here so that something like 'f0(x)'' doesn't match 'f',
+    // but javascript doesn't have them. Hence, we hack them in using the trick from here:
+    // http://instanceof.me/post/52245507631/regex-emulate-atomic-grouping-with-lookahead
+    /*
+       (?=                              # Open lookahead group
+         (                              # Open capturing group
+           [a-zA-Z]                     # Must start with an alpha character
+           [a-zA-Z0-9]*                 # Followed by any number of alphanumeric characters
+           (?:                          # Open noncapturing group (subscripts/tensors)
+             (?:                        # Open noncapturing group (tensor _^ or ^)
+               _{-?[a-zA-Z0-9]+}        # Match a tensor subscript
+               (?:\^{-?[a-zA-Z0-9]+})?  # Match an optional tensor superscript
+             |                          # Or
+               \^{-?[a-zA-Z0-9]+}       # Match a tensor superscript
+             )                          # Close group (tensor _^or ^)
+           |                            # Or
+             [\w]*                      # Match any alphanumeric or _, any number of times
+           )                            # Close group (subscripts/tensors)
+           '*                           # Match any number of primes
+         )                              # Close capturing group
+       )                                # Close lookahead group
+       \1                               # Require lookahead group to appear here
+       (?![(}])                         # Negative lookahead: '(' (function) or '}' (tensor indices)
+     */
+    // This site is really useful for debugging: https://www.regextester.com/
+    eqn = eqn.replace(var_expr, wrap_group);
+    // Do functions next (TODO)
 
     // Return the preprocessed equation
     return eqn;

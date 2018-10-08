@@ -65,50 +65,73 @@ describe('preProcessEqn', () => {
   it('replaces log10 and log2', () => {
     const expr = 'log10(1 + log2(x))'
     const result = preProcessEqn(expr)
-    expect(result).toBe('log_10(1 + log_2(x))')
+    expect(result).toBe('log_10(1+log_2({:x:}))')
   } )
 
   it('replaces fact and factorial', () => {
     const expr = 'fact(n) + factorial(2n)'
     const result = preProcessEqn(expr)
-    expect(result).toBe('{:n!:} + {:(2n)!:}')
+    expect(result).toBe('{:{:n:}!:}+{:(2{:n:})!:}')
   } )
 
   it('replaces ctrans, adj and trans', () => {
     const expr = 'ctrans(x) + adj(x+1) + trans([x, x^2])'
     window.MJxPrepOptions.vectors_as_columns = true;
     const result = preProcessEqn(expr)
-    expect(result).toBe('{:x^dagger:} + {:(x+1)^dagger:} + {:[[x], [ x^2]]^T:}')
+    expect(result).toBe('{:{:x:}^{:dagger:}:}+{:({:x:}+1)^{:dagger:}:}+{:[[{:x:}], [{:x:}^2]]^{:T:}:}')
     window.MJxPrepOptions.vectors_as_columns = false;
     const result2 = preProcessEqn(expr)
-    expect(result2).toBe('{:x^dagger:} + {:(x+1)^dagger:} + {:[x, x^2]^T:}')
+    expect(result2).toBe('{:{:x:}^{:dagger:}:}+{:({:x:}+1)^{:dagger:}:}+{:[{:x:},{:x:}^2]^{:T:}:}')
   } )
 
   it('replaces conj based on the options', () => {
     const expr = 'conj(psi)'
     window.MJxPrepOptions.conj_as_star = true;
     const result = preProcessEqn(expr)
-    expect(result).toBe('{:psi^**:}')
+    expect(result).toBe('{:{:psi:}^**:}')
 
     window.MJxPrepOptions.conj_as_star = false;
     const result2 = preProcessEqn(expr)
-    expect(result2).toBe('conj(psi)')
+    expect(result2).toBe('conj({:psi:})')
   } )
 
   it('wraps delta and Delta appropriately', () => {
     const expr = 'DeltaE + deltasomething + delta + Delta'
     const result = preProcessEqn(expr)
-    expect(result).toBe('{:DeltaE:} + {:deltasomething:} + delta + Delta')
+    expect(result).toBe('{:DeltaE:}+{:deltasomething:}+{:delta:}+{:Delta:}')
   } )
 
   it('replaces cross products', () => {
     const eqn = 'cross(x) + cross(a + b, c) + y'
-    expect(preProcessEqn(eqn)).toBe('cross(x) + {:(a + b) times c:} + y')
+    expect(preProcessEqn(eqn)).toBe('cross({:x:})+{:({:a:}+{:b:}) {:times:} {:c:}:}+{:y:}')
   } )
 
-  it('wraps primed expressions in unbreakable invisible brackets', () => {
-    const expr = "f''(x)/f(x) + g_a'(y) "
-    expect(preProcessEqn(expr)).toBe("{:f''(x):}/f(x) + {:g_a'(y):}")
+  it('wraps variable names in unbreakable invisible brackets', () => {
+    const exprs = [
+      ["f''/f + g_a'+sin(horse)", "{:f'':}/{:f:}+{:g_a':}+sin({:horse:})"],
+      ["f", "{:f:}"],
+      ["f'", "{:f':}"],
+      ["f''", "{:f'':}"],
+      ["f(x)", "f({:x:})"],
+      ["f'(x)", "f'({:x:})"],
+      ["f_{123}", "{:f_{123}:}"],
+      ["f^{123}", "{:f^{123}:}"],
+      ["f_{-ab}^{cd}'''", "{:f_{-ab}^{cd}''':}"],
+      ["f_{ab}^{cd}'''(x)", "f_{ab}^{cd}'''({:x:})"],
+      ["m0", "{:m0:}"],
+      ["m0'", "{:m0':}"],
+      ["m0''", "{:m0'':}"],
+      ["m0(x)", "m0({:x:})"],
+      ["m0'(x)", "m0'({:x:})"],
+      ["apple_1_red_something", "{:apple_1_red_something:}"],
+      ["apple_1_red_something'", "{:apple_1_red_something':}"],
+      ["apple_1_red_something''", "{:apple_1_red_something'':}"],
+      ["apple_1_red_something(x)", "apple_1_red_something({:x:})"],
+      ["apple_1_red_something'(x)", "apple_1_red_something'({:x:})"]
+    ]
+    for (index = 0; index < exprs.length; index++) {
+      expect(preProcessEqn(exprs[index][0])).toBe(exprs[index][1])
+    }
   } )
 
 } )
