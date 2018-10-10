@@ -6,6 +6,8 @@ const {
   groupExpr,
   shallowListSplit,
   preProcessEqn,
+  wrapVariables,
+  wrapFuncCalls,
   columnizeVectors,
   funcToPostfix
 } = window.MJxPrepExports
@@ -65,7 +67,7 @@ describe('preProcessEqn', () => {
   it('replaces log10 and log2', () => {
     const expr = 'log10(1 + log2(x))'
     const result = preProcessEqn(expr)
-    expect(result).toBe('log_10(1+log_2({:x:}))')
+    expect(result).toBe('{:log_10(1+{:log_2({:x:}):}):}')
   } )
 
   it('replaces fact and factorial', () => {
@@ -92,7 +94,7 @@ describe('preProcessEqn', () => {
 
     window.MJxPrepOptions.conj_as_star = false;
     const result2 = preProcessEqn(expr)
-    expect(result2).toBe('conj({:psi:})')
+    expect(result2).toBe('{:conj({:psi:}):}')
   } )
 
   it('wraps delta and Delta appropriately', () => {
@@ -103,12 +105,24 @@ describe('preProcessEqn', () => {
 
   it('replaces cross products', () => {
     const eqn = 'cross(x) + cross(a + b, c) + y'
-    expect(preProcessEqn(eqn)).toBe('cross({:x:})+{:({:a:}+{:b:}) {:times:} {:c:}:}+{:y:}')
+    expect(preProcessEqn(eqn)).toBe('{:cross({:x:}):}+{:({:a:}+{:b:}) {:times:} {:c:}:}+{:y:}')
   } )
+
+  it('wraps variables and function calls', () => {
+    // The behavior of wrapVariables and wrapFunCalls is primarily described
+    // in their dedicated tests
+    const expr = "x + f'(x, y) + cross(a, g(b)+2)/h''(y) + sin(pi/4)^3 + 5"
+    const expected = "{:x:}+{:f'({:x:},{:y:}):}+{:{:a:} {:times:} ({:g({:b:}):}+2):}/{:h''({:y:}):}+{:sin({:pi:}/4):}^3+5"
+    expect(preProcessEqn(expr)).toBe(expected)
+  } )
+
+} )
+
+describe('wrapVariables', () => {
 
   it('wraps variable names in unbreakable invisible brackets', () => {
     const exprs = [
-      ["f''/f + g_a'+sin(horse)", "{:f'':}/{:f:}+{:g_a':}+sin({:horse:})"],
+      ["f''/f + g_a' + sin(horse)", "{:f'':}/{:f:} + {:g_a':} + sin({:horse:})"],
       ["f", "{:f:}"],
       ["f'", "{:f':}"],
       ["f''", "{:f'':}"],
@@ -129,12 +143,29 @@ describe('preProcessEqn', () => {
       ["apple_1_red_something(x)", "apple_1_red_something({:x:})"],
       ["apple_1_red_something'(x)", "apple_1_red_something'({:x:})"]
     ]
-    for (index = 0; index < exprs.length; index++) {
-      expect(preProcessEqn(exprs[index][0])).toBe(exprs[index][1])
+    for (const pair of exprs) {
+      const [testCase, expected] = pair
+      expect(wrapVariables(testCase)).toBe(expected)
     }
   } )
 
 } )
+
+describe('wrapFuncCalls', () => {
+
+  it('wraps function calls names in unbreakable invisible brackets', () => {
+    const exprs = [
+      ["x + f(x, y) + sin(x)^2 + 3^2", "x + {:f(x, y):} + {:sin(x):}^2 + 3^2"],
+      ["1 + f(x, g(y + h(z))) + sin(pi)", "1 + {:f(x, {:g(y + {:h(z):}):}):} + {:sin(pi):}"]
+    ]
+    for (const pair of exprs) {
+      const [testCase, expected] = pair
+      expect(wrapFuncCalls(testCase)).toBe(expected)
+    }
+  } )
+
+} )
+
 
 describe('shallowListSplit', () => {
   it('splits a stringified list at commas where brackets are balanced', () => {
