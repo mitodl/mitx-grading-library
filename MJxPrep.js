@@ -297,7 +297,7 @@ if (window.MJxPrep) {
     // Need a regex to match any possible variable name
     // This regex matches all valid expressions in the python parser
     // If invalid expressions are given, this is less predictable, but the wrapping shouldn't hurt anything
-    var_expr = /(?=([a-zA-Z][a-zA-Z0-9]*(?:(?:_{-?[a-zA-Z0-9]+}(?:\^{-?[a-zA-Z0-9]+})?|\^{-?[a-zA-Z0-9]+})|[\w]*)'*))\1(?![(}])/g
+    var var_expr = /(?=([a-zA-Z][a-zA-Z0-9]*(?:(?:_{-?[a-zA-Z0-9]+}(?:\^{-?[a-zA-Z0-9]+})?|\^{-?[a-zA-Z0-9]+})|[\w]*)'*))\1(?![(}])/g
     // Explanation:
     // We really need atomic groups here so that something like 'f0(x)'' doesn't match 'f',
     // but javascript doesn't have them. Hence, we hack them in using the trick from here:
@@ -342,7 +342,7 @@ if (window.MJxPrep) {
     var wrap_group = function(match, substr) {
         return '{:' + substr + ':}';
     };
-    // Like wrapVariables, but requires ending in a parenthesis
+    // Like var_expr in wrapVariables, but requires ending in a parenthesis
     var func_call = /(?=([a-zA-Z][a-zA-Z0-9]*(?:(?:_{-?[a-zA-Z0-9]+}(?:\^{-?[a-zA-Z0-9]+})?|\^{-?[a-zA-Z0-9]+})|[\w]*)'*))\1(?:\()/g
 
     var matches = []
@@ -355,7 +355,9 @@ if (window.MJxPrep) {
       match && matches.push(match)
     }
 
-
+    // Iterate over matches from end of string to front of string, since
+    // replacing match ---> {:match:} lengthens the string and would
+    // mess up the indices if we iterated from start to finish.
     for (var j=matches.length - 1; j >= 0; j += -1) {
       var funcStart = matches[j].index
       var argStart = funcStart + (matches[j][0].length - 1)
