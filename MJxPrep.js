@@ -293,7 +293,7 @@ if (window.MJxPrep) {
     var wrap_group = function(match, substr) {
         return '{:' + substr + ':}';
     };
-    // Do variables first
+
     // Need a regex to match any possible variable name
     // This regex matches all valid expressions in the python parser
     // If invalid expressions are given, this is less predictable, but the wrapping shouldn't hurt anything
@@ -325,8 +325,6 @@ if (window.MJxPrep) {
      */
     // This site is really useful for debugging: https://www.regextester.com/
     eqn = eqn.replace(var_expr, wrap_group);
-    // Do functions next (TODO)
-    var func_call = /(?=([a-zA-Z][a-zA-Z0-9]*(?:(?:_{-?[a-zA-Z0-9]+}(?:\^{-?[a-zA-Z0-9]+})?|\^{-?[a-zA-Z0-9]+})|[\w]*)'*))\1(?:\()/g
 
     return eqn
   }
@@ -338,13 +336,9 @@ if (window.MJxPrep) {
    * @return {string}
    */
   function wrapFuncCalls(eqn) {
-    // Wrap invisibrackets around variables and functions
-    var wrap_group = function(match, substr) {
-        return '{:' + substr + ':}';
-    };
-    // Like var_expr in wrapVariables, but requires ending in a parenthesis
-    var func_call = /(?=([a-zA-Z][a-zA-Z0-9]*(?:(?:_{-?[a-zA-Z0-9]+}(?:\^{-?[a-zA-Z0-9]+})?|\^{-?[a-zA-Z0-9]+})|[\w]*)'*))\1(?:\()/g
 
+    // Like var_expr in wrapVariables, but requires ending in a parenthesis
+    var func_call = /([a-zA-Z][a-zA-Z0-9]*(?:(?:_{-?[a-zA-Z0-9]+}(?:\^{-?[a-zA-Z0-9]+})?|\^{-?[a-zA-Z0-9]+})|[\w]*)'*)\(/g
     var matches = []
     var match = true
     while (match !== null) {
