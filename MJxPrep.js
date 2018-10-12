@@ -87,44 +87,10 @@ if (window.MJxPrep) {
 
 
 
-    // Wrap invisibrackets around variables and functions
+
     // This is done last, so that it doesn't mess up subsequent processing
-    var wrap_group = function(match, substr) {
-        return '{:' + substr + ':}';
-    };
-    // Do variables first
-    // Need a regex to match any possible variable name
-    // This regex matches all valid expressions in the python parser
-    // If invalid expressions are given, this is less predictable, but the wrapping shouldn't hurt anything
-    var_expr = /(?=([a-zA-Z][a-zA-Z0-9]*(?:(?:_{-?[a-zA-Z0-9]+}(?:\^{-?[a-zA-Z0-9]+})?|\^{-?[a-zA-Z0-9]+})|[\w]*)'*))\1(?![(}])/g
-    // Explanation:
-    // We really need atomic groups here so that something like 'f0(x)'' doesn't match 'f',
-    // but javascript doesn't have them. Hence, we hack them in using the trick from here:
-    // http://instanceof.me/post/52245507631/regex-emulate-atomic-grouping-with-lookahead
-    /*
-       (?=                              # Open lookahead group
-         (                              # Open capturing group
-           [a-zA-Z]                     # Must start with an alpha character
-           [a-zA-Z0-9]*                 # Followed by any number of alphanumeric characters
-           (?:                          # Open noncapturing group (subscripts/tensors)
-             (?:                        # Open noncapturing group (tensor _^ or ^)
-               _{-?[a-zA-Z0-9]+}        # Match a tensor subscript
-               (?:\^{-?[a-zA-Z0-9]+})?  # Match an optional tensor superscript
-             |                          # Or
-               \^{-?[a-zA-Z0-9]+}       # Match a tensor superscript
-             )                          # Close group (tensor _^or ^)
-           |                            # Or
-             [\w]*                      # Match any alphanumeric or _, any number of times
-           )                            # Close group (subscripts/tensors)
-           '*                           # Match any number of primes
-         )                              # Close capturing group
-       )                                # Close lookahead group
-       \1                               # Require lookahead group to appear here
-       (?![(}])                         # Negative lookahead: '(' (function) or '}' (tensor indices)
-     */
-    // This site is really useful for debugging: https://www.regextester.com/
-    eqn = eqn.replace(var_expr, wrap_group);
-    // Do functions next (TODO)
+    eqn = wrapVariables(eqn)
+    eqn = wrapFuncCalls(eqn)
 
     // Return the preprocessed equation
     return eqn;
@@ -315,6 +281,89 @@ if (window.MJxPrep) {
 
   // Check for the AsciiMath object every 200ms
   var checkExist = setInterval(updateMathJax, 200);
+
+  /**
+   * Detect variables, then wrap them in invisible brackets
+   *
+   * @param  {string} eqn
+   * @return {string}
+   */
+  function wrapVariables(eqn) {
+    // Wrap invisibrackets around variables and functions
+    var wrap_group = function(match, substr) {
+        return '{:' + substr + ':}';
+    };
+
+    // Need a regex to match any possible variable name
+    // This regex matches all valid expressions in the python parser
+    // If invalid expressions are given, this is less predictable, but the wrapping shouldn't hurt anything
+    var var_expr = /(?=([a-zA-Z][a-zA-Z0-9]*(?:(?:_{-?[a-zA-Z0-9]+}(?:\^{-?[a-zA-Z0-9]+})?|\^{-?[a-zA-Z0-9]+})|[\w]*)'*))\1(?![(}])/g
+    // Explanation:
+    // We really need atomic groups here so that something like 'f0(x)'' doesn't match 'f',
+    // but javascript doesn't have them. Hence, we hack them in using the trick from here:
+    // http://instanceof.me/post/52245507631/regex-emulate-atomic-grouping-with-lookahead
+    /*
+       (?=                              # Open lookahead group
+         (                              # Open capturing group
+           [a-zA-Z]                     # Must start with an alpha character
+           [a-zA-Z0-9]*                 # Followed by any number of alphanumeric characters
+           (?:                          # Open noncapturing group (subscripts/tensors)
+             (?:                        # Open noncapturing group (tensor _^ or ^)
+               _{-?[a-zA-Z0-9]+}        # Match a tensor subscript
+               (?:\^{-?[a-zA-Z0-9]+})?  # Match an optional tensor superscript
+             |                          # Or
+               \^{-?[a-zA-Z0-9]+}       # Match a tensor superscript
+             )                          # Close group (tensor _^or ^)
+           |                            # Or
+             [\w]*                      # Match any alphanumeric or _, any number of times
+           )                            # Close group (subscripts/tensors)
+           '*                           # Match any number of primes
+         )                              # Close capturing group
+       )                                # Close lookahead group
+       \1                               # Require lookahead group to appear here
+       (?![(}])                         # Negative lookahead: '(' (function) or '}' (tensor indices)
+     */
+    // This site is really useful for debugging: https://www.regextester.com/
+    eqn = eqn.replace(var_expr, wrap_group);
+
+    return eqn
+  }
+
+  /**
+   * Detect function calls, then wrap them in invisible brackets
+   *
+   * @param  {string} eqn
+   * @return {string}
+   */
+  function wrapFuncCalls(eqn) {
+
+    // Like var_expr in wrapVariables, but requires ending in a parenthesis
+    var func_call = /([a-zA-Z][a-zA-Z0-9]*(?:(?:_{-?[a-zA-Z0-9]+}(?:\^{-?[a-zA-Z0-9]+})?|\^{-?[a-zA-Z0-9]+})|[\w]*)'*)\(/g
+    var matches = []
+    var match = true
+    while (match !== null) {
+      // func_call.exec will return a match array or null
+      // Since func_call is a global-matching regexp (g), subsequent matches
+      // start from the last match index.
+      var match = func_call.exec(eqn)
+      match && matches.push(match)
+    }
+
+    // Iterate over matches from end of string to front of string, since
+    // replacing match ---> {:match:} lengthens the string and would
+    // mess up the indices if we iterated from start to finish.
+    for (var j=matches.length - 1; j >= 0; j += -1) {
+      var funcStart = matches[j].index
+      var argStart = funcStart + (matches[j][0].length - 1)
+      var callEnd = findClosingBrace(eqn, argStart) + 1
+      var front = eqn.slice(0, funcStart)
+      var middle = '{:' + eqn.slice(funcStart, callEnd) +  ':}'
+      eqn = front + middle + eqn.slice(callEnd)
+    }
+
+    return eqn
+  }
+
 
   /**
    * get index at which the brace at braceIdx in expr is closed, or null if it
@@ -540,6 +589,8 @@ if (window.MJxPrep) {
     groupExpr: groupExpr,
     shallowListSplit: shallowListSplit,
     preProcessEqn: preProcessEqn,
+    wrapVariables: wrapVariables,
+    wrapFuncCalls: wrapFuncCalls,
     columnizeVectors: columnizeVectors,
     funcToPostfix: funcToPostfix
   }
