@@ -354,11 +354,16 @@ if (window.MJxPrep) {
     // mess up the indices if we iterated from start to finish.
     for (var j=matches.length - 1; j >= 0; j += -1) {
       var funcStart = matches[j].index
-      var argStart = funcStart + (matches[j][0].length - 1)
-      var callEnd = findClosingBrace(eqn, argStart) + 1
+
+      var bracketOpens = funcStart + (matches[j][0].length - 1)
+      var bracketCloses = findClosingBrace(eqn, bracketOpens)
+      // If brace does not close, bracketCloses is null. In that case,
+      // consider the end of the function to be bracketOpens
+      var funcEnd = bracketCloses === null ? bracketOpens : bracketCloses + 1
+
       var front = eqn.slice(0, funcStart)
-      var middle = '{:' + eqn.slice(funcStart, callEnd) +  ':}'
-      eqn = front + middle + eqn.slice(callEnd)
+      var middle = '{:' + eqn.slice(funcStart, funcEnd) +  ':}'
+      eqn = front + middle + eqn.slice(funcEnd)
     }
 
     return eqn

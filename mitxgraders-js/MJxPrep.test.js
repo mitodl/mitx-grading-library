@@ -164,6 +164,17 @@ describe('wrapFuncCalls', () => {
     }
   } )
 
+  it('wraps just the function name if call brackets do not close', () => {
+    const exprs = [
+      ["1 + sin(1/2 + 5", "1 + {:sin:}(1/2 + 5"],
+      ["1 + kitten(f_1''(5 + pi/2", "1 + {:kitten:}({:f_1'':}(5 + pi/2"]
+    ]
+    for (const pair of exprs) {
+      const [testCase, expected] = pair
+      expect(wrapFuncCalls(testCase)).toBe(expected)
+    }
+  } )
+
 } )
 
 
