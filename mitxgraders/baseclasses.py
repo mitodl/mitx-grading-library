@@ -92,26 +92,28 @@ class AbstractGrader(ObjectWithSchema):
         Used by edX as the check function (cfn).
 
         Arguments:
-            expect: The value of edX customresponse expect attribute (ignored)
+            expect: The value of edX customresponse expect attribute (ignored).
             student_input: The student's input passed by edX
 
         Notes:
-            This function ignores the value of expect.
+            This function ignores the value of expect. The expect argument is
+            provided because edX requires that a check function to have the
+            signature above.
 
-            The expect argument is provided because edX expects a check function
-            to have the signature above. Our graders usually ignore the first
-            argument, expect. Instead, we usually pass None as the expect value,
-            indicating that the grader should instead read the expected answer
-            from the grader's configuration. This is because we generally use
+            Our graders usually read the author's expected answer from the
+            grader configuration. This is because we generally use
             dictionaries to store the expected input along with correctness,
             grades, and feedback messages.
 
-            Note that authors should still specify the <customresponse />
+            Authors should still specify the <customresponse />
             expect attribute because its value is displayed to students as
             the "correct" answer.
 
-            Note: ItemGraders can infer its answers from the their answers from
-            the expect value of a customresponse tag.
+            ItemGraders: If no answer is provided in the configuration, an
+            ItemGrader will attempt to infer its answer from the expect
+            parameter of a textline or CustomResponse tag. Note that this does
+            not work when an ItemGrader is embedded inside a ListGrader. See
+            ItemGrader.__call__ the implementation.
         """
         # Initialize the debug log
         # The debug log always exists and is written to, so that it can be accessed
