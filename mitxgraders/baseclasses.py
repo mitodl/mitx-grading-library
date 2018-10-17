@@ -92,25 +92,28 @@ class AbstractGrader(ObjectWithSchema):
         Used by edX as the check function (cfn).
 
         Arguments:
-            expect: The value of edX customresponse expect attribute (ignored)
+            expect: The value of edX customresponse expect attribute (ignored).
             student_input: The student's input passed by edX
 
         Notes:
-            This function ignores the value of expect.
+            This function ignores the value of expect. The expect argument is
+            provided because edX requires that a check function to have the
+            signature above.
 
-            This is because edX requires a two-parameter check function cfn
-            with the signature above. In the graders module, we NEVER use
-            the <customresponse /> tag's expect attribute for grading.
+            Our graders usually read the author's expected answer from the
+            grader configuration. This is because we generally use
+            dictionaries to store the expected input along with correctness,
+            grades, and feedback messages.
 
-            (Our check functions require an answer dictionary, as described
-            in the documentation.)
-
-            But we do want to allow authors to use the edX <customresponse />
+            Authors should still specify the <customresponse />
             expect attribute because its value is displayed to students as
             the "correct" answer.
 
-            The answer that we pass to check is None, indicating that the
-            grader should read the answer from its internal configuration.
+            ItemGraders: If no answer is provided in the configuration, an
+            ItemGrader will attempt to infer its answer from the expect
+            parameter of a textline or CustomResponse tag. Note that this does
+            not work when an ItemGrader is embedded inside a ListGrader. See
+            ItemGrader.__call__ for the implementation.
         """
         # Initialize the debug log
         # The debug log always exists and is written to, so that it can be accessed
@@ -414,3 +417,14 @@ class ItemGrader(AbstractGrader):
             **kwargs: Anything else that has been passed in. For example, sibling
                 graders when a grader is used as a subgrader in a ListGrader.
         """
+
+    def __call__(self, expect, student_input):
+        """
+        The same as AbstractGrader.__call__, except that we try to infer
+        answers from expect argument if answers are not specified in the
+        grader configuration.
+        """
+        if not self.config['answers'] and expect is not None:
+            self.config['answers'] = self.schema_answers(expect)
+
+        return super(ItemGrader, self).__call__(expect, student_input)

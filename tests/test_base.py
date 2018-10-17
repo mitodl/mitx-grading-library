@@ -121,6 +121,14 @@ def test_itemgrader():
     assert grader(None, "2")['ok']
     assert not grader(None, "3")['ok']
 
+def test_itemgrader_infers_answers_from_expect():
+    grader = StringGrader()
+    expect = 'cat'
+    student_input_1 = 'cat'
+    student_input_2 = 'dog'
+    assert grader(expect, student_input_1)['ok']
+    assert not grader(expect, student_input_2)['ok']
+
 def test_single_expect_value_in_config():
     grader = StringGrader(
         answers='cat'
