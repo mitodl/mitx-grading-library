@@ -414,3 +414,14 @@ class ItemGrader(AbstractGrader):
             **kwargs: Anything else that has been passed in. For example, sibling
                 graders when a grader is used as a subgrader in a ListGrader.
         """
+
+    def __call__(self, expect, student_input):
+        """
+        The same as AbstractGrader.__call__, except that we try to infer
+        answers from expect argument if answers are not specified in the
+        grader configuration.
+        """
+        if not self.config['answers'] and expect is not None:
+            self.config['answers'] = self.schema_answers(expect)
+
+        return super(ItemGrader, self).__call__(expect, student_input)
