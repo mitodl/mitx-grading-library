@@ -98,19 +98,20 @@ class AbstractGrader(ObjectWithSchema):
         Notes:
             This function ignores the value of expect.
 
-            This is because edX requires a two-parameter check function cfn
-            with the signature above. In the graders module, we NEVER use
-            the <customresponse /> tag's expect attribute for grading.
+            The expect argument is provided because edX expects a check function
+            to have the signature above. Our graders usually ignore the first
+            argument, expect. Instead, we usually pass None as the expect value,
+            indicating that the grader should instead read the expected answer
+            from the grader's configuration. This is because we generally use
+            dictionaries to store the expected input along with correctness,
+            grades, and feedback messages.
 
-            (Our check functions require an answer dictionary, as described
-            in the documentation.)
-
-            But we do want to allow authors to use the edX <customresponse />
+            Note that authors should still specify the <customresponse />
             expect attribute because its value is displayed to students as
             the "correct" answer.
 
-            The answer that we pass to check is None, indicating that the
-            grader should read the answer from its internal configuration.
+            Note: ItemGraders can infer its answers from the their answers from
+            the expect value of a customresponse tag.
         """
         # Initialize the debug log
         # The debug log always exists and is written to, so that it can be accessed
