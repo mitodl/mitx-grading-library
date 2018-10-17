@@ -113,7 +113,7 @@ class AbstractGrader(ObjectWithSchema):
             ItemGrader will attempt to infer its answer from the expect
             parameter of a textline or CustomResponse tag. Note that this does
             not work when an ItemGrader is embedded inside a ListGrader. See
-            ItemGrader.__call__ the implementation.
+            ItemGrader.__call__ for the implementation.
         """
         # Initialize the debug log
         # The debug log always exists and is written to, so that it can be accessed
