@@ -79,7 +79,7 @@ grader = ListGrader(
   <h3>Resources</h3>
   <ul>
     <li>
-      <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list6.xml" target="_blank">View source</a>
+      <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula10.xml" target="_blank">View source</a>
     </li>
     <li>
       <a href="https://mitodl.github.io/mitx-grading-library/grading_math/formula_grader/#sibling-variables" target="_blank">Documentation for sibling variables</a>
