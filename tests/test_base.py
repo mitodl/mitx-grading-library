@@ -123,7 +123,7 @@ def test_itemgrader():
 
 def test_itemgrader_infers_answers_from_expect():
     grader = StringGrader()
-    expect = 'cat'
+    expect = u'cat'
     student_input_1 = 'cat'
     student_input_2 = 'dog'
     assert grader(expect, student_input_1)['ok']
