@@ -425,6 +425,6 @@ class ItemGrader(AbstractGrader):
         grader configuration.
         """
         if not self.config['answers'] and expect is not None:
-            self.config['answers'] = self.schema_answers(expect)
+            self.config['answers'] = self.schema_answers(expect.encode('utf-8'))
 
         return super(ItemGrader, self).__call__(expect, student_input)
