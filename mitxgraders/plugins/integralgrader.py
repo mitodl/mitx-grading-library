@@ -353,7 +353,7 @@ class IntegralGrader(AbstractGrader):
         answers = self.config['answers'] if answers is None else answers
         # If only a single input has been provided, wrap it in a list
         # This is possible if only the integrand is required from the student
-        if isinstance(student_input, str):
+        if not isinstance(student_input, list):
             student_input = [student_input]
         structured_input = self.structure_and_validate_input(student_input)
         for key in structured_input:
