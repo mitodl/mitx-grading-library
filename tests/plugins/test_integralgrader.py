@@ -281,6 +281,26 @@ def test_complex_integrand_grades_as_expected():
     assert grader(None, student_input_b1) == expected_b
     assert grader(None, student_input_b2) == expected_b
 
+def test_with_single_input():
+    grader = IntegralGrader(
+        answers={
+            'lower': '-a',
+            'upper': '+a',
+            'integrand': 'x^2',
+            'integration_variable': 'x'
+        },
+        input_positions = {
+            'integrand': 1
+        },
+        variables=['a'],
+    )
+    # The same answer as instructor
+    student_input0 = 'x^2'
+    # same, but with an extra odd function that integrates to zero
+    student_input1 = 'x^2 + x^3'
+    assert grader(None, student_input0)['ok']
+    assert grader(None, student_input1)['ok']
+
 # Integral Evaluation Error tests
 def test_learner_divergent_integral_real_part_raises_integration_error():
     msg = ("There appears to be an error with the integral you entered: "
