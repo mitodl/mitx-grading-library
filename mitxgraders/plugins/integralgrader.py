@@ -340,7 +340,7 @@ class IntegralGrader(AbstractGrader):
             raise ConfigError(msg.format(expected=len(used_inputs),
                                          found=len(student_input),
                                          order=sorted_inputs)
-                             )
+                              )
 
         structured_input = transform_list_to_dict(student_input,
                                                   self.config['answers'],
@@ -351,6 +351,10 @@ class IntegralGrader(AbstractGrader):
     def check(self, answers, student_input, **kwargs):
         """Validates and cleans student_input, then checks response and handles errors"""
         answers = self.config['answers'] if answers is None else answers
+        # If only a single input has been provided, wrap it in a list
+        # This is possible if only the integrand is required from the student
+        if isinstance(student_input, str):
+            student_input = [student_input]
         structured_input = self.structure_and_validate_input(student_input)
         for key in structured_input:
             if structured_input[key] == '':
