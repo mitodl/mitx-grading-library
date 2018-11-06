@@ -32,6 +32,9 @@ grader = FormulaGrader(variables=["x"])
 
 Note that the `customresponse` tag contains the answer that is passed to the grader. You can also use `expect="2*x"` instead of `answer="2*x"`; edX treats these parameters indistinguishably (although we strongly suggest not using both!). Also note that a grader can be reused if desired.
 
+
+## Using an answers key to a grader
+
 If you provide an `answers` key to the grader, it will ignore whatever is specified in the `customresponse` tag. Here is an example.
 
 ```XML
@@ -55,6 +58,9 @@ grader = FormulaGrader(
 ```
 
 Even though the `answers` key is provided to the grader explicitly, the `answer` parameter in the `customresponse` tag is still important, as it is what the students see when they click on "Show Answer".
+
+
+## Using `correct_answer` for multiple inputs
 
 If you are using multiple inputs (such as when using a `ListGrader`), you must provide the `answers` key to the grader explicitly, as the `expect` or `answer` parameters in the `customresponse` tag are ignored. When using multiple inputs, it's recommended to provide a `correct_answer` parameter on the `textline` tags, which is what is used to show students the correct answer. Here is an example.
 
@@ -83,6 +89,9 @@ grader = FormulaGrader(
 ```
 
 Note that the `correct_answer` parameters are never sent to the grader, which is why you must provide them independently.
+
+
+## Passing a grader directly
 
 Because the `cfn` parameter of the `customresponse` tag is executed as python code, it is possible to skip the definition of the grader altogether, as the following example shows.
 
