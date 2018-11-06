@@ -269,6 +269,8 @@ grader = FormulaGrader(
 
 Tolerances are necessary because of numerical roundoff error that lead to small differences in evaluations of algebraically equivalent expressions. Zero tolerance should be used sparingly, perhaps only with integer sampling and answers.
 
+Note that if the answer is exactly `0` (or can be sampled to be exactly `0`, such as when using integer sampling), percentage tolerances don't work (as any percentage of zero is still zero). This means that the student-supplied answer must also evaluate to exactly zero to be graded correctly. Note that answers like `cos(pi/2)` evaluate to approximately `10^(-16)` due to numerical roundoff error. If you want such answers to be graded correctly, make sure to use an absolute tolerance instead of a relative tolerance on such questions.
+
 
 ## Suffixes
 

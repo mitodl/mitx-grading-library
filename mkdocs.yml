@@ -8,6 +8,7 @@ pages:
     - Overview: 'index.md'
     - ItemGrader: 'item_grader.md'
     - StringGrader: 'string_grader.md'
+    - edX Syntax: 'edx.md'
   - Grading Math:
     - FormulaGrader: 'grading_math/formula_grader.md'
     - NumericalGrader: 'grading_math/numerical_grader.md'

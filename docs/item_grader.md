@@ -60,6 +60,8 @@ Internally, the `ItemGrader` converts the answers entry into a tuple of dictiona
 
 The `wrong_msg` is only displayed if the score is zero and there are no other messages.
 
+If no `answers` key is provided, the grader reads from the `expect` or `answer` parameter of the `customresponse` tag (see below). However, note that when using a `ListGrader` or a `SingleListGrader`, the `answers` key is required.
+
 
 ## Option Listing
 

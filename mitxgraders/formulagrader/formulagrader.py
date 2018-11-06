@@ -370,7 +370,7 @@ class FormulaGrader(ItemGrader):
 
         tolerance (number or PercentageString): Tolerance with which answers are compared to
             the solutions. Can be expressed as an absolute number (eg, 0.1), or as a string
-            percentage (default '0.1%'). Must be positive or zero.
+            percentage (default '0.01%'). Must be positive or zero.
 
         metric_suffixes (bool): Should metric affixes be available to students to modify
             answers (default False). If true, then "2m" == 0.002, for example.
