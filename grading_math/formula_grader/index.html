@@ -94,6 +94,12 @@
 </li>
 
                         
+                            
+<li >
+    <a href="../../edx/">edX Syntax</a>
+</li>
+
+                        
                         </ul>
                     </li>
                 
@@ -191,7 +197,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../../string_grader/">
+                        <a rel="next" href="../../edx/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
@@ -450,6 +456,7 @@ grader = FormulaGrader(
 
 
 <p>Tolerances are necessary because of numerical roundoff error that lead to small differences in evaluations of algebraically equivalent expressions. Zero tolerance should be used sparingly, perhaps only with integer sampling and answers.</p>
+<p>Note that if the answer is exactly <code>0</code> (or can be sampled to be exactly <code>0</code>, such as when using integer sampling), percentage tolerances don't work (as any percentage of zero is still zero). This means that the student-supplied answer must also evaluate to exactly zero to be graded correctly. Note that answers like <code>cos(pi/2)</code> evaluate to approximately <code>10^(-16)</code> due to numerical roundoff error. If you want such answers to be graded correctly, make sure to use an absolute tolerance instead of a relative tolerance on such questions.</p>
 <h2 id="suffixes">Suffixes<a class="headerlink" href="#suffixes" title="Permanent link"> # </a></h2>
 <p>Numbers with a % at the end will be treated as percentages, and converted to the appropriate decimals. If you desire, you can also enable the use of metric suffixes by setting the appropriate setting as follows.</p>
 <pre class="codehilite"><code class="language-python">grader = FormulaGrader(

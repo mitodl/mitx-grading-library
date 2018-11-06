@@ -94,6 +94,12 @@
 </li>
 
                         
+                            
+<li >
+    <a href="edx/">edX Syntax</a>
+</li>
+
+                        
                         </ul>
                     </li>
                 
@@ -261,7 +267,6 @@
 &lt;script type=&quot;loncapa/python&quot;&gt;
 from mitxgraders import FormulaGrader, RandomFunction
 grader = FormulaGrader(
-    answers=&quot;e^(f(x)) * f'(x^2) * 2*x&quot;,
     variables=[&quot;x&quot;],
     # allows students to use generic functions f and f' in their input
     user_functions={ &quot;f&quot;: RandomFunction(), &quot;f'&quot;:RandomFunction() }
@@ -269,10 +274,9 @@ grader = FormulaGrader(
 &lt;/script&gt;
 
   &lt;p&gt;Enter the derivative of \(g(x) = e^{f(x^2)} \).&lt;/p&gt;
-  &lt;customresponse cfn=&quot;grader&quot;&gt;
-    &lt;!-- correct_answer is shown to student when they press [Show Answer].
-         Its value is not used for grading purposes --&gt;
-    &lt;textline math=&quot;true&quot; correct_answer=&quot;e^(f(x)) * f'(x^2) * 2*x&quot; /&gt;
+  &lt;!-- answer is provided to the grader when using single inputs --&gt;
+  &lt;customresponse cfn=&quot;grader&quot; answer=&quot;e^(f(x)) * f'(x^2) * 2*x&quot;&gt;
+    &lt;textline math=&quot;true&quot; /&gt;
   &lt;/customresponse&gt;
 
 &lt;/problem&gt;</code></pre>
@@ -414,5 +418,5 @@ ConfigError: Warning: 'variables' contains entries '['pi']' which will override 
 
 <!--
 MkDocs version : 0.17.5
-Build Date UTC : 2018-10-30 05:56:41
+Build Date UTC : 2018-11-06 21:50:42
 -->

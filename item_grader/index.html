@@ -94,6 +94,12 @@
 </li>
 
                         
+                            
+<li >
+    <a href="../edx/">edX Syntax</a>
+</li>
+
+                        
                         </ul>
                     </li>
                 
@@ -277,6 +283,7 @@
 
 <p>Internally, the <code>ItemGrader</code> converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.</p>
 <p>The <code>wrong_msg</code> is only displayed if the score is zero and there are no other messages.</p>
+<p>If no <code>answers</code> key is provided, the grader reads from the <code>expect</code> or <code>answer</code> parameter of the <code>customresponse</code> tag (see below). However, note that when using a <code>ListGrader</code> or a <code>SingleListGrader</code>, the <code>answers</code> key is required.</p>
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to an <code>ItemGrader</code>.</p>
 <pre class="codehilite"><code class="language-python">grader = ItemGrader(
