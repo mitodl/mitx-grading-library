@@ -243,7 +243,7 @@
 )</code></pre>
 
 
-<p>To receive full points for this problem, a student would enter <code>cat, dog</code> or <code>dog, cat</code> into the input box. Entering <code>cat, octopus</code> or just <code>cat</code> will receive half points. The <code>answers</code> key is a python list of the individual answers you wish to require, and is a required key for <code>SingleListGrader</code>.</p>
+<p>To receive full points for this problem, a student would enter <code>cat, dog</code> or <code>dog, cat</code> into the input box. Entering <code>cat, octopus</code> or just <code>cat</code> will receive half points. The <code>answers</code> key is a python list of the individual answers you wish to use.</p>
 <p>You can use a tuple of lists to specify multiple lists of answers, just like normal ItemGraders.</p>
 <pre class="codehilite"><code class="language-python">grader = SingleListGrader(
     answers=(

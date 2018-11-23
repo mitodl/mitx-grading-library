@@ -282,7 +282,7 @@ grader = FormulaGrader(
 
 <p>Even though the <code>answers</code> key is provided to the grader explicitly, the <code>answer</code> parameter in the <code>customresponse</code> tag is still important, as it is what the students see when they click on "Show Answer".</p>
 <h2 id="using-correct_answer-for-multiple-inputs">Using <code>correct_answer</code> for multiple inputs<a class="headerlink" href="#using-correct_answer-for-multiple-inputs" title="Permanent link"> # </a></h2>
-<p>If you are using multiple inputs (such as when using a <code>ListGrader</code>), you must provide the <code>answers</code> key to the grader explicitly, as the <code>expect</code> or <code>answer</code> parameters in the <code>customresponse</code> tag are ignored. When using multiple inputs, it's recommended to provide a <code>correct_answer</code> parameter on the <code>textline</code> tags, which is what is used to show students the correct answer. Here is an example.</p>
+<p>If you are using multiple inputs (such as when using a <code>ListGrader</code>) or a <code>SingleListGrader</code>, you must provide the <code>answers</code> key to the grader explicitly, as the <code>expect</code> or <code>answer</code> parameters in the <code>customresponse</code> tag are ignored. When using multiple inputs, it's recommended to provide a <code>correct_answer</code> parameter on the <code>textline</code> tags, which is what is used to show students the correct answer. Here is an example.</p>
 <pre class="codehilite"><code class="language-XML">&lt;problem&gt;
 &lt;script type=&quot;loncapa/python&quot;&gt;
 from mitxgraders import *
@@ -307,6 +307,7 @@ grader = FormulaGrader(
 
 
 <p>Note that the <code>correct_answer</code> parameters are never sent to the grader, which is why you must provide them independently.</p>
+<p>When using sublists, such as a <code>ListGrader</code> or a <code>SingleListGrader</code> inside a <code>ListGrader</code>, you only need to provide an <code>answers</code> key to the top-level grader.</p>
 <h2 id="passing-a-grader-directly">Passing a grader directly<a class="headerlink" href="#passing-a-grader-directly" title="Permanent link"> # </a></h2>
 <p>Because the <code>cfn</code> parameter of the <code>customresponse</code> tag is executed as python code, it is possible to skip the definition of the grader altogether, as the following example shows.</p>
 <pre class="codehilite"><code class="language-XML">&lt;problem&gt;

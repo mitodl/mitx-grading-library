@@ -245,7 +245,7 @@
 )</code></pre>
 
 
-<p>Each element of answers is set as an answer that is passed as the answers key into the subgrader. This should be set up as two input boxes that the student types in. Note that the <code>answers</code> key is provided as a python list for a <code>ListGrader</code>, and is a required key.</p>
+<p>Each element of answers is set as an answer that is passed as the answers key into the subgrader. This should be set up as two input boxes that the student types in. Note that the <code>answers</code> key is provided as a python list of individual answers for a <code>ListGrader</code>.</p>
 <p>In the above example, the item grader just sees single strings as the answer. You can do more complicated things though, like the following.</p>
 <pre class="codehilite"><code class="language-python">answer1 = (
     {'expect': 'zebra', 'grade_decimal': 1},
