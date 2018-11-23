@@ -62,7 +62,7 @@ Even though the `answers` key is provided to the grader explicitly, the `answer`
 
 ## Using `correct_answer` for multiple inputs
 
-If you are using multiple inputs (such as when using a `ListGrader`), you must provide the `answers` key to the grader explicitly, as the `expect` or `answer` parameters in the `customresponse` tag are ignored. When using multiple inputs, it's recommended to provide a `correct_answer` parameter on the `textline` tags, which is what is used to show students the correct answer. Here is an example.
+If you are using multiple inputs (such as when using a `ListGrader`) or a `SingleListGrader`, you must provide the `answers` key to the grader explicitly, as the `expect` or `answer` parameters in the `customresponse` tag are ignored. When using multiple inputs, it's recommended to provide a `correct_answer` parameter on the `textline` tags, which is what is used to show students the correct answer. Here is an example.
 
 ```XML
 <problem>
@@ -89,6 +89,8 @@ grader = FormulaGrader(
 ```
 
 Note that the `correct_answer` parameters are never sent to the grader, which is why you must provide them independently.
+
+When using sublists, such as a `ListGrader` or a `SingleListGrader` inside a `ListGrader`, you only need to provide an `answers` key to the top-level grader.
 
 
 ## Passing a grader directly

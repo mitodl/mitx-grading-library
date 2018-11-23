@@ -9,7 +9,7 @@ grader = SingleListGrader(
 )
 ```
 
-To receive full points for this problem, a student would enter `cat, dog` or `dog, cat` into the input box. Entering `cat, octopus` or just `cat` will receive half points. The `answers` key is a python list of the individual answers you wish to require, and is a required key for `SingleListGrader`.
+To receive full points for this problem, a student would enter `cat, dog` or `dog, cat` into the input box. Entering `cat, octopus` or just `cat` will receive half points. The `answers` key is a python list of the individual answers you wish to use.
 
 You can use a tuple of lists to specify multiple lists of answers, just like normal ItemGraders.
 

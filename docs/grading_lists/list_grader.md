@@ -14,7 +14,7 @@ grader = ListGrader(
 )
 ```
 
-Each element of answers is set as an answer that is passed as the answers key into the subgrader. This should be set up as two input boxes that the student types in. Note that the `answers` key is provided as a python list for a `ListGrader`, and is a required key.
+Each element of answers is set as an answer that is passed as the answers key into the subgrader. This should be set up as two input boxes that the student types in. Note that the `answers` key is provided as a python list of individual answers for a `ListGrader`.
 
 In the above example, the item grader just sees single strings as the answer. You can do more complicated things though, like the following.
 
