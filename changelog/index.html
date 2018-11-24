@@ -221,6 +221,7 @@
         <li class="first-level active"><a href="#change-log">Change Log</a></li>
             <li class="second-level"><a href="#version-12">Version 1.2</a></li>
                 
+                <li class="third-level"><a href="#version-122">Version 1.2.2</a></li>
                 <li class="third-level"><a href="#version-121">Version 1.2.1</a></li>
                 <li class="third-level"><a href="#version-120">Version 1.2.0</a></li>
             <li class="second-level"><a href="#version-11x">Version 1.1.x</a></li>
@@ -241,6 +242,13 @@
 
 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link"> # </a></h1>
 <h2 id="version-12">Version 1.2<a class="headerlink" href="#version-12" title="Permanent link"> # </a></h2>
+<h3 id="version-122">Version 1.2.2<a class="headerlink" href="#version-122" title="Permanent link"> # </a></h3>
+<ul>
+<li>Added <code>accept_any</code> and <code>accept_nonempty</code> options to <code>StringGrader</code>.</li>
+<li>If only a single text input is present, the <code>answers</code> key is inferred from the <code>expect</code> attribute of the <code>customresponse</code> tag (does not work for <code>SingleListInput</code> however).</li>
+<li>Updated AsciiMath preprocessor to handle variable names and user-defined functions properly.</li>
+<li>Various small bug fixes.</li>
+</ul>
 <h3 id="version-121">Version 1.2.1<a class="headerlink" href="#version-121" title="Permanent link"> # </a></h3>
 <ul>
 <li>Added <code>arctan2(x, y)</code> function that returns angle between +x axis and the point (x, y); available by default for students to use in FormulaGrader problems.</li>

@@ -223,6 +223,8 @@
                 
             <li class="second-level"><a href="#stripping-input">Stripping Input</a></li>
                 
+            <li class="second-level"><a href="#accepting-anything">Accepting Anything</a></li>
+                
             <li class="second-level"><a href="#option-listing">Option Listing</a></li>
                 
     </ul>
@@ -256,6 +258,15 @@
 
 
 <p>This will accept <code>cat</code>, but will reject answers with leading or trailing spaces. By default, <code>strip=True</code>.</p>
+<h2 id="accepting-anything">Accepting Anything<a class="headerlink" href="#accepting-anything" title="Permanent link"> # </a></h2>
+<p>Sometimes you may just want to accept anything that a student provides. There are two options that allow you to do this. The first is <code>accept_any</code>, which will literally accept anything that is entered into the textbox. The second is <code>accept_nonempty</code>, which requires the textbox to contain a non-empty submission (blank spaces are stripped). <code>accept_any</code> has priority over <code>accept_nonempty</code>.</p>
+<pre class="codehilite"><code class="language-python">grader = StringGrader(
+    answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
+    accept_any=True
+)</code></pre>
+
+
+<p>Note that when either of these options are set to True, it is meaningless to provide more than one answer to check against, as they will all be graded as correct. Also note that you do not need to provide any answer at all in this situation.</p>
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to a <code>StringGrader</code>.</p>
 <pre class="codehilite"><code class="language-python">grader = SingleListGrader(
