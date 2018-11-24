@@ -12,6 +12,7 @@
         <html url_name="stringinfo"/>
         <problem url_name="string1"/>
         <problem url_name="string2"/>
+        <problem url_name="string3"/>
       </vertical>
     </sequential>
     <sequential url_name="formulagrader" display_name="FormulaGrader and NumericalGrader">

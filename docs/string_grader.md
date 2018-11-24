@@ -41,6 +41,20 @@ grader = StringGrader(
 This will accept `cat`, but will reject answers with leading or trailing spaces. By default, `strip=True`.
 
 
+## Accepting Anything
+
+Sometimes you may just want to accept anything that a student provides. There are two options that allow you to do this. The first is `accept_any`, which will literally accept anything that is entered into the textbox. The second is `accept_nonempty`, which requires the textbox to contain a non-empty submission (blank spaces are stripped). `accept_any` has priority over `accept_nonempty`.
+
+```python
+grader = StringGrader(
+    answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
+    accept_any=True
+)
+```
+
+Note that when either of these options are set to True, it is meaningless to provide more than one answer to check against, as they will all be graded as correct. Also note that you do not need to provide any answer at all in this situation.
+
+
 ## Option Listing
 
 Here is the full list of options specific to a `StringGrader`.

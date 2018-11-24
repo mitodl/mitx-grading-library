@@ -52,6 +52,23 @@ def test_case():
     assert not grader(None, "Cat")['ok']
     assert grader(None, "CAT")['ok']
 
+def test_any():
+    """Tests that accept_any is working correctly"""
+    grader = StringGrader(accept_any=True)
+    assert grader(None, "cat")['ok']
+    assert grader(None, "dog")['ok']
+    assert grader(None, "")['ok']
+    assert grader(None, " ")['ok']
+
+def test_nonempty():
+    """Tests that accept_nonempty is working correctly"""
+    grader = StringGrader(accept_nonempty=True)
+    assert grader(None, "cat")['ok']
+    assert grader(None, "dog")['ok']
+    assert not grader(None, "")['ok']
+    assert not grader(None, " ")['ok']
+
+
 # Documentation tests
 
 def test_docs():

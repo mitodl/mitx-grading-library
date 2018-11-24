@@ -30,7 +30,9 @@ class StringGrader(ItemGrader):
         # Append options
         return schema.extend({
             Required('strip', default=True): bool,
-            Required('case_sensitive', default=True): bool
+            Required('case_sensitive', default=True): bool,
+            Required('accept_any', default=False): bool,
+            Required('accept_nonempty', default=False): bool
         })
 
     def check_response(self, answer, student_input, **kwargs):
@@ -44,20 +46,38 @@ class StringGrader(ItemGrader):
         expect = answer['expect']
         student = student_input
 
-        # Apply options
-        if self.config['strip']:
-            expect = expect.strip()
-            student = student.strip()
-        if not self.config['case_sensitive']:
-            expect = expect.lower()
-            student = student.lower()
+        # What are we checking?
+        if self.config['accept_any']:
+            correct = True
+        elif self.config['accept_nonempty']:
+            correct = student.strip() != ""
+        else:
+            # Check for a match to instructor
+            # Apply options
+            if self.config['strip']:
+                expect = expect.strip()
+                student = student.strip()
+            if not self.config['case_sensitive']:
+                expect = expect.lower()
+                student = student.lower()
+            # Perform the comparison
+            correct = expect == student
 
-        # Perform comparison
-        if expect == student:
+        # Return grade
+        if correct:
             return {
                 'ok': answer['ok'],
                 'grade_decimal': answer['grade_decimal'],
                 'msg': answer['msg']
             }
-
         return {'ok': False, 'grade_decimal': 0, 'msg': ''}
+
+    def __call__(self, expect, student_input):
+        """
+        The same as ItemGrader.__call__, except that we accept a None
+        entry for expect if accept_any or accept_nonempty are set.
+        """
+        if expect is None and (self.config['accept_any'] or self.config['accept_nonempty']):
+            expect = ""
+
+        return super(StringGrader, self).__call__(expect, student_input)
