@@ -30,7 +30,6 @@ Typical usage in an edX course looks like:
 <script type="loncapa/python">
 from mitxgraders import FormulaGrader, RandomFunction
 grader = FormulaGrader(
-    answers="e^(f(x)) * f'(x^2) * 2*x",
     variables=["x"],
     # allows students to use generic functions f and f' in their input
     user_functions={ "f": RandomFunction(), "f'":RandomFunction() }
@@ -38,10 +37,9 @@ grader = FormulaGrader(
 </script>
 
   <p>Enter the derivative of \(g(x) = e^{f(x^2)} \).</p>
-  <customresponse cfn="grader">
-    <!-- correct_answer is shown to student when they press [Show Answer].
-         Its value is not used for grading purposes -->
-    <textline math="true" correct_answer="e^(f(x)) * f'(x^2) * 2*x" />
+  <!-- answer is provided to the grader when using single inputs -->
+  <customresponse cfn="grader" answer="e^(f(x)) * f'(x^2) * 2*x">
+    <textline math="true" />
   </customresponse>
 
 </problem>
