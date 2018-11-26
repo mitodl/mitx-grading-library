@@ -1,0 +1,23 @@
+<problem display_name="Accepting Anything" showanswer="always" weight="10" attempts="">
+
+<p>Sometimes, you may want to accept anything that a student types in. We have two options to allow this with StringGrader: <code>accept_any</code> and <code>accept_nonempty</code>. Here is an example of using <code>accept_nonempty</code>.</p>
+
+<p>Please enter your favorite color in the textbox below.</p>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = StringGrader(
+    # Note that the expect entry here is irrelevant
+    answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
+    accept_nonempty=True,
+    wrong_msg="Please enter a response."
+)
+</script>
+
+<customresponse cfn="grader">
+  <textline />
+</customresponse>
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string3.xml" target="_blank">View source</a>
+
+</problem>

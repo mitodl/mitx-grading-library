@@ -2,6 +2,13 @@
 
 ## Version 1.2
 
+### Version 1.2.2
+
+* Added `accept_any` and `accept_nonempty` options to `StringGrader`.
+* If only a single text input is present, the `answers` key is inferred from the `expect` attribute of the `customresponse` tag (does not work for `SingleListInput` however).
+* Updated AsciiMath preprocessor to handle variable names and user-defined functions properly.
+* Various small bug fixes.
+
 ### Version 1.2.1
 
 * Added `arctan2(x, y)` function that returns angle between +x axis and the point (x, y); available by default for students to use in FormulaGrader problems.
