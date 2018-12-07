@@ -41,6 +41,7 @@
         <problem url_name="matrix5"/>
         <problem url_name="matrix6"/>
         <problem url_name="matrix7"/>
+        <problem url_name="matrix8"/>
         <problem url_name="matrixtech"/>
       </vertical>
     </sequential>

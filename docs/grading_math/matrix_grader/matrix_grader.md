@@ -313,6 +313,26 @@ we can use:
 
 ```
 
+### Hiding all messages
+
+MatrixGraders can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting `suppress_matrix_messages=True`, which overrides `answer_shape_mismatch={'is_raised'}` and `shape_errors`. In the following example, `A` and `B` are secretly matrices that don't commute, but students will never see a matrix error message from typing something like `1+A`.
+
+```
+grader = MatrixGrader(
+    answers=['A*B'],
+    variables=['A', 'B'],
+    sample_from={
+        'A': RealMatrices(),
+        'B': RealMatrices()
+    },
+    max_array_dim=0,
+    suppress_matrix_messages=True
+)
+```
+
+Note that this will also suppress error messages from trying to do things like `sin([1, 2])` or `[1, 2]^2`. If your answer needs to take functions of the non-commuting variables, then this option is insufficient.
+
+
 ## Matrix Functions
 
 MatrixGrader provides all the default functions of `FormulaGrader` (`sin`, `cos`, etc.) plus some extras such as `trans(A)` (transpose) and `det(A)` (determinant). See [Mathematical Functions]('../functions_and_constants.md') for full list.

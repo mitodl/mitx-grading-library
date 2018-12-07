@@ -240,3 +240,21 @@ def test_wrong_answer_type_error_messages_with_scalars():
 def test_validate_student_input_shape_edge_case():
     with raises(AttributeError):
         MatrixGrader.validate_student_input_shape([1, 2], (2,), 'type')
+
+def test_suppress_matrix_messages():
+    grader = MatrixGrader(
+        answers='[1, 2, 3]',
+        answer_shape_mismatch=dict(
+            is_raised=True,  # Overridden by suppress_matrix_messages
+        ),
+        shape_errors=True,  # Overridden by suppress_matrix_messages
+        suppress_matrix_messages=True
+    )
+    assert grader(None, '10')['ok'] is False
+    assert grader(None, '10')['msg'] == ''
+    assert grader(None, '[1, 2, 3] + 1')['ok'] is False
+    assert grader(None, '[1, 2, 3] + 1')['msg'] == ''
+    assert grader(None, '[1, 2, 3, 4]')['ok'] is False
+    assert grader(None, '[1, 2, 3, 4]')['msg'] == ''
+    assert grader(None, 'sin([1, 2, 3])')['ok'] is False
+    assert grader(None, '[1, 2, 3]^1.3')['ok'] is False

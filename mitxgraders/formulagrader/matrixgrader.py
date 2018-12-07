@@ -11,7 +11,7 @@ from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from mitxgraders.helpers.validatorfuncs import NonNegative
 from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
 from mitxgraders.helpers.calc.exceptions import (
-    CalcError, MathArrayShapeError as ShapeError)
+    MathArrayShapeError as ShapeError, MathArrayError, DomainError)
 from mitxgraders.helpers.calc.mathfuncs import (
     merge_dicts, ARRAY_ONLY_FUNCTIONS)
 
@@ -55,6 +55,9 @@ class MatrixGrader(FormulaGrader):
                     'shape': Type and shape information about the expected and
                         received objects is revealed.
 
+        suppress_matrix_messages (bool): If True, suppresses all matrix-related
+            error messages from being displayed. Overrides shape_errors=True and
+            is_raised=True. Defaults to False.
     """
 
     # merge_dicts does not mutate the originals
@@ -69,6 +72,7 @@ class MatrixGrader(FormulaGrader):
             Required('max_array_dim', default=1): NonNegative(int),
             Required('negative_powers', default=True): bool,
             Required('shape_errors', default=True): bool,
+            Required('suppress_matrix_messages', default=False): bool,
             Required('answer_shape_mismatch', default={
                 'is_raised': True,
                 'msg_detail': 'type'
@@ -88,15 +92,27 @@ class MatrixGrader(FormulaGrader):
             with MathArray.enable_negative_powers(self.config['negative_powers']):
                 result = super(MatrixGrader, self).check_response(answer, student_input, **kwargs)
         except ShapeError as err:
-            if self.config['shape_errors']:
+            if self.config['suppress_matrix_messages']:
+                return {'ok': False, 'msg': '', 'grade_decimal': 0}
+            elif self.config['shape_errors']:
                 raise
             else:
                 return {'ok': False, 'msg': err.message, 'grade_decimal': 0}
         except InputTypeError as err:
-            if self.config['answer_shape_mismatch']['is_raised']:
+            if self.config['suppress_matrix_messages']:
+                return {'ok': False, 'msg': '', 'grade_decimal': 0}
+            elif self.config['answer_shape_mismatch']['is_raised']:
                 raise
             else:
                 return {'ok': False, 'grade_decimal': 0, 'msg': err.message}
+        except (DomainError, MathArrayError) as err:
+            # If we're using matrix quantities for noncommutative scalars, we
+            # might get a DomainError from using functions of matrices, or
+            # a MathArrayError from taking a funny power of a matrix.
+            # Suppress these too.
+            if self.config['suppress_matrix_messages']:
+                return {'ok': False, 'msg': '', 'grade_decimal': 0}
+            raise
         return result
 
     @staticmethod
@@ -137,7 +153,7 @@ class MatrixGrader(FormulaGrader):
                    "of incorrect shape".format(expected, received))
         else:
             msg = ("Expected answer to be a {0}, but input is a {1}"
-                .format(expected, received))
+                   .format(expected, received))
 
         raise InputTypeError(msg)
 
@@ -147,6 +163,7 @@ class MatrixGrader(FormulaGrader):
         """Get the utils for comparer function."""
         def _within_tolerance(x, y):
             return within_tolerance(x, y, self.config['tolerance'])
+
         def _validate_shape(student_input, shape):
             detail = self.config['answer_shape_mismatch']['msg_detail']
             return self.validate_student_input_shape(student_input, shape, detail)

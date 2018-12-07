@@ -1,0 +1,44 @@
+<problem display_name="Matrix Grader: Noncommuting Variables" showanswer="always" weight="10" attempts="">
+
+<p>Sometimes, you want to work with non-commuting variables or operations. These can be straightforwardly implemented as matrices, as in the following example. Note that although we secretly have matrix variables, students do not need to know this, and hence we never give error messages that have anything to do with matrices.</p>
+
+<p>[mathjaxinline]A[/mathjaxinline] is a scalar function. Write down its gradient.</p>
+
+<p>Suggested inputs:</p>
+
+<ul>
+  <li><code>nabla * A</code> (correct)</li>
+  <li><code>A * nabla</code> (incorrect)</li>
+  <li><code>nabla * A + 1</code> (incorrect, but looks like a matrix + a scalar)</li>
+</ul>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = MatrixGrader(
+    variables=['nabla', 'A'],
+    sample_from={
+        'nabla': RealMatrices(),
+        'A': RealMatrices()
+    },
+    max_array_dim=0,               # Students can't enter their own matrices
+    suppress_matrix_messages=True  # Turns off all matrix error messages
+)
+</script>
+
+<p style="display:inline">Gradient of \(A\) = </p>
+<customresponse cfn="grader" expect="nabla * A" inline="1">
+  <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" inline="1" />
+</customresponse>
+
+
+<h3>Resources</h3>
+<ul>
+  <li>
+    <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix7.xml" target="_blank">View source</a>
+  </li>
+  <li>
+    <a href="https://mitodl.github.io/mitx-grading-library/grading_math/comparer_functions/" target="_blank">Documentation for <code>comparer_functions</code></a>
+  </li>
+</ul>
+
+</problem>
