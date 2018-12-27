@@ -528,7 +528,7 @@ class MathParser(object):
             return self.cache[cache_key]
 
         try:
-            parsed = self.raw_parse(expression)
+            parsed = self.raw_parse(expression_no_whitespace)
         except ParseException:
             msg = "Invalid Input: Could not parse '{}' as a formula"
             raise UnableToParse(msg.format(expression))

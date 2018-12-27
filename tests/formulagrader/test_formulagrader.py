@@ -885,3 +885,11 @@ def test_numbered_vars():
     assert grader(None, 'a_{0}+a_{1}+a_{-1}')['ok']
     with raises(UndefinedVariable, match="a not permitted in answer as a variable"):
         grader(None, 'a')
+
+def test_whitespace_stripping():
+    """Test that formulas work regardless of whitespace"""
+    grader = FormulaGrader(
+        variables=['x_{ab}'],
+        answers='x _ { a b }'
+    )
+    assert grader(None, 'x_{a b}')['ok']
