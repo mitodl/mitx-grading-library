@@ -68,14 +68,14 @@ def test_bracket_balancing_open_without_close_raises_error():
     # parens only
     match = ("Invalid Input:\n"
              "2 parentheses were opened without being closed (highlighted below)\n"
-             "<code>5 + <mark>(</mark>(1) + <mark>(</mark></code>")
+             "<code>5+<mark>(</mark>(1)+<mark>(</mark></code>")
     with raises(UnbalancedBrackets, match=re.escape(match)):
         evaluator("5 + ((1) + (")
 
     # brackets only
     match = ("Invalid Input:\n"
              "1 square bracket was opened without being closed (highlighted below)\n"
-             "<code>5 + <mark>[</mark>1, (1 + 2),</code>")
+             "<code>5+<mark>[</mark>1,(1+2),</code>")
     with raises(UnbalancedBrackets, match=re.escape(match)):
         evaluator("5 + [1, (1 + 2), ")
 
@@ -83,21 +83,21 @@ def test_bracket_balancing_open_without_close_raises_error():
     match = ("Invalid Input:\n"
              "1 parenthesis was opened without being closed (highlighted below)\n"
              "1 square bracket was opened without being closed (highlighted below)\n"
-             "<code>5 + <mark>(</mark>(1) + <mark>[</mark></code>")
+             "<code>5+<mark>(</mark>(1)+<mark>[</mark></code>")
     with raises(UnbalancedBrackets, match=re.escape(match)):
         evaluator("5 + ((1) + [")
 
 def test_brackets_close_without_open_raises_error():
     match = ("Invalid Input: a parenthesis was closed without ever being "
              "opened, highlighted below.\n"
-             "<code>5 + <mark>)</mark>1) + 1</code>")
+             "<code>5+<mark>)</mark>1)+1</code>")
     with raises(UnbalancedBrackets, match=re.escape(match)):
         evaluator("5 + )1) + 1")
 
 def test_brackets_closed_by_wrong_type_raise_error():
     match = ("Invalid Input: a parenthesis was opened and then closed by a "
              "square bracket, highlighted below.\n"
-             "<code>5 + <mark>(</mark>1+2<mark>]</mark> + 3</code>")
+             "<code>5+<mark>(</mark>1+2<mark>]</mark>+3</code>")
     with raises(UnbalancedBrackets, match=re.escape(match)):
         evaluator("5 + (1+2] + 3")
 
