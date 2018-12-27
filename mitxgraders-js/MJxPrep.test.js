@@ -108,6 +108,11 @@ describe('preProcessEqn', () => {
     expect(preProcessEqn(eqn)).toBe('{:cross({:x:}):}+{:({:a:}+{:b:}) {:times:} {:c:}:}+{:y:}')
   } )
 
+  it('replaces Kronecker delta functions', () => {
+    const eqn = 'delta(x) + delta(a + b, c)'
+    expect(preProcessEqn(eqn)).toBe('{:delta({:x:}):}+{:delta_{{:a:}+{:b:},{:c:}}:}')
+  } )
+
   it('wraps variables and function calls', () => {
     // The behavior of wrapVariables and wrapFunCalls is primarily described
     // in their dedicated tests
