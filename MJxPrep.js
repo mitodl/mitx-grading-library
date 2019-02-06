@@ -93,7 +93,8 @@ if (window.MJxPrep) {
     eqn = wrapFuncCalls(eqn)
 
     // wrapFuncCalls correctly transforms 'conj(z)', but
-    // wrapVariables turns 'conj' and 'conj(' into '{:conj:}' and '{:conj:}('
+    // wrapFuncCalls turns 'conj(z' into '{:conj:}(' and
+    // wrapVariables turns 'conj' into '{:conj:}', This is problematic...
     // conj is defined below as a <mover/> symbol. edX version of asciimath
     // has trouble with <mover/> symbols wrapped directly in non-breaking group.
     // This hack avoids lonely, non-breaking, <mover/> symbols.
