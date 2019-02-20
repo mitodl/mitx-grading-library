@@ -92,6 +92,15 @@ if (window.MJxPrep) {
     eqn = wrapVariables(eqn)
     eqn = wrapFuncCalls(eqn)
 
+    // wrapFuncCalls correctly transforms 'conj(z)', but
+    // wrapFuncCalls turns 'conj(z' into '{:conj:}(' and
+    // wrapVariables turns 'conj' into '{:conj:}', This is problematic...
+    // conj is defined below as a <mover/> symbol. edX version of asciimath
+    // has trouble with <mover/> symbols wrapped directly in non-breaking group.
+    // This hack avoids lonely, non-breaking, <mover/> symbols.
+    // See https://github.com/mitodl/mitx-grading-library/issues/163 for more.
+    eqn = eqn.replace(/\{:conj:\}/g, "{:text(co)text(nj):}");
+
     // Return the preprocessed equation
     return eqn;
   }
