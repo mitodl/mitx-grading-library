@@ -109,7 +109,7 @@ if (window.MJxPrep) {
   function updateMathJax() {
     if (MathJax.InputJax.AsciiMath) {
       // Grab the AsciiMath object
-      AM = MathJax.InputJax.AsciiMath.AM;
+      var AM = MathJax.InputJax.AsciiMath.AM;
 
       // All of these new symbols are based on those appearing in the AsciiMath definitions
       // See https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js
