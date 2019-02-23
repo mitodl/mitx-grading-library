@@ -15,7 +15,7 @@ pages:
     - MatrixGrader: 'grading_math/matrix_grader/matrix_grader.md'
     - User-Defined Matrix Functions: 'grading_math/matrixfunctions.md'
     - Sampling Sets: 'grading_math/sampling.md'
-    - Function List: 'grading_math/functions.md'
+    - Functions and Constants List: 'grading_math/functions_and_constants.md'
     - Comparer Functions: 'grading_math/comparer_functions.md'
     - AsciiMath Renderer Definitions: 'grading_math/renderer.md'
   - Grading Lists:
