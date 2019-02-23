@@ -1,6 +1,6 @@
-# Mathematical Functions
+# Mathematical Functions and Constants
 
-## FormulaGrader Default Functions
+## FormulaGrader and NumericalGrader Default Functions
 
 !!! note
     Below, expressions marked with a * may require our [AsciiMath renderer definitions](renderer.md) to display properly in edX.
@@ -56,3 +56,32 @@ In `MatrixGrader` problems, all `FormulaGrader` functions are available by defau
 - `norm(x)`: Frobenius norm, works for scalars, vectors, and matrices
 - `trans(x)`: transpose
 - `trace(x)`: trace
+
+## Default Constants
+Available in `FormulaGrader`, `NumericalGrader`, and `MatrixGrader` by default:
+
+- `i`: imaginary unit
+- `j`: imaginary unit
+- `e`: approximately 2.718281828
+- `pi`: approximately 3.141592654
+
+## Optional Constant Collections
+The `mitxgraders.helpers.calc` module provides a few collections of constants that can be imported for convenience and reuse. For example, `pauli` is a dictionary with keys `sigma_x`, `sigma_y`, and `sigma_z` that are [`MathArray`](matrix_grader/matrix_grader/#matrix-operations-and-matharrays) representations of the 2 by 2 Pauli matrices.
+
+The collections of mathematical constants provided by `mitxgraders.helpers.calc` are:
+
+- `pauli`: MathArray representations of the 2 by 2 Pauli matrices, `sigma_x`, `sigma_y`, and `sigma_z`
+- `cartesian_xyz`: MathArray representations of the three-dimensional Cartesian unit vectors, named `hatx`, `haty`, `hatz`
+- `cartesian_ijk`: MathArray representations of the three-dimensional Cartesian unit vectors, named `hati`, `hatj`, `hatk`
+
+Each collection is a dictionary that can be provided as a value of `user_constants`:
+
+```pycon
+>>> from mitxgraders import MatrixGrader
+>>> from mitxgraders.helpers.calc import pauli
+>>> grader = MatrixGrader(
+...   answers='sigma_x + sigma_z',
+...   user_constants=pauli
+... )
+
+```
