@@ -141,7 +141,7 @@
                         
                             
 <li >
-    <a href="../../functions/">Function List</a>
+    <a href="../../functions_and_constants/">Functions and Constants List</a>
 </li>
 
                         
@@ -688,7 +688,7 @@ MathArrayShapeError: Cannot raise a non-square matrix to powers.
 
 
 <h2 id="matrix-functions">Matrix Functions<a class="headerlink" href="#matrix-functions" title="Permanent link"> # </a></h2>
-<p>MatrixGrader provides all the default functions of <code>FormulaGrader</code> (<code>sin</code>, <code>cos</code>, etc.) plus some extras such as <code>trans(A)</code> (transpose) and <code>det(A)</code> (determinant). See <a href="" title="../functions.md">Mathematical Functions</a> for full list.</p>
+<p>MatrixGrader provides all the default functions of <code>FormulaGrader</code> (<code>sin</code>, <code>cos</code>, etc.) plus some extras such as <code>trans(A)</code> (transpose) and <code>det(A)</code> (determinant). See <a href="" title="../functions_and_constants.md">Mathematical Functions</a> for full list.</p>
 <p>Since <code>MatrixGrader</code> has all of <code>FormulaGrader</code>'s configuration options, additional functions can be supplied through the <code>user_functions</code> configuration key. If you supply addition matrix functions, you may wish you use the <code>specify_domain</code> decorator function. See <a href="../../matrixfunctions/">Function Listing: Specify Domain</a> for details.</p>
 <h2 id="identity-matrix">Identity Matrix<a class="headerlink" href="#identity-matrix" title="Permanent link"> # </a></h2>
 <p>To make an n by n identity matrix available to students, specify the configuration key <code>identity_dim=n</code>. That is, the grader <code>MatrixGrader(identity_dim=4, ...)</code> will automatically have a constant <code>'I'</code> whose value is the 4 by 4 identity matrix.</p>

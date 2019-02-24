@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
-    <title>Function List - MITxGraders</title>
+    <title>Functions and Constants List - MITxGraders</title>
 
     <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -141,7 +141,7 @@
                         
                             
 <li class="active">
-    <a href="./">Function List</a>
+    <a href="./">Functions and Constants List</a>
 </li>
 
                         
@@ -218,17 +218,21 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#mathematical-functions">Mathematical Functions</a></li>
-            <li class="second-level"><a href="#formulagrader-default-functions">FormulaGrader Default Functions</a></li>
+        <li class="first-level active"><a href="#mathematical-functions-and-constants">Mathematical Functions and Constants</a></li>
+            <li class="second-level"><a href="#formulagrader-and-numericalgrader-default-functions">FormulaGrader and NumericalGrader Default Functions</a></li>
                 
             <li class="second-level"><a href="#matrixgrader-default-functions">MatrixGrader Default Functions</a></li>
+                
+            <li class="second-level"><a href="#default-constants">Default Constants</a></li>
+                
+            <li class="second-level"><a href="#optional-constant-collections">Optional Constant Collections</a></li>
                 
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="mathematical-functions">Mathematical Functions<a class="headerlink" href="#mathematical-functions" title="Permanent link"> # </a></h1>
-<h2 id="formulagrader-default-functions">FormulaGrader Default Functions<a class="headerlink" href="#formulagrader-default-functions" title="Permanent link"> # </a></h2>
+<h1 id="mathematical-functions-and-constants">Mathematical Functions and Constants<a class="headerlink" href="#mathematical-functions-and-constants" title="Permanent link"> # </a></h1>
+<h2 id="formulagrader-and-numericalgrader-default-functions">FormulaGrader and NumericalGrader Default Functions<a class="headerlink" href="#formulagrader-and-numericalgrader-default-functions" title="Permanent link"> # </a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Below, expressions marked with a * may require our <a href="../renderer/">AsciiMath renderer definitions</a> to display properly in edX.</p>
@@ -285,7 +289,30 @@
 <li><code>norm(x)</code>: Frobenius norm, works for scalars, vectors, and matrices</li>
 <li><code>trans(x)</code>: transpose</li>
 <li><code>trace(x)</code>: trace</li>
-</ul></div>
+</ul>
+<h2 id="default-constants">Default Constants<a class="headerlink" href="#default-constants" title="Permanent link"> # </a></h2>
+<p>Available in <code>FormulaGrader</code>, <code>NumericalGrader</code>, and <code>MatrixGrader</code> by default:</p>
+<ul>
+<li><code>i</code>: imaginary unit</li>
+<li><code>j</code>: imaginary unit</li>
+<li><code>e</code>: approximately 2.718281828</li>
+<li><code>pi</code>: approximately 3.141592654</li>
+</ul>
+<h2 id="optional-constant-collections">Optional Constant Collections<a class="headerlink" href="#optional-constant-collections" title="Permanent link"> # </a></h2>
+<p>The <code>mitxgraders.helpers.calc</code> module provides a few collections of constants that can be imported for convenience and reuse. For example, <code>pauli</code> is a dictionary with keys <code>sigma_x</code>, <code>sigma_y</code>, and <code>sigma_z</code> that are <a href="../matrix_grader/matrix_grader/#matrix-operations-and-matharrays"><code>MathArray</code></a> representations of the 2 by 2 Pauli matrices.</p>
+<p>The collections of mathematical constants provided by <code>mitxgraders.helpers.calc</code> are:</p>
+<ul>
+<li><code>pauli</code>: MathArray representations of the 2 by 2 Pauli matrices, <code>sigma_x</code>, <code>sigma_y</code>, and <code>sigma_z</code></li>
+<li><code>cartesian_xyz</code>: MathArray representations of the three-dimensional Cartesian unit vectors, named <code>hatx</code>, <code>haty</code>, <code>hatz</code></li>
+<li><code>cartesian_ijk</code>: MathArray representations of the three-dimensional Cartesian unit vectors, named <code>hati</code>, <code>hatj</code>, <code>hatk</code></li>
+</ul>
+<p>Each collection is a dictionary that can be provided as a value of <code>user_constants</code>:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import MatrixGrader
+&gt;&gt;&gt; from mitxgraders.helpers.calc import pauli
+&gt;&gt;&gt; grader = MatrixGrader(
+...   answers='sigma_x + sigma_z',
+...   user_constants=pauli
+... )</code></pre></div>
         
     </div>
 
