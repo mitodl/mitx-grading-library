@@ -90,15 +90,6 @@ if (window.MJxPrep) {
     eqn = wrapVariables(eqn)
     eqn = wrapFuncCalls(eqn)
 
-    // wrapFuncCalls correctly transforms 'conj(z)', but
-    // wrapFuncCalls turns 'conj(z' into '{:conj:}(' and
-    // wrapVariables turns 'conj' into '{:conj:}', This is problematic...
-    // conj is defined below as a <mover/> symbol. edX version of asciimath
-    // has trouble with <mover/> symbols wrapped directly in non-breaking group.
-    // This hack avoids lonely, non-breaking, <mover/> symbols.
-    // See https://github.com/mitodl/mitx-grading-library/issues/163 for more.
-    eqn = eqn.replace(/\{:conj:\}/g, "{:text(co)text(nj):}");
-
     // Return the preprocessed equation
     return eqn;
   }
@@ -107,7 +98,7 @@ if (window.MJxPrep) {
   function updateMathJax() {
     if (MathJax.InputJax.AsciiMath) {
       // Grab the AsciiMath object
-      AM = MathJax.InputJax.AsciiMath.AM;
+      var AM = MathJax.InputJax.AsciiMath.AM;
 
       // All of these new symbols are based on those appearing in the AsciiMath definitions
       // See https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js
@@ -289,18 +280,40 @@ if (window.MJxPrep) {
   // Check for the AsciiMath object every 200ms
   var checkExist = setInterval(updateMathJax, 200);
 
+  // set of AsciiMath symbols classified as mover (math-overscript) tags
+  // (This should be a Set object, but ie11 doesn't fully support Sets)
+  OVERSCRIPT_SYMBOLS = {
+    bar: true,
+    conj: true,
+    ddot: true,
+    dot: true,
+    hat: true,
+    obrace: true,
+    overarc: true,
+    overbrace: true,
+    overline: true,
+    overparen: true,
+    overset: true,
+    stackrel: true,
+    tilde: true,
+    vec: true
+  }
+
+  // callback function for String.prototype.replace
+  function wrapIfNotOverscript(match, substr) {
+    return OVERSCRIPT_SYMBOLS[substr]
+      ? substr
+      : '{:' + substr + ':}'
+  }
+
   /**
    * Detect variables, then wrap them in invisible brackets
+   * Without wrapping symbols, expressions like x'/x render poorly
    *
    * @param  {string} eqn
    * @return {string}
    */
   function wrapVariables(eqn) {
-    // Wrap invisibrackets around variables and functions
-    var wrap_group = function(match, substr) {
-        return '{:' + substr + ':}';
-    };
-
     // Need a regex to match any possible variable name
     // This regex matches all valid expressions in the python parser
     // If invalid expressions are given, this is less predictable, but the wrapping shouldn't hurt anything
@@ -331,14 +344,14 @@ if (window.MJxPrep) {
        (?![(}])                         # Negative lookahead: '(' (function) or '}' (tensor indices)
      */
     // This site is really useful for debugging: https://www.regextester.com/
-    eqn = eqn.replace(var_expr, wrap_group);
+    eqn = eqn.replace(var_expr, wrapIfNotOverscript);
 
     return eqn
   }
 
   /**
    * Detect function calls, then wrap them in invisible brackets
-   *
+   * Without wrapping function calls, expressions like p(x)/2 render poorly
    * @param  {string} eqn
    * @return {string}
    */
@@ -369,13 +382,12 @@ if (window.MJxPrep) {
       var funcEnd = bracketCloses === null ? bracketOpens : bracketCloses + 1
 
       var front = eqn.slice(0, funcStart)
-      var middle = '{:' + eqn.slice(funcStart, funcEnd) +  ':}'
-      eqn = front + middle + eqn.slice(funcEnd)
+      var middle = eqn.slice(funcStart, funcEnd)
+      eqn = front + wrapIfNotOverscript(null, middle) + eqn.slice(funcEnd)
     }
 
     return eqn
   }
-
 
   /**
    * get index at which the brace at braceIdx in expr is closed, or null if it

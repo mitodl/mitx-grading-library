@@ -149,6 +149,19 @@ describe('wrapVariables', () => {
     }
   } )
 
+  it('does not wrap isolated overscript symbols', () => {
+
+    const exprs = [
+      ['a+overline+b', '{:a:}+overline+{:b:}']
+    ]
+
+    for (const pair of exprs) {
+      const [testCase, expected] = pair
+      expect(wrapVariables(testCase)).toBe(expected)
+    }
+
+  } )
+
 } )
 
 describe('wrapFuncCalls', () => {
@@ -173,6 +186,22 @@ describe('wrapFuncCalls', () => {
       const [testCase, expected] = pair
       expect(wrapFuncCalls(testCase)).toBe(expected)
     }
+  } )
+
+  it('only wraps overscript symbols if function call is complete', () => {
+
+    const exprs = [
+      ['a+overline+b', 'a+overline+b'],
+      ['a+overline(+b', 'a+overline(+b'],
+      ['a+overline(x+b', 'a+overline(x+b'],
+      ['a+overline(x)+b', 'a+{:overline(x):}+b']
+    ]
+
+    for (const pair of exprs) {
+      const [testCase, expected] = pair
+      expect(wrapFuncCalls(testCase)).toBe(expected)
+    }
+
   } )
 
 } )
