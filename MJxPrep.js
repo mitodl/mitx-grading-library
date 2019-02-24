@@ -7,12 +7,14 @@
  * Modifies MathJax AsciiMath renderer to accept a variety of new functions
  * Also defines a preprocessor for further beautification
  *
+ * Options can be specified at the top of the script
+ * Custom replacements can be specified at the bottom of the script
  */
 
 // Make sure that this script only loads once
 if (window.MJxPrep) {
 } else {
-  // Specify options
+  // Specify options here!
   window.MJxPrepOptions = {
     conj_as_star: false,
     vectors_as_columns: true
@@ -81,12 +83,8 @@ if (window.MJxPrep) {
       eqn = columnizeVectors(eqn)
     }
 
-    /*
-     * If you want to do any custom preprocessing, here is the place to do it
-     */
-
-
-
+    // Do any custom replacements (see end of script)
+    eqn = customReplacements(eqn)
 
     // This is done last, so that it doesn't mess up subsequent processing
     eqn = wrapVariables(eqn)
@@ -607,5 +605,14 @@ if (window.MJxPrep) {
     wrapFuncCalls: wrapFuncCalls,
     columnizeVectors: columnizeVectors,
     funcToPostfix: funcToPostfix
+  }
+
+  // A function to allow for custom replacements
+  function customReplacements(eqn) {
+    var working = eqn;
+
+    // Manipulate working however you like here!
+
+    return working;
   }
 }
