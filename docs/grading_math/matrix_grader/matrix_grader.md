@@ -315,7 +315,7 @@ we can use:
 
 ## Matrix Functions
 
-MatrixGrader provides all the default functions of `FormulaGrader` (`sin`, `cos`, etc.) plus some extras such as `trans(A)` (transpose) and `det(A)` (determinant). See [Mathematical Functions]('../functions.md') for full list.
+MatrixGrader provides all the default functions of `FormulaGrader` (`sin`, `cos`, etc.) plus some extras such as `trans(A)` (transpose) and `det(A)` (determinant). See [Mathematical Functions]('../functions_and_constants.md') for full list.
 
 Since `MatrixGrader` has all of `FormulaGrader`'s configuration options, additional functions can be supplied through the `user_functions` configuration key. If you supply addition matrix functions, you may wish you use the `specify_domain` decorator function. See [Function Listing: Specify Domain](../matrixfunctions.md) for details.
 

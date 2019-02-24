@@ -86,7 +86,7 @@ grader = FormulaGrader(
 
 ## Functions
 
-By default, a large array of mathematical functions are available for use. See the full list [here](functions.md). Note that all functions are capable of handling complex expressions. In the following example, `z*z` is recognized to be different from `abs(z)^2`.
+By default, a large array of mathematical functions are available for use. See the full list [here](functions_and_constants.md). Note that all functions are capable of handling complex expressions. In the following example, `z*z` is recognized to be different from `abs(z)^2`.
 
 ```python
 grader = FormulaGrader(

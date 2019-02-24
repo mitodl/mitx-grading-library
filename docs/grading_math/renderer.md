@@ -57,4 +57,4 @@ By default, vectors `[1, 2, 3]` display as a column vector when the preprocessor
 
 * If you have a display issue with AsciiMath, it's likely that you can extend the symbol definitions and preprocessor to make your expressions display nicely for students.
 
-* The [mathematical functions](functions.md) article provides the complete list of functions that are corrected by the new AsciiMath renderer definitions.
+* The [mathematical functions](functions_and_constants.md) article provides the complete list of functions that are corrected by the new AsciiMath renderer definitions.
