@@ -4,12 +4,16 @@ from comparers import (
     equality_comparer,
     congruence_comparer,
     eigenvector_comparer,
-    between_comparer
+    between_comparer,
+    vector_span_comparer,
+    vector_phase_comparer
 )
 
 __all__ = [
     'equality_comparer',
     'congruence_comparer',
     'eigenvector_comparer',
-    'between_comparer'
+    'between_comparer',
+    'vector_span_comparer',
+    'vector_phase_comparer'
 ]

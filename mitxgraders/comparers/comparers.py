@@ -5,9 +5,9 @@ Comparer Functions
 ==================
 
 A comparer function must have signature
-`comparer_func(comparer_params_evals, student_eval, utils)`.
-When `FormulaGrader` (or its subclasses) call your custom comparer function,
-`comparer_func`'s argument values are:
+`comparer_func(comparer_params_evals, student_eval, utils)` and should return
+True or False. When `FormulaGrader` (or its subclasses) call your custom
+comparer function, `comparer_func`'s argument values are:
 
 - `comparer_params_evals`: The `comparer_params` list, numerically evaluated
   according to variable and function sampling.
@@ -45,6 +45,7 @@ NOTE: doctests in this module show how the comparer function would be used
 from numbers import Number
 import numpy as np
 from mitxgraders.exceptions import InputTypeError
+from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 
 def equality_comparer(comparer_params_evals, student_eval, utils):
     """
@@ -178,3 +179,126 @@ def eigenvector_comparer(comparer_params_evals, student_eval, utils):
         }
 
     return utils.within_tolerance(actual, expected)
+
+def vector_span_comparer(comparer_params_evals, student_eval, utils):
+    """
+    Check whether student's answer is nonzero and in the span of some given
+    vectors.
+
+    comparer_params: A list of vectors
+
+    Usage
+    =====
+
+    >>> from mitxgraders import MatrixGrader
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer_params': [
+    ...             '[3, x, 1 + i]',
+    ...         ],
+    ...         'comparer': vector_span_comparer
+    ...     },
+    ...     variables=['x'],
+    ... )
+    >>> grader(None, '[3, x, 1 + i]')['ok']
+    True
+    >>> grader(None, '[9, 3*x, 3 + 3*i]')['ok']
+    True
+    >>> grader(None, '[9, 3*x, 3 - 3*i]')['ok']
+    False
+
+    Complex scale factors work, too:
+    >>> grader(None, '(4 + 2*i)*[3, x, 1 + i]')['ok']
+    True
+
+    Student input should be nonzero:
+    >>> grader(None, '[0, 0, 0]')['ok']
+    False
+
+    Input shape is validated:
+    >>> grader(None, '5')
+    Traceback (most recent call last):
+    InputTypeError: Expected answer to be a vector, but input is a scalar
+
+    Multiple vectors can be provided:
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer_params': [
+    ...             '[1, 1, 0]',    # v0
+    ...             '[0, 1, 2]'     # v1
+    ...         ],
+    ...         'comparer': vector_span_comparer
+    ...     },
+    ... )
+
+    Above, 2*v0 + 3i*v1:
+    >>> grader(None, '[2, 2 + 3*i, 6*i]')['ok']
+    True
+    """
+
+    # All comparer_param_evals should have same shape, or numpy.linalg.lstsq
+    # will let us know.
+    utils.validate_shape(student_eval, comparer_params_evals[0].shape)
+
+    if utils.within_tolerance(0, np.linalg.norm(student_eval)):
+        return {
+            'ok': False,
+            'grade_decimal': 0,
+            'msg': 'Input should be a nonzero vector.'
+        }
+
+    # Use ordinary least squares to find an approximation to student_eval
+    # that lies within the span of given vectors, then check that the
+    # residual-sum is small in comparison to student input.
+    column_vectors = np.array(comparer_params_evals).transpose()
+    ols = np.linalg.lstsq(column_vectors, student_eval)
+    error = np.sqrt(ols[1])
+
+    # Check that error is nearly zero, using student_eval as a reference
+    # when tolerance is specified as a percentage
+    return is_nearly_zero(error, student_eval, utils.tolerance)
+
+def vector_phase_comparer(comparer_params_evals, student_eval, utils):
+    """
+    Check that student input equals a given input (to within tolerance), up to
+    an overall phase factor.
+
+    comparer_params: [target_vector]
+
+    Usage
+    =====
+
+    >>> from mitxgraders import MatrixGrader
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer_params': [
+    ...             '[1, exp(-i*phi)]',
+    ...         ],
+    ...         'comparer': vector_phase_comparer
+    ...     },
+    ...     variables=['phi'],
+    ... )
+
+    >>> grader(None, '[1, exp(-i*phi)]')['ok']
+    True
+    >>> grader(None, '[exp(i*phi/2), exp(-i*phi/2)]')['ok']
+    True
+    >>> grader(None, '[i, exp(i*(pi/2 - phi))]')['ok']
+    True
+
+    >>> grader(None, '[1, exp(+i*phi)]')['ok']
+    False
+    >>> grader(None, '[2, 2*exp(-i*phi)]')['ok']
+    False
+
+    """
+    # We'll check that student input is in the span as target vector and that
+    # it has the same magnitude
+
+    in_span = vector_span_comparer(comparer_params_evals, student_eval, utils)
+
+    expected_mag = np.linalg.norm(comparer_params_evals[0])
+    student_mag = np.linalg.norm(student_eval)
+    same_magnitude = utils.within_tolerance(expected_mag, student_mag)
+
+    return in_span and same_magnitude
