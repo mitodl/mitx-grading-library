@@ -6,7 +6,8 @@ Comparer Functions
 
 A comparer function must have signature
 `comparer_func(comparer_params_evals, student_eval, utils)` and should return
-True or False. When `FormulaGrader` (or its subclasses) call your custom
+True, False, 'partial', or a dictionary with required key 'grade_decimal' and
+optional key 'msg'. When `FormulaGrader` (or its subclasses) call your custom
 comparer function, `comparer_func`'s argument values are:
 
 - `comparer_params_evals`: The `comparer_params` list, numerically evaluated
