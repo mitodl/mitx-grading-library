@@ -342,6 +342,24 @@ cartesian_ijk = {
     'hatk': MathArray([0, 0, 1])
 }
 
+def percentage_as_number(percent_str):
+    """
+    Convert a percentage string to a number.
+
+    Args:
+        percent_str: A percent string, for example '5%' or '1.2%'
+
+    Usage
+    =====
+    >>> percentage_as_number('8%')
+    0.08
+    >>> percentage_as_number('250%')
+    2.5
+    >>> percentage_as_number('-10%')
+    -0.1
+    """
+    return float(percent_str.strip()[:-1]) * 0.01
+
 def within_tolerance(x, y, tolerance):
     """
     Check that |x-y| <= tolerance with appropriate norm.
@@ -380,10 +398,44 @@ def within_tolerance(x, y, tolerance):
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
     if isinstance(tolerance, str):
-        # Construct percentage tolerance
-        tolerance = tolerance.strip()
-        tolerance = np.linalg.norm(x) * float(tolerance[:-1]) * 0.01
+        tolerance = np.linalg.norm(x) * percentage_as_number(tolerance)
 
     difference = x - y
 
     return np.linalg.norm(difference) <= tolerance
+
+def is_nearly_zero(x, reference, tolerance):
+    """
+    Check that x is nearly zero in comparison to reference.
+
+    Args:
+        x: number or array (np array_like)
+        reference: number or array (np array_like)
+        tolerance: Number or PercentageString
+
+    Usage
+    =====
+    >>> is_nearly_zero(0.4, 10, 0.5)
+    True
+    >>> is_nearly_zero(0.4, 10, 0.3)
+    False
+    >>> is_nearly_zero(0.4, 10, '5%')
+    True
+    >>> is_nearly_zero(0.4, 10, '3%')
+    False
+
+    Works for arrays, too:
+    >>> x = np.array([[1, 1], [1, -1]])/10
+    >>> round(np.linalg.norm(x), 6)
+    0.2
+    >>> is_nearly_zero(x, 10, '5%')
+    True
+    >>> is_nearly_zero(x, 10, '1.5%')
+    False
+    """
+    # When used within graders, tolerance has already been
+    # validated as a Number or PercentageString
+    if isinstance(tolerance, str):
+        tolerance = np.linalg.norm(reference) * percentage_as_number(tolerance)
+
+    return np.linalg.norm(x) <= tolerance
