@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/mitodl/mitx-grading-library#readme",
   "devDependencies": {
-    "jest": "^23.4.2"
+    "jest": "^24.3.0"
   },
   "jest": {
     "verbose": true,
