@@ -191,6 +191,8 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
     Usage
     =====
 
+    Use a single vector as comparer_params to test whether student input is
+    parallel to a particular vector:
     >>> from mitxgraders import MatrixGrader
     >>> grader = MatrixGrader(
     ...     answers={
@@ -213,8 +215,11 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
     True
 
     Student input should be nonzero:
-    >>> grader(None, '[0, 0, 0]')['ok']
+    >>> result = grader(None, '[0, 0, 0]')
+    >>> result['ok']
     False
+    >>> result['msg']
+    'Input should be a nonzero vector.'
 
     Input shape is validated:
     >>> grader(None, '5')
@@ -232,7 +237,7 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
     ...     },
     ... )
 
-    Above, 2*v0 + 3i*v1:
+    The vector 2*v0 + 3i*v1 = [2, 2+3i, 6i] is in the span of v0 and v1:
     >>> grader(None, '[2, 2 + 3*i, 6*i]')['ok']
     True
     """
