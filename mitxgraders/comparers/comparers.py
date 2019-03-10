@@ -45,8 +45,9 @@ NOTE: doctests in this module show how the comparer function would be used
 """
 from numbers import Number
 import numpy as np
-from mitxgraders.exceptions import InputTypeError
+from mitxgraders.exceptions import InputTypeError, StudentFacingError
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
+from mitxgraders.helpers.calc.math_array import are_same_length_vectors, is_vector
 
 def equality_comparer(comparer_params_evals, student_eval, utils):
     """
@@ -240,10 +241,28 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
     The vector 2*v0 + 3i*v1 = [2, 2+3i, 6i] is in the span of v0 and v1:
     >>> grader(None, '[2, 2 + 3*i, 6*i]')['ok']
     True
+
+    The compaer_params should be list of equal-length vectors:
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer_params': [
+    ...             '[1, 1, 0]',
+    ...             '5'
+    ...         ],
+    ...         'comparer': vector_span_comparer
+    ...     },
+    ... )
+    >>> grader(None, '[1, 2, 3]')               # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    StudentFacingError: Problem Configuration Error: ...to equal-length vectors
     """
 
-    # All comparer_param_evals should have same shape, or numpy.linalg.lstsq
-    # will let us know.
+    # Validate the comparer params
+    if not are_same_length_vectors(comparer_params_evals):
+        raise StudentFacingError('Problem Configuration Error: comparer_params'
+            'should be a list of strings that evaluate to equal-length vectors')
+
+    # Validate student input shape
     utils.validate_shape(student_eval, comparer_params_evals[0].shape)
 
     if utils.within_tolerance(0, np.linalg.norm(student_eval)):
@@ -257,7 +276,7 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
     # that lies within the span of given vectors, then check that the
     # residual-sum is small in comparison to student input.
     column_vectors = np.array(comparer_params_evals).transpose()
-    ols = np.linalg.lstsq(column_vectors, student_eval)
+    ols = np.linalg.lstsq(column_vectors, student_eval, rcond=-1)
     error = np.sqrt(ols[1])
 
     # Check that error is nearly zero, using student_eval as a reference
@@ -297,7 +316,25 @@ def vector_phase_comparer(comparer_params_evals, student_eval, utils):
     >>> grader(None, '[2, 2*exp(-i*phi)]')['ok']
     False
 
+    The compaer_params should be list of equal-length vectors:
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer_params': [
+    ...             '[1, 1, 0]',
+    ...             '[0, 1, 1]'
+    ...         ],
+    ...         'comparer': vector_phase_comparer
+    ...     },
+    ... )
+    >>> grader(None, '[1, 2, 3]')               # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    StudentFacingError: Problem Configuration Error: ...to a single vector.
     """
+    # Validate that author comparer_params evaluate to a single vector
+    if not len(comparer_params_evals) == 1 and is_vector(comparer_params_evals[0]):
+        raise StudentFacingError('Problem Configuration Error: comparer_params '
+            'should be a list of strings that evaluate to a single vector.')
+
     # We'll check that student input is in the span as target vector and that
     # it has the same magnitude
 
