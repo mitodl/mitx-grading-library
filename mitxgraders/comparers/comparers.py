@@ -281,7 +281,7 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
 
     # Check that error is nearly zero, using student_eval as a reference
     # when tolerance is specified as a percentage
-    return is_nearly_zero(error, student_eval, utils.tolerance)
+    return is_nearly_zero(error, utils.tolerance, reference=student_eval)
 
 def vector_phase_comparer(comparer_params_evals, student_eval, utils):
     """
