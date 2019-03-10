@@ -438,13 +438,13 @@ def is_nearly_zero(x, tolerance, reference=None):
     A ValueError is raised when percentage tolerance is used without reference:
     >>> is_nearly_zero(0.4, '3%')
     Traceback (most recent call last):
-    ValueError: When tolerance is a percentage, refeence must not be None.
+    ValueError: When tolerance is a percentage, reference must not be None.
     """
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
     if isinstance(tolerance, str):
         if reference is None:
-            raise ValueError('When tolerance is a percentage, refeence must '
+            raise ValueError('When tolerance is a percentage, reference must '
                 'not be None.')
         tolerance = np.linalg.norm(reference) * percentage_as_number(tolerance)
 

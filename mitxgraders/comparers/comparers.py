@@ -242,7 +242,7 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
     >>> grader(None, '[2, 2 + 3*i, 6*i]')['ok']
     True
 
-    The compaer_params should be list of equal-length vectors:
+    The comparer_params should be list of equal-length vectors:
     >>> grader = MatrixGrader(
     ...     answers={
     ...         'comparer_params': [
@@ -259,7 +259,7 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
 
     # Validate the comparer params
     if not are_same_length_vectors(comparer_params_evals):
-        raise StudentFacingError('Problem Configuration Error: comparer_params'
+        raise StudentFacingError('Problem Configuration Error: comparer_params '
             'should be a list of strings that evaluate to equal-length vectors')
 
     # Validate student input shape
@@ -277,7 +277,7 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
     # residual-sum is small in comparison to student input.
     column_vectors = np.array(comparer_params_evals).transpose()
     # rcond=-1 uses machine precision for testing singular values
-    # In numpy 1.14+, use rcond=None fo this behavio. (we use 1.6)
+    # In numpy 1.14+, use rcond=None fo this behavior. (we use 1.6)
     ols = np.linalg.lstsq(column_vectors, student_eval, rcond=-1)
     error = np.sqrt(ols[1])
 
@@ -318,7 +318,7 @@ def vector_phase_comparer(comparer_params_evals, student_eval, utils):
     >>> grader(None, '[2, 2*exp(-i*phi)]')['ok']
     False
 
-    The compaer_params should be list of equal-length vectors:
+    The comparer_params should be list with a single vector:
     >>> grader = MatrixGrader(
     ...     answers={
     ...         'comparer_params': [
