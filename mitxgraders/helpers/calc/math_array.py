@@ -72,6 +72,38 @@ def is_vector(obj):
     """Tests if obj is a vector MathArray"""
     return isinstance(obj, MathArray) and obj.ndim == 1
 
+def are_same_length_vectors(items):
+    """
+    Check that a list of items are vectors of equal length.
+
+    Usage
+    =====
+
+    >>> are_same_length_vectors([
+    ...     MathArray([1, 2, 3]),
+    ...     MathArray([4, 5, 6])
+    ... ])
+    True
+    >>> are_same_length_vectors([
+    ...     MathArray([1, 2, 3]),
+    ...     MathArray([4, 5, 6, 7])
+    ... ])
+    False
+    >>> are_same_length_vectors([
+    ...     MathArray([1, 2, 3]),
+    ...     5
+    ... ])
+    False
+    """
+
+    # Validate comparer params
+    all_vectors = all([is_vector(v) for v in items])
+    if not all_vectors:
+        return False
+
+    expected_shape = items[0].shape
+    return all([v.shape == expected_shape for v in items])
+
 class MathArray(np.ndarray):
     """
     A modification of numpy's ndarray class that behaves more like a mathematician would expect.

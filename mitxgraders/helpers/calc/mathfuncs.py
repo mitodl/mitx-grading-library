@@ -342,6 +342,24 @@ cartesian_ijk = {
     'hatk': MathArray([0, 0, 1])
 }
 
+def percentage_as_number(percent_str):
+    """
+    Convert a percentage string to a number.
+
+    Args:
+        percent_str: A percent string, for example '5%' or '1.2%'
+
+    Usage
+    =====
+    >>> percentage_as_number('8%')
+    0.08
+    >>> percentage_as_number('250%')
+    2.5
+    >>> percentage_as_number('-10%')
+    -0.1
+    """
+    return float(percent_str.strip()[:-1]) * 0.01
+
 def within_tolerance(x, y, tolerance):
     """
     Check that |x-y| <= tolerance with appropriate norm.
@@ -380,10 +398,54 @@ def within_tolerance(x, y, tolerance):
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
     if isinstance(tolerance, str):
-        # Construct percentage tolerance
-        tolerance = tolerance.strip()
-        tolerance = np.linalg.norm(x) * float(tolerance[:-1]) * 0.01
+        tolerance = np.linalg.norm(x) * percentage_as_number(tolerance)
 
     difference = x - y
 
     return np.linalg.norm(difference) <= tolerance
+
+def is_nearly_zero(x, tolerance, reference=None):
+    """
+    Check that x is within tolerance of zero. If tolerance is provided as a
+    percentage, a reference value is requied.
+
+    Args:
+        x: number or array (np array_like)
+        reference: None number or array (np array_like), only used when
+              tolerance is provided as a percentage
+        tolerance: Number or PercentageString
+
+    Usage
+    =====
+    >>> is_nearly_zero(0.4, 0.5)
+    True
+    >>> is_nearly_zero(0.4, 0.3)
+    False
+    >>> is_nearly_zero(0.4, '5%', reference=10)
+    True
+    >>> is_nearly_zero(0.4, '3%', reference=10)
+    False
+
+    Works for arrays, too:
+    >>> x = np.array([[1, 1], [1, -1]])/10
+    >>> round(np.linalg.norm(x), 6)
+    0.2
+    >>> is_nearly_zero(x, '5%', reference=10)
+    True
+    >>> is_nearly_zero(x, '1.5%', reference=10)
+    False
+
+    A ValueError is raised when percentage tolerance is used without reference:
+    >>> is_nearly_zero(0.4, '3%')
+    Traceback (most recent call last):
+    ValueError: When tolerance is a percentage, reference must not be None.
+    """
+    # When used within graders, tolerance has already been
+    # validated as a Number or PercentageString
+    if isinstance(tolerance, str):
+        if reference is None:
+            raise ValueError('When tolerance is a percentage, reference must '
+                'not be None.')
+        tolerance = np.linalg.norm(reference) * percentage_as_number(tolerance)
+
+    return np.linalg.norm(x) <= tolerance

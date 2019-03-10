@@ -5,9 +5,10 @@ Comparer Functions
 ==================
 
 A comparer function must have signature
-`comparer_func(comparer_params_evals, student_eval, utils)`.
-When `FormulaGrader` (or its subclasses) call your custom comparer function,
-`comparer_func`'s argument values are:
+`comparer_func(comparer_params_evals, student_eval, utils)` and should return
+True, False, 'partial', or a dictionary with required key 'grade_decimal' and
+optional key 'msg'. When `FormulaGrader` (or its subclasses) call your custom
+comparer function, `comparer_func`'s argument values are:
 
 - `comparer_params_evals`: The `comparer_params` list, numerically evaluated
   according to variable and function sampling.
@@ -44,7 +45,9 @@ NOTE: doctests in this module show how the comparer function would be used
 """
 from numbers import Number
 import numpy as np
-from mitxgraders.exceptions import InputTypeError
+from mitxgraders.exceptions import InputTypeError, StudentFacingError
+from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
+from mitxgraders.helpers.calc.math_array import are_same_length_vectors, is_vector
 
 def equality_comparer(comparer_params_evals, student_eval, utils):
     """
@@ -178,3 +181,169 @@ def eigenvector_comparer(comparer_params_evals, student_eval, utils):
         }
 
     return utils.within_tolerance(actual, expected)
+
+def vector_span_comparer(comparer_params_evals, student_eval, utils):
+    """
+    Check whether student's answer is nonzero and in the span of some given
+    vectors.
+
+    comparer_params: A list of vectors
+
+    Usage
+    =====
+
+    Use a single vector as comparer_params to test whether student input is
+    parallel to a particular vector:
+    >>> from mitxgraders import MatrixGrader
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer_params': [
+    ...             '[3, x, 1 + i]',
+    ...         ],
+    ...         'comparer': vector_span_comparer
+    ...     },
+    ...     variables=['x'],
+    ... )
+    >>> grader(None, '[3, x, 1 + i]')['ok']
+    True
+    >>> grader(None, '[9, 3*x, 3 + 3*i]')['ok']
+    True
+    >>> grader(None, '[9, 3*x, 3 - 3*i]')['ok']
+    False
+
+    Complex scale factors work, too:
+    >>> grader(None, '(4 + 2*i)*[3, x, 1 + i]')['ok']
+    True
+
+    Student input should be nonzero:
+    >>> result = grader(None, '[0, 0, 0]')
+    >>> result['ok']
+    False
+    >>> result['msg']
+    'Input should be a nonzero vector.'
+
+    Input shape is validated:
+    >>> grader(None, '5')
+    Traceback (most recent call last):
+    InputTypeError: Expected answer to be a vector, but input is a scalar
+
+    Multiple vectors can be provided:
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer_params': [
+    ...             '[1, 1, 0]',    # v0
+    ...             '[0, 1, 2]'     # v1
+    ...         ],
+    ...         'comparer': vector_span_comparer
+    ...     },
+    ... )
+
+    The vector 2*v0 + 3i*v1 = [2, 2+3i, 6i] is in the span of v0 and v1:
+    >>> grader(None, '[2, 2 + 3*i, 6*i]')['ok']
+    True
+
+    The comparer_params should be list of equal-length vectors:
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer_params': [
+    ...             '[1, 1, 0]',
+    ...             '5'
+    ...         ],
+    ...         'comparer': vector_span_comparer
+    ...     },
+    ... )
+    >>> grader(None, '[1, 2, 3]')               # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    StudentFacingError: Problem Configuration Error: ...to equal-length vectors
+    """
+
+    # Validate the comparer params
+    if not are_same_length_vectors(comparer_params_evals):
+        raise StudentFacingError('Problem Configuration Error: comparer_params '
+            'should be a list of strings that evaluate to equal-length vectors')
+
+    # Validate student input shape
+    utils.validate_shape(student_eval, comparer_params_evals[0].shape)
+
+    if utils.within_tolerance(0, np.linalg.norm(student_eval)):
+        return {
+            'ok': False,
+            'grade_decimal': 0,
+            'msg': 'Input should be a nonzero vector.'
+        }
+
+    # Use ordinary least squares to find an approximation to student_eval
+    # that lies within the span of given vectors, then check that the
+    # residual-sum is small in comparison to student input.
+    column_vectors = np.array(comparer_params_evals).transpose()
+    # rcond=-1 uses machine precision for testing singular values
+    # In numpy 1.14+, use rcond=None fo this behavior. (we use 1.6)
+    ols = np.linalg.lstsq(column_vectors, student_eval, rcond=-1)
+    error = np.sqrt(ols[1])
+
+    # Check that error is nearly zero, using student_eval as a reference
+    # when tolerance is specified as a percentage
+    return is_nearly_zero(error, utils.tolerance, reference=student_eval)
+
+def vector_phase_comparer(comparer_params_evals, student_eval, utils):
+    """
+    Check that student input equals a given input (to within tolerance), up to
+    an overall phase factor.
+
+    comparer_params: [target_vector]
+
+    Usage
+    =====
+
+    >>> from mitxgraders import MatrixGrader
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer_params': [
+    ...             '[1, exp(-i*phi)]',
+    ...         ],
+    ...         'comparer': vector_phase_comparer
+    ...     },
+    ...     variables=['phi'],
+    ... )
+
+    >>> grader(None, '[1, exp(-i*phi)]')['ok']
+    True
+    >>> grader(None, '[exp(i*phi/2), exp(-i*phi/2)]')['ok']
+    True
+    >>> grader(None, '[i, exp(i*(pi/2 - phi))]')['ok']
+    True
+
+    >>> grader(None, '[1, exp(+i*phi)]')['ok']
+    False
+    >>> grader(None, '[2, 2*exp(-i*phi)]')['ok']
+    False
+
+    The comparer_params should be list with a single vector:
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer_params': [
+    ...             '[1, 1, 0]',
+    ...             '[0, 1, 1]'
+    ...         ],
+    ...         'comparer': vector_phase_comparer
+    ...     },
+    ... )
+    >>> grader(None, '[1, 2, 3]')               # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    StudentFacingError: Problem Configuration Error: ...to a single vector.
+    """
+    # Validate that author comparer_params evaluate to a single vector
+    if not len(comparer_params_evals) == 1 and is_vector(comparer_params_evals[0]):
+        raise StudentFacingError('Problem Configuration Error: comparer_params '
+            'should be a list of strings that evaluate to a single vector.')
+
+    # We'll check that student input is in the span as target vector and that
+    # it has the same magnitude
+
+    in_span = vector_span_comparer(comparer_params_evals, student_eval, utils)
+
+    expected_mag = np.linalg.norm(comparer_params_evals[0])
+    student_mag = np.linalg.norm(student_eval)
+    same_magnitude = utils.within_tolerance(expected_mag, student_mag)
+
+    return in_span and same_magnitude
