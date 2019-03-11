@@ -271,19 +271,31 @@ False</code></pre>
 <td><code>congruence_comparer</code></td>
 <td><code>FormulaGrader</code> <br/> <code>NumericalGrader</code></td>
 <td><code>[expected, modulus]</code></td>
-<td>reduces student input modulo modulus, then checks for equality within grader's tolerance</td>
+<td>reduces student input modulo modulus, then checks for equality within grader's tolerance.</td>
 </tr>
 <tr>
 <td><code>between_comparer</code></td>
 <td><code>FormulaGrader</code> <br/> <code>NumericalGrader</code></td>
 <td><code>[start, stop]</code></td>
-<td>checks that student input is real and between <code>start</code> and <code>stop</code></td>
+<td>checks that student input is real and between <code>start</code> and <code>stop</code>.</td>
 </tr>
 <tr>
 <td><code>eigenvector_comparer</code></td>
 <td><code>MatrixGrader</code></td>
 <td><code>[matrix, eigenvalue]</code></td>
-<td>checks that student input is an eigenvector of <code>matrix</code> with eigenvalue <code>eigenvalue</code> within grader's tolerance</td>
+<td>checks that student input is an eigenvector of <code>matrix</code> with eigenvalue <code>eigenvalue</code> within grader's tolerance.</td>
+</tr>
+<tr>
+<td><code>vector_phase_comparer</code></td>
+<td><code>MatrixGrader</code></td>
+<td><code>[comparison_vector]</code></td>
+<td>checks that student input is equal to <code>comparison_vector</code> up to a phase, within grader's tolerance.</td>
+</tr>
+<tr>
+<td><code>vector_span_comparer</code></td>
+<td><code>MatrixGrader</code></td>
+<td><code>[vector1, vector2, ...]</code></td>
+<td>checks that student input is in the span of the given list of vectors, within grader's tolerance. If only a single vector is given, checks if the student input is equal to the given vector up to a (possibly complex) constant of proportionality.</td>
 </tr>
 </tbody>
 </table>
