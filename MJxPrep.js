@@ -2,7 +2,7 @@
  * MITx Grading Library Javascript Helper
  * https://github.com/mitodl/mitx-grading-library
  *
- * Copyright 2017-2018 Jolyon Bloomfield and Chris Chudzicki
+ * Copyright 2017-2019 Jolyon Bloomfield and Chris Chudzicki
  *
  * Modifies MathJax AsciiMath renderer to accept a variety of new functions
  * Also defines a preprocessor for further beautification

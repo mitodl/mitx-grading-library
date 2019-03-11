@@ -2,6 +2,11 @@
 
 ## Version 1.2
 
+### Version 1.2.3
+
+* Added new custom comparers `vector_span_comparer` and `vector_phase_comparer`.
+* Updated AsciiMath preprocessor to handle lonely `mover` (math-over) entries.
+
 ### Version 1.2.2
 
 * Added `accept_any` and `accept_nonempty` options to `StringGrader`.
