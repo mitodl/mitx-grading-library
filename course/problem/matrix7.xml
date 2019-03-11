@@ -67,7 +67,7 @@ grader2 = MatrixGrader(
     <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix7.xml" target="_blank">View source</a>
   </li>
   <li>
-    <a href="https://mitodl.github.io/mitx-grading-library/grading_math/matrixfunctions/" target="_blank">Documentation for <code>specify_domain</code></a>
+    <a href="https://mitodl.github.io/mitx-grading-library/grading_math/comparer_functions/" target="_blank">Documentation for <code>comparer_functions</code></a>
   </li>
 </ul>
 

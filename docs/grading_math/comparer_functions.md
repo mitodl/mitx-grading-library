@@ -37,7 +37,7 @@ The table below lists the comparers are exported by `mitxgraders.comparers` alon
 | `between_comparer` |  `FormulaGrader` <br/> `NumericalGrader` | `[start, stop]` | checks that student input is real and between `start` and `stop`.  |
 | `eigenvector_comparer` | `MatrixGrader`  | `[matrix, eigenvalue]`  | checks that student input is an eigenvector of `matrix` with eigenvalue `eigenvalue` within grader's tolerance.  |
 | `vector_phase_comparer` | `MatrixGrader`  | `[comparison_vector]`  | checks that student input is equal to `comparison_vector` up to a phase, within grader's tolerance. |
-| `vector_span_comparer` | `MatrixGrader`  | `[vector1, vector2, ...]`  | checks that student input is in the span of the given list of vectors, within grader's tolerance. If only a single vector is given, checks if the student input is equal to the given vector up to a (possibly complex) constant of proportionality.  |
+| `vector_span_comparer` | `MatrixGrader`  | `[vector1, vector2, ...]`  | checks that student input is nonzero and in the span of the given list of vectors, within grader's tolerance. If only a single vector is given, checks if the student input is equal to the given vector up to a (possibly complex) constant of proportionality.  |
 
 
 FormulaGrader (and its subclasses) use `equality_comparer` as the default. That is, specifying `FormulaGrader(answers='x*y', variables=['x', 'y'])` is equivalent to
