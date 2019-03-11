@@ -1,49 +1,65 @@
-<problem display_name="Tech Demo: specify_domain" showanswer="always" weight="10" attempts="">
+<problem display_name="Matrix Grader: Normalization and phase of vectors" showanswer="always" weight="10" attempts="">
 
-<script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader, specify_domain, RealVectors, RealMatrices
+<p>One of the perennial issues in grading vectors is dealing with normalization and phase conventions. We have a couple of custom comparers to help address these issues.</p>
 
-# This is a contrived example specify_domain, just to demonstrate its usage
-@specify_domain(input_shapes=[1, [2, 3], [3]], display_name='f')
-def my_func(a, b, c):
-    return a*b*c
-
-# Define a grader using rotate
-grader = MatrixGrader(
-   answers='f(a, b, c)',
-   variables=['a', 'b', 'c'],
-   sample_from={
-       'b': RealMatrices(shape=[2, 3]),
-       'c': RealVectors(shape=3),
-   },
-   user_functions={
-       'f': my_func
-   }
-)
-
-</script>
-
-<p>If you need to define an author-specified function in a MatrixGrader problem, you can use the <code>specify_domain</code> decorator to provide informative error messages to students when things go wrong. (For example, if a student inputs a scalar to a function whose domain is vectors).</p>
-
-<p>This problem is intended only to show off the syntax (see source code below) and error messages provided by <code>specify_domain</code>.</p>
-
-<p>Available variables and functions:</p>
-<ul>
-    <li><code>func(arg1, arg2, arg3)</code> expects a scalar <code>arg1</code>, a 3 by 2 matrix <code>arg2</code>, and a 3-component vector <code>arg3</code>.</li>
-    <li><code>a</code> is a scalar</li>
-    <li><code>b</code> is a 3 by 2 matrix</li>
-    <li><code>c</code> is a 3-component vector</li>
-</ul>
+<p>Our first example allows a vector to be compared against a reference vector, and graded correct if the two vectors are related by a phase. The vectors must have the same normalization, however. In the below case, the suggested answer is <code>[1, i]</code>, but this can be multiplied by any phase and still be graded as correct.</p>
 
 <p>Suggested inputs:</p>
+
 <ul>
-    <li><code>f(a, b, c)</code> is the correct answer</li>
-    <li><code>f(a, [1, 2], b)</code>, or anything where arguments have the wrong shape, will produce interesting error messages</li>
+  <li><code>[1, i]</code></li>
+  <li><code>[i, -1]</code></li>
+  <li><code>[-1, -i]</code></li>
+  <li><code>[-i, 1]</code></li>
+  <li><code>exp(i*1.2345)*[1, i]</code></li>
+  <li><code>[1, i+0.1]</code></li>
+  <li><code>exp(i*1.2345)*[1, i]*1.01</code></li>
 </ul>
 
-<customresponse cfn="grader" expect="f(a,b,c)">
-  <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" />
+<script type="text/python" system_path="python_lib">
+from mitxgraders import MatrixGrader
+from mitxgraders.comparers import vector_phase_comparer
+grader = MatrixGrader(
+    answers={
+        'comparer': vector_phase_comparer,
+        'comparer_params': ['[1, i]']
+    }
+)
+</script>
+
+<p style="display:inline">\(\vec{v} = \) </p>
+<customresponse cfn="grader" expect="[1, i]" inline="1">
+  <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" inline="1" />
 </customresponse>
+
+
+<p>While this deals with phases, sometimes we also want to allow for arbitrary normalization too. In this case, we can request that the student enter a vector in the span of our reference vector. Here, we again set that reference vector to be <code>[1, i]</code>.</p>
+
+<p>Suggested inputs:</p>
+
+<ul>
+  <li><code>[1, i]</code></li>
+  <li><code>17.8*exp(i*1.2345)*[1, i]</code></li>
+  <li><code>[1, i+0.1]</code></li>
+</ul>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import MatrixGrader
+from mitxgraders.comparers import vector_span_comparer
+grader2 = MatrixGrader(
+    answers={
+        'comparer': vector_span_comparer,
+        'comparer_params': ['[1, i]']
+    }
+)
+</script>
+
+<p>
+<p style="display:inline">\(\vec{v} = \) </p>
+<customresponse cfn="grader2" expect="[1, i]" inline="1">
+  <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" inline="1" />
+</customresponse>
+</p>
 
 <h3>Resources</h3>
 <ul>
