@@ -4,7 +4,7 @@ import numpy as np
 from pytest import approx, raises
 from mitxgraders.helpers.calc.exceptions import DomainError, FunctionEvalError
 from mitxgraders.helpers.calc.mathfuncs import (
-    arctan2,
+    arctan2, kronecker,
     cot, arccot,
     csc, arccsc,
     sec, arcsec,
@@ -125,3 +125,10 @@ def test_arctan2():
     match = 'arctan2\(0, 0\) is undefined'
     with raises(FunctionEvalError, match=match):
         arctan2(0, 0)
+
+def test_kronecker():
+    assert kronecker(1, 1) == 1
+    assert kronecker(1, 0) == 0
+    assert kronecker(0, 1) == 0
+    assert kronecker(0, 0) == 1
+    assert kronecker(1.5, 1.5) == 1

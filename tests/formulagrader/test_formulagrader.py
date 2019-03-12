@@ -531,6 +531,7 @@ def test_fg_debug_log():
     "    'fact': <function factorial at 0x...>,<br/>\n"
     "    'factorial': <function factorial at 0x...>,<br/>\n"
     "    'im': <function imag at 0x...>,<br/>\n"
+    "    'kronecker': <function kronecker at 0x...>,<br/>\n"
     "    'ln': <function log at 0x...>,<br/>\n"
     "    'log10': <function log10 at 0x...>,<br/>\n"
     "    'log2': <function log2 at 0x...>,<br/>\n"
