@@ -237,6 +237,7 @@
                 <li class="third-level"><a href="#parse-errors">Parse errors:</a></li>
                 <li class="third-level"><a href="#shape-mismatch-errors-during-evaluation">Shape-mismatch errors during evaluation</a></li>
                 <li class="third-level"><a href="#shape-mismatch-errors-during-comparison">Shape-mismatch errors during comparison</a></li>
+                <li class="third-level"><a href="#hiding-all-messages">Hiding all messages</a></li>
             <li class="second-level"><a href="#matrix-functions">Matrix Functions</a></li>
                 
             <li class="second-level"><a href="#identity-matrix">Identity Matrix</a></li>
@@ -685,6 +686,20 @@ MathArrayShapeError: Cannot raise a non-square matrix to powers.
 &gt;&gt;&gt; student_input = '0' # wrong shape
 &gt;&gt;&gt; grader(None, student_input) # grade the input like edX would
 {'grade_decimal': 0, 'msg': 'Expected answer to be a vector of length 3, but input is a scalar', 'ok': False}</code></pre>
+
+
+<h3 id="hiding-all-messages">Hiding all messages<a class="headerlink" href="#hiding-all-messages" title="Permanent link"> # </a></h3>
+<p>MatrixGraders can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting <code>suppress_messages=True</code>, which overrides <code>answer_shape_mismatch={'is_raised'}</code> and <code>shape_errors</code>. In the following example, <code>A</code> and <code>B</code> are secretly matrices that don't commute, but students will never see a matrix error message from typing something like <code>1+A</code>.</p>
+<pre class="codehilite"><code>grader = MatrixGrader(
+    answers=['A*B'],
+    variables=['A', 'B'],
+    sample_from={
+        'A': RealMatrices(),
+        'B': RealMatrices()
+    },
+    max_array_dim=0,
+    suppress_messages=True
+)</code></pre>
 
 
 <h2 id="matrix-functions">Matrix Functions<a class="headerlink" href="#matrix-functions" title="Permanent link"> # </a></h2>
