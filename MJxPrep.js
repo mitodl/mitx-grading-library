@@ -91,7 +91,8 @@ if (window.MJxPrep) {
     eqn = wrapFuncCalls(eqn)
 
     // Fix Kronecker deltas now: kronecker(a, b) -> kronecker_{a, b}
-    // The wrapping interferes with parsing of delta_{complexthings}
+    // The wrapping interferes with parsing of delta_{complexthings},
+    // due to not satisfying the usual regex forms for a variable or function
     eqn = replaceFunctionCalls(eqn, 'kronecker', function(funcName, args) {
       if (args.length !== 2) {return funcToSelf(funcName, args) ;}
       return 'delta_{' + args[0] + ',' + args[1] + '}'
