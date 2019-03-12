@@ -16,7 +16,7 @@ We thank the MIT Office of Open Learning for their support.
 **Table of Contents**
 
 - [Demo Course](#demo-course)
-- [Grader Documentation](#grader-documentation)
+- [Grader Documentation](#documentation-for-edx-course-authors)
 - [Local Installation](#local-installation)
 - [FAQ](#faq)
 
