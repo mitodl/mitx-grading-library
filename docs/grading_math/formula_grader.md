@@ -49,7 +49,7 @@ Sub/superscripts can contain any combination of letters and numbers. Tensor styl
 
 All types of variable names are allowed to end with an arbitrary number of primes `'` (apostrophes). Students on tables may need to disable "smart quotes" to enter this character.
 
-The AsciiMath rendered used in `<textline>` entries in edX has a number of special symbols that can help make variable names look like particular mathematical entries. A handful of these are `hatx`, `vecx`, `tildex`, `barx`, `dotx` and `ddotx`. We recommend testing your variable names to ensure that they render as expected.
+The AsciiMath rendered used in `<textline>` entries in edX has a number of special symbols that can help make variable names look like particular mathematical entries. A handful of these are `hatx`, `vecx`, `tildex`, `barx`, `dotx` and `ddotx`. There are also a handful of other reserved names in AsciiMath; we recommend testing your variables to ensure that they render as expected.
 
 
 ## Numbered Variables
