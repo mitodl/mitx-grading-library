@@ -4,19 +4,6 @@ Whenever random variables/functions are involved, they need to be sampled from a
 
 These sampling classes are available for use in `FormulaGrader`, `MatrixGrader`, etc.
 
-## Variable Names
-
-Variable names must start with a letter, and can continue with letters, numbers, and underscores. Variable names may conclude with an arbitrary number of apostrophes. The same naming conventions apply to user-defined constants.
-
-It is also possible to have "tensor" variable names. The following three forms are available:
-
-- `T^{ijk}`
-- `T_{ijk}`
-- `T_{ijk}^{123}` (note that lowered indices must come first)
-
-The tensor name itself must start with a letter, and may continue with letters and numbers. The indices may be any combination of letters and numbers. After the indices, you may have apostrophes, such as `T^{ijk}''` (tensors can be differentiated too!).
-
-
 ## Variable Sampling: Numbers
 
 These sampling sets generate a random number on demand. It may be real or complex.
