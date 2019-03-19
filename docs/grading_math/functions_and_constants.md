@@ -43,6 +43,7 @@ By default, all of the following functions are made available to students in `Fo
 - `re(x)` Real part of a complex expression*
 - `im(x)` Imaginary part of a complex expression*
 - `conj(x)` Complex conjugate of a complex expression*
+- `kronecker(x, y)` Kronecker delta* (Note that we highly recommend integer sampling over a short range (eg, 1 to 4) when kronecker deltas appear in an answer, and using many samples (eg, 30) so that most permutations appear in the sampling.)
 
 ## MatrixGrader Default Functions
 

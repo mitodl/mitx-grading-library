@@ -28,6 +28,7 @@
         <problem url_name="formula8"/>
         <problem url_name="formula9"/>
         <problem url_name="formula10"/>
+        <problem url_name="formula11"/>
       </vertical>
     </sequential>
     <sequential url_name="matrixgrader" display_name="MatrixGrader">

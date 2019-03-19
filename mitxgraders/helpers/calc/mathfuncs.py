@@ -88,6 +88,18 @@ def arctan2(x, y):
 
     return np.arctan2(y, x)
 
+# NOTE: tests are in a separate file, NOT doctests.
+# see https://bugs.python.org/issue6835
+@SpecifyDomain.make_decorator((1,), (1,))
+def kronecker(x, y):
+    """
+    Returns 1 if x==y, and 0 otherwise.
+    Note that this should really only be used for integer expressions.
+    """
+    if x == y:
+        return 1
+    return 0
+
 def content_if_0d_array(obj):
     """
     If obj is a 0d numpy array, return its contents. Otherwise, return item.
@@ -261,6 +273,7 @@ SCALAR_FUNCTIONS = {key: has_one_scalar_input(key)(ELEMENTWISE_FUNCTIONS[key])
                     for key in ELEMENTWISE_FUNCTIONS}
 
 SCALAR_FUNCTIONS['arctan2'] = arctan2
+SCALAR_FUNCTIONS['kronecker'] = kronecker
 
 ARRAY_FUNCTIONS = {
     're': real,
