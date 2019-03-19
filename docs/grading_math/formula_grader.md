@@ -38,6 +38,19 @@ grader = FormulaGrader(
 
 The `sample_from` key must be a dictionary of 'variable_name': sampling_set pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.
 
+### Variable Names
+
+Variable names are case-sensitive. They must start with a letter, and can be proceded by any combination of letters and numbers. There are two ways to write subscripts and superscripts:
+
+* Old edX style: `var_123` (note that multiple underscores may be used for backwards compatibility, although it is not recommended that this be used)
+* Tensor style: `var_{123}`, `var_{123}^{456}` (subscript first), or `var^{456}`
+
+Sub/superscripts can contain any combination of letters and numbers. Tensor style sub/superscripts are allowed to start with a `-` sign.
+
+All types of variable names are allowed to end with an arbitrary number of primes `'` (apostrophes, useful to indicate differentiation or different reference frames). Students on tables may need to disable "smart quotes" to enter this character.
+
+The AsciiMath rendered used in `<textline>` entries in edX has a number of special symbols that can help make variable names look like particular mathematical entries. A handful of these are `hatx`, `vecx`, `tildex`, `barx`, `dotx` and `ddotx`. There are also a handful of other reserved names in AsciiMath; we recommend testing your variables to ensure that they render as expected.
+
 
 ## Numbered Variables
 
