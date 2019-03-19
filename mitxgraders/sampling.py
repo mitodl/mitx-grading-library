@@ -1,14 +1,18 @@
 """
 sampling.py
 
-Contains classes for sampling numerical values
+Contains classes for sampling numerical values:
 * RealInterval
 * IntegerRange
 * DiscreteSet
 * ComplexRectangle
 * ComplexSector
 * DependentSampler
-and for specifying functions
+for sampling vectors/matrices/tensors:
+* RealMatrices
+* RealVectors
+* IdentityMatrixMultiples
+for specifying functions:
 * SpecificFunctions
 * RandomFunction
 
@@ -43,6 +47,7 @@ __all__ = [
     "ComplexSector",
     "RealVectors",
     "RealMatrices",
+    "IdentityMatrixMultiples",
     "SpecificFunctions",
     "RandomFunction",
     "DependentSampler"
@@ -70,6 +75,13 @@ class VariableSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-meth
     __metaclass__ = abc.ABCMeta
 
 
+class ScalarSamplingSet(VariableSamplingSet):  # pylint: disable=abstract-method
+    """Represents a set from which random scalar variable samples are taken."""
+
+    # This is an abstract base class
+    __metaclass__ = abc.ABCMeta
+
+
 class FunctionSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-method
     """Represents a set from which random function samples are taken."""
 
@@ -77,7 +89,7 @@ class FunctionSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-meth
     __metaclass__ = abc.ABCMeta
 
 
-class RealInterval(VariableSamplingSet):
+class RealInterval(ScalarSamplingSet):
     """
     Represents an interval of real numbers from which to sample.
 
@@ -111,7 +123,7 @@ class RealInterval(VariableSamplingSet):
         return start + (stop - start) * np.random.random_sample()
 
 
-class IntegerRange(VariableSamplingSet):
+class IntegerRange(ScalarSamplingSet):
     """
     Represents an interval of integers from which to sample.
 
@@ -146,7 +158,7 @@ class IntegerRange(VariableSamplingSet):
         return np.random.randint(low=self.config['start'], high=self.config['stop'] + 1)
 
 
-class ComplexRectangle(VariableSamplingSet):
+class ComplexRectangle(ScalarSamplingSet):
     """
     Represents a rectangle in the complex plane from which to sample.
 
@@ -177,7 +189,7 @@ class ComplexRectangle(VariableSamplingSet):
         return self.re.gen_sample() + self.im.gen_sample()*1j
 
 
-class ComplexSector(VariableSamplingSet):
+class ComplexSector(ScalarSamplingSet):
     """
     Represents an annular sector in the complex plane from which to sample,
     based on a given range of modulus and argument.
@@ -210,12 +222,12 @@ class ComplexSector(VariableSamplingSet):
         return self.modulus.gen_sample() * np.exp(1j * self.argument.gen_sample())
 
 
-class DiscreteSet(VariableSamplingSet):  # pylint: disable=too-few-public-methods
+class DiscreteSet(ScalarSamplingSet):  # pylint: disable=too-few-public-methods
     """
     Represents a discrete set of values from which to sample.
 
-    Initialize with a single value or a non-empty tuple of values. Note that we use a
-    tuple instead of a list so that the range [0,1] isn't confused with (0,1). We would
+    Initialize with a single value or a non-empty tuple of scalar values. Note that we use
+    a tuple instead of a list so that the range [0,1] isn't confused with (0,1). We would
     use a set, but unfortunately voluptuous doesn't work with sets.
 
     Usage
@@ -266,7 +278,6 @@ class RealMathArrays(VariableSamplingSet):
     >>> 10 < np.linalg.norm(sample) < 20
     True
     """
-
 
     schema_config = Schema({
         Required('shape'): is_shape_specification(min_dim=1),
@@ -336,6 +347,85 @@ class RealMatrices(RealMathArrays):
     schema_config = RealMathArrays.schema_config.extend({
         Required('shape', default=(2, 2)): is_shape_specification(min_dim=2, max_dim=2)
     })
+
+
+class AbstractSquareMatrices(VariableSamplingSet):  # pylint: disable=abstract-method
+    """
+    Abstract class representing a collection of square matrices
+
+    Config:
+    =======
+        dimension: Positive integer that specifies the dimension of the matrix (default 2)
+    """
+
+    # This is an abstract base class
+    __metaclass__ = abc.ABCMeta
+
+    # Store the dimension of the square matrix
+    schema_config = Schema({
+        Required('dimension', default=2): Positive(int)
+    })
+
+
+class IdentityMatrixMultiples(AbstractSquareMatrices):
+    """
+    Class representing a collection of multiples of the identity matrix
+    of a given dimension
+
+    Config:
+    =======
+        dimension: Positive integer that specifies the dimension of the matrix (default 2)
+        sampler: A scalar sampling set for the multiplicative constant (default [1, 5])
+
+    Usage:
+    ======
+
+    By default, we generate 2x2 matrices:
+    >>> matrices = IdentityMatrixMultiples()
+    >>> matrices.gen_sample().shape
+    (2, 2)
+
+    We can generate NxN matrices by specifying the dimension:
+    >>> matrices = IdentityMatrixMultiples(dimension=4)
+    >>> matrices.gen_sample().shape
+    (4, 4)
+
+    The scalar multiple can be generated in a number of ways:
+    >>> matrices = IdentityMatrixMultiples(sampler=[1,3])
+    >>> matrices = IdentityMatrixMultiples(sampler=(1, 3, 5))
+    >>> sect = ComplexSector(modulus=[0,1], argument=[-np.pi,np.pi])
+    >>> matrices = IdentityMatrixMultiples(sampler=sect)
+
+    The resulting samples are simply a scalar times the identity matrix:
+    >>> matrices = IdentityMatrixMultiples()
+    >>> m = matrices.gen_sample()
+    >>> m == m[0, 0] * np.eye(2)
+    array([[ True,  True],
+           [ True,  True]], dtype=bool)
+    """
+
+    # Sampling set for the multiplicative constant
+    # Accept anything that FormulaGrader would accept for a sampling set, restricted to
+    # scalar sampling sets. Hence, ScalarSamplingSets, ranges, and objects that can be
+    # coerced into discrete sets are allowed.
+    # Note: Does not support DependentSampler, as that is not guaranteed to return a
+    # scalar value.
+    schema_config = AbstractSquareMatrices.schema_config.extend({
+        Required('sampler', default=RealInterval()): Any(ScalarSamplingSet,
+                                                         All(list, Coerce(RealInterval)),
+                                                         Coerce(DiscreteSet))
+    })
+
+    def gen_sample(self):
+        """
+        Generates an identity matrix of specified dimension multiplied by a random scalar
+        """
+        # Sample the multiplicative constant
+        scaling = self.config['sampler'].gen_sample()
+        # Create the matrix
+        matrix = scaling * np.eye(self.config['dimension'])
+        # Return the result
+        return matrix
 
 
 class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-methods
