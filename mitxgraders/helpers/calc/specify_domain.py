@@ -8,7 +8,7 @@ from numbers import Number
 from voluptuous import Schema, Invalid, Required, Any
 from mitxgraders.helpers.validatorfuncs import is_shape_specification
 from mitxgraders.baseclasses import ObjectWithSchema
-from mitxgraders.helpers.calc.exceptions import DomainError
+from mitxgraders.helpers.calc.exceptions import ArgumentShapeError, ArgumentError
 from mitxgraders.helpers.calc.math_array import (
     MathArray, is_numberlike_array, is_square)
 from mitxgraders.helpers.calc.formatters import get_description
@@ -156,17 +156,17 @@ class SpecifyDomain(ObjectWithSchema):
     ... )
     True
 
-    If inputs are bad, student-facing DomainErrors are thrown:
+    If inputs are bad, student-facing ArgumentShapeErrors are thrown:
     >>> a = MathArray([2, -1, 3])
     >>> b = MathArray([-1, 4])
     >>> cross(a, b)                                 # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    DomainError: There was an error evaluating function cross(...)
+    ArgumentShapeError: There was an error evaluating function cross(...)
     1st input is ok: received a vector of length 3 as expected
     2nd input has an error: received a vector of length 2, expected a vector of length 3
     >>> cross(a)
     Traceback (most recent call last):
-    DomainError: There was an error evaluating function cross(...): expected 2 inputs, but received 1.
+    ArgumentError: Wrong number of arguments passed to cross(...): Expected 2 inputs, but received 1.
 
     To specify that an input should be a an array of specific size, use a list or tuple
     for that shape value. Below, [3, 2] specifies a 3 by 2 matrix (the tuple
@@ -178,7 +178,7 @@ class SpecifyDomain(ObjectWithSchema):
     >>> square_mat = MathArray([[1, 2], [3, 4]])
     >>> f(1, 2, 3, square_mat)                                      # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    DomainError: There was an error evaluating function f(...)
+    ArgumentShapeError: There was an error evaluating function f(...)
     1st input is ok: received a scalar as expected
     2nd input has an error: received a scalar, expected a matrix of shape (rows: 3, cols: 2)
     3rd input has an error: received a scalar, expected a vector of length 2
@@ -207,7 +207,7 @@ class SpecifyDomain(ObjectWithSchema):
         """
         Constructs the decorator that validates inputs.
 
-        This method is NOT author-facing; its inputs undero no validation.
+        This method is NOT author-facing; its inputs undergo no validation.
 
         Used internally in mitxgraders library.
         """
@@ -218,14 +218,15 @@ class SpecifyDomain(ObjectWithSchema):
         # can't use @wraps, func might be a numpy ufunc
         def decorator(func):
             func_name = display_name if display_name else func.__name__
+
             def _func(*args):
                 if len(shapes) != len(args):
-                    msg = ("There was an error evaluating function "
-                           "{func_name}(...): expected {expected} inputs, but "
-                           "received {received}."
+                    # Use the same response as in validate_function_call in expressions.py
+                    msg = ("Wrong number of arguments passed to {func_name}(...): "
+                           "Expected {expected} inputs, but received {received}."
                            .format(func_name=func_name, expected=len(shapes), received=len(args))
-                          )
-                    raise DomainError(msg)
+                           )
+                    raise ArgumentError(msg)
 
                 errors = []
                 for schema, arg in zip(schemas, args):
@@ -246,15 +247,14 @@ class SpecifyDomain(ObjectWithSchema):
                     else:
                         expected = get_shape_description(shape)
                         lines.append('{0} input is ok: received a {1} as expected'
-                            .format(ordinal, expected))
+                                     .format(ordinal, expected))
 
                 message = "\n".join(lines)
-                raise DomainError(message)
+                raise ArgumentShapeError(message)
 
             _func.__name__ = func.__name__
             _func.validated = True
             return _func
-
 
         return decorator
 

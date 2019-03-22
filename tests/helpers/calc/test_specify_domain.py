@@ -85,7 +85,7 @@ def test_incorrect_arguments_raise_errors():
 
 def test_incorrect_number_of_inputs_raises_useful_error():
     f = get_somefunc()
-    match = 'There was an error evaluating function somefunc\(...\): expected 4 inputs, but received 2.'
+    match = 'Wrong number of arguments passed to somefunc\(...\): Expected 4 inputs, but received 2.'
     with raises(DomainError, match=match):
         f(1, 2)
 

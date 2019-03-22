@@ -11,7 +11,7 @@ from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from mitxgraders.helpers.validatorfuncs import NonNegative
 from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
 from mitxgraders.helpers.calc.exceptions import (
-    MathArrayShapeError as ShapeError, MathArrayError, DomainError)
+    MathArrayShapeError as ShapeError, MathArrayError, DomainError, ArgumentShapeError)
 from mitxgraders.helpers.calc.mathfuncs import (
     merge_dicts, ARRAY_ONLY_FUNCTIONS)
 
@@ -105,10 +105,10 @@ class MatrixGrader(FormulaGrader):
                 raise
             else:
                 return {'ok': False, 'grade_decimal': 0, 'msg': err.message}
-        except (DomainError, MathArrayError) as err:
+        except (ArgumentShapeError, MathArrayError) as err:
             # If we're using matrix quantities for noncommutative scalars, we
-            # might get a DomainError from using functions of matrices, or
-            # a MathArrayError from taking a funny power of a matrix.
+            # might get an ArgumentShapeError from using functions of matrices,
+            # or a MathArrayError from taking a funny power of a matrix.
             # Suppress these too.
             if self.config['suppress_matrix_messages']:
                 return {'ok': False, 'msg': '', 'grade_decimal': 0}

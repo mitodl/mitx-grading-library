@@ -3,7 +3,7 @@ import re
 from mitxgraders import (MatrixGrader, RealMatrices, RealVectors, ComplexRectangle)
 from mitxgraders.formulagrader.matrixgrader import InputTypeError
 from mitxgraders.helpers.calc.exceptions import (
-    DomainError, MathArrayError,
+    DomainError, MathArrayError, ArgumentError,
     MathArrayShapeError as ShapeError, UnableToParse
 )
 from mitxgraders.helpers.calc.math_array import identity, equal_as_arrays
@@ -258,3 +258,7 @@ def test_suppress_matrix_messages():
     assert grader(None, '[1, 2, 3, 4]')['msg'] == ''
     assert grader(None, 'sin([1, 2, 3])')['ok'] is False
     assert grader(None, '[1, 2, 3]^1.3')['ok'] is False
+
+    # Note that we haven't suppressed all errors:
+    with raises(ArgumentError):
+        grader(None, 'sin(1, 2)')
