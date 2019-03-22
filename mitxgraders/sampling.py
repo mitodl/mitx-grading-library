@@ -392,7 +392,6 @@ class IdentityMatrixMultiples(AbstractSquareMatrices):
 
     The scalar multiple can be generated in a number of ways:
     >>> matrices = IdentityMatrixMultiples(sampler=[1,3])
-    >>> matrices = IdentityMatrixMultiples(sampler=(1, 3, 5))
     >>> sect = ComplexSector(modulus=[0,1], argument=[-np.pi,np.pi])
     >>> matrices = IdentityMatrixMultiples(sampler=sect)
 
