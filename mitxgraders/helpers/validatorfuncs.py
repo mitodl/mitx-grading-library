@@ -62,6 +62,19 @@ def NumberRange(number_type=Number):
         number_range_alternate(number_type)
     ))
 
+def SubClassOf(parent_class):
+    """Demand a subclass of parent_class"""
+    def _validator(given_class):
+        try:
+            if issubclass(given_class, parent_class):
+                return given_class
+        except TypeError:
+            pass # Raise a voluptuous error below instead
+        msg = "Expected a subclass {parent_class.__name__}"
+        raise Invalid(msg.format(parent_class=parent_class))
+
+    return _validator
+
 def ListOfType(given_type, validator=None):
     """
     Validator that allows for a single given_type or a list of given_type.
