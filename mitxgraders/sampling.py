@@ -29,7 +29,7 @@ from numbers import Number
 import abc
 import random
 import numpy as np
-from voluptuous import Schema, Required, All, Coerce, Any, Extra
+from voluptuous import Schema, Required, Optional, All, Coerce, Any, Extra
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
@@ -282,7 +282,7 @@ class RealMathArrays(VariableSamplingSet):
     schema_config = Schema({
         Required('shape'): is_shape_specification(min_dim=1),
         Required('norm', default=[1, 5]): NumberRange(),
-        Required('array_class'): SubClassOf(MathArray)
+        Optional('array_class'): SubClassOf(MathArray)
     })
 
     def __init__(self, config=None, **kwargs):
