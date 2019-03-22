@@ -34,7 +34,7 @@ from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
-    has_keys_of_type, is_shape_specification)
+    has_keys_of_type, is_shape_specification, SubClassOf)
 from mitxgraders.helpers.calc import (
     METRIC_SUFFIXES, CalcError, evaluator, MathArray)
 
@@ -281,7 +281,8 @@ class RealMathArrays(VariableSamplingSet):
 
     schema_config = Schema({
         Required('shape'): is_shape_specification(min_dim=1),
-        Required('norm', default=[1, 5]): NumberRange()
+        Required('norm', default=[1, 5]): NumberRange(),
+        Required('array_class'): SubClassOf(MathArray)
     })
 
     def __init__(self, config=None, **kwargs):
@@ -300,7 +301,11 @@ class RealMathArrays(VariableSamplingSet):
         array = np.random.random_sample(self.config['shape']) - 0.5
         actual_norm = np.linalg.norm(array)
         # convert the array to a matrix with desired norm
-        return MathArray(array) * desired_norm/actual_norm
+
+        # Using classes as default values in voluptuous seems to mangle the nice
+        # error messages, so set the default by hand
+        ArrayClass = self.config.get('array_class', MathArray)
+        return ArrayClass(array) * desired_norm/actual_norm
 
 
 class RealVectors(RealMathArrays):
