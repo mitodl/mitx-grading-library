@@ -12,6 +12,8 @@ for sampling vectors/matrices/tensors:
 * RealMatrices
 * RealVectors
 * IdentityMatrixMultiples
+* OrthogonalMatrices
+* UnitaryMatrices
 for specifying functions:
 * SpecificFunctions
 * RandomFunction
@@ -29,6 +31,7 @@ from numbers import Number
 import abc
 import random
 import numpy as np
+from scipy.stats import ortho_group, special_ortho_group, unitary_group
 from voluptuous import Schema, Required, All, Coerce, Any, Extra
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
@@ -36,7 +39,7 @@ from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
     has_keys_of_type, is_shape_specification)
 from mitxgraders.helpers.calc import (
-    METRIC_SUFFIXES, CalcError, evaluator, MathArray)
+    METRIC_SUFFIXES, CalcError, evaluator, MathArray, within_tolerance)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -48,6 +51,8 @@ __all__ = [
     "RealVectors",
     "RealMatrices",
     "IdentityMatrixMultiples",
+    "OrthogonalMatrices",
+    "UnitaryMatrices",
     "SpecificFunctions",
     "RandomFunction",
     "DependentSampler"
@@ -421,6 +426,129 @@ class IdentityMatrixMultiples(AbstractSquareMatrices):
         scaling = self.config['sampler'].gen_sample()
         # Create the numpy matrix
         array = scaling * np.eye(self.config['dimension'])
+        # Return the result as a MathArray
+        return MathArray(array)
+
+
+class OrthogonalMatrices(AbstractSquareMatrices):
+    """
+    Class representing a collection of orthogonal matrices of a given dimension
+
+    Config:
+    =======
+        dimension: Positive integer that specifies the dimension of the matrix (default 2)
+        unitdet: Boolean specifying whether to sample from unit determinant matrices SO(n)
+                 (True, default) or arbitrary determinant matrices O(n) (False).
+
+    Usage:
+    ======
+
+    By default, we generate 2x2 matrices:
+    >>> matrices = OrthogonalMatrices()
+    >>> matrices.gen_sample().shape
+    (2, 2)
+
+    We can generate NxN matrices by specifying the dimension:
+    >>> matrices = OrthogonalMatrices(dimension=4)
+    >>> matrices.gen_sample().shape
+    (4, 4)
+
+    If unitdet is specified, the determinant is 1:
+    >>> matrices = OrthogonalMatrices(unitdet=True)
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample(), 1, 1e-14)
+    True
+
+    Otherwise, it's typically not (thought it could randomly be):
+    >>> matrices = OrthogonalMatrices(unitdet=False)
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample(), 1, 1e-14)
+    False
+
+    The resulting samples are orthogonal matrices:
+    >>> matrices = OrthogonalMatrices(unitdet=True)
+    >>> m = matrices.gen_sample()
+    >>> within_tolerance(m * np.transpose(m), np.eye(2))
+    True
+    >>> matrices = OrthogonalMatrices(unitdet=False)
+    >>> m = matrices.gen_sample()
+    >>> within_tolerance(m * np.transpose(m), np.eye(2))
+    True
+    """
+
+    schema_config = AbstractSquareMatrices.schema_config.extend({
+        Required('unitdet', default=True): bool
+    })
+
+    def gen_sample(self):
+        """
+        Generates an orthogonal matrix as appropriate
+        """
+        # Generate the array
+        if self.config['unitdet']:
+            array = special_ortho_group.rvs(self.config['dimension'])
+        else:
+            array = ortho_group.rvs(self.config['dimension'])
+        # Return the result as a MathArray
+        return MathArray(array)
+
+
+class UnitaryMatrices(AbstractSquareMatrices):
+    """
+    Class representing a collection of unitary matrices of a given dimension
+
+    Config:
+    =======
+        dimension: Positive integer that specifies the dimension of the matrix (default 2)
+        unitdet: Boolean specifying whether to sample from unit determinant matrices SU(n)
+                 (True, default) or arbitrary determinant matrices U(n) (False).
+
+    Usage:
+    ======
+
+    By default, we generate 2x2 matrices:
+    >>> matrices = UnitaryMatrices()
+    >>> matrices.gen_sample().shape
+    (2, 2)
+
+    We can generate NxN matrices by specifying the dimension:
+    >>> matrices = UnitaryMatrices(dimension=4)
+    >>> matrices.gen_sample().shape
+    (4, 4)
+
+    If unitdet is specified, the determinant is 1:
+    >>> matrices = UnitaryMatrices(unitdet=True)
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample(), 1, 1e-14)
+    True
+
+    Otherwise, it's typically not (thought it could randomly be):
+    >>> matrices = UnitaryMatrices(unitdet=False)
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample(), 1, 1e-14)
+    False
+
+    The resulting samples are unitary matrices:
+    >>> matrices = UnitaryMatrices(unitdet=True)
+    >>> m = matrices.gen_sample()
+    >>> within_tolerance(m * np.conjugate(np.transpose(m)), np.eye(2))
+    True
+    >>> matrices = UnitaryMatrices(unitdet=False)
+    >>> m = matrices.gen_sample()
+    >>> within_tolerance(m * np.conjugate(np.transpose(m)), np.eye(2))
+    True
+    """
+
+    schema_config = AbstractSquareMatrices.schema_config.extend({
+        Required('unitdet', default=True): bool
+    })
+
+    def gen_sample(self):
+        """
+        Generates an orthogonal matrix as appropriate
+        """
+        # Generate the array
+        array = unitary_group.rvs(self.config['dimension'])
+        # Fix the determinant if need be
+        if self.config['unitdet']:
+            det = np.linalg.det(array)
+            array /= det**(1/self.config['dimension'])
         # Return the result as a MathArray
         return MathArray(array)
 

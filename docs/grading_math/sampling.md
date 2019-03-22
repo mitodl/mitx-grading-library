@@ -109,6 +109,26 @@ Sample square matrices of a given dimension consisting of the identity matrix mu
 ```
 
 
+### Special Matrices: Orthogonal and Unitary
+
+These sampling sets sample orthogonal `O(n)`, special orthogonal `SO(n)`, unitary `U(n)` and special unitary `SU(n)` matrices of a given dimension.
+
+```python
+>>> # Sample matrices from O(3)
+>>> sampler = OrthogonalMatrices(dimension=3, unitdet=False)
+>>> # Sample matrices from SO(4)
+>>> sampler = OrthogonalMatrices(dimension=4, unitdet=True)
+>>> # Sample matrices from U(3)
+>>> sampler = UnitaryMatrices(dimension=3, unitdet=False)
+>>> # Sample matrices from SU(4)
+>>> sampler = UnitaryMatrices(dimension=4, unitdet=True)
+>>> # The default is dimension=2 and unitdet=True
+>>> OrthogonalMatrices()
+>>> UnitaryMatrices()
+
+```
+
+
 ## Variable Sampling: Generic
 
 ### DiscreteSet
