@@ -689,7 +689,7 @@ MathArrayShapeError: Cannot raise a non-square matrix to powers.
 
 
 <h3 id="hiding-all-messages">Hiding all messages<a class="headerlink" href="#hiding-all-messages" title="Permanent link"> # </a></h3>
-<p>MatrixGraders can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting <code>suppress_messages=True</code>, which overrides <code>answer_shape_mismatch={'is_raised'}</code> and <code>shape_errors</code>. In the following example, <code>A</code> and <code>B</code> are secretly matrices that don't commute, but students will never see a matrix error message from typing something like <code>1+A</code>.</p>
+<p>MatrixGraders can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting <code>suppress_matrix_messages=True</code>, which overrides <code>answer_shape_mismatch={'is_raised'}</code> and <code>shape_errors</code>. In the following example, <code>A</code> and <code>B</code> are secretly matrices that don't commute, but students will never see a matrix error message from typing something like <code>1+A</code>.</p>
 <pre class="codehilite"><code>grader = MatrixGrader(
     answers=['A*B'],
     variables=['A', 'B'],
@@ -698,10 +698,11 @@ MathArrayShapeError: Cannot raise a non-square matrix to powers.
         'B': RealMatrices()
     },
     max_array_dim=0,
-    suppress_messages=True
+    suppress_matrix_messages=True
 )</code></pre>
 
 
+<p>Note that this will also suppress error messages from trying to do things like <code>sin([1, 2])</code> or <code>[1, 2]^2</code>. If your answer needs to take functions of the non-commuting variables, then this option is insufficient.</p>
 <h2 id="matrix-functions">Matrix Functions<a class="headerlink" href="#matrix-functions" title="Permanent link"> # </a></h2>
 <p>MatrixGrader provides all the default functions of <code>FormulaGrader</code> (<code>sin</code>, <code>cos</code>, etc.) plus some extras such as <code>trans(A)</code> (transpose) and <code>det(A)</code> (determinant). See <a href="" title="../functions_and_constants.md">Mathematical Functions</a> for full list.</p>
 <p>Since <code>MatrixGrader</code> has all of <code>FormulaGrader</code>'s configuration options, additional functions can be supplied through the <code>user_functions</code> configuration key. If you supply addition matrix functions, you may wish you use the <code>specify_domain</code> decorator function. See <a href="../../matrixfunctions/">Function Listing: Specify Domain</a> for details.</p>

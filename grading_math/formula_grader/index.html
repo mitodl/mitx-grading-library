@@ -221,6 +221,7 @@
         <li class="first-level active"><a href="#formulagrader">FormulaGrader</a></li>
             <li class="second-level"><a href="#variables-and-sampling">Variables and Sampling</a></li>
                 
+                <li class="third-level"><a href="#variable-names">Variable Names</a></li>
             <li class="second-level"><a href="#numbered-variables">Numbered Variables</a></li>
                 
             <li class="second-level"><a href="#samples-and-failable-evaluations">Samples and Failable Evaluations</a></li>
@@ -284,6 +285,15 @@
 
 
 <p>The <code>sample_from</code> key must be a dictionary of 'variable_name': sampling_set pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.</p>
+<h3 id="variable-names">Variable Names<a class="headerlink" href="#variable-names" title="Permanent link"> # </a></h3>
+<p>Variable names are case-sensitive. They must start with a letter, and can be proceded by any combination of letters and numbers. There are two ways to write subscripts and superscripts:</p>
+<ul>
+<li>Old edX style: <code>var_123</code> (note that multiple underscores may be used for backwards compatibility, although it is not recommended that this be used)</li>
+<li>Tensor style: <code>var_{123}</code>, <code>var_{123}^{456}</code> (subscript first), or <code>var^{456}</code></li>
+</ul>
+<p>Sub/superscripts can contain any combination of letters and numbers. Tensor style sub/superscripts are allowed to start with a <code>-</code> sign.</p>
+<p>All types of variable names are allowed to end with an arbitrary number of primes <code>'</code> (apostrophes, useful to indicate differentiation or different reference frames). Students on tables may need to disable "smart quotes" to enter this character.</p>
+<p>The AsciiMath rendered used in <code>&lt;textline&gt;</code> entries in edX has a number of special symbols that can help make variable names look like particular mathematical entries. A handful of these are <code>hatx</code>, <code>vecx</code>, <code>tildex</code>, <code>barx</code>, <code>dotx</code> and <code>ddotx</code>. There are also a handful of other reserved names in AsciiMath; we recommend testing your variables to ensure that they render as expected.</p>
 <h2 id="numbered-variables">Numbered Variables<a class="headerlink" href="#numbered-variables" title="Permanent link"> # </a></h2>
 <p>You can also specify special variables that are numbered. For example, if you specify that <code>a</code> is a numbered variable, students can include <code>a_{0}</code>, <code>a_{5}</code>, <code>a_{-2}</code>, etc, using any integer. All entries for a numbered variable will use the sampling set specified by the base name.</p>
 <pre class="codehilite"><code class="language-python">grader = FormulaGrader(
