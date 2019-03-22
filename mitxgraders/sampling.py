@@ -222,7 +222,7 @@ class ComplexSector(ScalarSamplingSet):
         return self.modulus.gen_sample() * np.exp(1j * self.argument.gen_sample())
 
 
-class DiscreteSet(ScalarSamplingSet):  # pylint: disable=too-few-public-methods
+class DiscreteSet(VariableSamplingSet):  # pylint: disable=too-few-public-methods
     """
     Represents a discrete set of values from which to sample.
 
