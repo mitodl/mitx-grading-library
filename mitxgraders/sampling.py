@@ -400,20 +400,18 @@ class IdentityMatrixMultiples(AbstractSquareMatrices):
     >>> matrices = IdentityMatrixMultiples()
     >>> m = matrices.gen_sample()
     >>> m == m[0, 0] * np.eye(2)
-    array([[ True,  True],
+    MathArray([[ True,  True],
            [ True,  True]], dtype=bool)
     """
 
     # Sampling set for the multiplicative constant
     # Accept anything that FormulaGrader would accept for a sampling set, restricted to
-    # scalar sampling sets. Hence, ScalarSamplingSets, ranges, and objects that can be
-    # coerced into discrete sets are allowed.
-    # Note: Does not support DependentSampler, as that is not guaranteed to return a
-    # scalar value.
+    # scalar sampling sets. Hence, ScalarSamplingSets and ranges are allowed.
+    # Note: Does not support DependentSampler or DiscreteSet, as they are not guaranteed
+    # to return a scalar value.
     schema_config = AbstractSquareMatrices.schema_config.extend({
         Required('sampler', default=RealInterval()): Any(ScalarSamplingSet,
-                                                         All(list, Coerce(RealInterval)),
-                                                         Coerce(DiscreteSet))
+                                                         All(list, Coerce(RealInterval)))
     })
 
     def gen_sample(self):
@@ -422,10 +420,10 @@ class IdentityMatrixMultiples(AbstractSquareMatrices):
         """
         # Sample the multiplicative constant
         scaling = self.config['sampler'].gen_sample()
-        # Create the matrix
-        matrix = scaling * np.eye(self.config['dimension'])
-        # Return the result
-        return matrix
+        # Create the numpy matrix
+        array = scaling * np.eye(self.config['dimension'])
+        # Return the result as a MathArray
+        return MathArray(array)
 
 
 class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-methods

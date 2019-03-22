@@ -98,7 +98,7 @@ If you want to sample a matrix in a way that depends on a scalar, see `Dependent
 
 ### IdentityMatrixMultiples
 
-Sample square matrices of a given dimension consisting of the identity matrix multiplied by a scalar. The `sampler` parameter can be any scalar sampling set listed above, as well as `DiscreteSet` (see below). This sampling set is useful when you want a variable that will commute with other matrices, but can also be added to them.
+Sample square matrices of a given dimension consisting of the identity matrix multiplied by a scalar. The `sampler` parameter can be any scalar sampling set listed above. This sampling set is useful when you want a variable that will commute with other matrices, but can also be added to them.
 
 ```python
 >>> # Sample 3x3 matrices consisting of a random number between 1 and 3 multiplying the identity
@@ -113,7 +113,7 @@ Sample square matrices of a given dimension consisting of the identity matrix mu
 
 ### DiscreteSet
 
-Sample from a discrete set of scalar values, specified in a tuple. A single value may also be provided, but this case should usually be specified as a constant instead of as a sampling set.
+Sample from any discrete set of values that are specified in a tuple. A single value may also be provided, but this case should usually be specified as a constant instead of as a sampling set.
 
 ```python
 >>> # Select random numbers from (1, 3, 5, 7, 9)
@@ -124,7 +124,6 @@ Sample from a discrete set of scalar values, specified in a tuple. A single valu
 >>> sampler = (1, 3, 5, 7, 9)
 
 ```
-
 
 ### DependentSampler
 
