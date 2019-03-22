@@ -54,6 +54,12 @@ class ArgumentError(DomainError):
     """
     pass
 
+class ArgumentShapeError(DomainError):
+    """
+    Raised when the wrong type of argument is passed to a function
+    """
+    pass
+
 class MathArrayError(CalcError):
     """
     Thrown by MathArray when anticipated errors are made.

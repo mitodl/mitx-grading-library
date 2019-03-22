@@ -30,7 +30,7 @@ def PercentageString(value):
                 return "{percent}%".format(percent=percent)
             except Invalid:
                 raise
-            except:
+            except Exception:
                 pass
 
     raise Invalid("Not a valid percentage string")

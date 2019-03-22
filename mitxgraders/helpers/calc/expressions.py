@@ -800,7 +800,7 @@ class MathExpression(object):
         >>> def h(x, y): return x + y
         >>> MathExpression.eval_function(['h', [1, 2, 3]], {"h": h})
         Traceback (most recent call last):
-        ArgumentError: Wrong number of arguments passed to h. Expected 2, received 3.
+        ArgumentError: Wrong number of arguments passed to h(...): Expected 2 inputs, but received 3.
 
         However, if the function to be evaluated has a truthy 'validated'
         property, we assume it does its own validation and we do not check the
@@ -854,8 +854,8 @@ class MathExpression(object):
         num_args = len(args)
         expected = get_number_of_args(func)
         if expected != num_args:
-            msg = ("Wrong number of arguments passed to {func}. "
-                   "Expected {num}, received {num2}.")
+            msg = ("Wrong number of arguments passed to {func}(...): "
+                   "Expected {num} inputs, but received {num2}.")
             raise ArgumentError(msg.format(func=name, num=expected, num2=num_args))
         return True
 
