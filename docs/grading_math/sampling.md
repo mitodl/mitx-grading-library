@@ -96,6 +96,20 @@ Sample real matrices of a specific shape and norm. (`RealMatrices` uses the Frob
 
 If you want to sample a matrix in a way that depends on a scalar, see `DependentSampler` below.
 
+### TriangularMatrices
+
+Sample triangular matrices of a specific shape and norm.
+
+```python
+>>> # Sample lower triangular 3 by 2 real matrices with norm between 5 and 10
+>>> sampler = TriangularMatrices(shape=[3, 2], norm=[5, 10], lower=True)
+>>> # the default is shape=[2, 2], norm=[1, 5] and lower=False (giving upper triangular matrices)
+>>> TriangularMatrices()
+
+```
+
+If you want to sample a matrix in a way that depends on a scalar, see `DependentSampler` below.
+
 ### IdentityMatrixMultiples
 
 Sample square matrices of a given dimension consisting of the identity matrix multiplied by a scalar. The `sampler` parameter can be any scalar sampling set listed above. This sampling set is useful when you want a variable that will commute with other matrices, but can also be added to them.

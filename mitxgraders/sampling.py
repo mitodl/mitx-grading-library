@@ -12,6 +12,7 @@ for sampling vectors/matrices/tensors:
 * RealMatrices
 * RealVectors
 * IdentityMatrixMultiples
+* TriangularMatrices
 for specifying functions:
 * SpecificFunctions
 * RandomFunction
@@ -36,7 +37,7 @@ from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
     has_keys_of_type, is_shape_specification)
 from mitxgraders.helpers.calc import (
-    METRIC_SUFFIXES, CalcError, evaluator, MathArray)
+    METRIC_SUFFIXES, CalcError, evaluator, MathArray, within_tolerance)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -48,6 +49,7 @@ __all__ = [
     "RealVectors",
     "RealMatrices",
     "IdentityMatrixMultiples",
+    "TriangularMatrices",
     "SpecificFunctions",
     "RandomFunction",
     "DependentSampler"
@@ -423,6 +425,58 @@ class IdentityMatrixMultiples(AbstractSquareMatrices):
         array = scaling * np.eye(self.config['dimension'])
         # Return the result as a MathArray
         return MathArray(array)
+
+
+class TriangularMatrices(RealMatrices):
+    """
+    Class representing a collection of upper or lower triangular matrices.
+
+    Config:
+    =======
+        Same as RealMatrices.
+        lower: Boolean to select upper triangular (False, default) or lower triangular
+               matrices.
+
+    Usage:
+    ======
+
+    By default, matrices have two rows and two columns:
+    >>> matrices = RealMatrices()
+    >>> matrices.gen_sample().shape
+    (2, 2)
+
+    We can choose between upper triangular matrices:
+    >>> matrices = TriangularMatrices()
+    >>> m = matrices.gen_sample()
+    >>> within_tolerance(m, np.triu(m), 0)
+    True
+
+    and lower triangular matrices:
+    >>> matrices = TriangularMatrices(lower=True)
+    >>> m = matrices.gen_sample()
+    >>> within_tolerance(m, np.tril(m), 0)
+    True
+    """
+
+    schema_config = RealMatrices.schema_config.extend({
+        Required('lower', default=False): bool
+    })
+
+    def gen_sample(self):
+        """
+        Generates a triangular matrix
+        """
+        # Use RealMatrices to generate a matrix
+        matrix = super(TriangularMatrices, self).gen_sample()
+        # Save the norm before we make the matrix triangular
+        norm = np.linalg.norm(matrix)
+        # Now zero out the unwanted portion
+        if self.config['lower']:
+            matrix = np.tril(matrix)
+        else:
+            matrix = np.triu(matrix)
+        # Return the matrix with the original norm
+        return matrix * norm / np.linalg.norm(matrix)
 
 
 class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-methods
