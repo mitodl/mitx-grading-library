@@ -4,7 +4,7 @@ Whenever random variables/functions are involved, they need to be sampled from a
 
 These sampling classes are available for use in `FormulaGrader`, `MatrixGrader`, etc.
 
-## Variable Sampling: Numbers
+## Variable Sampling: Numbers (Scalars)
 
 These sampling sets generate a random number on demand. It may be real or complex.
 
@@ -87,7 +87,7 @@ Sample real vectors with specified shape (number of components) and norm.
 Sample real matrices of a specific shape and norm. (`RealMatrices` uses the Frobenius norm.)
 
 ```python
->>> # Sample 3 b 2 real matrices with norm between 5 and 10
+>>> # Sample 3 by 2 real matrices with norm between 5 and 10
 >>> sampler = RealMatrices(shape=[3, 2], norm=[5, 10])
 >>> # the default is shape=[2, 2] and norm=[1, 5]
 >>> RealMatrices()
@@ -96,12 +96,24 @@ Sample real matrices of a specific shape and norm. (`RealMatrices` uses the Frob
 
 If you want to sample a matrix in a way that depends on a scalar, see `DependentSampler` below.
 
+### IdentityMatrixMultiples
+
+Sample square matrices of a given dimension consisting of the identity matrix multiplied by a scalar. The `sampler` parameter can be any scalar sampling set listed above. This sampling set is useful when you want a variable that will commute with other matrices, but can also be added to them.
+
+```python
+>>> # Sample 3x3 matrices consisting of a random number between 1 and 3 multiplying the identity
+>>> sampler = IdentityMatrixMultiples(dimension=3, sampler=[1, 3])
+>>> # The default is dimension=2 and sampler=[1, 5]
+>>> IdentityMatrixMultiples()
+
+```
+
 
 ## Variable Sampling: Generic
 
 ### DiscreteSet
 
-Sample from a discrete set of values, specified in a tuple. A single value may also be provided, but this case should usually be specified as a constant instead of as a sampling set.
+Sample from any discrete set of values that are specified in a tuple. A single value may also be provided, but this case should usually be specified as a constant instead of as a sampling set.
 
 ```python
 >>> # Select random numbers from (1, 3, 5, 7, 9)
@@ -113,10 +125,9 @@ Sample from a discrete set of values, specified in a tuple. A single value may a
 
 ```
 
-
 ### DependentSampler
 
-Compute a value for a variable based on the values of other variables. The sampler must be initialized with a list of variables that it depends on, as well as the formula used to perform the computation. The formula can use any base functions, but no user-defined functions. DependentSamplers can depend on other dependent variables. If you construct a self-referential chain, an error will occur.
+Compute a value for a variable based on the values of other variables. The sampler must be initialized with a list of variables that it depends on, as well as the formula used to perform the computation. The formula can use any base functions, but no user-defined functions. `DependentSampler`s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that `DependentSampler` can depend on vector/matrix quantities as well as scalars.
 
 ```python
 >>> # Set radius based on the random values of x, y and z
