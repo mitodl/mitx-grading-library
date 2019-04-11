@@ -227,6 +227,25 @@ def test_multiple_listAnswers():
     }
     assert result == expected_result
 
+def test_picking_between_equally_graded_results():
+    """Check that a listgrader with multiple equally-scoring answers picks
+    the one where high scores occur early"""
+    grader = ListGrader(
+        answers=(['a', 'b', 'c'], ['1', '2', '3']),
+        subgraders=StringGrader()
+    )
+
+    result = grader(None, ['wrong', 'b', '3'])
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1.0, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''}
+        ]
+    }
+    assert result == expected_result
+
 def test_multiple_listAnswers_same_grade():
     grader = ListGrader(
         answers=(

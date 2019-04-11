@@ -510,7 +510,18 @@ class ListGrader(AbstractGrader):
 
     @staticmethod
     def get_best_result(results):
-        """Compute the best result from a multi-input problem"""
+        """
+        Computes the best student result in multi-answer ListGrader problems.
+
+        Arguments:
+            results: a list of {'overall_message': '...', 'input_list': [...]}
+                dicts.
+
+        Returns:
+            The result in results which has the highest cumulative score. In the
+            case of ties, the result where high-scoring subparts occur early
+            is chosen.
+        """
         # If we had a single list of answers, just return the results
         if len(results) == 1:
             return results[0]
@@ -538,9 +549,10 @@ class ListGrader(AbstractGrader):
         # Find which of the culled results did best at each input
         max_vals = np.amax(culled_grades, axis=1)
         max_vals = np.array([max_vals]).T
-        high_scoring = culled_grades == max_vals
-        # high_scoring is a matrix the same shape as full_grades
-        # It stores True/False values for whether that result was the best for that input
+        high_scoring = (culled_grades == max_vals).T
+        # high_scoring is a matrix the same number of columns as full_grades
+        # It stores True/False values for whether that result was the best for
+        # that input, over the culled results
 
         # Run through the culled_grades matrix to figure out which results are still in
         # the running after each input
