@@ -10,7 +10,7 @@ import re
 import itertools
 import numpy as np
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
-from mitxgraders.comparers import equality_comparer
+from mitxgraders.comparers import equality_comparer, CorrellatedComparer
 from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
                                   gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes,
@@ -735,9 +735,13 @@ class FormulaGrader(ItemGrader):
         Compare the student evaluations to the expected results.
         """
         results = []
-        for compare_parms_eval, student_eval in zip(compare_parms_evals, student_evals):
-            result = comparer(compare_parms_eval, student_eval, utils)
+        if isinstance(comparer, CorrellatedComparer):
+            result = comparer(compare_parms_evals, student_evals, utils)
             results.append(ItemGrader.standardize_cfn_return(result))
+        else:
+            for compare_parms_eval, student_eval in zip(compare_parms_evals, student_evals):
+                result = comparer(compare_parms_eval, student_eval, utils)
+                results.append(ItemGrader.standardize_cfn_return(result))
 
         if debug_logger:
             debug_logger(comparer, results)
@@ -768,7 +772,7 @@ class FormulaGrader(ItemGrader):
 
         num_failures = 0
         for result in results:
-            if not result['ok']:
+            if result['ok'] != True:
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
                     return result, functions_used
