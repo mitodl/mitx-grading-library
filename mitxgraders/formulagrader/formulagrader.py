@@ -10,7 +10,7 @@ import re
 import itertools
 import numpy as np
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
-from mitxgraders.comparers import equality_comparer
+from mitxgraders.comparers import equality_comparer, CorrelatedComparer
 from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
                                   gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes,
@@ -393,10 +393,15 @@ class FormulaGrader(ItemGrader):
         failable_evals (int): The number of samples that may disagree before the student's
             answer is marked incorrect (default 0)
 
-        answers (str | dict): A string, dictionary, or tuple thereof. If a string is supplied,
-            it represents the correct answer and is compared to student input for equality.
+        answers: A single "expect" value, a dictionary, or a tuple thereof, as
+            described in the documentation for ItemGraders.
 
-            If a dictionary is supplied, it needs keys:
+            The expect value can be a string, or can itself be a dictionary.
+
+            If the expect value is a string string, it represents the correct
+            answer and is compared to student input for equality.
+
+            If the expect value is a dictionary, it needs keys:
                 - comparer_params: a list of strings to be numerically sampled and passed to the
                     comparer function.
                 - comparer: a function with signature comparer(comparer_params_evals, student_eval,
@@ -485,7 +490,7 @@ class FormulaGrader(ItemGrader):
                 raise Invalid("Something's wrong with grader's 'answers' configuration key. "
                               "Please see documentation for accepted formats.")
 
-    debug_appendix_header_template = (
+    debug_appendix_eval_header_template = (
         "\n"
         "==============================================================\n"
         "{grader} Debug Info\n"
@@ -495,7 +500,7 @@ class FormulaGrader(ItemGrader):
         "Functions available during evaluation and disallowed in answer:\n"
         "{functions_disallowed}\n"
     )
-    debug_appendix_sample_template = (
+    debug_appendix_eval_template = (
         "\n"
         "==========================================\n"
         "Evaluation Data for Sample Number {sample_num} of {samples_total}\n"
@@ -503,9 +508,17 @@ class FormulaGrader(ItemGrader):
         "Variables:\n"
         "{variables}\n"
         "Student Eval: {student_eval}\n"
-        "Compare to:  {compare_parms_eval}\n"  # compare_parms_eval is list, so start 1 char earlier
+        "Compare to:  {comparer_params_eval}\n"
+        ""
+    )
+    debug_appendix_comparison_template = (
+        "\n"
+        "==========================================\n"
+        "Comparison Data for All {samples_total} Samples\n"
+        "==========================================\n"
         "Comparer Function: {comparer}\n"
-        "Comparison Result: {comparer_result}\n"
+        "Comparison Results:\n"
+        "{comparer_results}\n"
         ""
     )
 
@@ -639,15 +652,12 @@ class FormulaGrader(ItemGrader):
             if FormulaGrader.sibling_varname(i) in required_siblings
         }
 
-    def raw_check(self, answer, student_input, **kwargs):
-        """Perform the numerical check of student_input vs answer"""
+    def gen_var_and_func_samples(self, answer, student_input, sibling_formulas):
+        """
+        Generate a list of variable/function sampling dictionaries.
+        """
+
         comparer_params = answer['expect']['comparer_params']
-
-        siblings = kwargs.get('siblings', None)
-        required_siblings = self.get_used_vars(comparer_params)
-        # required_siblings might include some extra variable names, but no matter
-        sibling_formulas = self.get_sibling_formulas(siblings, required_siblings)
-
         # Generate samples; Include siblings to get numbered_vars from them
         expressions = (comparer_params
                        + [student_input]
@@ -665,15 +675,26 @@ class FormulaGrader(ItemGrader):
                                            self.functions,
                                            self.suffixes)
 
-        # Make a copy of the functions and variables lists
-        # We'll add the sampled functions/variables in
+        return var_samples, func_samples
+
+    def gen_evaluations(self, comparer_params, student_input, sibling_formulas,
+                        var_samples, func_samples):
+        """
+        Evaluate the comparer_params and student input.
+
+        Returns:
+            A tuple (list, list, set). The first two lists are comparer_params_evals
+            and student_evals. These have length equal to number of samples specified
+            in config. The set is a record of mathematical functions used in the
+            student's input.
+        """
+
         funclist = self.functions.copy()
         varlist = self.constants.copy()
 
-        # Get the comparer function
-        comparer = answer['expect']['comparer']
+        comparer_params_evals = []
+        student_evals = []
 
-        num_failures = 0
         for i in range(self.config['samples']):
             # Update the functions and variables listings with this sample
             funclist.update(func_samples[i])
@@ -696,34 +717,75 @@ class FormulaGrader(ItemGrader):
             # Compute expressions
             comparer_params_eval = self.eval_and_validate_comparer_params(
                 scoped_eval, comparer_params, siblings_eval)
+            comparer_params_evals.append(comparer_params_eval)
 
             # Before performing student evaluation, scrub the siblings
             # so that students can't use them
             for key in siblings_eval:
                 del varlist[key]
 
-            student_eval, used = scoped_eval(student_input)
+            student_eval, meta = scoped_eval(student_input)
+            student_evals.append(student_eval)
 
-            # Check if expressions agree
-            comparer_result = comparer(comparer_params_eval, student_eval, self.comparer_utils)
-            comparer_result = ItemGrader.standardize_cfn_return(comparer_result)
             if self.config['debug']:
                 # Put the siblings back in for the debug output
                 varlist.update(siblings_eval)
-                self.log_sample_info(i, varlist, funclist, student_eval,
-                                     comparer, comparer_params_eval, comparer_result)
+                self.log_eval_info(i, varlist, funclist, comparer_params_eval, student_eval)
 
-            if not comparer_result['ok']:
+        return comparer_params_evals, student_evals, meta.functions_used
+
+    def compare_evaluations(self, compare_parms_evals, student_evals, comparer, utils):
+        """
+        Compare the student evaluations to the expected results.
+        """
+        results = []
+        if isinstance(comparer, CorrelatedComparer):
+            result = comparer(compare_parms_evals, student_evals, utils)
+            results.append(ItemGrader.standardize_cfn_return(result))
+        else:
+            for compare_parms_eval, student_eval in zip(compare_parms_evals, student_evals):
+                result = comparer(compare_parms_eval, student_eval, utils)
+                results.append(ItemGrader.standardize_cfn_return(result))
+
+        if self.config['debug']:
+            self.log_comparison_info(comparer, results)
+
+        return results
+
+    def raw_check(self, answer, student_input, **kwargs):
+        """Perform the numerical check of student_input vs answer"""
+
+        siblings = kwargs.get('siblings', None)
+        comparer_params = answer['expect']['comparer_params']
+        required_siblings = self.get_used_vars(comparer_params)
+        # required_siblings might include some extra variable names, but no matter
+        sibling_formulas = self.get_sibling_formulas(siblings, required_siblings)
+
+        var_samples, func_samples = self.gen_var_and_func_samples(answer, student_input, sibling_formulas)
+
+        (comparer_params_evals,
+         student_evals,
+         functions_used) = self.gen_evaluations(comparer_params, student_input,
+                                                sibling_formulas, var_samples, func_samples)
+
+        # Get the comparer function
+        comparer = answer['expect']['comparer']
+        results = self.compare_evaluations(comparer_params_evals, student_evals,
+                                           comparer, self.comparer_utils)
+
+        num_failures = 0
+        for result in results:
+            if result['ok'] != True:
                 num_failures += 1
                 if num_failures > self.config["failable_evals"]:
-                    return comparer_result, used.functions_used
+                    return result, functions_used
 
         # This response appears to agree with the expected answer
         return {
             'ok': answer['ok'],
             'grade_decimal': answer['grade_decimal'],
             'msg': answer['msg']
-        }, used.functions_used
+        }, functions_used
 
     @staticmethod
     def eval_and_validate_comparer_params(scoped_eval, comparer_params, siblings_eval):
@@ -752,12 +814,12 @@ class FormulaGrader(ItemGrader):
 
         return comparer_params_eval
 
-    def log_sample_info(self, index, varlist, funclist, student_eval,
-                        comparer, comparer_params_eval, comparer_result):
-        """Add sample information to debug log"""
+
+    def log_eval_info(self, index, varlist, funclist, comparer_params_eval, student_eval):
+        """Add sample evaluation information to debug log"""
         pp = PrettyPrinter(indent=4)
         if index == 0:
-            header = self.debug_appendix_header_template.format(
+            header = self.debug_appendix_eval_header_template.format(
                 grader=self.__class__.__name__,
                 # The regexp replaces memory locations, e.g., 0x10eb1e848 -> 0x...
                 functions_allowed=pp.pformat({f: funclist[f] for f in funclist
@@ -766,14 +828,22 @@ class FormulaGrader(ItemGrader):
                                                  if f not in self.permitted_functions}),
             )
             self.log(re.sub(r"0x[0-9a-fA-F]+", "0x...", header))
-        self.log(self.debug_appendix_sample_template.format(
+
+        self.log(self.debug_appendix_eval_template.format(
             sample_num=index + 1,  # to account for 0 index
             samples_total=self.config['samples'],
             variables=pp.pformat(varlist),
             student_eval=student_eval,
+            comparer_params_eval=comparer_params_eval
+        ))
+
+    def log_comparison_info(self, comparer, comparer_results):
+        """Add sample comparison information to debug log"""
+        pp = PrettyPrinter(indent=4)
+        self.log(self.debug_appendix_comparison_template.format(
+            samples_total=self.config['samples'],
             comparer=re.sub(r"0x[0-9a-fA-F]+", "0x...", str(comparer)),
-            comparer_result=pp.pformat(comparer_result),
-            compare_parms_eval=pp.pformat(comparer_params_eval)
+            comparer_results=pp.pformat(comparer_results)
         ))
 
     def post_eval_validation(self, expr, used_funcs):
