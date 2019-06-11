@@ -406,11 +406,19 @@ def make_constant_multiple_comparer(grade_decimal=0.5, msg='The submitted answer
     @CorrellatedComparer
     def _comparer(comparer_params_evals, student_evals, utils):
         student_eval_norm = np.linalg.norm(student_evals)/len(student_evals)
+
+        # Validate student input shape...only needed for MatrixGrader
+        try:
+            utils.validate_shape(student_evals[0], comparer_params_evals[0][0].shape)
+        except AttributeError:
+            pass # not called by MatrixGrader
+
         if is_nearly_zero(student_eval_norm, utils.tolerance, reference=student_evals):
             return False
 
-        A = np.vstack([student_evals]).T
-        y = [c[0] for c in comparer_params_evals]
+        A = np.vstack(np.array(student_evals).flatten())
+        y = np.array(comparer_params_evals).flatten()
+
         sol, residuals, _, _ = np.linalg.lstsq(A, y, rcond=-1)
         coeff = sol[0]
         error = np.sqrt(residuals)
