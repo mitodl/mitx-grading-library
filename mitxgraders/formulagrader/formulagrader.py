@@ -393,10 +393,15 @@ class FormulaGrader(ItemGrader):
         failable_evals (int): The number of samples that may disagree before the student's
             answer is marked incorrect (default 0)
 
-        answers (str | dict): A string, dictionary, or tuple thereof. If a string is supplied,
-            it represents the correct answer and is compared to student input for equality.
+        answers: A single "expect" value, a dictionary, or a tuple thereof, as
+            described in the documentation for ItemGraders.
 
-            If a dictionary is supplied, it needs keys:
+            The expect value can be a string, or can itself be a dictionary.
+
+            If the expect value is a string string, it represents the correct
+            answer and is compared to student input for equality.
+
+            If the expect value is a dictionary, it needs keys:
                 - comparer_params: a list of strings to be numerically sampled and passed to the
                     comparer function.
                 - comparer: a function with signature comparer(comparer_params_evals, student_eval,
