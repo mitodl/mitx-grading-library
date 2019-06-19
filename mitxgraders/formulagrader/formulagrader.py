@@ -391,7 +391,7 @@ class FormulaGrader(ItemGrader):
             between a and b. Will also accept a tuple of discrete values to sample from.
 
         failable_evals (int): The number of samples that may disagree before the student's
-            answer is marked incorrect (default 0)
+            answer is marked incorrect (default 0). Ignored by correlated comparers.
 
         answers: A single "expect" value, a dictionary, or a tuple thereof, as
             described in the documentation for ItemGraders.
@@ -573,6 +573,7 @@ class FormulaGrader(ItemGrader):
         """Check the student response against a given answer"""
 
         result, used_funcs = self.raw_check(answer, student_input, **kwargs)
+
         if result['ok'] is True or result['ok'] == 'partial':
             self.post_eval_validation(student_input, used_funcs)
         return result
@@ -747,10 +748,45 @@ class FormulaGrader(ItemGrader):
                 result = comparer(compare_parms_eval, student_eval, utils)
                 results.append(ItemGrader.standardize_cfn_return(result))
 
+
         if self.config['debug']:
             self.log_comparison_info(comparer, results)
 
         return results
+
+    @staticmethod
+    def consolidate_results(results, answer, failable_evals):
+        """
+        Consolidate comparer result(s) into just one result.
+
+        Arguments:
+            results: a list of results dicts
+            answer (dict): correctness data for the expected answer
+            failable_evals: int
+        """
+
+        # answer contains extra keys, so prune them
+        pruned_answer = { key: answer[key] for key in ['ok', 'grade_decimal', 'msg'] }
+
+        correlated = isinstance(answer['expect']['comparer'], CorrelatedComparer)
+
+        # Correlated comparers return a single result, so failable_evals makes no sense
+        if correlated:
+            [result] = results
+            if result['ok'] is True:
+                return pruned_answer
+            return result
+
+        num_failures = 0
+        for result in results:
+            if result['ok'] != True:
+                num_failures += 1
+                if num_failures > failable_evals:
+                    return result
+
+        # This response appears to agree with the expected answer
+        return pruned_answer
+
 
     def raw_check(self, answer, student_input, **kwargs):
         """Perform the numerical check of student_input vs answer"""
@@ -773,19 +809,9 @@ class FormulaGrader(ItemGrader):
         results = self.compare_evaluations(comparer_params_evals, student_evals,
                                            comparer, self.comparer_utils)
 
-        num_failures = 0
-        for result in results:
-            if result['ok'] != True:
-                num_failures += 1
-                if num_failures > self.config["failable_evals"]:
-                    return result, functions_used
+        consolidated = self.consolidate_results(results, answer, self.config['failable_evals'])
 
-        # This response appears to agree with the expected answer
-        return {
-            'ok': answer['ok'],
-            'grade_decimal': answer['grade_decimal'],
-            'msg': answer['msg']
-        }, functions_used
+        return consolidated, functions_used
 
     @staticmethod
     def eval_and_validate_comparer_params(scoped_eval, comparer_params, siblings_eval):
