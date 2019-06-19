@@ -675,7 +675,7 @@ class FormulaGrader(ItemGrader):
     def gen_evaluations(self, comparer_params, student_input, sibling_formulas,
                         var_samples, func_samples):
         """
-        Evaluate the compaerer_params and student input.
+        Evaluate the comparer_params and student input.
 
         Returns:
             A tuple (list, list, set). The first two lists are comparer_params_evals
@@ -729,8 +729,7 @@ class FormulaGrader(ItemGrader):
 
         return comparer_params_evals, student_evals, meta.functions_used
 
-    @staticmethod
-    def compare_evaluations(compare_parms_evals, student_evals, comparer, utils, debug_logger):
+    def compare_evaluations(self, compare_parms_evals, student_evals, comparer, utils):
         """
         Compare the student evaluations to the expected results.
         """
@@ -743,8 +742,8 @@ class FormulaGrader(ItemGrader):
                 result = comparer(compare_parms_eval, student_eval, utils)
                 results.append(ItemGrader.standardize_cfn_return(result))
 
-        if debug_logger:
-            debug_logger(comparer, results)
+        if self.config['debug']:
+            self.log_comparison_info(comparer, results)
 
         return results
 
@@ -766,9 +765,8 @@ class FormulaGrader(ItemGrader):
 
         # Get the comparer function
         comparer = answer['expect']['comparer']
-        debug_logger = self.log_comparison_info if self.config['debug'] else None
         results = self.compare_evaluations(comparer_params_evals, student_evals,
-                                           comparer, self.comparer_utils, debug_logger)
+                                           comparer, self.comparer_utils)
 
         num_failures = 0
         for result in results:
