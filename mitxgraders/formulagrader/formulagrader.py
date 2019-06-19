@@ -10,7 +10,7 @@ import re
 import itertools
 import numpy as np
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
-from mitxgraders.comparers import equality_comparer, CorrellatedComparer
+from mitxgraders.comparers import equality_comparer, CorrelatedComparer
 from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
                                   gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes,
@@ -735,7 +735,7 @@ class FormulaGrader(ItemGrader):
         Compare the student evaluations to the expected results.
         """
         results = []
-        if isinstance(comparer, CorrellatedComparer):
+        if isinstance(comparer, CorrelatedComparer):
             result = comparer(compare_parms_evals, student_evals, utils)
             results.append(ItemGrader.standardize_cfn_return(result))
         else:

@@ -7,7 +7,7 @@ from comparers import (
     between_comparer,
     vector_span_comparer,
     vector_phase_comparer,
-    CorrellatedComparer,
+    CorrelatedComparer,
     constant_multiple_comparer,
     make_constant_multiple_comparer
 )
@@ -19,7 +19,7 @@ __all__ = [
     'between_comparer',
     'vector_span_comparer',
     'vector_phase_comparer',
-    'CorrellatedComparer',
+    'CorrelatedComparer',
     'constant_multiple_comparer',
     'make_constant_multiple_comparer'
 ]

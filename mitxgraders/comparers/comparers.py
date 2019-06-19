@@ -348,10 +348,10 @@ def vector_phase_comparer(comparer_params_evals, student_eval, utils):
 
     return in_span and same_magnitude
 
-class CorrellatedComparer(object):
+class CorrelatedComparer(object):
     """
     CorrelatedComparer instances are callable objects used as comparer functions
-    in FormulaGrader problems. Unlike standard comparer functions, CorrellatedComparer
+    in FormulaGrader problems. Unlike standard comparer functions, CorrelatedComparer
     instances are given access to all parameter evaluations at once.
 
     For example, a comparer function that decides whether the student input is a
@@ -403,7 +403,7 @@ def make_constant_multiple_comparer(grade_decimal=0.5, msg='The submitted answer
     """
 
 
-    @CorrellatedComparer
+    @CorrelatedComparer
     def _comparer(comparer_params_evals, student_evals, utils):
         student_eval_norm = np.linalg.norm(student_evals)/len(student_evals)
 
