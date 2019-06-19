@@ -756,12 +756,12 @@ class FormulaGrader(ItemGrader):
         # required_siblings might include some extra variable names, but no matter
         sibling_formulas = self.get_sibling_formulas(siblings, required_siblings)
 
-        var_samples,func_samples = self.gen_var_and_func_samples(answer, student_input, sibling_formulas)
+        var_samples, func_samples = self.gen_var_and_func_samples(answer, student_input, sibling_formulas)
 
         (comparer_params_evals,
          student_evals,
-         functions_used) = self.gen_evaluations(comparer_params,student_input,
-                                      sibling_formulas, var_samples, func_samples)
+         functions_used) = self.gen_evaluations(comparer_params, student_input,
+                                                sibling_formulas, var_samples, func_samples)
 
         # Get the comparer function
         comparer = answer['expect']['comparer']
