@@ -360,6 +360,16 @@ class ItemGrader(AbstractGrader):
         msg = value.get('msg', '')
         return {'ok': ok, 'msg': msg, 'grade_decimal': grade_decimal}
 
+    @staticmethod
+    def get_best_result(results):
+        """
+        Get the highest-scoring result with the longest feedback message.
+        """
+        best_score = max([r['grade_decimal'] for r in results])
+        best_results = [r for r in results if r['grade_decimal'] == best_score]
+        best_result_with_longest_msg = max(best_results, key=lambda r: len(r['msg']))
+        return best_result_with_longest_msg
+
     def check(self, answers, student_input, **kwargs):
         """
         Compares student input to each answer in answers, using check_response.
@@ -393,16 +403,13 @@ class ItemGrader(AbstractGrader):
         # Compute the results for each answer
         results = [self.check_response(answer, student_input, **kwargs) for answer in answers]
 
-        # Now find the best result for the student
-        best_score = max([r['grade_decimal'] for r in results])
-        best_results = [r for r in results if r['grade_decimal'] == best_score]
-        best_result_with_longest_msg = max(best_results, key=lambda r: len(r['msg']))
+        best_result = self.get_best_result(results)
 
         # Add in wrong_msg if appropriate
-        if best_result_with_longest_msg['msg'] == "" and best_score == 0:
-            best_result_with_longest_msg['msg'] = self.config["wrong_msg"]
+        if best_result['msg'] == "" and best_result['grade_decimal'] == 0:
+            best_result['msg'] = self.config["wrong_msg"]
 
-        return best_result_with_longest_msg
+        return best_result
 
     @abc.abstractmethod
     def check_response(self, answer, student_input, **kwargs):
