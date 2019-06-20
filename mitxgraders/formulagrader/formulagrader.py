@@ -458,7 +458,10 @@ class FormulaGrader(ItemGrader):
         Required('comparer_params'): [str],
         # Functions seem not to be usable as default values, so the default comparer is added later.
         # https://github.com/alecthomas/voluptuous/issues/340
-        Required('comparer'): is_callable_with_args(3)
+        Required('comparer'): Any(
+            All(is_callable_with_args(3), lambda f: [f]),
+            [is_callable_with_args(3)]
+        )
     })
 
     def validate_expect(self, expect):
@@ -468,7 +471,7 @@ class FormulaGrader(ItemGrader):
         >>> result = FormulaGrader().validate_expect('mc^2')
         >>> expected = {
         ... 'comparer_params': ['mc^2'],
-        ... 'comparer': equality_comparer
+        ... 'comparer': [equality_comparer]
         ... }
         >>> result == expected
         True
@@ -735,17 +738,17 @@ class FormulaGrader(ItemGrader):
 
         return comparer_params_evals, student_evals, meta.functions_used
 
-    def compare_evaluations(self, compare_parms_evals, student_evals, comparer, utils):
+    def compare_evaluations(self, compare_params_evals, student_evals, comparer, utils):
         """
         Compare the student evaluations to the expected results.
         """
         results = []
         if isinstance(comparer, CorrelatedComparer):
-            result = comparer(compare_parms_evals, student_evals, utils)
+            result = comparer(compare_params_evals, student_evals, utils)
             results.append(ItemGrader.standardize_cfn_return(result))
         else:
-            for compare_parms_eval, student_eval in zip(compare_parms_evals, student_evals):
-                result = comparer(compare_parms_eval, student_eval, utils)
+            for compare_params_eval, student_eval in zip(compare_params_evals, student_evals):
+                result = comparer(compare_params_eval, student_eval, utils)
                 results.append(ItemGrader.standardize_cfn_return(result))
 
 
@@ -755,23 +758,22 @@ class FormulaGrader(ItemGrader):
         return results
 
     @staticmethod
-    def consolidate_results(results, answer, failable_evals):
+    def consolidate_results(results, answer, from_correlated, failable_evals):
         """
         Consolidate comparer result(s) into just one result.
 
         Arguments:
             results: a list of results dicts
             answer (dict): correctness data for the expected answer
+            from_correlated (bool): whether the results come from a correlated comparer
             failable_evals: int
         """
 
         # answer contains extra keys, so prune them
         pruned_answer = { key: answer[key] for key in ['ok', 'grade_decimal', 'msg'] }
 
-        correlated = isinstance(answer['expect']['comparer'], CorrelatedComparer)
-
         # Correlated comparers return a single result, so failable_evals makes no sense
-        if correlated:
+        if from_correlated:
             [result] = results
             if result['ok'] is True:
                 return pruned_answer
@@ -805,13 +807,20 @@ class FormulaGrader(ItemGrader):
                                                 sibling_formulas, var_samples, func_samples)
 
         # Get the comparer function
-        comparer = answer['expect']['comparer']
-        results = self.compare_evaluations(comparer_params_evals, student_evals,
-                                           comparer, self.comparer_utils)
+        results_across_comparers = []
+        for comparer in answer['expect']['comparer']:
+            from_correlated = isinstance(comparer, CorrelatedComparer)
+            results = self.compare_evaluations(comparer_params_evals, student_evals,
+                                               comparer, self.comparer_utils)
+            consolidated = self.consolidate_results(results, answer, from_correlated,
+                                                    self.config['failable_evals'])
+            if consolidated['grade_decimal'] == 1.0:
+                return consolidated, functions_used
+            results_across_comparers.append(consolidated)
 
-        consolidated = self.consolidate_results(results, answer, self.config['failable_evals'])
+        best_result = self.get_best_result(results_across_comparers)
 
-        return consolidated, functions_used
+        return best_result, functions_used
 
     @staticmethod
     def eval_and_validate_comparer_params(scoped_eval, comparer_params, siblings_eval):
