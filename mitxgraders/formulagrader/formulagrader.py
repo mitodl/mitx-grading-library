@@ -11,6 +11,10 @@ import itertools
 import numpy as np
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
 from mitxgraders.comparers import equality_comparer, CorrelatedComparer
+from mitxgraders.comparers.affine_comparer import (
+    affine_mode_schema,
+    AffineComparer
+)
 from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
                                   gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes,
@@ -22,7 +26,7 @@ from mitxgraders.helpers.calc import (
     DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NonNegative, is_callable, PercentageString, all_unique,
-    is_callable_with_args)
+    is_callable_with_args, equals)
 
 # Some of these validators are useful to other classes, e.g., IntegralGrader
 def validate_blacklist_whitelist_config(default_funcs, blacklist, whitelist):
@@ -404,8 +408,9 @@ class FormulaGrader(ItemGrader):
             If the expect value is a dictionary, it needs keys:
                 - comparer_params: a list of strings to be numerically sampled and passed to the
                     comparer function.
-                - comparer: a function with signature comparer(comparer_params_evals, student_eval,
-                    utils) that compares student and comparer_params after evaluation. This function
+                - comparer (func, [func]): a comparer function or a list thereof.
+                    A comparer function has signature comparer(comparer_params_evals, student_eval,
+                    utils) and compares student and comparer_params after evaluation. This function
                     should return True, False, 'partial', or a dictionary with required key
                     'grade_decimal' and optional key 'msg'.
     """
@@ -442,7 +447,10 @@ class FormulaGrader(ItemGrader):
             Required('numbered_vars', default=[]): All([str], all_unique),
             Required('sample_from', default={}): dict,
             Required('failable_evals', default=0): NonNegative(int),
-            Required('max_array_dim', default=0): NonNegative(int)
+            Required('max_array_dim', default=0): NonNegative(int),
+            # convenient comparer shortcuts
+            Required('proportional_credit', default=None): affine_mode_schema('proportional'),
+            Required('offset_credit', default=None): affine_mode_schema('offset')
         })
 
     Utils = namedtuple('Utils', ['tolerance', 'within_tolerance'])
@@ -478,7 +486,7 @@ class FormulaGrader(ItemGrader):
         """
         if isinstance(expect, str):
             return self.schema_expect({
-                'comparer': equality_comparer,
+                'comparer': [equality_comparer],
                 'comparer_params': [expect]
                 })
 
@@ -525,6 +533,28 @@ class FormulaGrader(ItemGrader):
         ""
     )
 
+    def validate_and_append_comparer_shortcuts(self):
+        proportional = self.config['proportional_credit']
+        offset = self.config['offset_credit']
+        if proportional is None and offset is None:
+            return
+
+        # proportional/offset keyword shortcuts should only be used alongside
+        # equality_comparer
+        expect_schema = Schema({
+            'comparer': equals([equality_comparer]),
+            'comparer_params': All([str], Length(min=1, max=1))
+        })
+        for answer in self.config['answers']:
+            expect_schema(answer['expect'])
+            if proportional is not None:
+                answer['expect']['comparer'].append(AffineComparer(proportional))
+            if offset is not None:
+                answer['expect']['comparer'].append(AffineComparer(offset))
+
+
+
+
     def __init__(self, config=None, **kwargs):
         """
         Validate the FormulaGrader's configuration.
@@ -533,8 +563,8 @@ class FormulaGrader(ItemGrader):
         Finally, we refine the sample_from entry.
         """
         super(FormulaGrader, self).__init__(config, **kwargs)
-
         # finish validating
+        self.validate_and_append_comparer_shortcuts()
         validate_blacklist_whitelist_config(self.default_functions,
                                             self.config['blacklist'],
                                             self.config['whitelist'])
@@ -789,9 +819,24 @@ class FormulaGrader(ItemGrader):
         # This response appears to agree with the expected answer
         return pruned_answer
 
-
     def raw_check(self, answer, student_input, **kwargs):
-        """Perform the numerical check of student_input vs answer"""
+        """
+        Numerically compare the student_input to answer.
+
+        We use the following algorithm. Below, N represents the number of
+        numerical samples.
+
+            0. Get sibling variables, if needed (can happen in ListGrader problems)
+            1. Generate N random samples for each variable and RandomFunction
+            2. Numerically evaluate comparer_params and student_input
+            3. Call each comparer function on the evaluated params and input.
+               Generally, the comparer function checks for equality.
+               Multiple comparers might be used for partial credit, but they
+               must all use the same comparer_params.
+            4. Consolidate comparer function results into a single grade
+
+            Note: this process is repeated for each answer in answers.
+        """
 
         siblings = kwargs.get('siblings', None)
         comparer_params = answer['expect']['comparer_params']

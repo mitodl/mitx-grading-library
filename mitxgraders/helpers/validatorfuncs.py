@@ -347,3 +347,13 @@ def is_shape_specification(min_dim=1, max_dim=None):
         ),
         Length(min=min_dim, max=max_dim),
     )
+
+def equals(obj):
+    """
+    docstring
+    """ # TODO
+    def _validator(x):
+        if x != obj:
+            msg = "{x} is not {obj}".format(x=x, obj=obj)
+            raise Invalid(msg)
+    return _validator

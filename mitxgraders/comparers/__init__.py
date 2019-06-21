@@ -6,11 +6,11 @@ from comparers import (
     eigenvector_comparer,
     between_comparer,
     vector_span_comparer,
-    vector_phase_comparer,
-    CorrelatedComparer,
-    constant_multiple_comparer,
-    make_constant_multiple_comparer
+    vector_phase_comparer
 )
+from mitxgraders.comparers.baseclasses import CorrelatedComparer
+
+from mitxgraders.comparers.affine_comparer import AffineComparer
 
 __all__ = [
     'equality_comparer',
