@@ -414,6 +414,8 @@ class FormulaGrader(ItemGrader):
     default_variables = DEFAULT_VARIABLES.copy()
     default_suffixes = DEFAULT_SUFFIXES.copy()
 
+    default_comparer = staticmethod(equality_comparer)
+
     @property
     def schema_config(self):
         """Define the configuration options for FormulaGrader"""
@@ -475,7 +477,7 @@ class FormulaGrader(ItemGrader):
         """
         if isinstance(expect, str):
             return self.schema_expect({
-                'comparer': equality_comparer,
+                'comparer': self.default_comparer,
                 'comparer_params': [expect]
                 })
 
