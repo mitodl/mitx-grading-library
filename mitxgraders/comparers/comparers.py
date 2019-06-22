@@ -1,8 +1,8 @@
 """
 Defines comparer functions used by FormulaGrader and its subclasses.
 
-Comparer Functions
-==================
+Simple Comparer Functions
+=========================
 
 A comparer function must have signature
 `comparer_func(comparer_params_evals, student_eval, utils)` and should return
@@ -42,6 +42,10 @@ A comparer function must return either:
 
 NOTE: doctests in this module show how the comparer function would be used
       inside a grader
+
+Correlated Comparers
+====================
+See ./baseclasses.py and ./affine_comparer.py for examples.
 """
 from numbers import Number
 import numpy as np
@@ -347,89 +351,3 @@ def vector_phase_comparer(comparer_params_evals, student_eval, utils):
     same_magnitude = utils.within_tolerance(expected_mag, student_mag)
 
     return in_span and same_magnitude
-
-class CorrelatedComparer(object):
-    """
-    CorrelatedComparer instances are callable objects used as comparer functions
-    in FormulaGrader problems. Unlike standard comparer functions, CorrelatedComparer
-    instances are given access to all parameter evaluations at once.
-
-    For example, a comparer function that decides whether the student input is a
-    nonzero constant multiple of the expected input would need to be a correlated
-    comparer so that it can determine if there is a linear relationship between
-    the student and expected samples.
-    """
-
-    def __init__(self, func):
-        self._comparer = func
-
-    def __call__(self, comparer_params_evals, student_evals, utils):
-        return self._comparer(comparer_params_evals, student_evals, utils)
-
-def make_constant_multiple_comparer(grade_decimal=0.5, msg='The submitted answer differs from the expected answer by a constant multiple'):
-    """
-    Makes a comparer function that tests whether student input is a constant multiple
-    of expected input, and if so, gives partial credit and displays a message.
-
-    Usage
-    =====
-
-    >>> from mitxgraders import FormulaGrader
-    >>> grader = FormulaGrader(
-    ...     answers={
-    ...         'comparer_params': ['m*c^2'],
-    ...         'comparer': make_constant_multiple_comparer(grade_decimal=0.75)
-    ...     },
-    ...     variables=['m', 'c']
-    ... )
-    >>> result = grader(None, '2*m*c^2')
-    >>> result == {
-    ...     'ok': 'partial',
-    ...     'msg': 'The submitted answer differs from the expected answer by a constant multiple',
-    ...     'grade_decimal': 0.75
-    ... }
-    True
-
-
-    Gives full credit / no credit appropriately:
-    >>> grader(None, 'm*c^3')['ok']
-    False
-    >>> grader(None, 'm*c^2')['ok']
-    True
-
-    Zero input is always marked wrong:
-    >>> grader(None, '0')['ok']
-    False
-    """
-
-
-    @CorrelatedComparer
-    def _comparer(comparer_params_evals, student_evals, utils):
-        student_eval_norm = np.linalg.norm(student_evals)/len(student_evals)
-
-        # Validate student input shape...only needed for MatrixGrader
-        try:
-            utils.validate_shape(student_evals[0], comparer_params_evals[0][0].shape)
-        except AttributeError:
-            pass # not called by MatrixGrader
-
-        if is_nearly_zero(student_eval_norm, utils.tolerance, reference=student_evals):
-            return False
-
-        A = np.vstack(np.array(student_evals).flatten())
-        y = np.array(comparer_params_evals).flatten()
-
-        sol, residuals, _, _ = np.linalg.lstsq(A, y, rcond=-1)
-        coeff = sol[0]
-        error = np.sqrt(residuals)
-
-        if is_nearly_zero(error, utils.tolerance, reference=student_eval_norm):
-            if is_nearly_zero(coeff - 1, utils.tolerance, reference=student_eval_norm):
-                return True
-            return { 'grade_decimal': grade_decimal, 'msg': msg }
-
-        return False
-
-    return _comparer
-
-constant_multiple_comparer = make_constant_multiple_comparer()
