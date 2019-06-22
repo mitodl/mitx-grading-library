@@ -789,7 +789,6 @@ class FormulaGrader(ItemGrader):
         # This response appears to agree with the expected answer
         return pruned_answer
 
-
     def raw_check(self, answer, student_input, **kwargs):
         """Perform the numerical check of student_input vs answer"""
 
@@ -810,8 +809,13 @@ class FormulaGrader(ItemGrader):
         comparer = answer['expect']['comparer']
         results = self.compare_evaluations(comparer_params_evals, student_evals,
                                            comparer, self.comparer_utils)
-
+        # Comparer function results might assign partial credit.
+        # But the answer we're testing against might only merit partial credit
+        for result in results:
+            result['grade_decimal'] *= answer['grade_decimal']
         consolidated = self.consolidate_results(results, answer, self.config['failable_evals'])
+
+
 
         return consolidated, functions_used
 
