@@ -26,6 +26,7 @@ from mitxgraders.helpers.calc.exceptions import (
 )
 from mitxgraders import ListGrader
 from tests.helpers import log_results
+from mitxgraders.comparers import equality_comparer
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
@@ -899,3 +900,20 @@ def test_whitespace_stripping():
         answers='x _ { a b }'
     )
     assert grader(None, 'x_{a b}')['ok']
+
+def test_default_comparer():
+    """Tests setting and resetting default_comparer"""
+
+    def silly_comparer(comparer_params_evals, student_eval, utils):
+        return utils.within_tolerance(1, student_eval)
+
+    FormulaGrader.set_default_comparer(silly_comparer)
+    silly_grader = FormulaGrader(answers='pi')
+    FormulaGrader.reset_default_comparer()
+    grader = FormulaGrader(answers='pi')
+
+    silly_grader.config['answers'][0]['expect']['comparer'] is silly_comparer
+    assert silly_grader(None, '1')['ok']
+    grader.config['answers'][0]['expect']['comparer'] is equality_comparer
+    assert not grader(None, '1')['ok']
+    assert grader(None, '3.141592653')['ok']

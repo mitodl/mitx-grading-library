@@ -81,19 +81,47 @@ def get_equals_fit_error(x, y):
     return sum(np.abs(x-y))
 
 class AffineComparer(CorrelatedComparer):
-    """docstring for AffineComparer.""" #TODO
+    """
+    Used to check that there is an affine relationship between student's input
+    and the expected answer.
+
+    The general affine relationship is expected = a * student + b. The comparer
+    can check for four subtypes:
+        equals: (a, b) = (1, 0)
+        proportional: b = 0
+        offset: a = 1
+        affine: neither a nor b fixed
+
+    Configuration
+    =============
+    The first four configuration keys determine the amount of partial credit
+    given for a specific type of affine relationship. If set to None, the
+    relationship is not checked.
+        equals (None | number): defaults to 1.0
+        proportional (None | number): defaults to 0.5
+        offset (None | number): defaults to None
+        affine (None | number): defaults to None
+
+    The remaining configuration keys specify a feedback message to be given
+    in each case:
+        equals_msg (str): defaults to ''
+        proportional_msg (str): defaults to 'The submitted answer differs from
+            an expected answer by a constant factor.'
+        offset_msg (str): defaults to ''
+        affine_msg (str): defaults to ''
+    """
 
     schema_config = Schema({
-        Required('equals', default=1.0): Range(0, 1),
+        Required('equals', default=1.0): Any(None, Range(0, 1)),
+        Required('proportional', default=0.5): Any(None, Range(0, 1)),
+        Required('offset', default=None): Any(None, Range(0, 1)),
+        Required('affine', default=None): Any(None, Range(0, 1)),
         Required('equals_msg', default=''): str,
-        Required('proportional', default=0.5): Range(0, 1),
         Required('proportional_msg', default=(
-            'The submitted answer differs from the expected answer by a '
+            'The submitted answer differs from an expected answer by a '
             'constant factor.'
         )): str,
-        Required('offset', default=None): Range(0, 1),
         Required('offset_msg', default=''): str,
-        Required('affine', default=None): Range(0, 1),
         Required('affine_msg', default=''): str,
     })
 

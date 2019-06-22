@@ -39,4 +39,3 @@ class CorrelatedComparer(ObjectWithSchema):
         Returns:
             bool or results dict
         """
-        pass
