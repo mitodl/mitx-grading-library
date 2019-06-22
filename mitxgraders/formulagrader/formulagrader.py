@@ -416,6 +416,30 @@ class FormulaGrader(ItemGrader):
 
     default_comparer = staticmethod(equality_comparer)
 
+    @classmethod
+    def set_default_comparer(cls, comparer):
+        """
+        Used to set the default comparer of FormulaGrader class.
+
+        Note: This class method exists primarily to ensure that
+        FormulaGrader.default_comparer is a static method. If the staticmethod
+        decorator is not used,
+
+            FormulaGrader.default_grader = equality_comparer
+            grader = FormulaGrader()
+
+        then grader.default_grader will be a bound method. That's bad, since
+        comparer functions do not expect self as the first argument.
+        """
+        cls.default_comparer = staticmethod(comparer)
+
+    @classmethod
+    def reset_default_comparer(cls):
+        """
+        Resets the default_comparer to equality_comparer.
+        """
+        cls.set_default_comparer(equality_comparer)
+
     @property
     def schema_config(self):
         """Define the configuration options for FormulaGrader"""
