@@ -78,7 +78,7 @@ def get_equals_fit_error(x, y):
     Arguments:
         x, y: compatible numpy arrays
     """
-    return sum(np.abs(x-y))
+    return np.sqrt(sum(np.square(x - y)))
 
 class AffineComparer(CorrelatedComparer):
     """
@@ -109,6 +109,8 @@ class AffineComparer(CorrelatedComparer):
             an expected answer by a constant factor.'
         offset_msg (str): defaults to ''
         affine_msg (str): defaults to ''
+
+    NOTE:
     """
 
     schema_config = Schema({
