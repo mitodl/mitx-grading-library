@@ -634,11 +634,13 @@ def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes, cons
         if not isinstance(sample_from[symbol], DependentSampler)
     ]
 
+    pruned_constants = { sym: constants[sym] for sym in constants if sym not in symbols }
+
     # Generate the samples
     sample_list = []
     for _ in range(samples):
         # Generate independent samples
-        sample_dict = constants.copy()
+        sample_dict = pruned_constants.copy()
         sample_dict.update({
             symbol: sample_from[symbol].gen_sample() for symbol in independent
         })

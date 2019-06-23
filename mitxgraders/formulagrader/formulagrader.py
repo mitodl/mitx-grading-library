@@ -670,7 +670,7 @@ class FormulaGrader(ItemGrader):
         # Make a copy of the functions and variables lists
         # We'll add the sampled functions/variables in
         funclist = self.functions.copy()
-        varlist = self.constants.copy()
+        varlist = {}
 
         # Get the comparer function
         comparer = answer['expect']['comparer']

@@ -289,3 +289,20 @@ def test_dependent_sampler():
 
     with raises(Exception, match="DependentSampler must be invoked with compute_sample."):
         DependentSampler(depends=[], formula="1").gen_sample()
+
+def test_overriding_constant_with_dependent_sampling():
+    symbols = ['a', 'b', 'c']
+    samples = 1
+    sample_from = {
+        'a': RealInterval([10, 10]),
+        'b': DependentSampler(depends=["a"], formula="a+1"),
+        'c': DependentSampler(depends=["b"], formula="b+1")
+    }
+    funcs, suffs = {}, {}
+    consts = {'unity': 1, 'b': 3.14}
+    result = gen_symbols_samples(symbols, samples, sample_from, funcs, suffs, consts)[0]
+    a, b, c = [result[sym] for sym in 'abc']
+
+    assert a == 10
+    assert b == 11
+    assert c == 12
