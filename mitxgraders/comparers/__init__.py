@@ -10,7 +10,7 @@ from comparers import (
 )
 from mitxgraders.comparers.baseclasses import CorrelatedComparer
 
-from mitxgraders.comparers.affine_comparer import AffineComparer
+from mitxgraders.comparers.linear_comparer import LinearComparer
 
 __all__ = [
     'equality_comparer',
@@ -20,5 +20,5 @@ __all__ = [
     'vector_span_comparer',
     'vector_phase_comparer',
     'CorrelatedComparer',
-    'AffineComparer'
+    'LinearComparer'
 ]

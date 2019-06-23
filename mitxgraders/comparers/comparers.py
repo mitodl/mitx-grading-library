@@ -45,7 +45,7 @@ NOTE: doctests in this module show how the comparer function would be used
 
 Correlated Comparers
 ====================
-See ./baseclasses.py and ./affine_comparer.py for examples.
+See ./baseclasses.py and ./linear_comparer.py for examples.
 """
 from numbers import Number
 import numpy as np
