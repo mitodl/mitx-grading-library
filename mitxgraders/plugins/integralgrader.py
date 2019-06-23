@@ -378,12 +378,12 @@ class IntegralGrader(AbstractGrader):
         var_samples = gen_symbols_samples(self.config['variables'],
                                           self.config['samples'],
                                           self.config['sample_from'],
-                                          self.functions, {})
+                                          self.functions, {}, self.constants)
 
         func_samples = gen_symbols_samples(self.random_funcs.keys(),
                                            self.config['samples'],
                                            self.random_funcs,
-                                           self.functions, {})
+                                           self.functions, {}, {} )
 
         # Make a copy of the functions and variables lists
         # We'll add the sampled functions/variables in
