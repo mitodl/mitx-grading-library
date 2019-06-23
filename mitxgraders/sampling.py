@@ -638,8 +638,11 @@ def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes, cons
     sample_list = []
     for _ in range(samples):
         # Generate independent samples
-        sample_dict = {symbol: sample_from[symbol].gen_sample() for symbol in independent}
-        sample_dict.update(constants)
+        sample_dict = constants.copy()
+        sample_dict.update({
+            symbol: sample_from[symbol].gen_sample() for symbol in independent
+        })
+
         # Generate dependent samples, following chains as necessary
         unevaluated_dependents = {
             symbol: sample_from[symbol].config['depends'] for symbol in symbols
