@@ -597,7 +597,7 @@ def is_subset(iterable, iterable_superset):
             return False
     return True
 
-def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes):
+def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes, constants):
     """
     Generates a list of dictionaries mapping symbol names to values.
 
@@ -619,7 +619,7 @@ def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes):
     ...     {
     ...         'a': RealInterval([1,3]),
     ...         'b': RealInterval([-4,-2])
-    ...     }, {}, {}
+    ...     }, {}, {}, {}
     ... )
     >>> variable_samples # doctest: +SKIP
     [
@@ -639,7 +639,7 @@ def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes):
     for _ in range(samples):
         # Generate independent samples
         sample_dict = {symbol: sample_from[symbol].gen_sample() for symbol in independent}
-
+        sample_dict.update(constants)
         # Generate dependent samples, following chains as necessary
         unevaluated_dependents = {
             symbol: sample_from[symbol].config['depends'] for symbol in symbols
