@@ -1,3 +1,4 @@
+import sys
 from functools import wraps
 
 def log_results(results):
@@ -33,3 +34,8 @@ def log_results(results):
         return decorator
 
     return make_decorator(results)
+
+if sys.version_info >= (3,):
+    import unittest.mock as mock
+else:
+    import mock

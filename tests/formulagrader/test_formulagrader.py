@@ -3,7 +3,6 @@ Tests for FormulaGrader and NumericalGrader
 """
 from __future__ import division
 from pytest import raises
-from mock import Mock, patch
 import numpy as np
 from voluptuous import Error, MultipleInvalid
 from mitxgraders import (
@@ -25,7 +24,7 @@ from mitxgraders.helpers.calc.exceptions import (
     CalcError, UndefinedVariable, UndefinedFunction
 )
 from mitxgraders import ListGrader
-from tests.helpers import log_results
+from tests.helpers import log_results, mock
 from mitxgraders.comparers import equality_comparer
 
 def test_square_root_of_negative_number():
@@ -443,20 +442,20 @@ def test_fg_custom_comparers():
         reduced = student_input % (360)
         return utils.within_tolerance(answer, reduced) and student_input > min_value
 
-    mock = Mock(side_effect=is_coterminal_and_large,
+    mocked = mock.Mock(side_effect=is_coterminal_and_large,
                 # The next two kwargs ensure that the Mock behaves nicely for inspect.getargspec
                 spec=is_coterminal_and_large,
                 func_code=is_coterminal_and_large.func_code,)
 
     grader = FormulaGrader(
         answers={
-            'comparer': mock,
+            'comparer': mocked,
             'comparer_params': ['150 + 50', '360 * 2'],
         },
         tolerance='1%'
     )
     assert grader(None, '200 + 3*360') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-    mock.assert_called_with([200, 720], 1280, grader.comparer_utils)
+    mocked.assert_called_with([200, 720], 1280, grader.comparer_utils)
 
     assert grader(None, '199 + 3*360') == {'grade_decimal': 1, 'msg': '', 'ok': True}
     assert grader(None, '197 + 3*360') == {'grade_decimal': 0, 'msg': '', 'ok': False}
@@ -635,7 +634,7 @@ def test_fg_evals_numbered_variables_in_siblings():
 
     results = []
     side_effect = log_results(results)(subgrader.get_sibling_formulas)
-    with patch.object(subgrader, 'get_sibling_formulas', side_effect=side_effect):
+    with mock.patch.object(subgrader, 'get_sibling_formulas', side_effect=side_effect):
         grader(None, ['x_{0}+1', 'x_{1} + 1'])
         # get_sibling_formulas should be called twice, once for each input
         assert len(results) == 2

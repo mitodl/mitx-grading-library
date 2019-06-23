@@ -10,6 +10,7 @@ from __future__ import division
 import numbers
 import abc
 import pprint
+import six
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
@@ -401,7 +402,7 @@ class ItemGrader(AbstractGrader):
             raise ConfigError(msg)
 
         # Make sure the input is in the expected format
-        if not isinstance(student_input, basestring):
+        if not isinstance(student_input, six.string_types):
             msg = "Expected string for student_input, received {}"
             raise ConfigError(msg.format(type(student_input)))
 

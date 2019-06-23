@@ -1,0 +1,7 @@
+numpy==1.16.4
+scipy==1.2.2
+pyparsing==2.0.7
+pytest==3.6.2
+pytest-cov==2.5.1
+mkdocs==0.17.5
+mkdocs-cinder==0.11.0

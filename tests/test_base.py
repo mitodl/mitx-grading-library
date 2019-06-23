@@ -4,13 +4,13 @@ Tests of base class functionality
 from __future__ import division
 import sys
 from imp import reload
-import mock
 from pytest import raises
 from voluptuous import Error
 import mitxgraders
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, __version__
 from mitxgraders.baseclasses import AbstractGrader
 from mitxgraders.exceptions import MITxError, StudentFacingError
+from tests.helpers import mock
 
 def test_debug_with_author_message():
     grader = StringGrader(

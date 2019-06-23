@@ -3,11 +3,11 @@ Tests for ListGrader
 """
 from __future__ import division
 import pprint
-import mock
 from pytest import raises
 from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader,
                          NumericalGrader, SingleListGrader)
 from mitxgraders import CalcError
+from tests.helpers import mock
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint
