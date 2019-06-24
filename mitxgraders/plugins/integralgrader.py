@@ -368,9 +368,9 @@ class IntegralGrader(AbstractGrader):
             if result['ok'] is True or result['ok'] == 'partial':
                 self.post_eval_validation(used_funcs)
             return result
-        except IntegrationError as e:
+        except IntegrationError as error:
             msg = "There appears to be an error with the integral you entered: {}"
-            raise IntegrationError(msg.format(e.message))
+            raise IntegrationError(msg.format(str(error)))
 
     def raw_check(self, answer, cleaned_input):
         """Perform the numerical check of student_input vs answer"""
@@ -408,9 +408,9 @@ class IntegralGrader(AbstractGrader):
                     varscope=varscope,
                     funcscope=funcscope
                 )
-            except IntegrationError as e:
+            except IntegrationError as error:
                 msg = "Integration Error with author's stored answer: {}"
-                raise ConfigError(msg.format(e.message))
+                raise ConfigError(msg.format(str(error)))
 
             student_re, student_im, used_funcs = self.evaluate_int(
                 cleaned_input['integrand'],

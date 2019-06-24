@@ -155,7 +155,7 @@ class AbstractGrader(ObjectWithSchema):
             elif isinstance(error, MITxError):
                 # we want to re-raise the error with a modified message but the
                 # same class type, hence calling __class__
-                raise error.__class__(error.message.replace('\n', '<br/>'))
+                raise error.__class__(str(error).replace('\n', '<br/>'))
             else:
                 # Otherwise, give a generic error message
                 if isinstance(student_input, list):

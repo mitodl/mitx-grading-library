@@ -330,7 +330,7 @@ class MathArray(np.ndarray):
             try:
                 return np.linalg.matrix_power(self, exponent)
             except np.linalg.linalg.LinAlgError as error:
-                if error.message.startswith('Singular'):
+                if str(error).startswith('Singular'):
                     raise MathArrayError('Cannot raise singular matrix to negative powers.')
                 else:
                     # Not sure what could cause this...
@@ -356,7 +356,7 @@ class MathArray(np.ndarray):
         ...     try:
         ...         A**-1
         ...     except MathArrayError as err:
-        ...         print(err.message)
+        ...         print(err)
         Negative matrix powers have been disabled.
 
         It's only temporary!
