@@ -6,6 +6,7 @@ of a function. Currently only supports specifying the shape of inputs.
 """
 from numbers import Number
 from voluptuous import Schema, Invalid, Required, Any
+from mitxgraders.helpers.compatibility import wraps
 from mitxgraders.helpers.validatorfuncs import is_shape_specification, Nullable
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.helpers.calc.exceptions import ArgumentShapeError, ArgumentError
@@ -219,6 +220,7 @@ class SpecifyDomain(ObjectWithSchema):
         def decorator(func):
             func_name = display_name if display_name else func.__name__
 
+            @wraps(func)
             def _func(*args):
                 if len(shapes) != len(args):
                     # Use the same response as in validate_function_call in expressions.py
@@ -252,8 +254,8 @@ class SpecifyDomain(ObjectWithSchema):
                 message = "\n".join(lines)
                 raise ArgumentShapeError(message)
 
-            _func.__name__ = func.__name__
             _func.validated = True
+
             return _func
 
         return decorator
