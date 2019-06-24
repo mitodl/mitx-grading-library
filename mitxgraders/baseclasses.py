@@ -9,6 +9,7 @@ Contains base classes for the library:
 from __future__ import division
 import numbers
 import abc
+import pprint
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
@@ -48,7 +49,11 @@ class ObjectWithSchema(object):
 
     def __repr__(self):
         """Printable representation of the object"""
-        return "{classname}({config})".format(classname=self.__class__.__name__, config=self.config)
+        # Among other things, pprint.pformat ensures the config dict has
+        # keys in alphabetical order
+        pretty_config = pprint.pformat(self.config)
+        return "{classname}({config})".format(classname=self.__class__.__name__,
+                                              config=pretty_config)
 
 class AbstractGrader(ObjectWithSchema):
     """
