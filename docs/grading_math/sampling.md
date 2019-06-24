@@ -90,7 +90,9 @@ Sample real matrices of a specific shape and norm. (`RealMatrices` uses the Frob
 >>> # Sample 3 by 2 real matrices with norm between 5 and 10
 >>> sampler = RealMatrices(shape=[3, 2], norm=[5, 10])
 >>> # the default is shape=[2, 2] and norm=[1, 5]
->>> RealMatrices()
+>>> default_sampler = RealMatrices()
+>>> default_sampler
+RealMatrices({'norm': [1, 5], 'shape': (2, 2)})
 
 ```
 
@@ -105,6 +107,7 @@ Sample square matrices of a given dimension consisting of the identity matrix mu
 >>> sampler = IdentityMatrixMultiples(dimension=3, sampler=[1, 3])
 >>> # The default is dimension=2 and sampler=[1, 5]
 >>> IdentityMatrixMultiples()
+IdentityMatrixMultiples({'dimension': 2, 'sampler': RealInterval({'start': 1, 'stop': 5})})
 
 ```
 
@@ -187,4 +190,5 @@ Finally, if you want to generate a complex random function, simply set `complex=
 
 ```python
 >>> functionsampler = RandomFunction(complex=True)
+
 ```
