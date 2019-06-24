@@ -493,7 +493,7 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
         # Phases C range from 0 to 2*pi
         C = 2 * np.pi * np.random.rand(output_dim, num_terms, input_dim)
 
-        def f(*args):
+        def random_function(*args):
             """Function that generates the random values"""
             # Check that the dimensions are correct
             if len(args) != input_dim:
@@ -519,9 +519,9 @@ class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-met
             return MathArray(fullsum) if output_dim > 1 else fullsum[0]
 
         # Tag the function with the number of required arguments
-        f.nin = input_dim
+        random_function.nin = input_dim
 
-        return f
+        return random_function
 
 
 class SpecificFunctions(FunctionSamplingSet):  # pylint: disable=too-few-public-methods

@@ -882,8 +882,9 @@ class FormulaGrader(ItemGrader):
                 functions_disallowed=pp.pformat({f: funclist[f] for f in funclist
                                                  if f not in self.permitted_functions}),
             )
-            self.log(re.sub(r"0x[0-9a-fA-F]+", "0x...", header))
-
+            header = re.sub(r"0x[0-9a-fA-F]+", "0x...", header)
+            header = header.replace('RandomFunction.gen_sample.<locals>.', '')
+            self.log(header)
         self.log(self.debug_appendix_eval_template.format(
             sample_num=index + 1,  # to account for 0 index
             samples_total=self.config['samples'],

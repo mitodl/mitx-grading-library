@@ -527,7 +527,7 @@ def test_fg_debug_log():
     "    'csc': <function csc at 0x...>,<br/>\n"
     "    'csch': <function csch at 0x...>,<br/>\n"
     "    'exp': <function exp at 0x...>,<br/>\n"
-    "    'f': <function f at 0x...>,<br/>\n"
+    "    'f': <function random_function at 0x...>,<br/>\n"
     "    'fact': <function factorial at 0x...>,<br/>\n"
     "    'factorial': <function factorial at 0x...>,<br/>\n"
     "    'im': <function imag at 0x...>,<br/>\n"
