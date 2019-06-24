@@ -1,7 +1,8 @@
 """
 Tests for the various sampling classes
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 import random
 import numpy as np
 from pytest import raises, approx

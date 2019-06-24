@@ -1,4 +1,5 @@
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 from pytest import raises
 import random
 import numpy as np

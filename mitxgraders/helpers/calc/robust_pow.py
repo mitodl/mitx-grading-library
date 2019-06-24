@@ -1,3 +1,5 @@
+from __future__ import print_function, division, absolute_import
+
 import numpy as np
 """
 Contains the power function used by MathArray and parsing.py

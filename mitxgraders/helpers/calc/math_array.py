@@ -3,8 +3,7 @@ math_array.py
 
 Contains a subclass of numpy.ndarray with matrix-like operations.
 """
-
-from __future__ import division  # necessary for one of the doctests
+from __future__ import print_function, division, absolute_import
 from contextlib import contextmanager
 from numbers import Number
 import numpy as np

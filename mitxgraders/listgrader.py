@@ -7,7 +7,8 @@ Classes for grading inputs that look like lists:
 
 Both work by farming out the individual objects to other graders.
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 import numpy as np
 from voluptuous import Required, Any
 from mitxgraders.helpers import munkres

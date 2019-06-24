@@ -1,3 +1,5 @@
+from __future__ import print_function, division, absolute_import
+
 from pytest import raises
 from mitxgraders.version import __version__
 from mitxgraders import CalcError

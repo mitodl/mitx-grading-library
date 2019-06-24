@@ -24,7 +24,8 @@ Contains some helper functions used in grading formulae:
 
 All of these classes perform random sampling. To obtain a sample, use class.gen_sample()
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 from numbers import Number
 import abc
 import random

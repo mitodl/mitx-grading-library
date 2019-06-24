@@ -3,6 +3,8 @@ validatorfuncs.py
 
 Stand-alone validator functions for use in voluptuous Schema
 """
+from __future__ import print_function, division, absolute_import
+
 from numbers import Number
 from inspect import getargspec, isbuiltin
 from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth, Coerce

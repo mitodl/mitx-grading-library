@@ -3,6 +3,8 @@ matrixgrader.py
 
 Defines a FormulaGrader subtype that handles matrices, too.
 """
+from __future__ import print_function, division, absolute_import
+
 from numbers import Number
 from collections import namedtuple
 from voluptuous import Required, Any

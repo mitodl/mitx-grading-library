@@ -1,6 +1,8 @@
 """
 Tests that the plugin implementation is functioning
 """
+from __future__ import print_function, division, absolute_import
+
 from mitxgraders import *
 
 def test_plugins():

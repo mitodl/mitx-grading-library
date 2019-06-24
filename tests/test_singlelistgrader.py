@@ -1,7 +1,8 @@
 """
 Tests for SingleListGrader
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 import pprint
 from pytest import approx, raises
 from mitxgraders import ConfigError, StringGrader, SingleListGrader

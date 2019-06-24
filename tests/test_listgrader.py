@@ -1,7 +1,8 @@
 """
 Tests for ListGrader
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 import pprint
 from pytest import raises
 from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader,

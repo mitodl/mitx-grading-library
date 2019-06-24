@@ -1,7 +1,8 @@
 """
 Tests of base class functionality
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 import sys
 from imp import reload
 from pytest import raises

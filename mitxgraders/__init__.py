@@ -8,8 +8,10 @@ See version.py for version number
 
 An edX python grading library
 """
+from __future__ import print_function, division, absolute_import
 
 # Add the current version
+
 from mitxgraders.version import __version__
 
 # Add voluptuous

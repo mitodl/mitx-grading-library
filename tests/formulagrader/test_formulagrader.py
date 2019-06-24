@@ -1,7 +1,8 @@
 """
 Tests for FormulaGrader and NumericalGrader
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 from pytest import raises
 import numpy as np
 from voluptuous import Error, MultipleInvalid

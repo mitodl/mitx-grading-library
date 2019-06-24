@@ -1,7 +1,8 @@
 """
 formulagrader.py
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 from numbers import Number
 from functools import wraps
 from collections import namedtuple

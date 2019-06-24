@@ -3,6 +3,8 @@ calc module
 
 Exports frequently used objects for convenience
 """
+from __future__ import print_function, division, absolute_import
+
 from mitxgraders.helpers.calc.expressions import evaluator, PARSER
 from mitxgraders.helpers.calc.mathfuncs import (
     DEFAULT_VARIABLES,
