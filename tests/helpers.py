@@ -1,4 +1,4 @@
-import sys
+import sys, re
 from functools import wraps
 
 def log_results(results):
@@ -34,6 +34,26 @@ def log_results(results):
         return decorator
 
     return make_decorator(results)
+
+def round_decimals_in_string(string, round_to=6):
+    """
+    Round all decimals in a string to a specified number of places.
+
+    Usage
+    =====
+    >>> s = "pi is 3.141592653589793 and e is 2.71828182845904523536028747 and one is 1.000"
+    >>> round_decimals_in_string(s)
+    'pi is 3.141593 and e is 2.718282 and one is 1.000'
+
+    Note that the final occurrence of 1.000 was not rounded.
+    """
+    pattern = "([0-9]*\.[0-9]{{{round_to}}}[0-9]*)".format(round_to=round_to)
+    def replacer(match):
+        number = float(match.group(1))
+        formatter = "{{0:.{round_to}f}}".format(round_to=round_to)
+        return formatter.format(number)
+
+    return re.sub(pattern, replacer, string)
 
 if sys.version_info >= (3,):
     import unittest.mock as mock
