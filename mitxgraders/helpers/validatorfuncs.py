@@ -129,15 +129,19 @@ def has_keys_of_type(thetype):
 
     Raises error if argument has invalid keys:
     >>> invalid_keys = {'0': 'a', 1: 'b', 'cat': [1, 2]}
-    >>> validator(invalid_keys)
-    Traceback (most recent call last):
-    Invalid: 1 is not a valid key, must be of <type 'str'>
+    >>> try:                                                # doctest: +ELLIPSIS
+    ...     validator(invalid_keys)
+    ... except Invalid as error:
+    ...     print(error)
+    1 is not a valid key, must be of <... 'str'>
 
     or if argument is not a dictionary:
     >>> not_dict = 5
-    >>> validator(not_dict)
-    Traceback (most recent call last):
-    Invalid: expected a dictionary with keys of <type 'str'>
+    >>> try:                                                # doctest: +ELLIPSIS
+    ...     validator(not_dict)
+    ... except Invalid as error:
+    ...     print(error)
+    expected a dictionary with keys of <... 'str'>
     """
     def validator(thedict):
         if not isinstance(thedict, dict):

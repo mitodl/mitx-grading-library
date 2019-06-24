@@ -214,8 +214,9 @@ def test_fg_userfunction():
         )
         grader(None, "that'sbad(1)")
 
-    expect = ("1 is not a valid key, must be of <type 'str'> for dictionary "
-              "value @ data\['user_functions'\]. Got {1: <ufunc 'tan'>}")
+    expect = ("1 is not a valid key, must be of {str_type} for dictionary "
+              "value @ data\['user_functions'\]. Got {{1: <ufunc 'tan'>}}").format(
+              str_type=str(str))
     with raises(Error, match=expect):
         FormulaGrader(
             answers="1",
@@ -230,8 +231,8 @@ def test_fg_userconstants():
     )
     assert grader(None, "hello")['ok']
 
-    expect = ("1 is not a valid key, must be of <type 'str'> for dictionary "
-              "value @ data\['user_constants'\]. Got {1: 5}")
+    expect = ("1 is not a valid key, must be of {str_type} for dictionary "
+              "value @ data\['user_constants'\]. Got {{1: 5}}").format(str_type=str(str))
     with raises(Error, match=expect):
         FormulaGrader(
             answers="1",
