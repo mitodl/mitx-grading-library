@@ -27,6 +27,7 @@ from mitxgraders.formulagrader import *
 from mitxgraders.sampling import *
 from mitxgraders.exceptions import ConfigError, StudentFacingError
 from mitxgraders.helpers.calc import *
+from mitxgraders.comparers import *
 
 def import_plugins():
     """Imports all plugins into the global namespace"""
