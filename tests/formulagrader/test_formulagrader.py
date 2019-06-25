@@ -26,6 +26,7 @@ from mitxgraders.helpers.calc.exceptions import (
 )
 from mitxgraders import ListGrader
 from tests.helpers import log_results
+from mitxgraders.comparers import equality_comparer
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
@@ -561,8 +562,6 @@ def test_fg_debug_log():
     "    'z': (2.205526752143288+2.0897663659937935j)}}<br/>\n"
     "Student Eval: (14.7111745179+2.08976636599j)<br/>\n"
     "Compare to:  [(14.711174517877566+2.0897663659937935j)]<br/>\n"
-    "Comparer Function: <function equality_comparer at 0x...><br/>\n"
-    "Comparison Result: {{   'grade_decimal': 1.0, 'msg': '', 'ok': True}}<br/>\n"
     "<br/>\n"
     "<br/>\n"
     "==========================================<br/>\n"
@@ -578,8 +577,15 @@ def test_fg_debug_log():
     "    'z': (1.875174422525385+2.7835460015641598j)}}<br/>\n"
     "Student Eval: (11.9397106851+2.78354600156j)<br/>\n"
     "Compare to:  [(11.93971068506166+2.7835460015641598j)]<br/>\n"
+    "<br/>\n"
+    "<br/>\n"
+    "==========================================<br/>\n"
+    "Comparison Data for All 2 Samples<br/>\n"
+    "==========================================<br/>\n"
     "Comparer Function: <function equality_comparer at 0x...><br/>\n"
-    "Comparison Result: {{   'grade_decimal': 1.0, 'msg': '', 'ok': True}}<br/>\n"
+    "Comparison Results:<br/>\n"
+    "[   {{   'grade_decimal': 1.0, 'msg': '', 'ok': True}},<br/>\n"
+    "    {{   'grade_decimal': 1.0, 'msg': '', 'ok': True}}]<br/>\n"
     "</pre>"
     ).format(version=VERSION)
     assert result['msg'] == message
@@ -839,8 +845,8 @@ def test_docs():
     assert grader(None, '2*m')['ok']
     assert not grader(None, '2m')['ok']
 
-    def is_coterminal(comparer_params_evals, student_eval, utils):
-        answer = comparer_params_evals[0]
+    def is_coterminal(comparer_params_eval, student_eval, utils):
+        answer = comparer_params_eval[0]
         reduced = student_eval % (360)
         return utils.within_tolerance(answer, reduced)
 
@@ -894,3 +900,20 @@ def test_whitespace_stripping():
         answers='x _ { a b }'
     )
     assert grader(None, 'x_{a b}')['ok']
+
+def test_default_comparer():
+    """Tests setting and resetting default_comparer"""
+
+    def silly_comparer(comparer_params_eval, student_eval, utils):
+        return utils.within_tolerance(1, student_eval)
+
+    FormulaGrader.set_default_comparer(silly_comparer)
+    silly_grader = FormulaGrader(answers='pi')
+    FormulaGrader.reset_default_comparer()
+    grader = FormulaGrader(answers='pi')
+
+    silly_grader.config['answers'][0]['expect']['comparer'] is silly_comparer
+    assert silly_grader(None, '1')['ok']
+    grader.config['answers'][0]['expect']['comparer'] is equality_comparer
+    assert not grader(None, '1')['ok']
+    assert grader(None, '3.141592653')['ok']
