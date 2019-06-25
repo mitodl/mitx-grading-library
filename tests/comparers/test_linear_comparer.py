@@ -1,4 +1,4 @@
-from mitxgraders import FormulaGrader
+from mitxgraders import FormulaGrader, MatrixGrader, RealMatrices
 from mitxgraders.comparers import LinearComparer
 
 def test_linear_comparer_default_modes():
@@ -86,3 +86,24 @@ def test_scaling_partial_credit():
     }
 
     assert grader(None, '4*m*c^3') == expected
+
+def test_works_with_matrixgrader():
+    grader = MatrixGrader(
+        answers={
+            'comparer_params': ['x*A*B^2'],
+            'comparer': LinearComparer(proportional=0.6, offset=0.4, linear=0.2)
+        },
+        variables=['x', 'A', 'B'],
+        sample_from={
+            'A': RealMatrices(),
+            'B': RealMatrices()
+        },
+        max_array_dim=2
+    )
+
+    assert grader(None, 'x*A*B^2')['grade_decimal'] == 1.0
+    assert grader(None, '2*x*A*B^2')['grade_decimal'] == 0.6
+    assert grader(None, 'x*A*B^2 + 5*[[1, 1], [1, 1]]')['grade_decimal'] == 0.4
+    assert grader(None, '3*x*A*B^2 + 5*[[1, 1], [1, 1]]')['grade_decimal'] == 0.2
+    assert grader(None, 'x*A*B^2 + x*[[1, 1], [1, 1]]')['grade_decimal'] == 0
+    assert grader(None, '0*A')['grade_decimal'] == 0

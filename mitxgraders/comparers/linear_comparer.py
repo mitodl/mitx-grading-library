@@ -135,10 +135,12 @@ class LinearComparer(CorrelatedComparer):
         Required('linear_msg', default=''): str,
     })
 
+    all_modes = ('equals', 'proportional', 'offset', 'linear')
+    zero_compatible_modes = ('equals', 'offset')
+
     def __init__(self, config=None, **kwargs):
         super(LinearComparer, self).__init__(config, **kwargs)
-        all_modes = ('equals', 'proportional', 'offset', 'linear')
-        self.modes = tuple(mode for mode in all_modes if self.config[mode] is not None)
+        self.modes = tuple(mode for mode in self.all_modes if self.config[mode] is not None)
 
     error_calculators = {
         'equals': get_equals_fit_error,
@@ -154,20 +156,20 @@ class LinearComparer(CorrelatedComparer):
         """
         student_zero = all([
             is_nearly_zero(x, tolerance, reference=y)
-            for x, y in zip(comparer_params_evals, student_evals)
+            for x, y in zip(student_evals, comparer_params_evals)
         ])
-        expected_zero = all(x == 0.0 for [x] in comparer_params_evals)
+        expected_zero = all(np.all(x == 0.0) for [x] in comparer_params_evals)
         return student_zero or expected_zero
-
 
     def get_valid_modes(self, is_comparing_zero):
         """
         Returns a copy of self.modes, first removing 'proportional' and 'linear'
         when is_comparing_zero is truthy.
         """
-        remove_if_zero = set(['linear', 'proportional'])
-        invalid = lambda mode: is_comparing_zero and mode in remove_if_zero
-        return tuple(mode for mode in self.modes if not invalid(mode) )
+        if is_comparing_zero:
+            return tuple(mode for mode in self.modes
+                         if mode in self.zero_compatible_modes)
+        return self.modes
 
     def __call__(self, comparer_params_evals, student_evals, utils):
         student_evals_norm = np.linalg.norm(student_evals)
@@ -175,8 +177,9 @@ class LinearComparer(CorrelatedComparer):
         # Validate student input shape...only needed for MatrixGrader
         if hasattr(utils, 'validate_shape'):
             # in numpy, scalars have empty tuples as their shapes
-            scalar_expected = isinstance(comparer_params_evals[0], Number)
-            shape = tuple() if scalar_expected else comparer_params_evals[0].shape
+            expected_0 = comparer_params_evals[0][0]
+            scalar_expected = isinstance(expected_0, Number)
+            shape = tuple() if scalar_expected else expected_0.shape
             utils.validate_shape(student_evals[0], shape)
 
         is_comparing_zero = self.check_comparing_zero(comparer_params_evals,
@@ -191,7 +194,7 @@ class LinearComparer(CorrelatedComparer):
 
         results = [
             {'grade_decimal': self.config[mode], 'msg': self.config[mode+'_msg']}
-            if is_nearly_zero(error, utils. tolerance, reference=student_evals_norm)
+            if is_nearly_zero(error, utils.tolerance, reference=student_evals_norm)
             else
             {'grade_decimal': 0, 'msg': ''}
             for mode, error in zip(filtered_modes, errors)
