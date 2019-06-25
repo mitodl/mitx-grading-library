@@ -398,7 +398,7 @@ class FormulaGrader(ItemGrader):
 
             The expect value can be a string, or can itself be a dictionary.
 
-            If the expect value is a string string, it represents the correct
+            If the expect value is a string, it represents the correct
             answer and is compared to student input for equality.
 
             If the expect value is a dictionary, it needs keys:
