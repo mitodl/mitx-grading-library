@@ -5,12 +5,12 @@ Simple Comparer Functions
 =========================
 
 A comparer function must have signature
-`comparer_func(comparer_params_evals, student_eval, utils)` and should return
+`comparer_func(comparer_params_eval, student_eval, utils)` and should return
 True, False, 'partial', or a dictionary with required key 'grade_decimal' and
 optional key 'msg'. When `FormulaGrader` (or its subclasses) call your custom
 comparer function, `comparer_func`'s argument values are:
 
-- `comparer_params_evals`: The `comparer_params` list, numerically evaluated
+- `comparer_params_eval`: The `comparer_params` list, numerically evaluated
   according to variable and function sampling.
 - `student_eval`: The student's input, numerically evaluated according to
   variable and function sampling.
@@ -53,14 +53,14 @@ from mitxgraders.exceptions import InputTypeError, StudentFacingError
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 from mitxgraders.helpers.calc.math_array import are_same_length_vectors, is_vector
 
-def equality_comparer(comparer_params_evals, student_eval, utils):
+def equality_comparer(comparer_params_eval, student_eval, utils):
     """
     Default comparer function used by FormulaGrader, NumericalGrader,
     and MatrixGrader. Checks for equality.
 
     comparer_params: ['expected_input']
     """
-    expected_input = comparer_params_evals[0]
+    expected_input = comparer_params_eval[0]
 
     if hasattr(utils, 'validate_shape'):
         # in numpy, scalars have empty tuples as their shapes
@@ -69,7 +69,7 @@ def equality_comparer(comparer_params_evals, student_eval, utils):
 
     return utils.within_tolerance(expected_input, student_eval)
 
-def between_comparer(comparer_params_evals, student_eval, utils):
+def between_comparer(comparer_params_eval, student_eval, utils):
     """
     Used to check that input is real and between two parameters.
 
@@ -95,14 +95,14 @@ def between_comparer(comparer_params_evals, student_eval, utils):
     Traceback (most recent call last):
     InputTypeError: Input must be real.
     """
-    start, stop = comparer_params_evals
+    start, stop = comparer_params_eval
 
     if not np.isreal(student_eval):
         raise InputTypeError("Input must be real.")
 
     return start <= student_eval <= stop
 
-def congruence_comparer(comparer_params_evals, student_eval, utils):
+def congruence_comparer(comparer_params_eval, student_eval, utils):
     """
     Compares the student input to a target, moduli a given modulus.
     Will often set modulus to 2*pi in order to compare angles.
@@ -128,13 +128,13 @@ def congruence_comparer(comparer_params_evals, student_eval, utils):
     >>> grader(None, 'b^2/a + 2*c  ')['ok']
     True
     """
-    expected, modulus = comparer_params_evals
+    expected, modulus = comparer_params_eval
 
     expected_reduced = expected % modulus
     input_reduced = student_eval % modulus
     return utils.within_tolerance(expected_reduced, input_reduced)
 
-def eigenvector_comparer(comparer_params_evals, student_eval, utils):
+def eigenvector_comparer(comparer_params_eval, student_eval, utils):
     """
     Used to check that a student's answer is an eigenvector of a matrix
     with a given eigenvalue. Ignores scaling of the eigenvector.
@@ -168,7 +168,7 @@ def eigenvector_comparer(comparer_params_evals, student_eval, utils):
 
     """
 
-    matrix, eigenvalue = comparer_params_evals
+    matrix, eigenvalue = comparer_params_eval
 
     # matrix is square with shape (n, n); student input should have shape (n, )
     expected_input_shape = (matrix.shape[0], )
@@ -186,7 +186,7 @@ def eigenvector_comparer(comparer_params_evals, student_eval, utils):
 
     return utils.within_tolerance(actual, expected)
 
-def vector_span_comparer(comparer_params_evals, student_eval, utils):
+def vector_span_comparer(comparer_params_eval, student_eval, utils):
     """
     Check whether student's answer is nonzero and in the span of some given
     vectors.
@@ -262,12 +262,12 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
     """
 
     # Validate the comparer params
-    if not are_same_length_vectors(comparer_params_evals):
+    if not are_same_length_vectors(comparer_params_eval):
         raise StudentFacingError('Problem Configuration Error: comparer_params '
             'should be a list of strings that evaluate to equal-length vectors')
 
     # Validate student input shape
-    utils.validate_shape(student_eval, comparer_params_evals[0].shape)
+    utils.validate_shape(student_eval, comparer_params_eval[0].shape)
 
     if utils.within_tolerance(0, np.linalg.norm(student_eval)):
         return {
@@ -279,7 +279,7 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
     # Use ordinary least squares to find an approximation to student_eval
     # that lies within the span of given vectors, then check that the
     # residual-sum is small in comparison to student input.
-    column_vectors = np.array(comparer_params_evals).transpose()
+    column_vectors = np.array(comparer_params_eval).transpose()
     # rcond=-1 uses machine precision for testing singular values
     # In numpy 1.14+, use rcond=None fo this behavior. (we use 1.6)
     ols = np.linalg.lstsq(column_vectors, student_eval, rcond=-1)
@@ -289,7 +289,7 @@ def vector_span_comparer(comparer_params_evals, student_eval, utils):
     # when tolerance is specified as a percentage
     return is_nearly_zero(error, utils.tolerance, reference=student_eval)
 
-def vector_phase_comparer(comparer_params_evals, student_eval, utils):
+def vector_phase_comparer(comparer_params_eval, student_eval, utils):
     """
     Check that student input equals a given input (to within tolerance), up to
     an overall phase factor.
@@ -337,16 +337,16 @@ def vector_phase_comparer(comparer_params_evals, student_eval, utils):
     StudentFacingError: Problem Configuration Error: ...to a single vector.
     """
     # Validate that author comparer_params evaluate to a single vector
-    if not len(comparer_params_evals) == 1 and is_vector(comparer_params_evals[0]):
+    if not len(comparer_params_eval) == 1 and is_vector(comparer_params_eval[0]):
         raise StudentFacingError('Problem Configuration Error: comparer_params '
             'should be a list of strings that evaluate to a single vector.')
 
     # We'll check that student input is in the span as target vector and that
     # it has the same magnitude
 
-    in_span = vector_span_comparer(comparer_params_evals, student_eval, utils)
+    in_span = vector_span_comparer(comparer_params_eval, student_eval, utils)
 
-    expected_mag = np.linalg.norm(comparer_params_evals[0])
+    expected_mag = np.linalg.norm(comparer_params_eval[0])
     student_mag = np.linalg.norm(student_eval)
     same_magnitude = utils.within_tolerance(expected_mag, student_mag)
 

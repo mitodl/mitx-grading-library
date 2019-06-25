@@ -845,8 +845,8 @@ def test_docs():
     assert grader(None, '2*m')['ok']
     assert not grader(None, '2m')['ok']
 
-    def is_coterminal(comparer_params_evals, student_eval, utils):
-        answer = comparer_params_evals[0]
+    def is_coterminal(comparer_params_eval, student_eval, utils):
+        answer = comparer_params_eval[0]
         reduced = student_eval % (360)
         return utils.within_tolerance(answer, reduced)
 
@@ -904,7 +904,7 @@ def test_whitespace_stripping():
 def test_default_comparer():
     """Tests setting and resetting default_comparer"""
 
-    def silly_comparer(comparer_params_evals, student_eval, utils):
+    def silly_comparer(comparer_params_eval, student_eval, utils):
         return utils.within_tolerance(1, student_eval)
 
     FormulaGrader.set_default_comparer(silly_comparer)

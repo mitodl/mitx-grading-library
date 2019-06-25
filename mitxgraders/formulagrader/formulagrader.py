@@ -404,7 +404,7 @@ class FormulaGrader(ItemGrader):
             If the expect value is a dictionary, it needs keys:
                 - comparer_params: a list of strings to be numerically sampled and passed to the
                     comparer function.
-                - comparer: a function with signature comparer(comparer_params_evals, student_eval,
+                - comparer: a function with signature comparer(comparer_params_eval, student_eval,
                     utils) that compares student and comparer_params after evaluation. This function
                     should return True, False, 'partial', or a dictionary with required key
                     'grade_decimal' and optional key 'msg'. Comparer messages are ignored
