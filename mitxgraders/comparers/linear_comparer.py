@@ -1,6 +1,6 @@
-from collections import namedtuple
+from numbers import Number
 import numpy as np
-from voluptuous import Schema, Required, Any, All, Optional, Range
+from voluptuous import Schema, Required, Any, Range
 from mitxgraders.comparers.baseclasses import CorrelatedComparer
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 
@@ -111,6 +111,14 @@ class LinearComparer(CorrelatedComparer):
         linear_msg (str): defaults to ''
 
     NOTE:
+        LinearComparer can be used with MatrixGrader, but the linear
+        relationship must be the same for all entries. Essentially, this means
+        we test for
+            expected_array = sclar_a * expected_array + scalar_b * ONES
+        where ONES is a matrix of all ones.
+        The ONES offset works as expected for vectors, but is probably not what
+        you want for matrices.
+
     """
 
     schema_config = Schema({
@@ -139,28 +147,54 @@ class LinearComparer(CorrelatedComparer):
         'linear': get_linear_fit_error,
     }
 
+    @staticmethod
+    def check_comparing_zero(comparer_params_evals, student_evals, tolerance):
+        """
+        Check whether student input is nearly zero, or author input is exactly zero
+        """
+        student_zero = all([
+            is_nearly_zero(x, tolerance, reference=y)
+            for x, y in zip(comparer_params_evals, student_evals)
+        ])
+        expected_zero = all(x == 0.0 for [x] in comparer_params_evals)
+        return student_zero or expected_zero
+
+
+    def get_valid_modes(self, is_comparing_zero):
+        """
+        Returns a copy of self.modes, first removing 'proportional' and 'linear'
+        when is_comparing_zero is truthy.
+        """
+        remove_if_zero = set(['linear', 'proportional'])
+        invalid = lambda mode: is_comparing_zero and mode in remove_if_zero
+        return tuple(mode for mode in self.modes if not invalid(mode) )
+
     def __call__(self, comparer_params_evals, student_evals, utils):
-        student_eval_norm = np.linalg.norm(student_evals)
+        student_evals_norm = np.linalg.norm(student_evals)
 
         # Validate student input shape...only needed for MatrixGrader
-        try:
-            utils.validate_shape(student_evals[0], comparer_params_evals[0][0].shape)
-        except AttributeError:
-            pass # not called by MatrixGrader
+        if hasattr(utils, 'validate_shape'):
+            # in numpy, scalars have empty tuples as their shapes
+            scalar_expected = isinstance(comparer_params_evals[0], Number)
+            shape = tuple() if scalar_expected else comparer_params_evals[0].shape
+            utils.validate_shape(student_evals[0], shape)
 
-        if is_nearly_zero(student_eval_norm, utils.tolerance, reference=comparer_params_evals):
-            return False
+        is_comparing_zero = self.check_comparing_zero(comparer_params_evals,
+                                                      student_evals, utils.tolerance)
+        filtered_modes = self.get_valid_modes(is_comparing_zero)
 
         # Get the result for each mode
+        # flatten in case individual evals are arrays (as in MatrixGrader)
         student = np.array(student_evals).flatten()
         expected = np.array(comparer_params_evals).flatten()
-        errors = [self.error_calculators[mode](student, expected) for mode in self.modes]
+        errors = [self.error_calculators[mode](student, expected) for mode in filtered_modes]
+
         results = [
             {'grade_decimal': self.config[mode], 'msg': self.config[mode+'_msg']}
-            if is_nearly_zero(error, utils.tolerance, reference=student_eval_norm)
+            if is_nearly_zero(error, utils. tolerance, reference=student_evals_norm)
             else
             {'grade_decimal': 0, 'msg': ''}
-            for mode, error in zip(self.modes, errors)
+            for mode, error in zip(filtered_modes, errors)
         ]
 
         # Get the best result using max.

@@ -407,7 +407,8 @@ class FormulaGrader(ItemGrader):
                 - comparer: a function with signature comparer(comparer_params_evals, student_eval,
                     utils) that compares student and comparer_params after evaluation. This function
                     should return True, False, 'partial', or a dictionary with required key
-                    'grade_decimal' and optional key 'msg'.
+                    'grade_decimal' and optional key 'msg'. Comparer messages are ignored
+                    when comparison succeeds (result['ok'] is True).
     """
 
     default_functions = DEFAULT_FUNCTIONS.copy()
@@ -774,7 +775,6 @@ class FormulaGrader(ItemGrader):
                 result = comparer(compare_parms_eval, student_eval, utils)
                 results.append(ItemGrader.standardize_cfn_return(result))
 
-
         if self.config['debug']:
             self.log_comparison_info(comparer, results)
 
@@ -793,7 +793,6 @@ class FormulaGrader(ItemGrader):
 
         # answer contains extra keys, so prune them
         pruned_answer = { key: answer[key] for key in ['ok', 'grade_decimal', 'msg'] }
-
         correlated = isinstance(answer['expect']['comparer'], CorrelatedComparer)
 
         # Correlated comparers return a single result, so failable_evals makes no sense
@@ -838,8 +837,6 @@ class FormulaGrader(ItemGrader):
         for result in results:
             result['grade_decimal'] *= answer['grade_decimal']
         consolidated = self.consolidate_results(results, answer, self.config['failable_evals'])
-
-
 
         return consolidated, functions_used
 

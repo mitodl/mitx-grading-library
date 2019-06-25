@@ -25,6 +25,18 @@ def test_linear_comparer_default_modes():
     assert grader(None, 'm*c^3') == wrong_result
     assert grader(None, '0') == wrong_result
 
+def test_linear_comparer_with_zero_as_correct_answer():
+    grader = FormulaGrader(
+        answers={
+            'comparer_params': ['0'],
+            'comparer': LinearComparer(proportional=0.5, offset=0.4, linear=0.3)
+        },
+        variables=['m', 'c']
+    )
+    assert grader(None, '0')['grade_decimal'] == 1
+    assert grader(None, 'm')['grade_decimal'] == 0 # proportional & linear test fails
+    assert grader(None, '1')['grade_decimal'] == 0.4 # not 0.5, proportional disabled
+
 def test_linear_comparer_custom_credit_modes():
     grader = FormulaGrader(
         answers={
