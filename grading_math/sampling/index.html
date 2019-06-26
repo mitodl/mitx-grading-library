@@ -303,7 +303,9 @@
 <pre class="codehilite"><code class="language-python">&gt;&gt;&gt; # Sample 3 by 2 real matrices with norm between 5 and 10
 &gt;&gt;&gt; sampler = RealMatrices(shape=[3, 2], norm=[5, 10])
 &gt;&gt;&gt; # the default is shape=[2, 2] and norm=[1, 5]
-&gt;&gt;&gt; RealMatrices()</code></pre>
+&gt;&gt;&gt; default_sampler = RealMatrices()
+&gt;&gt;&gt; default_sampler
+RealMatrices({'norm': [1, 5], 'shape': (2, 2)})</code></pre>
 
 
 <p>If you want to sample a matrix in a way that depends on a scalar, see <code>DependentSampler</code> below.</p>
@@ -312,7 +314,8 @@
 <pre class="codehilite"><code class="language-python">&gt;&gt;&gt; # Sample 3x3 matrices consisting of a random number between 1 and 3 multiplying the identity
 &gt;&gt;&gt; sampler = IdentityMatrixMultiples(dimension=3, sampler=[1, 3])
 &gt;&gt;&gt; # The default is dimension=2 and sampler=[1, 5]
-&gt;&gt;&gt; IdentityMatrixMultiples()</code></pre>
+&gt;&gt;&gt; IdentityMatrixMultiples()
+IdentityMatrixMultiples({'dimension': 2, 'sampler': RealInterval({'start': 1, 'stop': 5})})</code></pre>
 
 
 <h2 id="variable-sampling-generic">Variable Sampling: Generic<a class="headerlink" href="#variable-sampling-generic" title="Permanent link"> # </a></h2>
