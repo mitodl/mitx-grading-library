@@ -48,3 +48,5 @@ def ensure_text(s, encoding='utf-8', errors='strict'):
         return s
     else:
         raise TypeError("not expecting type '%s'" % type(s))
+
+UNICODE_PREFIX = 'u' if six.PY2 else ''

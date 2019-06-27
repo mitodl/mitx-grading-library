@@ -18,6 +18,7 @@ from mitxgraders import (
     RandomFunction,
     ConfigError,
 )
+from mitxgraders.helpers.compatibility import UNICODE_PREFIX
 from mitxgraders.exceptions import MissingInput, InvalidInput
 from mitxgraders.sampling import set_seed
 from mitxgraders.version import __version__ as VERSION
@@ -466,7 +467,7 @@ def test_fg_config_expect():
 
     # If trying to use comparer, a detailed validation error is raised
     expect = ("to have 3 arguments, instead it has 2 for dictionary value @ "
-              "data\['answers'\]\[0\]\['expect'\]\['comparer'\]")
+              "data\['answers'\]\[0\]\[u?'expect'\]\['comparer'\]")
     with raises(Error, match=expect):
         FormulaGrader(
             answers={
@@ -585,10 +586,10 @@ def test_fg_debug_log():
     "==========================================<br/>\n"
     "Comparer Function: <function equality_comparer at 0x...><br/>\n"
     "Comparison Results:<br/>\n"
-    "[{{'grade_decimal': 1.0, 'msg': '', 'ok': True}},<br/>\n"
-    " {{'grade_decimal': 1.0, 'msg': '', 'ok': True}}]<br/>\n"
+    "[{{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}},<br/>\n"
+    " {{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}}]<br/>\n"
     "</pre>"
-    ).format(version=VERSION)
+    ).format(version=VERSION, u=UNICODE_PREFIX)
     expected = round_decimals_in_string(message)
     result_msg = round_decimals_in_string(result['msg']).replace(
         'test_fg_debug_log.<locals>.', '')

@@ -21,16 +21,19 @@ A typical use of MatrixGrader might look like
 
 The next few lines call the grader as a check function. The inputs `'4*A*B^2*v'` and `'4*A*B*B*v'` are correct:
 ```pycon
->>> grader1(None, '4*A*B^2*v')
-{'grade_decimal': 1, 'msg': '', 'ok': True}
->>> grader1(None, '4*A*B*B*v')
-{'grade_decimal': 1, 'msg': '', 'ok': True}
+>>> result = grader1(None, '4*A*B^2*v')
+>>> result == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+>>> result = grader1(None, '4*A*B*B*v')
+>>> result == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
 
 ```
 while the input `'4*B*A*B*v'` is incorrect because the matrix-sampled variables are non-commutative:
 ```pycon
->>> grader1(None, '4*B*A*B*v')
-{'msg': '', 'grade_decimal': 0, 'ok': False}
+>>> result = grader1(None, '4*B*A*B*v')
+>>> result == {'msg': '', 'grade_decimal': 0, 'ok': False}
+True
 
 ```
 
@@ -269,8 +272,9 @@ If the author's answer is a 3-component vector, and the student submits a differ
 ...     answers='[1, 2, 3]',
 ... )
 >>> student_input = '[1, 2, -3]' # wrong answer
->>> grader(None, student_input) # grade the input like edX would
-{'msg': '', 'grade_decimal': 0, 'ok': False}
+>>> result = grader(None, student_input) # grade the input like edX would
+>>> result == {'msg': '', 'grade_decimal': 0, 'ok': False}
+True
 
 >>> student_input = '[1, 2, 3, 4]' # too many components
 >>> try:
@@ -308,8 +312,13 @@ we can use:
 ...     }
 ... )
 >>> student_input = '0' # wrong shape
->>> grader(None, student_input) # grade the input like edX would
-{'grade_decimal': 0, 'msg': 'Expected answer to be a vector of length 3, but input is a scalar', 'ok': False}
+>>> result = grader(None, student_input) # grades the input like edX would
+>>> result == {
+...   'grade_decimal': 0,
+...   'msg': 'Expected answer to be a vector of length 3, but input is a scalar',
+...   'ok': False
+... }
+True
 
 ```
 

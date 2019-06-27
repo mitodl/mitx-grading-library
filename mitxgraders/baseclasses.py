@@ -6,7 +6,7 @@ Contains base classes for the library:
 * AbstractGrader
 * ItemGrader
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 import numbers
 import abc
@@ -16,6 +16,7 @@ from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
 from mitxgraders.exceptions import ConfigError, MITxError, StudentFacingError
+from mitxgraders.helpers.validatorfuncs import text_string
 
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""
@@ -143,9 +144,9 @@ class AbstractGrader(ObjectWithSchema):
         self.log("MITx Grading Library Version " + __version__)
         # Add the student inputs to the debug log
         if isinstance(student_input, list):
-            self.log("Student Responses:\n" + "\n".join(map(str, student_input)))
+            self.log("Student Responses:\n" + "\n".join(map(six.text_type, student_input)))
         else:
-            self.log("Student Response:\n" + str(student_input))
+            self.log("Student Response:\n" + six.text_type(student_input))
 
         # Compute the result of the check
         try:
@@ -156,7 +157,7 @@ class AbstractGrader(ObjectWithSchema):
             elif isinstance(error, MITxError):
                 # we want to re-raise the error with a modified message but the
                 # same class type, hence calling __class__
-                raise error.__class__(str(error).replace('\n', '<br/>'))
+                raise error.__class__(six.text_type(error).replace('\n', '<br/>'))
             else:
                 # Otherwise, give a generic error message
                 if isinstance(student_input, list):
@@ -252,7 +253,7 @@ class ItemGrader(AbstractGrader):
         schema = super(ItemGrader, self).schema_config
         return schema.extend({
             Required('answers', default=tuple()): self.schema_answers,
-            Required('wrong_msg', default=""): str
+            Required('wrong_msg', default=""): text_string
         })
 
     def schema_answers(self, answer_tuple):
@@ -306,7 +307,7 @@ class ItemGrader(AbstractGrader):
         return Schema({
             Required('expect'): self.validate_expect,
             Required('grade_decimal', default=1): All(numbers.Number, Range(0, 1)),
-            Required('msg', default=''): str,
+            Required('msg', default=''): text_string,
             Required('ok', default='computed'): Any('computed', True, False, 'partial')
         })
 
@@ -367,7 +368,7 @@ class ItemGrader(AbstractGrader):
         """
         if value == True:
             return {'ok': True, 'msg': '', 'grade_decimal': 1.0}
-        elif isinstance(value, str) and value.lower() == 'partial':
+        elif isinstance(value, six.text_type) and value.lower() == 'partial':
             return {'ok': 'partial', 'msg': '', 'grade_decimal': 0.5}
         elif value == False:
             return {'ok': False, 'msg': '', 'grade_decimal': 0}
