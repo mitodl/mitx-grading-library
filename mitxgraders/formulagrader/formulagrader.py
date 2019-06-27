@@ -10,6 +10,8 @@ import pprint
 import re
 import itertools
 import numpy as np
+import six
+from mitxgraders.helpers.compatibility import ensure_text
 from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
 from mitxgraders.comparers import equality_comparer, CorrelatedComparer
 from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
@@ -23,7 +25,7 @@ from mitxgraders.helpers.calc import (
     DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NonNegative, is_callable, PercentageString, all_unique,
-    is_callable_with_args)
+    is_callable_with_args, text_string)
 
 # Some of these validators are useful to other classes, e.g., IntegralGrader
 def validate_blacklist_whitelist_config(default_funcs, blacklist, whitelist):
@@ -311,7 +313,7 @@ def warn_if_override(config, key, defaults):
     ... {'cat': 1, 'pi': 2}
     ... ) # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    ConfigError: Warning: 'vars' contains entries '['cat', 'pi']' ...
+    ConfigError: Warning: 'vars' contains entries 'cat', 'pi' ...
 
     >>> config = {'vars': ['a', 'b', 'cat', 'psi', 'pi'], 'suppress_warnings': True}
     >>> warn_if_override(
@@ -324,11 +326,11 @@ def warn_if_override(config, key, defaults):
     """
     duplicates = set(defaults).intersection(set(config[key]))
     if duplicates and not config.get('suppress_warnings', False):
-        sorted_dups = list(sorted(duplicates))
-        msg = ("Warning: '{key}' contains entries '{duplicates}' which will override default "
+        text_dups = ', '.join(sorted(("'{}'".format(dup) for dup in duplicates)))
+        msg = ("Warning: '{key}' contains entries {duplicates} which will override default "
                "values. If you intend to override defaults, you may suppress "
                "this warning by adding 'suppress_warnings=True' to the grader configuration.")
-        raise ConfigError(msg.format(key=key, duplicates=sorted_dups))
+        raise ConfigError(msg.format(key=key, duplicates=text_dups))
     return config
 
 class FormulaGrader(ItemGrader):
@@ -455,19 +457,19 @@ class FormulaGrader(ItemGrader):
                 Number, MathArray),
             # Blacklist/Whitelist have additional validation that can't happen here, because
             # their validation is correlated with each other
-            Required('blacklist', default=[]): [str],
+            Required('blacklist', default=[]): [text_string],
             Required('whitelist', default=[]): Any(
                 All([None], Length(min=1, max=1)),
-                [str]
+                [text_string]
             ),
-            Required('forbidden_strings', default=[]): [str],
-            Required('forbidden_message', default=forbidden_default): str,
-            Required('required_functions', default=[]): [str],
+            Required('forbidden_strings', default=[]): [text_string],
+            Required('forbidden_message', default=forbidden_default): text_string,
+            Required('required_functions', default=[]): [text_string],
             Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
             Required('metric_suffixes', default=False): bool,
             Required('samples', default=5): Positive(int),
-            Required('variables', default=[]): All([str], all_unique),
-            Required('numbered_vars', default=[]): All([str], all_unique),
+            Required('variables', default=[]): All([text_string], all_unique),
+            Required('numbered_vars', default=[]): All([text_string], all_unique),
             Required('sample_from', default={}): dict,
             Required('failable_evals', default=0): NonNegative(int),
             Required('max_array_dim', default=0): NonNegative(int)
@@ -483,7 +485,7 @@ class FormulaGrader(ItemGrader):
                           within_tolerance=_within_tolerance)
 
     schema_expect = Schema({
-        Required('comparer_params'): [str],
+        Required('comparer_params'): [text_string],
         # Functions seem not to be usable as default values, so the default comparer is added later.
         # https://github.com/alecthomas/voluptuous/issues/340
         Required('comparer'): is_callable_with_args(3)
@@ -501,7 +503,7 @@ class FormulaGrader(ItemGrader):
         >>> result == expected
         True
         """
-        if isinstance(expect, str):
+        if isinstance(expect, six.string_types):
             return self.schema_expect({
                 'comparer': self.default_comparer,
                 'comparer_params': [expect]
@@ -898,7 +900,7 @@ class FormulaGrader(ItemGrader):
 
         self.log(self.debug_appendix_comparison_template.format(
             samples_total=self.config['samples'],
-            comparer=re.sub(r"0x[0-9a-fA-F]+", "0x...", str(comparer)),
+            comparer=re.sub(r"0x[0-9a-fA-F]+", "0x...", six.text_type(comparer)),
             comparer_results=pprint.pformat(comparer_results)
         ))
 

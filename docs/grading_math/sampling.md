@@ -105,8 +105,8 @@ Sample square matrices of a given dimension consisting of the identity matrix mu
 >>> # Sample 3x3 matrices consisting of a random number between 1 and 3 multiplying the identity
 >>> sampler = IdentityMatrixMultiples(dimension=3, sampler=[1, 3])
 >>> # The default is dimension=2 and sampler=[1, 5]
->>> IdentityMatrixMultiples()
-IdentityMatrixMultiples({'dimension': 2, 'sampler': RealInterval({'start': 1, 'stop': 5})})
+>>> IdentityMatrixMultiples() == IdentityMatrixMultiples(dimension=2, sampler=[1, 5])
+True
 
 ```
 
