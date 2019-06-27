@@ -55,6 +55,13 @@ class ObjectWithSchema(object):
         return "{classname}({config})".format(classname=self.__class__.__name__,
                                               config=pretty_config)
 
+    def __eq__(self, other):
+        """
+        Checks equality by checking class-equality and config equality.
+        """
+        return self.__class__ == other.__class__ and self.config == other.config
+
+
 class AbstractGrader(ObjectWithSchema):
     """
     Abstract grader class. All graders must build on this class.
