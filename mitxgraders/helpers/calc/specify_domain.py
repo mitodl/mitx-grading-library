@@ -6,7 +6,7 @@ of a function. Currently only supports specifying the shape of inputs.
 """
 from numbers import Number
 from voluptuous import Schema, Invalid, Required, Any
-from mitxgraders.helpers.validatorfuncs import is_shape_specification
+from mitxgraders.helpers.validatorfuncs import is_shape_specification, Nullable
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.helpers.calc.exceptions import ArgumentShapeError, ArgumentError
 from mitxgraders.helpers.calc.math_array import (
@@ -189,7 +189,7 @@ class SpecifyDomain(ObjectWithSchema):
         Required('input_shapes'): [Schema(
             Any(is_shape_specification(), 'square')
         )],
-        Required('display_name', default=None): str
+        Required('display_name', default=None): Nullable(str)
     })
 
     def __init__(self, config=None, **kwargs):

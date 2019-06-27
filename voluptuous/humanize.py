@@ -1,4 +1,5 @@
-from voluptuous.error import Error, Invalid, MultipleInvalid
+from voluptuous import Invalid, MultipleInvalid
+from voluptuous.error import Error
 
 
 MAX_VALIDATION_ERROR_ITEM_LENGTH = 500

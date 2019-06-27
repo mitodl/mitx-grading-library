@@ -347,3 +347,9 @@ def is_shape_specification(min_dim=1, max_dim=None):
         ),
         Length(min=min_dim, max=max_dim),
     )
+
+def Nullable(schema):
+    """
+    Indicates that a value could be None or satisfy schema.
+    """
+    return Any(None, schema)
