@@ -660,15 +660,15 @@ def test_ng_config():
             samples=2
         )
 
-    expect = "not a valid value for dictionary value @ data\['variables'\]. Got \['x'\]"
+    expect = "length of value must be at most 0 for dictionary value @ data\['variables'\]. Got \['x'\]"
     with raises(Error, match=expect):
         NumericalGrader(
             answers="1",
             variables=["x"]
         )
 
-    expect = "not a valid value for dictionary value @ data\['sample_from'\]. " + \
-             "Got {'x': RealInterval\({'start': 1, 'stop': 5}\)}"
+    expect = ("extra keys not allowed @ data\['sample_from'\]\['x'\]. Got "
+              "RealInterval\({'start': 1, 'stop': 5}\)")
     with raises(Error, match=expect):
         NumericalGrader(
             answers="1",

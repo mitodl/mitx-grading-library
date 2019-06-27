@@ -947,8 +947,8 @@ class NumericalGrader(FormulaGrader):
             Required('user_functions', default={}): {Extra: is_callable},
             Required('tolerance', default='5%'): Any(PercentageString, NonNegative(Number)),
             Required('samples', default=1): 1,
-            Required('variables', default=[]): [],
-            Required('numbered_vars', default=[]): [],
+            Required('variables', default=[]): All(Length(max=0), []),
+            Required('numbered_vars', default=[]): All(Length(max=0), []),
             Required('sample_from', default={}): {},
             Required('failable_evals', default=0): 0
         })

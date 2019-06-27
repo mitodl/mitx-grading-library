@@ -8,7 +8,7 @@ from collections import namedtuple
 from voluptuous import Required, Any
 from mitxgraders.exceptions import InputTypeError
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
-from mitxgraders.helpers.validatorfuncs import NonNegative
+from mitxgraders.helpers.validatorfuncs import NonNegative, Nullable
 from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
 from mitxgraders.helpers.calc.exceptions import (
     MathArrayShapeError as ShapeError, MathArrayError, DomainError, ArgumentShapeError)
@@ -68,8 +68,8 @@ class MatrixGrader(FormulaGrader):
     def schema_config(self):
         schema = super(MatrixGrader, self).schema_config
         return schema.extend({
-            Required('identity_dim', default=None): NonNegative(int),
-            Required('max_array_dim', default=1): NonNegative(int),
+            Required('identity_dim', default=None): Nullable(NonNegative(int)),
+            Required('max_array_dim', default=1): Nullable(NonNegative(int)),
             Required('negative_powers', default=True): bool,
             Required('shape_errors', default=True): bool,
             Required('suppress_matrix_messages', default=False): bool,
