@@ -177,22 +177,29 @@ def test_validation():
     """Make sure that validation works correctly"""
     grader = StringGrader(accept_any=True,
                           validation_pattern=r"\([0-9]+\)",
-                          validation_err=False,
+                          explain_validation=None,
                           debug=False)
     assert grader(None, '1') == {'ok': False, 'grade_decimal': 0, 'msg': ''}
     assert grader(None, '(1234566542)')['ok']
 
     grader = StringGrader(accept_any=True,
                           validation_pattern=r"\([0-9]+\)",
-                          validation_err=False,
+                          explain_validation=None,
                           debug=True)
     assert not grader(None, '1')['ok']
-    assert 'Validation failed' in grader(None, '1')['msg']
+    assert 'Your input is not in the expected format' in grader(None, '1')['msg']
     assert grader(None, '(1234566542)')['ok']
 
     grader = StringGrader(accept_any=True,
                           validation_pattern=r"\([0-9]+\)",
-                          validation_err=True)
+                          explain_validation='msg',
+                          debug=False)
+    assert grader(None, '1') == {'ok': False, 'grade_decimal': 0, 'msg': 'Your input is not in the expected format'}
+    assert grader(None, '(1234566542)')['ok']
+
+    grader = StringGrader(accept_any=True,
+                          validation_pattern=r"\([0-9]+\)",
+                          explain_validation='err')
     expect = 'Your input is not in the expected format'
     with raises(InvalidInput, match=expect):
         grader(None, '1')
@@ -201,7 +208,7 @@ def test_validation():
     expect = 'Look! An elephant!'
     grader = StringGrader(accept_any=True,
                           validation_pattern=r"\([0-9]+\)",
-                          validation_err=True,
+                          explain_validation='err',
                           invalid_msg=expect)
     with raises(InvalidInput, match=expect):
         grader(None, '1')

@@ -48,20 +48,19 @@ class StringGrader(ItemGrader):
 
         explain_minimums ('err', 'msg', None): If a response is unsatisfactory due to
             min_length or min_words being insufficient, do we raise an error ('err'),
-            grade as incorrect but present a message ('msg'), or just grade as
-            incorrect (None)? (default 'err')
+            grade as incorrect but present a message ('msg' or debug=True), or just grade
+            as incorrect (None)? (default 'err')
 
     * Validating input
         validation_pattern (str or None): A regex pattern to validate the cleaned input
-            against. If the pattern is not satisfied, the setting in validation_err
+            against. If the pattern is not satisfied, the setting in explain_validation
             is followed. Applies even when accept_any/accept_nonempty are True.
             (default None)
 
-        validation_err (bool): Whether to raise an error if the validation_pattern
-            is not met (True) or to just grade as incorrect (False). If an error is
-            raised, invalid_msg is presented to students. When set to True, if debug is
-            also set to true, then a message is provided explaining that validation
-            failed. (default True)
+        explain_validation ('err', 'msg', None): How to proceed when the student response
+            does not satisfy the validation_pattern. Raise an error ('err'), grade as
+            incorrect but present a message ('msg' or debug=True), or just grade as
+            incorrect (None)? (default 'err')
 
         invalid_msg (str): Error message presented to students if their input does
             not satisfy the validation pattern
@@ -85,7 +84,7 @@ class StringGrader(ItemGrader):
             Required('min_words', default=0): NonNegative(int),
             Required('explain_minimums', default='err'): Any('err', 'msg', None),
             Required('validation_pattern', default=None): Any(str, None),
-            Required('validation_err', default=True): bool,
+            Required('explain_validation', default='err'): Any('err', 'msg', None),
             Required('invalid_msg', default='Your input is not in the expected format'): str
             })
 
@@ -120,6 +119,22 @@ class StringGrader(ItemGrader):
 
         return cleaned
 
+    def construct_message(self, msg, msg_type):
+        """
+        Depending on the configuration, construct the appropriate return dictionary
+        for a bad entry or raises an error.
+
+        Arguments:
+            msg: Message to return if a message should be returned
+            msg_type: Type of message to return ('err', 'msg', or None)
+        """
+        invalid_response = {'ok': False, 'grade_decimal': 0, 'msg': ''}
+        if msg_type == 'err':
+            raise InvalidInput(msg)
+        elif msg_type == 'msg' or self.config['debug']:
+            invalid_response['msg'] = msg
+        return invalid_response
+
     def check_response(self, answer, student_input, **kwargs):
         """
         Grades a student response against a given answer
@@ -131,7 +146,6 @@ class StringGrader(ItemGrader):
         """
         expect = self.clean_input(answer['expect'])
         student = self.clean_input(student_input)
-        incorrect_response = {'ok': False, 'grade_decimal': 0, 'msg': ''}
 
         # Figure out if we are accepting any input
         accept_any = self.config['accept_any'] or self.config['accept_nonempty']
@@ -151,19 +165,14 @@ class StringGrader(ItemGrader):
 
             # Check to see if the student input matches the validation pattern
             if re.match(pattern, student) is None:
-                # Either raise an error or grade as incorrect
-                if self.config['validation_err']:
-                    raise InvalidInput(self.config['invalid_msg'])
-                else:
-                    if self.config['debug']:
-                        incorrect_response['msg'] = 'Validation failed'
-                    return incorrect_response
+                return self.construct_message(self.config['invalid_msg'],
+                                              self.config['explain_validation'])
 
         # Perform the comparison
         if not accept_any:
             # Check for a match to expect
             if student != expect:
-                return incorrect_response
+                return {'ok': False, 'grade_decimal': 0, 'msg': ''}
         else:
             # Check for the minimum length
             msg = None
@@ -180,11 +189,8 @@ class StringGrader(ItemGrader):
 
             # Give student feedback
             if msg:
-                if self.config['explain_minimums'] == 'err':
-                    raise InvalidInput(msg)
-                elif self.config['explain_minimums'] == 'msg':
-                    incorrect_response['msg'] = msg
-                return incorrect_response
+                return self.construct_message(msg,
+                                              self.config['explain_minimums'])
 
         # If we got here, everything is correct
         return {
