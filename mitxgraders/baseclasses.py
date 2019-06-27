@@ -62,7 +62,10 @@ class AbstractGrader(ObjectWithSchema):
     Configuration options:
         debug (bool): Whether to add debug information to the output. Can also affect
             the types of error messages that are generated to be more technical (for
-            authors) or more user-friendly (for students) (default True)
+            authors) or more user-friendly (for students) (default False)
+
+        suppress_warnings (bool): Whether to suppress warnings that the given
+            configuration may lead to unintended consequences (default False)
     """
 
     # This is an abstract base class
