@@ -5,6 +5,7 @@ from mitxgraders.version import __version__
 from mitxgraders import CalcError
 from mitxgraders.plugins.integralgrader import IntegralGrader, IntegrationError
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
+from mitxgraders.helpers.compatibility import UNICODE_PREFIX
 
 # Configuration Error Test
 def test_wrong_number_of_inputs_raises_error():
@@ -516,7 +517,7 @@ def test_debug_message():
         "==============================================<br/>\n"
         "Integration Data for Sample Number 0<br/>\n"
         "==============================================<br/>\n"
-        "Variables: {{'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, 's': 5.530375019455111, 'x': 5.530375019455111, 'pi': 3.141592653589793}}<br/>\n"
+        "Variables: {{'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, u's': 5.530375019455111, u'x': 5.530375019455111, 'pi': 3.141592653589793}}<br/>\n"
         "<br/>\n"
         "========== Student Integration Data, Real Part<br/>\n"
         "Numerical Value: 0.685802339677<br/>\n"
@@ -540,7 +541,7 @@ def test_debug_message():
         "==============================================<br/>\n"
         "Integration Data for Sample Number 1<br/>\n"
         "==============================================<br/>\n"
-        "Variables: {{'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, 's': 5.530375019455111, 'x': 5.530375019455111, 'pi': 3.141592653589793}}<br/>\n"
+        "Variables: {{'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, u's': 5.530375019455111, u'x': 5.530375019455111, 'pi': 3.141592653589793}}<br/>\n"
         "<br/>\n"
         "========== Student Integration Data, Real Part<br/>\n"
         "Numerical Value: 0.685802339677<br/>\n"
@@ -560,7 +561,7 @@ def test_debug_message():
         "Error Estimate: None<br/>\n"
         "Number of integrand evaluations: None<br/>\n"
         "</pre>"
-    ).format(version=__version__)
+    ).format(version=__version__, u=UNICODE_PREFIX)
     expected_result = {'ok': True, 'grade_decimal': 1, 'msg': expected_message}
     result = grader(None, student_input)
     assert expected_result == result
@@ -589,7 +590,7 @@ def test_debug_message_complex_integrand():
         "==============================================<br/>\n"
         "Integration Data for Sample Number 0<br/>\n"
         "==============================================<br/>\n"
-        "Variables: {{'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, 's': 1.8831785881043805, 'x': 0.022981166359782736, 'pi': 3.141592653589793}}<br/>\n"
+        "Variables: {{'infty': inf, 'e': 2.718281828459045, 'i': 1j, 'j': 1j, {u}'s': 1.8831785881043805, {u}'x': 0.022981166359782736, 'pi': 3.141592653589793}}<br/>\n"
         "<br/>\n"
         "========== Student Integration Data, Real Part<br/>\n"
         "Numerical Value: 7.453559925<br/>\n"
@@ -609,9 +610,10 @@ def test_debug_message_complex_integrand():
         "Error Estimate: 4.1882074502e-14<br/>\n"
         "Number of integrand evaluations: 21<br/>\n"
         "</pre>"
-    ).format(version=__version__)
+    ).format(version=__version__, u=UNICODE_PREFIX)
     expected_result = {'ok': False, 'grade_decimal': 0, 'msg': expected_message}
     result = grader(None, student_input)
+    print(result['msg'])
     assert expected_result == result
 
 def test_error_catching():

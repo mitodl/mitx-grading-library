@@ -3,6 +3,7 @@ Tests for FormulaGrader and NumericalGrader
 """
 from __future__ import print_function, division, absolute_import
 
+import six
 from pytest import raises
 import numpy as np
 from voluptuous import Error, MultipleInvalid
@@ -233,8 +234,8 @@ def test_fg_userconstants():
     )
     assert grader(None, "hello")['ok']
 
-    expect = ("1 is not a valid key, must be of {str_type} for dictionary "
-              "value @ data\['user_constants'\]. Got {{1: 5}}").format(str_type=str)
+    expect = ("1 is not a valid key, must be of type string for dictionary "
+              "value @ data\['user_constants'\]. Got {1: 5}")
     with raises(Error, match=expect):
         FormulaGrader(
             answers="1",

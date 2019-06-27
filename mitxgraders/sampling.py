@@ -29,6 +29,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from numbers import Number
 import abc
 import random
+import six
 import numpy as np
 from voluptuous import Schema, Required, All, Coerce, Any, Extra
 from mitxgraders.baseclasses import ObjectWithSchema
@@ -36,6 +37,7 @@ from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
     has_keys_of_type, is_shape_specification, text_string)
+from mitxgraders.helpers.compatibility import coerce_string_keys_to_text_type
 from mitxgraders.helpers.calc import (
     METRIC_SUFFIXES, CalcError, evaluator, MathArray)
 
@@ -724,7 +726,8 @@ def construct_functions(default_functions, user_funcs):
 
 def validate_user_constants(*allow_types):
     return All(
-        has_keys_of_type(str),
+        has_keys_of_type(six.string_types),
+        coerce_string_keys_to_text_type,
         {Extra: Any(*allow_types)},
     )
 

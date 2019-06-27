@@ -147,13 +147,18 @@ def has_keys_of_type(thetype):
     ...     print(error)
     expected a dictionary with keys of <... 'str'>
     """
+    if thetype == six.string_types:
+        formatted_thetype = 'type string'
+    else:
+        formatted_thetype = six.text_type(thetype)
+
     def validator(thedict):
         if not isinstance(thedict, dict):
-            raise Invalid('expected a dictionary with keys of {}'.format(thetype))
+            raise Invalid('expected a dictionary with keys of {}'.format(formatted_thetype))
         for key in thedict:
             if not isinstance(key, thetype):
                 raise Invalid("{key} is not a valid key, must be of {thetype}"
-                              .format(key=key, thetype=thetype))
+                              .format(key=key, thetype=formatted_thetype))
 
         return thedict
     return validator
