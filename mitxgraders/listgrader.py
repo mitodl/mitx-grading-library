@@ -15,7 +15,7 @@ from mitxgraders.helpers import munkres
 from mitxgraders.baseclasses import AbstractGrader, ItemGrader
 from mitxgraders.exceptions import ConfigError, MissingInput
 from mitxgraders.helpers.validatorfuncs import Positive
-
+str
 # Set the objects to be imported from this grader
 __all__ = [
     "ListGrader",

@@ -64,7 +64,6 @@ class ObjectWithSchema(object):
         """
         return self.__class__ == other.__class__ and self.config == other.config
 
-
 class AbstractGrader(ObjectWithSchema):
     """
     Abstract grader class. All graders must build on this class.

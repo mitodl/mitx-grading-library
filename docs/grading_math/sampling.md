@@ -90,8 +90,7 @@ Sample real matrices of a specific shape and norm. (`RealMatrices` uses the Frob
 >>> # Sample 3 by 2 real matrices with norm between 5 and 10
 >>> sampler = RealMatrices(shape=[3, 2], norm=[5, 10])
 >>> # the default is shape=[2, 2] and norm=[1, 5]
->>> default_sampler = RealMatrices()
->>> default_sampler == RealMatrices(shape=[2, 2], norm=[1, 5])
+>>> RealMatrices() == RealMatrices({'norm': [1, 5], 'shape': (2, 2)})
 True
 
 ```

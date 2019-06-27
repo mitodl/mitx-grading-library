@@ -24,7 +24,7 @@ Contains some helper functions used in grading formulae:
 
 All of these classes perform random sampling. To obtain a sample, use class.gen_sample()
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 from numbers import Number
 import abc
@@ -35,7 +35,7 @@ from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
-    has_keys_of_type, is_shape_specification)
+    has_keys_of_type, is_shape_specification, text_string)
 from mitxgraders.helpers.calc import (
     METRIC_SUFFIXES, CalcError, evaluator, MathArray)
 
@@ -567,8 +567,8 @@ class DependentSampler(VariableSamplingSet):
 
     # Take in an individual or tuple of numbers
     schema_config = Schema({
-        Required('depends'): [str],
-        Required('formula'): str
+        Required('depends'): [text_string],
+        Required('formula'): text_string
     })
 
     def gen_sample(self):
@@ -740,10 +740,17 @@ def construct_constants(default_variables, user_consts):
     ...     'e': 2.718281828459045,
     ...     'j': 1j
     ... }
-    >>> construct_constants(default_variables, {})
-    {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'j': 1j}
-    >>> construct_constants(default_variables, {"T": 1.5})
-    {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'T': 1.5, 'j': 1j}
+    >>> construct_constants(default_variables, {}) == default_variables
+    True
+
+    >>> construct_constants(default_variables, {"T": 1.5}) == {
+    ...     'i': 1j,
+    ...     'pi': 3.141592653589793,
+    ...     'e': 2.718281828459045,
+    ...     'T': 1.5, 'j': 1j
+    ... }
+    True
+
     """
     constants = default_variables.copy()
 
@@ -761,8 +768,9 @@ def construct_suffixes(default_suffixes, metric=False):
     Usage
     =====
     >>> default_suffixes={'%': 0.01}
-    >>> construct_suffixes(default_suffixes)
-    {'%': 0.01}
+    >>> construct_suffixes(default_suffixes) == {'%': 0.01}
+    True
+
     >>> suff = construct_suffixes(default_suffixes, metric=True)
     >>> suff['G'] == 1e9
     True
