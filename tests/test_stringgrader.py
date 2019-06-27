@@ -64,7 +64,7 @@ def test_any():
 
 def test_nonempty():
     """Tests that accept_nonempty is working correctly"""
-    grader = StringGrader(accept_nonempty=True)
+    grader = StringGrader(accept_nonempty=True, explain_minimums='msg')
     assert grader(None, "cat")['ok']
     assert grader(None, "dog")['ok']
     assert not grader(None, "")['ok']
@@ -141,24 +141,36 @@ def test_clean():
 
 def test_min_length():
     """Make sure that minimum lengths are graded correctly"""
-    grader = StringGrader(accept_any=True, min_length=2)
+    grader = StringGrader(accept_any=True, min_length=2, explain_minimums='err')
+    assert grader(None, 'cat')['ok']
+    msg = r'Your response is too short \(1/2 characters\)'
+    with raises(InvalidInput, match=msg):
+        grader(None, 'c')
+
+    grader = StringGrader(accept_any=True, min_length=2, explain_minimums='msg')
     assert grader(None, 'cat')['ok']
     assert grader(None, 'c') == {'ok': False,
                                  'grade_decimal': 0,
                                  'msg': 'Your response is too short (1/2 characters)'}
 
-    grader = StringGrader(accept_any=True, min_length=2, explain_minimums=False)
+    grader = StringGrader(accept_any=True, min_length=2, explain_minimums=None)
     assert grader(None, 'c') == {'ok': False, 'grade_decimal': 0, 'msg': ''}
 
 def test_min_words():
     """Make sure that minimum wordcounts are graded correctly"""
-    grader = StringGrader(accept_any=True, min_words=3)
+    grader = StringGrader(accept_any=True, min_words=3, explain_minimums='err')
+    assert grader(None, 'cat in the hat')['ok']
+    msg = r'Your response is too short \(2/3 words\)'
+    with raises(InvalidInput, match=msg):
+        grader(None, 'A cat')
+
+    grader = StringGrader(accept_any=True, min_words=3, explain_minimums='msg')
     assert grader(None, 'cat in the hat')['ok']
     assert grader(None, 'A cat') == {'ok': False,
                                      'grade_decimal': 0,
                                      'msg': 'Your response is too short (2/3 words)'}
 
-    grader = StringGrader(accept_any=True, min_words=3, explain_minimums=False)
+    grader = StringGrader(accept_any=True, min_words=3, explain_minimums=None)
     assert grader(None, 'A cat') == {'ok': False, 'grade_decimal': 0, 'msg': ''}
 
 def test_validation():

@@ -18,9 +18,9 @@ class StringGrader(ItemGrader):
     Grader based on exact comparison of strings
 
     Configuration options:
+    * Cleaning input
         case_sensitive (bool): Whether to be case sensitive in comparing responses to
             answers (default True)
-
 
         clean_spaces (bool): Whether or not to convert multiple spaces into single spaces
             before comparing (default True)
@@ -31,13 +31,12 @@ class StringGrader(ItemGrader):
         strip_all (bool): Whether or not to remove all spaces from student
             input before grading (default False)
 
-
+    * Accepting any input
         accept_any (bool): Whether to accept any answer as correct (default False)
 
         accept_nonempty (bool): Whether to accept any nonempty answer as correct.
             Implemented as turning on accept_any and ensuring that min_length > 0.
             (default False)
-
 
         min_length (int): When using accept_any or accept_nonempty, sets the minimum
             number of characters required to be entered in order to be graded
@@ -47,11 +46,12 @@ class StringGrader(ItemGrader):
             number of words required to be entered in order to be graded
             correct (default 0)
 
-        explain_minimums (bool): If a response is unsatisfactory due to min_length or
-            min_words being insufficient, presents an explanatory message to the student
-            (default True)
+        explain_minimums ('err', 'msg', None): If a response is unsatisfactory due to
+            min_length or min_words being insufficient, do we raise an error ('err'),
+            grade as incorrect but present a message ('msg'), or just grade as
+            incorrect (None)? (default 'err')
 
-
+    * Validating input
         validation_pattern (str or None): A regex pattern to validate the cleaned input
             against. If the pattern is not satisfied, the setting in validation_err
             is followed. Applies even when accept_any/accept_nonempty are True.
@@ -83,7 +83,7 @@ class StringGrader(ItemGrader):
             Required('accept_nonempty', default=False): bool,
             Required('min_length', default=0): NonNegative(int),
             Required('min_words', default=0): NonNegative(int),
-            Required('explain_minimums', default=True): bool,
+            Required('explain_minimums', default='err'): Any('err', 'msg', None),
             Required('validation_pattern', default=None): Any(str, None),
             Required('validation_err', default=True): bool,
             Required('invalid_msg', default='Your input is not in the expected format'): str
@@ -125,38 +125,32 @@ class StringGrader(ItemGrader):
         Grades a student response against a given answer
 
         Arguments:
-            answer (str): The answer to compare to
+            answer (dict): Dictionary describing the expected answer,
+                           its point value, and any associated message
             student_input (str): The student's input passed by edX
         """
         expect = self.clean_input(answer['expect'])
         student = self.clean_input(student_input)
         incorrect_response = {'ok': False, 'grade_decimal': 0, 'msg': ''}
 
-        # Figure out if we are accepting any input,
-        # and construct the appropriate minimum length
-        accept_any = self.config['accept_any']
+        # Figure out if we are accepting any input
+        accept_any = self.config['accept_any'] or self.config['accept_nonempty']
         min_length = self.config['min_length']
-        if self.config['accept_nonempty']:
-            accept_any = True
-            if min_length == 0:
-                min_length = 1
+        if self.config['accept_nonempty'] and min_length == 0:
+            min_length = 1
 
         # Apply the validation pattern
-        if self.config['validation_pattern'] is not None:
+        pattern = self.config['validation_pattern']
+        if pattern is not None:
             if not accept_any:
                 # Make sure that expect matches the pattern
-                match = re.match(self.config['validation_pattern'], expect)
-                if match is None:
-                    # expect doesn't match the required pattern,
-                    # so a student can never get this right.
-                    # Raise an error!
-                    msg = ("The provided answer '{}' does not match the validation pattern "
-                           "'{}'").format(answer['expect'], self.config['validation_pattern'])
-                    raise ConfigError(msg)
+                # If it doesn't, a student can never get this right
+                if re.match(pattern, expect) is None:
+                    msg = "The provided answer '{}' does not match the validation pattern '{}'"
+                    raise ConfigError(msg.format(answer['expect'], pattern))
 
             # Check to see if the student input matches the validation pattern
-            match = re.match(self.config['validation_pattern'], student)
-            if match is None:
+            if re.match(pattern, student) is None:
                 # Either raise an error or grade as incorrect
                 if self.config['validation_err']:
                     raise InvalidInput(self.config['invalid_msg'])
@@ -166,29 +160,30 @@ class StringGrader(ItemGrader):
                     return incorrect_response
 
         # Perform the comparison
-        if accept_any:
-            # Just check the minimums. No comparison to expect.
-            # Check for the minimum length
-            chars = len(student)
-            if chars < min_length:
-                if self.config['explain_minimums']:
-                    msg = 'Your response is too short ({chars}/{min_length} characters)'
-                    incorrect_response['msg'] = msg.format(chars=chars,
-                                                           min_length=min_length)
-                return incorrect_response
-
-            # Check for minimum word count
-            if self.config['min_words'] > 0:
-                wordcount = len(student.split())
-                if wordcount < self.config['min_words']:
-                    if self.config['explain_minimums']:
-                        msg = 'Your response is too short ({wordcount}/{min_words} words)'
-                        msg = msg.format(wordcount=wordcount, min_words=self.config['min_words'])
-                        incorrect_response['msg'] = msg
-                    return incorrect_response
-        else:
+        if not accept_any:
             # Check for a match to expect
             if student != expect:
+                return incorrect_response
+        else:
+            # Check for the minimum length
+            msg = None
+            chars = len(student)
+            if chars < min_length:
+                msg = ('Your response is too short ({chars}/{min} characters)'
+                       ).format(chars=chars, min=min_length)
+
+            # Check for minimum word count (more important than character count)
+            words = len(student.split())
+            if words < self.config['min_words']:
+                msg = ('Your response is too short ({words}/{min} words)'
+                       ).format(words=words, min=self.config['min_words'])
+
+            # Give student feedback
+            if msg:
+                if self.config['explain_minimums'] == 'err':
+                    raise InvalidInput(msg)
+                elif self.config['explain_minimums'] == 'msg':
+                    incorrect_response['msg'] = msg
                 return incorrect_response
 
         # If we got here, everything is correct
