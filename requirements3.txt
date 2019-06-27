@@ -1,7 +1,17 @@
+# Used by the library (versions most recent, except six mirrors edX current)
 numpy==1.16.4
 scipy==1.2.2
 pyparsing==2.0.7
+six==1.11.0
+
+# For testing/linting
+pylint
 pytest==3.6.2
 pytest-cov==2.5.1
+
+# For documentation
 mkdocs==0.17.5
-mkdocs-cinder==0.11.0
+mkdocs-cinder
+
+# For uploading to edge
+requests
