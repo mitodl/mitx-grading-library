@@ -3,6 +3,7 @@ Helper functions to facilitate python2-python3 compatibility
 """
 from __future__ import print_function, division, absolute_import
 
+import six
 import functools
 
 def wraps(wrapped,
@@ -30,3 +31,20 @@ def wraps(wrapped,
             _f.__qualname__ = _f.__name__
         return _f
     return _wrapper
+
+# This is copied from six repo; was added in version 1.12.0, but edX uses 1.11.0
+def ensure_text(s, encoding='utf-8', errors='strict'):
+    """Coerce *s* to six.text_type.
+    For Python 2:
+      - `unicode` -> `unicode`
+      - `str` -> `unicode`
+    For Python 3:
+      - `str` -> `str`
+      - `bytes` -> decoded to `str`
+    """
+    if isinstance(s, six.binary_type):
+        return s.decode(encoding, errors)
+    elif isinstance(s, six.text_type):
+        return s
+    else:
+        raise TypeError("not expecting type '%s'" % type(s))

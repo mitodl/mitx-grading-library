@@ -5,9 +5,11 @@ Stand-alone validator functions for use in voluptuous Schema
 """
 from __future__ import print_function, division, absolute_import
 
+import six
 from numbers import Number
 from inspect import getargspec, isbuiltin
 from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth, Coerce
+from mitxgraders.helpers.compatibility import ensure_text
 
 def Positive(thetype):
     """Demand a positive number type"""
@@ -359,3 +361,13 @@ def Nullable(schema):
     Indicates that a value could be None or satisfy schema.
     """
     return Any(None, schema)
+
+def text_string(obj):
+    """
+    Voluptuous validator that expects text strings and coerces Python 2 string
+    literals to unicode.
+    """
+    if isinstance(obj, six.string_types):
+        return ensure_text(obj)
+
+    raise Invalid('expected str (or unicode)')
