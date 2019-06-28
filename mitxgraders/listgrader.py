@@ -7,15 +7,15 @@ Classes for grading inputs that look like lists:
 
 Both work by farming out the individual objects to other graders.
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 import numpy as np
 from voluptuous import Required, Any
 from mitxgraders.helpers import munkres
 from mitxgraders.baseclasses import AbstractGrader, ItemGrader
 from mitxgraders.exceptions import ConfigError, MissingInput
-from mitxgraders.helpers.validatorfuncs import Positive
-str
+from mitxgraders.helpers.validatorfuncs import Positive, text_string
+
 # Set the objects to be imported from this grader
 __all__ = [
     "ListGrader",
@@ -622,7 +622,7 @@ class SingleListGrader(ItemGrader):
         return schema.extend({
             Required('ordered', default=False): bool,
             Required('length_error', default=False): bool,
-            Required('delimiter', default=','): str,
+            Required('delimiter', default=','): text_string,
             Required('partial_credit', default=True): bool,
             Required('subgrader'): ItemGrader,
             Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists

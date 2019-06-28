@@ -4,7 +4,7 @@ specify_domain.py
 Defines class SpecifyDomain, an author-facing decorator for specifying the domain
 of a function. Currently only supports specifying the shape of inputs.
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 from numbers import Number
 from voluptuous import Schema, Invalid, Required, Any
@@ -85,9 +85,14 @@ def make_shape_validator(shape):
     >>> validate_vec4(MathArray([[1, 2, 3], [4, 5, 6]]))
     Traceback (most recent call last):
     Invalid: received a matrix of shape (rows: 2, cols: 3), expected a vector of length 4
-    >>> validate_vec4('cat')
+    >>> validate_vec4(5)
     Traceback (most recent call last):
-    Invalid: received a str, expected a vector of length 4
+    Invalid: received a scalar, expected a vector of length 4
+
+    Fallback error message shows Python type:
+    >>> validate_vec4({})
+    Traceback (most recent call last):
+    Invalid: received a dict, expected a vector of length 4
 
     Instead of specifying a tuple shape, you can specify 'square' to demand
     square matrices of any dimension.

@@ -93,7 +93,7 @@ def test_incorrect_number_of_inputs_raises_useful_error():
 
 def test_author_facing_decorator_raises_errors_with_invalid_config():
 
-    match = "required key not provided @ data\['input_shapes'\]. Got None"
+    match = "required key not provided @ data\[u?'input_shapes'\]. Got None"
     with raises(Error, match=match):
         @specify_domain()
         def f():
