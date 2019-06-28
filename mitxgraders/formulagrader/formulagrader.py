@@ -1,7 +1,7 @@
 """
 formulagrader.py
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 from numbers import Number
 from functools import wraps
@@ -17,7 +17,8 @@ from mitxgraders.comparers import equality_comparer, CorrelatedComparer
 from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
                                   gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes,
-                                  schema_user_functions, validate_user_constants)
+                                  schema_user_functions, schema_user_functions_no_random,
+                                  validate_user_constants)
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.helpers.calc import (
@@ -947,7 +948,7 @@ class NumericalGrader(FormulaGrader):
         schema = super(NumericalGrader, self).schema_config
         # Modify the default FormulaGrader options
         return schema.extend({
-            Required('user_functions', default={}): {Extra: is_callable},
+            Required('user_functions', default={}): schema_user_functions_no_random,
             Required('tolerance', default='5%'): Any(PercentageString, NonNegative(Number)),
             Required('samples', default=1): 1,
             Required('variables', default=[]): All(Length(max=0), []),

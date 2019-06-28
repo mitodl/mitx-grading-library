@@ -670,8 +670,14 @@ def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes, cons
         sample_list.append(sample_dict)
     return sample_list
 
+schema_user_functions_no_random = All(
+    has_keys_of_type(six.string_types),
+    coerce_string_keys_to_text_type,
+    {Extra: is_callable}
+)
 schema_user_functions = All(
-    has_keys_of_type(str),
+    has_keys_of_type(six.string_types),
+    coerce_string_keys_to_text_type,
     {Extra: Any(is_callable,
                 All([is_callable], Coerce(SpecificFunctions)),
                 FunctionSamplingSet)},
