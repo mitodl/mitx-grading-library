@@ -373,7 +373,7 @@ class ItemGrader(AbstractGrader):
 
         Usually this is a just a string.
         """
-        return Schema(str)(expect)
+        return Schema(text_string)(expect)
 
     @staticmethod
     def grade_decimal_to_ok(grade):
