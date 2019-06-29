@@ -57,7 +57,7 @@ def round_decimals_in_string(string, round_to=6):
 
     return re.sub(pattern, replacer, string)
 
-if sys.version_info >= (3,):
-    import unittest.mock as mock
-else:
-    import mock
+try:
+    import unittest.mock as mock # Python 3
+except ImportError:
+    import mock # Python 2
