@@ -42,11 +42,12 @@ and also:
 
 
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 import copy
 from collections import namedtuple
 import numpy as np
+import six
 from pyparsing import (
     CaselessLiteral,
     Combine,
@@ -983,7 +984,7 @@ class MathExpression(object):
         while data:
             # Result contains the current exponent
             working = data.pop()
-            if isinstance(working, str) and working == "-":
+            if isinstance(working, six.text_type) and working == "-":
                 result = -result
             else:
                 # working is base, result is exponent
@@ -1114,7 +1115,7 @@ class MathExpression(object):
         """
         data = parse_result[:]
         result = data.pop(0)
-        if isinstance(result, str) and result == "+":
+        if isinstance(result, six.text_type) and result == "+":
             result = data.pop(0)
         while data:
             op = data.pop(0)

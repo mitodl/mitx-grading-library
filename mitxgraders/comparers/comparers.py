@@ -47,7 +47,7 @@ Correlated Comparers
 ====================
 See ./baseclasses.py and ./linear_comparer.py for examples.
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 from numbers import Number
 import numpy as np

@@ -1,8 +1,10 @@
+from __future__ import print_function, division, absolute_import, unicode_literals
 from numbers import Number
 import numpy as np
 from voluptuous import Schema, Required, Any, Range
 from mitxgraders.comparers.baseclasses import CorrelatedComparer
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
+from mitxgraders.helpers.validatorfuncs import text_string
 
 def get_linear_fit_error(x, y):
     """
@@ -126,13 +128,13 @@ class LinearComparer(CorrelatedComparer):
         Required('proportional', default=0.5): Any(None, Range(0, 1)),
         Required('offset', default=None): Any(None, Range(0, 1)),
         Required('linear', default=None): Any(None, Range(0, 1)),
-        Required('equals_msg', default=''): str,
+        Required('equals_msg', default=''): text_string,
         Required('proportional_msg', default=(
             'The submitted answer differs from an expected answer by a '
             'constant factor.'
-        )): str,
-        Required('offset_msg', default=''): str,
-        Required('linear_msg', default=''): str,
+        )): text_string,
+        Required('offset_msg', default=''): text_string,
+        Required('linear_msg', default=''): text_string,
     })
 
     all_modes = ('equals', 'proportional', 'offset', 'linear')
