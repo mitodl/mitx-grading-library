@@ -233,7 +233,7 @@ def test_fg_userconstants():
     assert grader(None, "hello")['ok']
 
     expect = ("1 is not a valid key, must be of {str_type} for dictionary "
-              "value @ data\['user_constants'\]. Got {{1: 5}}").format(str_type=str(str))
+              "value @ data\['user_constants'\]. Got {{1: 5}}").format(str_type=str)
     with raises(Error, match=expect):
         FormulaGrader(
             answers="1",
