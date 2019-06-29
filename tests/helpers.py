@@ -49,7 +49,7 @@ def round_decimals_in_string(string, round_to=6):
 
     Note that the final occurrence of 1.000 was not rounded.
     """
-    pattern = "([0-9]*\.[0-9]{{{round_to}}}[0-9]*)".format(round_to=round_to)
+    pattern = "([0-9]\.[0-9]{{{round_to}}}[0-9]+)".format(round_to=round_to)
     def replacer(match):
         number = float(match.group(1))
         formatter = "{{0:.{round_to}f}}".format(round_to=round_to)
