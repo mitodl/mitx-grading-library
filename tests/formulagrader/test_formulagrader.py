@@ -217,7 +217,7 @@ def test_fg_userfunction():
 
     expect = ("1 is not a valid key, must be of {str_type} for dictionary "
               "value @ data\['user_functions'\]. Got {{1: <ufunc 'tan'>}}").format(
-              str_type=str(str))
+              str_type=str)
     with raises(Error, match=expect):
         FormulaGrader(
             answers="1",
