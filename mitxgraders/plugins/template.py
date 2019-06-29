@@ -2,8 +2,10 @@
 This is a template file that also is used to test that the plugin loading
 mechanism is working.
 """
+from __future__ import print_function, division, absolute_import
 
 # Make sure that imports are working
+
 from mitxgraders.baseclasses import ItemGrader
 
 def plugin_test():

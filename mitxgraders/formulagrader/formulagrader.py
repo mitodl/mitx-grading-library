@@ -1,11 +1,12 @@
 """
 formulagrader.py
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 from numbers import Number
 from functools import wraps
 from collections import namedtuple
-from pprint import PrettyPrinter
+import pprint
 import re
 import itertools
 import numpy as np
@@ -869,36 +870,36 @@ class FormulaGrader(ItemGrader):
 
         return comparer_params_eval
 
-
     def log_eval_info(self, index, varlist, funclist, comparer_params_eval, student_eval):
-        """Add sample evaluation information to debug log"""
-        pp = PrettyPrinter(indent=4)
+        """Add sample information to debug log"""
+
         if index == 0:
             header = self.debug_appendix_eval_header_template.format(
                 grader=self.__class__.__name__,
                 # The regexp replaces memory locations, e.g., 0x10eb1e848 -> 0x...
-                functions_allowed=pp.pformat({f: funclist[f] for f in funclist
+                functions_allowed=pprint.pformat({f: funclist[f] for f in funclist
                                               if f in self.permitted_functions}),
-                functions_disallowed=pp.pformat({f: funclist[f] for f in funclist
+                functions_disallowed=pprint.pformat({f: funclist[f] for f in funclist
                                                  if f not in self.permitted_functions}),
             )
-            self.log(re.sub(r"0x[0-9a-fA-F]+", "0x...", header))
-
+            header = re.sub(r"0x[0-9a-fA-F]+", "0x...", header)
+            header = header.replace('RandomFunction.gen_sample.<locals>.', '')
+            self.log(header)
         self.log(self.debug_appendix_eval_template.format(
             sample_num=index + 1,  # to account for 0 index
             samples_total=self.config['samples'],
-            variables=pp.pformat(varlist),
+            variables=pprint.pformat(varlist),
             student_eval=student_eval,
             comparer_params_eval=comparer_params_eval
         ))
 
     def log_comparison_info(self, comparer, comparer_results):
         """Add sample comparison information to debug log"""
-        pp = PrettyPrinter(indent=4)
+
         self.log(self.debug_appendix_comparison_template.format(
             samples_total=self.config['samples'],
             comparer=re.sub(r"0x[0-9a-fA-F]+", "0x...", str(comparer)),
-            comparer_results=pp.pformat(comparer_results)
+            comparer_results=pprint.pformat(comparer_results)
         ))
 
     def post_eval_validation(self, expr, used_funcs):

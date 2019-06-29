@@ -4,6 +4,7 @@ stringgrader.py
 Class for grading inputs that correspond to a text string
 * StringGrader
 """
+from __future__ import print_function, division, absolute_import
 import re
 from voluptuous import Required, Any
 from mitxgraders.baseclasses import ItemGrader

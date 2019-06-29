@@ -234,7 +234,7 @@ For example, student enters `'[[1, 2],[3] ]'`, a matrix missing an entry in seco
 >>> try:
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
-...     str(error.message) # students see this error message
+...     str(error) # students see this error message
 "Unable to parse vector/matrix. If you're trying to enter a matrix, this is most likely caused by an unequal number of elements in each row."
 
 ```
@@ -253,7 +253,7 @@ If a student submits an answer that will raise shape-mismatch errors then an err
 >>> try:
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
-...     str(error.message) # students see this error message
+...     str(error) # students see this error message
 'Cannot add/subtract a vector of length 3 with a vector of length 2.'
 
 ```
@@ -276,14 +276,14 @@ If the author's answer is a 3-component vector, and the student submits a differ
 >>> try:
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
-...     str(error.message) # students see this error message
+...     str(error) # students see this error message
 'Expected answer to be a vector, but input is a vector of incorrect shape'
 
 >>> student_input = '0' # scalar; should be a vector
 >>> try:
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
-...     str(error.message) # students see this error message
+...     str(error) # students see this error message
 'Expected answer to be a vector, but input is a scalar'
 
 ```

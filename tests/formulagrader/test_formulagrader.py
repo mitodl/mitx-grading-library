@@ -1,9 +1,9 @@
 """
 Tests for FormulaGrader and NumericalGrader
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 from pytest import raises
-from mock import Mock, patch
 import numpy as np
 from voluptuous import Error, MultipleInvalid
 from mitxgraders import (
@@ -25,8 +25,8 @@ from mitxgraders.helpers.calc.exceptions import (
     CalcError, UndefinedVariable, UndefinedFunction
 )
 from mitxgraders import ListGrader
-from tests.helpers import log_results
 from mitxgraders.comparers import equality_comparer
+from tests.helpers import log_results, mock, round_decimals_in_string
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(
@@ -215,8 +215,9 @@ def test_fg_userfunction():
         )
         grader(None, "that'sbad(1)")
 
-    expect = ("1 is not a valid key, must be of <type 'str'> for dictionary "
-              "value @ data\['user_functions'\]. Got {1: <ufunc 'tan'>}")
+    expect = ("1 is not a valid key, must be of {str_type} for dictionary "
+              "value @ data\['user_functions'\]. Got {{1: <ufunc 'tan'>}}").format(
+              str_type=str)
     with raises(Error, match=expect):
         FormulaGrader(
             answers="1",
@@ -231,8 +232,8 @@ def test_fg_userconstants():
     )
     assert grader(None, "hello")['ok']
 
-    expect = ("1 is not a valid key, must be of <type 'str'> for dictionary "
-              "value @ data\['user_constants'\]. Got {1: 5}")
+    expect = ("1 is not a valid key, must be of {str_type} for dictionary "
+              "value @ data\['user_constants'\]. Got {{1: 5}}").format(str_type=str)
     with raises(Error, match=expect):
         FormulaGrader(
             answers="1",
@@ -443,20 +444,20 @@ def test_fg_custom_comparers():
         reduced = student_input % (360)
         return utils.within_tolerance(answer, reduced) and student_input > min_value
 
-    mock = Mock(side_effect=is_coterminal_and_large,
+    mocked = mock.Mock(side_effect=is_coterminal_and_large,
                 # The next two kwargs ensure that the Mock behaves nicely for inspect.getargspec
                 spec=is_coterminal_and_large,
                 func_code=is_coterminal_and_large.func_code,)
 
     grader = FormulaGrader(
         answers={
-            'comparer': mock,
+            'comparer': mocked,
             'comparer_params': ['150 + 50', '360 * 2'],
         },
         tolerance='1%'
     )
     assert grader(None, '200 + 3*360') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-    mock.assert_called_with([200, 720], 1280, grader.comparer_utils)
+    mocked.assert_called_with([200, 720], 1280, grader.comparer_utils)
 
     assert grader(None, '199 + 3*360') == {'grade_decimal': 1, 'msg': '', 'ok': True}
     assert grader(None, '197 + 3*360') == {'grade_decimal': 0, 'msg': '', 'ok': False}
@@ -507,59 +508,59 @@ def test_fg_debug_log():
     "FormulaGrader Debug Info<br/>\n"
     "==============================================================<br/>\n"
     "Functions available during evaluation and allowed in answer:<br/>\n"
-    "{{   'abs': <function absolute at 0x...>,<br/>\n"
-    "    'arccos': <function arccos at 0x...>,<br/>\n"
-    "    'arccosh': <function arccosh at 0x...>,<br/>\n"
-    "    'arccot': <function arccot at 0x...>,<br/>\n"
-    "    'arccoth': <function arccoth at 0x...>,<br/>\n"
-    "    'arccsc': <function arccsc at 0x...>,<br/>\n"
-    "    'arccsch': <function arccsch at 0x...>,<br/>\n"
-    "    'arcsec': <function arcsec at 0x...>,<br/>\n"
-    "    'arcsech': <function arcsech at 0x...>,<br/>\n"
-    "    'arcsin': <function arcsin at 0x...>,<br/>\n"
-    "    'arcsinh': <function arcsinh at 0x...>,<br/>\n"
-    "    'arctan': <function arctan at 0x...>,<br/>\n"
-    "    'arctan2': <function arctan2 at 0x...>,<br/>\n"
-    "    'arctanh': <function arctanh at 0x...>,<br/>\n"
-    "    'conj': <ufunc 'conjugate'>,<br/>\n"
-    "    'cosh': <function cosh at 0x...>,<br/>\n"
-    "    'cot': <function cot at 0x...>,<br/>\n"
-    "    'coth': <function coth at 0x...>,<br/>\n"
-    "    'csc': <function csc at 0x...>,<br/>\n"
-    "    'csch': <function csch at 0x...>,<br/>\n"
-    "    'exp': <function exp at 0x...>,<br/>\n"
-    "    'f': <function f at 0x...>,<br/>\n"
-    "    'fact': <function factorial at 0x...>,<br/>\n"
-    "    'factorial': <function factorial at 0x...>,<br/>\n"
-    "    'im': <function imag at 0x...>,<br/>\n"
-    "    'kronecker': <function kronecker at 0x...>,<br/>\n"
-    "    'ln': <function log at 0x...>,<br/>\n"
-    "    'log10': <function log10 at 0x...>,<br/>\n"
-    "    'log2': <function log2 at 0x...>,<br/>\n"
-    "    're': <function real at 0x...>,<br/>\n"
-    "    'sec': <function sec at 0x...>,<br/>\n"
-    "    'sech': <function sech at 0x...>,<br/>\n"
-    "    'sinh': <function sinh at 0x...>,<br/>\n"
-    "    'sqrt': <function sqrt at 0x...>,<br/>\n"
-    "    'square': <function <lambda> at 0x...>,<br/>\n"
-    "    'tanh': <function tanh at 0x...>}}<br/>\n"
+    "{{'abs': <function absolute at 0x...>,<br/>\n"
+    " 'arccos': <function arccos at 0x...>,<br/>\n"
+    " 'arccosh': <function arccosh at 0x...>,<br/>\n"
+    " 'arccot': <function arccot at 0x...>,<br/>\n"
+    " 'arccoth': <function arccoth at 0x...>,<br/>\n"
+    " 'arccsc': <function arccsc at 0x...>,<br/>\n"
+    " 'arccsch': <function arccsch at 0x...>,<br/>\n"
+    " 'arcsec': <function arcsec at 0x...>,<br/>\n"
+    " 'arcsech': <function arcsech at 0x...>,<br/>\n"
+    " 'arcsin': <function arcsin at 0x...>,<br/>\n"
+    " 'arcsinh': <function arcsinh at 0x...>,<br/>\n"
+    " 'arctan': <function arctan at 0x...>,<br/>\n"
+    " 'arctan2': <function arctan2 at 0x...>,<br/>\n"
+    " 'arctanh': <function arctanh at 0x...>,<br/>\n"
+    " 'conj': <ufunc 'conjugate'>,<br/>\n"
+    " 'cosh': <function cosh at 0x...>,<br/>\n"
+    " 'cot': <function cot at 0x...>,<br/>\n"
+    " 'coth': <function coth at 0x...>,<br/>\n"
+    " 'csc': <function csc at 0x...>,<br/>\n"
+    " 'csch': <function csch at 0x...>,<br/>\n"
+    " 'exp': <function exp at 0x...>,<br/>\n"
+    " 'f': <function random_function at 0x...>,<br/>\n"
+    " 'fact': <function factorial at 0x...>,<br/>\n"
+    " 'factorial': <function factorial at 0x...>,<br/>\n"
+    " 'im': <function imag at 0x...>,<br/>\n"
+    " 'kronecker': <function kronecker at 0x...>,<br/>\n"
+    " 'ln': <function log at 0x...>,<br/>\n"
+    " 'log10': <function log10 at 0x...>,<br/>\n"
+    " 'log2': <function log2 at 0x...>,<br/>\n"
+    " 're': <function real at 0x...>,<br/>\n"
+    " 'sec': <function sec at 0x...>,<br/>\n"
+    " 'sech': <function sech at 0x...>,<br/>\n"
+    " 'sinh': <function sinh at 0x...>,<br/>\n"
+    " 'sqrt': <function sqrt at 0x...>,<br/>\n"
+    " 'square': <function <lambda> at 0x...>,<br/>\n"
+    " 'tanh': <function tanh at 0x...>}}<br/>\n"
     "Functions available during evaluation and disallowed in answer:<br/>\n"
-    "{{   'cos': <function cos at 0x...>,<br/>\n"
-    "    'sin': <function sin at 0x...>,<br/>\n"
-    "    'tan': <function tan at 0x...>}}<br/>\n"
+    "{{'cos': <function cos at 0x...>,<br/>\n"
+    " 'sin': <function sin at 0x...>,<br/>\n"
+    " 'tan': <function tan at 0x...>}}<br/>\n"
     "<br/>\n"
     "<br/>\n"
     "==========================================<br/>\n"
     "Evaluation Data for Sample Number 1 of 2<br/>\n"
     "==========================================<br/>\n"
     "Variables:<br/>\n"
-    "{{   'e': 2.718281828459045,<br/>\n"
-    "    'i': 1j,<br/>\n"
-    "    'j': 1j,<br/>\n"
-    "    'pi': 3.141592653589793,<br/>\n"
-    "    'x': 3.195254015709299,<br/>\n"
-    "    'y': 3.860757465489678,<br/>\n"
-    "    'z': (2.205526752143288+2.0897663659937935j)}}<br/>\n"
+    "{{'e': 2.718281828459045,<br/>\n"
+    " 'i': 1j,<br/>\n"
+    " 'j': 1j,<br/>\n"
+    " 'pi': 3.141592653589793,<br/>\n"
+    " 'x': 3.195254015709299,<br/>\n"
+    " 'y': 3.860757465489678,<br/>\n"
+    " 'z': (2.205526752143288+2.0897663659937935j)}}<br/>\n"
     "Student Eval: (14.7111745179+2.08976636599j)<br/>\n"
     "Compare to:  [(14.711174517877566+2.0897663659937935j)]<br/>\n"
     "<br/>\n"
@@ -568,13 +569,13 @@ def test_fg_debug_log():
     "Evaluation Data for Sample Number 2 of 2<br/>\n"
     "==========================================<br/>\n"
     "Variables:<br/>\n"
-    "{{   'e': 2.718281828459045,<br/>\n"
-    "    'i': 1j,<br/>\n"
-    "    'j': 1j,<br/>\n"
-    "    'pi': 3.141592653589793,<br/>\n"
-    "    'x': 2.694619197355619,<br/>\n"
-    "    'y': 3.5835764522666245,<br/>\n"
-    "    'z': (1.875174422525385+2.7835460015641598j)}}<br/>\n"
+    "{{'e': 2.718281828459045,<br/>\n"
+    " 'i': 1j,<br/>\n"
+    " 'j': 1j,<br/>\n"
+    " 'pi': 3.141592653589793,<br/>\n"
+    " 'x': 2.694619197355619,<br/>\n"
+    " 'y': 3.5835764522666245,<br/>\n"
+    " 'z': (1.875174422525385+2.7835460015641598j)}}<br/>\n"
     "Student Eval: (11.9397106851+2.78354600156j)<br/>\n"
     "Compare to:  [(11.93971068506166+2.7835460015641598j)]<br/>\n"
     "<br/>\n"
@@ -584,11 +585,14 @@ def test_fg_debug_log():
     "==========================================<br/>\n"
     "Comparer Function: <function equality_comparer at 0x...><br/>\n"
     "Comparison Results:<br/>\n"
-    "[   {{   'grade_decimal': 1.0, 'msg': '', 'ok': True}},<br/>\n"
-    "    {{   'grade_decimal': 1.0, 'msg': '', 'ok': True}}]<br/>\n"
+    "[{{'grade_decimal': 1.0, 'msg': '', 'ok': True}},<br/>\n"
+    " {{'grade_decimal': 1.0, 'msg': '', 'ok': True}}]<br/>\n"
     "</pre>"
     ).format(version=VERSION)
-    assert result['msg'] == message
+    expected = round_decimals_in_string(message)
+    result_msg = round_decimals_in_string(result['msg']).replace(
+        'test_fg_debug_log.<locals>.', '')
+    assert expected == result_msg
 
 def test_fg_evaluates_siblings_appropriately():
     grader=ListGrader(
@@ -635,7 +639,7 @@ def test_fg_evals_numbered_variables_in_siblings():
 
     results = []
     side_effect = log_results(results)(subgrader.get_sibling_formulas)
-    with patch.object(subgrader, 'get_sibling_formulas', side_effect=side_effect):
+    with mock.patch.object(subgrader, 'get_sibling_formulas', side_effect=side_effect):
         grader(None, ['x_{0}+1', 'x_{1} + 1'])
         # get_sibling_formulas should be called twice, once for each input
         assert len(results) == 2

@@ -49,7 +49,7 @@ Our `rot(vec, axis, angle)` function works, but if students supply the function 
 >>> try:
 ...     grader_1(None, 'rot(v, theta, [0, 0, 1])')
 ... except StudentFacingError as error:
-...     print(error.message)
+...     print(error)
 There was an error evaluating rot(...). Its input does not seem to be in its domain.
 
 ```
@@ -86,7 +86,7 @@ Now if a student calls `rot` with incorrect inputs, they receive a more helpful 
 >>> try:
 ...     grader_2(None, 'rot(v, theta, [0, 0, 1])')
 ... except StudentFacingError as error:
-...     print(error.message.replace('<br/>', '\n'))
+...     print(str(error).replace('<br/>', '\n'))
 There was an error evaluating function rot(...)
 1st input is ok: received a vector of length 3 as expected
 2nd input has an error: received a scalar, expected a vector of length 3

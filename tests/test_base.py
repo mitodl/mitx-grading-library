@@ -1,16 +1,17 @@
 """
 Tests of base class functionality
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 import sys
 from imp import reload
-import mock
 from pytest import raises
 from voluptuous import Error
 import mitxgraders
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, __version__
 from mitxgraders.baseclasses import AbstractGrader
 from mitxgraders.exceptions import MITxError, StudentFacingError
+from tests.helpers import mock
 
 def test_debug_with_author_message():
     grader = StringGrader(
@@ -112,7 +113,7 @@ def test_itemgrader():
     with raises(ConfigError, match="Expected at least one answer in answers"):
         grader = StringGrader(answers=())
         grader(None, "hello")
-    with raises(ConfigError, match="Expected string for student_input, received <type 'int'>"):
+    with raises(ConfigError, match="Expected string for student_input, received {int}".format(int=int)):
         grader = StringGrader(answers="hello")
         grader(None, 5)
 

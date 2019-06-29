@@ -7,7 +7,8 @@ Classes for grading inputs that look like lists:
 
 Both work by farming out the individual objects to other graders.
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 import numpy as np
 from voluptuous import Required, Any
 from mitxgraders.helpers import munkres
@@ -373,8 +374,8 @@ class ListGrader(AbstractGrader):
             results = [self.perform_check(answer_list, student_input) for answer_list in answers]
             return self.get_best_result(results)
         else:
-            msg = "Expected answer to have type <type list>, but received {}"
-            raise ConfigError(msg.format(type(student_input)))
+            msg = "Expected answer to have {0}, but received {1}"
+            raise ConfigError(msg.format(list, type(student_input)))
 
     @staticmethod
     def groupify_list(grouping, thelist):
@@ -463,7 +464,7 @@ class ListGrader(AbstractGrader):
         # If 'subgraders' is a single grader, create a list of references to it.
         graders = (self.config['subgraders'] if self.subgrader_list
                    else [self.config['subgraders'] for _ in answers])
-        compare = zip(graders, answers, grouped_inputs)
+        compare = list(zip(graders, answers, grouped_inputs))
         siblings = [
             {'grader': grader, 'input': theinput}
             for grader, _, theinput in compare

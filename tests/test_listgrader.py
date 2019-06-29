@@ -1,13 +1,14 @@
 """
 Tests for ListGrader
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 import pprint
-import mock
 from pytest import raises
 from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader,
                          NumericalGrader, SingleListGrader)
 from mitxgraders import CalcError
+from tests.helpers import mock
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint
@@ -851,7 +852,7 @@ def test_errors():
         grader(None, ["Hello"])
 
     # Bad input
-    msg = "Expected answer to have type <type list>, but received <type 'tuple'>"
+    msg = "Expected answer to have {list}, but received {tuple}".format(list=list, tuple=tuple)
     with raises(ConfigError, match=msg):
         grader = ListGrader(
             answers=["hello", "there"],

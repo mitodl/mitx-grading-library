@@ -2,6 +2,8 @@
 exceptions.py
 Contains generic grader-related exceptions
 """
+from __future__ import print_function, division, absolute_import
+
 
 class MITxError(Exception):
     """

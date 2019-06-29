@@ -1,7 +1,8 @@
 """
 tests of expression.py with arrays
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 from pytest import raises
 import numpy as np
 from mitxgraders import evaluator, MathArray

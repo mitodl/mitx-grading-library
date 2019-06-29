@@ -47,6 +47,8 @@ Correlated Comparers
 ====================
 See ./baseclasses.py and ./linear_comparer.py for examples.
 """
+from __future__ import print_function, division, absolute_import
+
 from numbers import Number
 import numpy as np
 from mitxgraders.exceptions import InputTypeError, StudentFacingError

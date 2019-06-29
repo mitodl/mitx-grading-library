@@ -1,3 +1,5 @@
+from __future__ import print_function, division, absolute_import
+
 from mitxgraders.sampling import set_seed
 
 def pytest_runtest_setup(item):

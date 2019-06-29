@@ -3,8 +3,7 @@ math_array.py
 
 Contains a subclass of numpy.ndarray with matrix-like operations.
 """
-
-from __future__ import division  # necessary for one of the doctests
+from __future__ import print_function, division, absolute_import
 from contextlib import contextmanager
 from numbers import Number
 import numpy as np
@@ -312,7 +311,7 @@ class MathArray(np.ndarray):
                 raise ShapeError("Cannot raise a matrix to {other.shape_name} powers.".format(
                     other=other))
         else:
-            raise TypeError("Cannot raise matrix to power of type {type}.".format(
+            raise TypeError("Cannot raise matrix to power of {type}.".format(
                 type=type(other)))
 
         # Henceforth:
@@ -330,7 +329,7 @@ class MathArray(np.ndarray):
             try:
                 return np.linalg.matrix_power(self, exponent)
             except np.linalg.linalg.LinAlgError as error:
-                if error.message.startswith('Singular'):
+                if str(error).startswith('Singular'):
                     raise MathArrayError('Cannot raise singular matrix to negative powers.')
                 else:
                     # Not sure what could cause this...
@@ -356,7 +355,7 @@ class MathArray(np.ndarray):
         ...     try:
         ...         A**-1
         ...     except MathArrayError as err:
-        ...         print(err.message)
+        ...         print(err)
         Negative matrix powers have been disabled.
 
         It's only temporary!
