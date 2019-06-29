@@ -127,7 +127,7 @@ def test_addition_with_other_types():
     with raises(ShapeError, match=match):
         A + (1 + 2j)
     with raises(TypeError, match="Cannot add/subtract a matrix with object of "
-                "<type 'list'>"):
+                "{list_type}".format(list_type=list)):
         A + [[1, 2], [4, 5]]
 
 ##########     Test Subtraction     ##########
@@ -179,7 +179,7 @@ def test_subtraction_with_other_types():
     with raises(ShapeError, match=match):
         A - (1 + 2j)
     with raises(TypeError, match="Cannot add/subtract a matrix with object of "
-                "<type 'list'>"):
+                "{list_type}".format(list_type=list)):
         A - [[1, 2], [4, 5]]
 
 ##########     Test Multiplication     ##########
@@ -298,11 +298,11 @@ def test_tensor_multiplication_not_supported():
 def test_multiplication_with_unexpected_types_raises_TypeError():
     A = random_math_array([4, 2])
     B = [1, 2, 3]
-    match = "Cannot multiply a matrix with object of <type 'list'>"
+    match = "Cannot multiply a matrix with object of {list_type}".format(list_type=list)
     with raises(TypeError, match=match):
         A*B
 
-    match = "Cannot multiply object of type <type 'list'> with a matrix."
+    match = "Cannot multiply object of type {list_type} with a matrix.".format(list_type=list)
     with raises(TypeError, match=match):
         B*A
 
@@ -325,7 +325,7 @@ def test_division_by_array_raises_error():
     with raises(ShapeError, match=match):
         A/A
 
-    match = "Cannot divide vector by object of <type 'list'>"
+    match = "Cannot divide vector by object of {list_type}".format(list_type=list)
     with raises(TypeError, match=match):
         A/[1, 2, 3]
 
@@ -370,7 +370,7 @@ def test_power_error_messages():
         2**A
 
     # Weird case with MathArray on the right.
-    match = "Cannot raise <type 'list'> to power of matrix."
+    match = "Cannot raise {list_type} to power of matrix.".format(list_type=list)
     with raises(TypeError, match=match):
         [1, 2, 3]**A
 
@@ -394,7 +394,7 @@ def test_power_error_messages():
     with raises(ShapeError, match=match):
         A**B
 
-    match = "Cannot raise matrix to power of type <type 'list'>."
+    match = "Cannot raise matrix to power of {list_type}.".format(list_type=list)
     with raises(TypeError, match=match):
         A**[1, 2, 3]
 
@@ -415,7 +415,7 @@ def test_scalar_special_cases():
     assert five**three == 125
 
     # With MathArrays on the right:
-    match = "Cannot raise a scalar to a <type 'list'> power"
+    match = "Cannot raise a scalar to a {list} power".format(list=list)
     with raises(TypeError, match=match):
         MathArray(2)**[1, 2, 3]
 

@@ -852,7 +852,7 @@ def test_errors():
         grader(None, ["Hello"])
 
     # Bad input
-    msg = "Expected answer to have type <type list>, but received <type 'tuple'>"
+    msg = "Expected answer to have {list}, but received {tuple}".format(list=list, tuple=tuple)
     with raises(ConfigError, match=msg):
         grader = ListGrader(
             answers=["hello", "there"],

@@ -113,7 +113,7 @@ def test_itemgrader():
     with raises(ConfigError, match="Expected at least one answer in answers"):
         grader = StringGrader(answers=())
         grader(None, "hello")
-    with raises(ConfigError, match="Expected string for student_input, received <type 'int'>"):
+    with raises(ConfigError, match="Expected string for student_input, received {int}".format(int=int)):
         grader = StringGrader(answers="hello")
         grader(None, 5)
 

@@ -374,8 +374,8 @@ class ListGrader(AbstractGrader):
             results = [self.perform_check(answer_list, student_input) for answer_list in answers]
             return self.get_best_result(results)
         else:
-            msg = "Expected answer to have type <type list>, but received {}"
-            raise ConfigError(msg.format(type(student_input)))
+            msg = "Expected answer to have {0}, but received {1}"
+            raise ConfigError(msg.format(type(list()), type(student_input)))
 
     @staticmethod
     def groupify_list(grouping, thelist):

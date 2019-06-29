@@ -268,8 +268,11 @@ def cast_np_numeric_as_builtin(obj, map_across_lists=False):
     >>> z = 3 + 2j
     >>> z128 = np.complex128(z)
     >>> examples = [x, x64, y, y64, z, z128]
-    >>> [type(cast_np_numeric_as_builtin(example)) for example in examples]
-    [<type 'float'>, <type 'float'>, <type 'int'>, <type 'int'>, <type 'complex'>, <type 'complex'>]
+    >>> [
+    ...     type(cast_np_numeric_as_builtin(example))
+    ...     for example in examples
+    ... ] == [float, float, int, int, complex, complex]
+    True
 
     Leaves MathArrays alone:
     >>> from mitxgraders.helpers.calc.math_array import MathArray

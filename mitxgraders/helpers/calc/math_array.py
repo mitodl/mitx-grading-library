@@ -311,7 +311,7 @@ class MathArray(np.ndarray):
                 raise ShapeError("Cannot raise a matrix to {other.shape_name} powers.".format(
                     other=other))
         else:
-            raise TypeError("Cannot raise matrix to power of type {type}.".format(
+            raise TypeError("Cannot raise matrix to power of {type}.".format(
                 type=type(other)))
 
         # Henceforth:
