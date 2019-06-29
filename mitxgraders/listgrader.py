@@ -464,7 +464,7 @@ class ListGrader(AbstractGrader):
         # If 'subgraders' is a single grader, create a list of references to it.
         graders = (self.config['subgraders'] if self.subgrader_list
                    else [self.config['subgraders'] for _ in answers])
-        compare = zip(graders, answers, grouped_inputs)
+        compare = list(zip(graders, answers, grouped_inputs))
         siblings = [
             {'grader': grader, 'input': theinput}
             for grader, _, theinput in compare
