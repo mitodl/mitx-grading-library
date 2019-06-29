@@ -1,6 +1,4 @@
 from __future__ import print_function, division, absolute_import
-# Comparers can be imported by using "from mitxgraders import comparers"
-# and referenced as "comparers.comparer_name"
 
 from mitxgraders.comparers.comparers import (
     equality_comparer,
