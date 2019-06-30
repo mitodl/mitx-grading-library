@@ -5,11 +5,11 @@ Stand-alone validator functions for use in voluptuous Schema
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-import six
 from numbers import Number
-from inspect import getargspec, isbuiltin
+import six
 from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth, Coerce
 from mitxgraders.helpers.compatibility import ensure_text
+from mitxgraders.helpers.get_number_of_args import get_number_of_args
 
 def Positive(thetype):
     """Demand a positive number type"""
@@ -171,120 +171,6 @@ def is_callable(obj):
     """Returns true if obj is callable"""
     return callable(obj)
 
-def get_builtin_positional_args(obj):
-    """
-    Get the number of position arguments on a built-in function by inspecting
-    its docstring. (Built-in functions cannot be inspected by inspect.getargspec.)
-
-    >>> pow.__doc__     # doctest: +ELLIPSIS
-    'pow(x, y[, z]) -> number...
-    >>> get_builtin_positional_args(pow)
-    2
-    """
-    # Built-in functions cannot be inspected by
-    # inspect.getargspec. We have to try and parse
-    # the __doc__ attribute of the function.
-    docstr = obj.__doc__
-    if docstr:
-        items = docstr.split('\n')
-        if items:
-            func_descr = items[0]
-            s = func_descr.replace(obj.__name__, '')
-            idx1 = s.find('(')
-            idx_default = s.find('[')
-            idx2 = s.find(')') if idx_default == -1 else idx_default
-            if idx1 != -1 and idx2 != -1 and (idx2 > idx1+1):
-                argstring = s[idx1+1:idx2]
-                # This gets the argument string
-                # Count the number of commas!
-                return argstring.count(",") + 1
-    return 0  # pragma: no cover
-
-def get_number_of_args(callable_obj):
-    """
-    Get number of positional arguments of function or callable object.
-
-    Examples
-    ========
-
-    Works for simple functions:
-    >>> def f(x, y):
-    ...     return x + y
-    >>> get_number_of_args(f)
-    2
-
-    Positional arguments only:
-    >>> def f(x, y, z=5):
-    ...     return x + y
-    >>> get_number_of_args(f)
-    2
-
-    Works with bound and unbound object methods
-    >>> class Foo:
-    ...     def do_stuff(self, x, y, z):
-    ...         return x*y*z
-    >>> get_number_of_args(Foo.do_stuff) # unbound, is NOT automatically passed self as argument
-    4
-    >>> foo = Foo()
-    >>> get_number_of_args(foo.do_stuff) # bound, is automatically passed self as argument
-    3
-
-    Works for bound and unbound callable objects
-    >>> class Bar:
-    ...     def __call__(self, x, y):
-    ...         return x + y
-    >>> get_number_of_args(Bar) # unbound, is NOT automatically passed self as argument
-    3
-    >>> bar = Bar()
-    >>> get_number_of_args(bar) # bound, is automatically passed self as argument
-    2
-
-    Works on built-in functions (assuming their docstring is correct)
-    >>> import math
-    >>> get_number_of_args(math.sin)
-    1
-
-    Works on numpy ufuncs
-    >>> import numpy as np
-    >>> get_number_of_args(np.sin)
-    1
-
-    Works on RandomFunctions (tested in unit tests due to circular imports)
-    """
-    if isbuiltin(callable_obj):
-        # Built-in function
-        func = callable_obj
-        return get_builtin_positional_args(func)
-    elif hasattr(callable_obj, "nin"):
-        # Matches RandomFunction or numpy ufunc
-        return callable_obj.nin
-    else:
-        try:
-            # Assume object is a function
-            func = callable_obj
-            # see https://docs.python.org/2/library/inspect.html#inspect.getargspec
-            # defaults might be None, or something weird for Mock functions
-            args, _, _, defaults = getargspec(func)
-        except TypeError:
-            # Callable object
-            func = callable_obj.__call__
-            args, _, _, defaults = getargspec(func)
-
-    try:
-        num_args = len(args) - len(defaults)
-    except TypeError:
-        num_args = len(args)
-
-    # If func is a bound method, remove one argument
-    # (in Python 2.7, unbound methods have __self__ = None)
-    try:
-        if func.__self__ is not None:
-            num_args += -1
-    except AttributeError:
-        pass
-
-    return num_args
-
 def is_callable_with_args(num_args):
     """
     Validates that a function is callable and takes num_args arguments
@@ -293,9 +179,11 @@ def is_callable_with_args(num_args):
     >>> def func(x, y): return x + y
     >>> is_callable_with_args(2)(func) == func
     True
-    >>> is_callable_with_args(3)(func) == func # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    Invalid: Expected function... to have 3 arguments, instead it has 2
+    >>> try:                                                # doctest: +ELLIPSIS
+    ...     is_callable_with_args(3)(func) == func
+    ... except Invalid as error:
+    ...     print(error)
+    Expected function ... to have 3 arguments, instead it has 2
 
     Callable objects work, too:
     >>> class Foo:
@@ -304,9 +192,11 @@ def is_callable_with_args(num_args):
     >>> foo = Foo()
     >>> is_callable_with_args(1)(foo) == foo
     True
-    >>> is_callable_with_args(1)(Foo) # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    Invalid: Expected function... to have 1 arguments, instead it has 2
+    >>> try:                                                # doctest: +ELLIPSIS
+    ...     is_callable_with_args(1)(Foo)
+    ... except Invalid as error:
+    ...     print(error)
+    Expected function... to have 1 arguments, instead it has 2
     """
     def _validate(func):
         # first, check that the function is callable
