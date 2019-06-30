@@ -372,14 +372,8 @@ class ListGrader(AbstractGrader):
         else:
             self.config['subgraders'].debuglog = self.debuglog
 
-        # Go and grade the responses
-        if isinstance(student_input, list):
-            # Compute the results for each answer
-            results = [self.perform_check(answer_list, student_input) for answer_list in answers]
-            return self.get_best_result(results)
-        else:
-            msg = "Expected answer to have {0}, but received {1}"
-            raise ConfigError(msg.format(list, type(student_input)))
+        results = [self.perform_check(answer_list, student_input) for answer_list in answers]
+        return self.get_best_result(results)
 
     @staticmethod
     def groupify_list(grouping, thelist):
