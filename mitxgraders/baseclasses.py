@@ -208,87 +208,45 @@ class AbstractGrader(ObjectWithSchema):
         return "<pre>{content}</pre>".format(content=content)
 
     @staticmethod
-    def ensure_list_of_text_inputs(student_input):
-        """
-        Delegated to by AbstractGrader.ensure_text_inputs. Validates whether
-        student_input is a list of text strings.
-
-        Returns:
-        A pair (result, errmsg) where either:
-            - result is a list of text strings and errmsg is None, or
-            - result is None and errmsg is a string describing what went wrong
-        """
-
-        if isinstance(student_input, list):
-            try:
-                return Schema([text_string])(student_input), None
-            except MultipleInvalid as error:
-                pos = error.path[0]
-                errmsg = (
-                    "Expected a list of text strings for student_input, but "
-                    "item at position {pos} has {thetype}"
-                    .format(pos=pos, thetype=type(student_input[pos])))
-        else:
-            errmsg = (
-                "Expected student_input to be a list of text strings, but "
-                "received {}".format(type(student_input)))
-
-        return None, errmsg
-
-    @staticmethod
-    def ensure_single_text_inputs(student_input):
-        """
-        Delegated to by AbstractGrader.ensure_text_inputs. Validates whether
-        student_input is a single text string.
-
-        Returns:
-        A pair (result, errmsg) where either:
-            - result is a text string and errmsg is None, or
-            - result is None and errmsg is a string describing what went wrong
-        """
-        try:
-            return Schema(text_string)(student_input), None
-        except MultipleInvalid:
-            errmsg = (
-                "Expected string for student_input, received {}"
-                .format(type(student_input)))
-            return None, errmsg
-
-    @staticmethod
     def ensure_text_inputs(student_input, allow_lists=True, allow_single=True):
         """
-        Ensures that student_input is a list of text strings or a single text string.
-
-        NOTE:
-            - Overriden by ItemGrader to ensure input is a single text string.
-            - Overriden by ListGrader to ensure input is a list of text strings.
+        Ensures that student_input is a text string or a list of text strings,
+        depending on arguments. Called by ItemGrader and ListGrader with
+        appropriate arguments. Defaults are set to be friendly to user-defined
+        grading classes.
         """
+        # Try to perform validation
+        try:
+            if allow_lists and isinstance(student_input, list):
+                return Schema([text_string])(student_input)
+            elif allow_single and not isinstance(student_input, list):
+                return Schema(text_string)(student_input)
+        except MultipleInvalid as error:
+            if allow_lists:
+                pos = error.path[0]
 
-        # Try to validate the result as text string or [text string], as appropriate
-        if allow_lists:
-            result, list_errmsg = AbstractGrader.ensure_list_of_text_inputs(student_input)
-            if list_errmsg is None:
-                return result
-
-
-        if allow_single:
-            result, single_errmsg = AbstractGrader.ensure_single_text_inputs(student_input)
-            if single_errmsg is None:
-                return result
-
-        # An error happened. Decide the correct case and raise.
+        # The given student_input is invalid, so raise the appropriate error message
         if allow_lists and allow_single:
             msg = ("The student_input passed to a grader should be:\n"
                    " - a text string for problems with a single input box\n"
                    " - a list of text strings for problems with multiple input boxes\n"
-                   "Received student_input of {}").format(type(student_input))
-            raise ConfigError(msg)
+                   "Received student_input of {}"
+                  ).format(type(student_input))
+        elif allow_lists and not isinstance(student_input, list):
+            msg = ("Expected student_input to be a list of text strings, but "
+                   "received {}"
+                  ).format(type(student_input))
         elif allow_lists:
-            raise ConfigError(list_errmsg)
+            msg = ("Expected a list of text strings for student_input, but "
+                   "item at position {pos} has {thetype}"
+                  ).format(pos=pos, thetype=type(student_input[pos]))
         elif allow_single:
-            raise ConfigError(single_errmsg)
+            msg = ("Expected string for student_input, received {}"
+                  ).format(type(student_input))
         else:
             raise ValueError('At least one of (allow_lists, allow_single) must be True.')
+
+        raise ConfigError(msg)
 
 class ItemGrader(AbstractGrader):
     """
