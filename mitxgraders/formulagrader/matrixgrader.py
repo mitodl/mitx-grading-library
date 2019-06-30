@@ -3,10 +3,11 @@ matrixgrader.py
 
 Defines a FormulaGrader subtype that handles matrices, too.
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 from numbers import Number
 from collections import namedtuple
+import six
 from voluptuous import Required, Any
 from mitxgraders.exceptions import InputTypeError
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
@@ -99,14 +100,14 @@ class MatrixGrader(FormulaGrader):
             elif self.config['shape_errors']:
                 raise
             else:
-                return {'ok': False, 'msg': str(err), 'grade_decimal': 0}
+                return {'ok': False, 'msg': six.text_type(err), 'grade_decimal': 0}
         except InputTypeError as err:
             if self.config['suppress_matrix_messages']:
                 return {'ok': False, 'msg': '', 'grade_decimal': 0}
             elif self.config['answer_shape_mismatch']['is_raised']:
                 raise
             else:
-                return {'ok': False, 'grade_decimal': 0, 'msg': str(err)}
+                return {'ok': False, 'grade_decimal': 0, 'msg': six.text_type(err)}
         except (ArgumentShapeError, MathArrayError) as err:
             # If we're using matrix quantities for noncommutative scalars, we
             # might get an ArgumentShapeError from using functions of matrices,

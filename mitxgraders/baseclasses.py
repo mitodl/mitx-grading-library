@@ -6,7 +6,7 @@ Contains base classes for the library:
 * AbstractGrader
 * ItemGrader
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 import numbers
 import abc
@@ -16,6 +16,7 @@ from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
 from mitxgraders.exceptions import ConfigError, MITxError, StudentFacingError
+from mitxgraders.helpers.validatorfuncs import text_string
 
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""
@@ -62,7 +63,6 @@ class ObjectWithSchema(object):
         Checks equality by checking class-equality and config equality.
         """
         return self.__class__ == other.__class__ and self.config == other.config
-
 
 class AbstractGrader(ObjectWithSchema):
     """
@@ -132,6 +132,8 @@ class AbstractGrader(ObjectWithSchema):
             not work when an ItemGrader is embedded inside a ListGrader. See
             ItemGrader.__call__ for the implementation.
         """
+        student_input = self.ensure_text_inputs(student_input)
+
         # Initialize the debug log
         # The debug log always exists and is written to, so that it can be accessed
         # programmatically. It is only output with the grading when config["debug"] is True
@@ -143,9 +145,9 @@ class AbstractGrader(ObjectWithSchema):
         self.log("MITx Grading Library Version " + __version__)
         # Add the student inputs to the debug log
         if isinstance(student_input, list):
-            self.log("Student Responses:\n" + "\n".join(map(str, student_input)))
+            self.log("Student Responses:\n" + "\n".join(map(six.text_type, student_input)))
         else:
-            self.log("Student Response:\n" + str(student_input))
+            self.log("Student Response:\n" + six.text_type(student_input))
 
         # Compute the result of the check
         try:
@@ -156,7 +158,7 @@ class AbstractGrader(ObjectWithSchema):
             elif isinstance(error, MITxError):
                 # we want to re-raise the error with a modified message but the
                 # same class type, hence calling __class__
-                raise error.__class__(str(error).replace('\n', '<br/>'))
+                raise error.__class__(six.text_type(error).replace('\n', '<br/>'))
             else:
                 # Otherwise, give a generic error message
                 if isinstance(student_input, list):
@@ -205,6 +207,46 @@ class AbstractGrader(ObjectWithSchema):
         content = "\n".join(self.debuglog)
         return "<pre>{content}</pre>".format(content=content)
 
+    @staticmethod
+    def ensure_text_inputs(student_input, allow_lists=True, allow_single=True):
+        """
+        Ensures that student_input is a text string or a list of text strings,
+        depending on arguments. Called by ItemGrader and ListGrader with
+        appropriate arguments. Defaults are set to be friendly to user-defined
+        grading classes.
+        """
+        # Try to perform validation
+        try:
+            if allow_lists and isinstance(student_input, list):
+                return Schema([text_string])(student_input)
+            elif allow_single and not isinstance(student_input, list):
+                return Schema(text_string)(student_input)
+        except MultipleInvalid as error:
+            if allow_lists:
+                pos = error.path[0] if error.path else None
+
+        # The given student_input is invalid, so raise the appropriate error message
+        if allow_lists and allow_single:
+            msg = ("The student_input passed to a grader should be:\n"
+                   " - a text string for problems with a single input box\n"
+                   " - a list of text strings for problems with multiple input boxes\n"
+                   "Received student_input of {}").format(type(student_input))
+        elif allow_lists and not isinstance(student_input, list):
+            msg = ("Expected student_input to be a list of text strings, but "
+                   "received {}"
+                  ).format(type(student_input))
+        elif allow_lists:
+            msg = ("Expected a list of text strings for student_input, but "
+                   "item at position {pos} has {thetype}"
+                  ).format(pos=pos, thetype=type(student_input[pos]))
+        elif allow_single:
+            msg = ("Expected string for student_input, received {}"
+                  ).format(type(student_input))
+        else:
+            raise ValueError('At least one of (allow_lists, allow_single) must be True.')
+
+        raise ConfigError(msg)
+
 class ItemGrader(AbstractGrader):
     """
     Abstract base class that represents a grader that grades a single input.
@@ -252,7 +294,7 @@ class ItemGrader(AbstractGrader):
         schema = super(ItemGrader, self).schema_config
         return schema.extend({
             Required('answers', default=tuple()): self.schema_answers,
-            Required('wrong_msg', default=""): str
+            Required('wrong_msg', default=""): text_string
         })
 
     def schema_answers(self, answer_tuple):
@@ -306,7 +348,7 @@ class ItemGrader(AbstractGrader):
         return Schema({
             Required('expect'): self.validate_expect,
             Required('grade_decimal', default=1): All(numbers.Number, Range(0, 1)),
-            Required('msg', default=''): str,
+            Required('msg', default=''): text_string,
             Required('ok', default='computed'): Any('computed', True, False, 'partial')
         })
 
@@ -317,7 +359,7 @@ class ItemGrader(AbstractGrader):
 
         Usually this is a just a string.
         """
-        return Schema(str)(expect)
+        return Schema(text_string)(expect)
 
     @staticmethod
     def grade_decimal_to_ok(grade):
@@ -367,7 +409,7 @@ class ItemGrader(AbstractGrader):
         """
         if value == True:
             return {'ok': True, 'msg': '', 'grade_decimal': 1.0}
-        elif isinstance(value, str) and value.lower() == 'partial':
+        elif isinstance(value, six.text_type) and value.lower() == 'partial':
             return {'ok': 'partial', 'msg': '', 'grade_decimal': 0.5}
         elif value == False:
             return {'ok': False, 'msg': '', 'grade_decimal': 0}
@@ -388,6 +430,7 @@ class ItemGrader(AbstractGrader):
             **kwargs: Anything else that has been passed in. For example, sibling
                 graders when a grader is used as a subgrader in a ListGrader.
         """
+
         # If no answers provided, use the internal configuration
         answers = self.config['answers'] if answers is None else answers
 
@@ -401,11 +444,6 @@ class ItemGrader(AbstractGrader):
             msg = ("There is a problem with the author's problem configuration: "
                    "Expected at least one answer in answers")
             raise ConfigError(msg)
-
-        # Make sure the input is in the expected format
-        if not isinstance(student_input, six.string_types):
-            msg = "Expected string for student_input, received {}"
-            raise ConfigError(msg.format(type(student_input)))
 
         # Compute the results for each answer
         results = [self.check_response(answer, student_input, **kwargs) for answer in answers]
@@ -442,6 +480,10 @@ class ItemGrader(AbstractGrader):
         grader configuration.
         """
         if not self.config['answers'] and expect is not None:
-            self.config['answers'] = self.schema_answers(expect.encode('utf-8'))
+            self.config['answers'] = self.schema_answers(expect)
 
         return super(ItemGrader, self).__call__(expect, student_input)
+
+    @staticmethod
+    def ensure_text_inputs(student_input):
+        return super(ItemGrader, ItemGrader).ensure_text_inputs(student_input, allow_lists=False)

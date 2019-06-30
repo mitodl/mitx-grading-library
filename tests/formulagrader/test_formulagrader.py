@@ -3,6 +3,7 @@ Tests for FormulaGrader and NumericalGrader
 """
 from __future__ import print_function, division, absolute_import
 
+import six
 from pytest import raises
 import numpy as np
 from voluptuous import Error, MultipleInvalid
@@ -18,6 +19,7 @@ from mitxgraders import (
     RandomFunction,
     ConfigError,
 )
+from mitxgraders.helpers.compatibility import UNICODE_PREFIX
 from mitxgraders.exceptions import MissingInput, InvalidInput
 from mitxgraders.sampling import set_seed
 from mitxgraders.version import __version__ as VERSION
@@ -215,7 +217,7 @@ def test_fg_userfunction():
         )
         grader(None, "that'sbad(1)")
 
-    expect = ("1 is not a valid key, must be of {str_type} for dictionary "
+    expect = ("1 is not a valid key, must be of type string for dictionary "
               "value @ data\['user_functions'\]. Got {{1: <ufunc 'tan'>}}").format(
               str_type=str)
     with raises(Error, match=expect):
@@ -232,8 +234,8 @@ def test_fg_userconstants():
     )
     assert grader(None, "hello")['ok']
 
-    expect = ("1 is not a valid key, must be of {str_type} for dictionary "
-              "value @ data\['user_constants'\]. Got {{1: 5}}").format(str_type=str)
+    expect = ("1 is not a valid key, must be of type string for dictionary "
+              "value @ data\['user_constants'\]. Got {1: 5}")
     with raises(Error, match=expect):
         FormulaGrader(
             answers="1",
@@ -466,7 +468,7 @@ def test_fg_config_expect():
 
     # If trying to use comparer, a detailed validation error is raised
     expect = ("to have 3 arguments, instead it has 2 for dictionary value @ "
-              "data\['answers'\]\[0\]\['expect'\]\['comparer'\]")
+              "data\['answers'\]\[0\]\[u?'expect'\]\['comparer'\]")
     with raises(Error, match=expect):
         FormulaGrader(
             answers={
@@ -508,59 +510,59 @@ def test_fg_debug_log():
     "FormulaGrader Debug Info<br/>\n"
     "==============================================================<br/>\n"
     "Functions available during evaluation and allowed in answer:<br/>\n"
-    "{{'abs': <function absolute at 0x...>,<br/>\n"
-    " 'arccos': <function arccos at 0x...>,<br/>\n"
-    " 'arccosh': <function arccosh at 0x...>,<br/>\n"
-    " 'arccot': <function arccot at 0x...>,<br/>\n"
-    " 'arccoth': <function arccoth at 0x...>,<br/>\n"
-    " 'arccsc': <function arccsc at 0x...>,<br/>\n"
-    " 'arccsch': <function arccsch at 0x...>,<br/>\n"
-    " 'arcsec': <function arcsec at 0x...>,<br/>\n"
-    " 'arcsech': <function arcsech at 0x...>,<br/>\n"
-    " 'arcsin': <function arcsin at 0x...>,<br/>\n"
-    " 'arcsinh': <function arcsinh at 0x...>,<br/>\n"
-    " 'arctan': <function arctan at 0x...>,<br/>\n"
-    " 'arctan2': <function arctan2 at 0x...>,<br/>\n"
-    " 'arctanh': <function arctanh at 0x...>,<br/>\n"
-    " 'conj': <ufunc 'conjugate'>,<br/>\n"
-    " 'cosh': <function cosh at 0x...>,<br/>\n"
-    " 'cot': <function cot at 0x...>,<br/>\n"
-    " 'coth': <function coth at 0x...>,<br/>\n"
-    " 'csc': <function csc at 0x...>,<br/>\n"
-    " 'csch': <function csch at 0x...>,<br/>\n"
-    " 'exp': <function exp at 0x...>,<br/>\n"
-    " 'f': <function random_function at 0x...>,<br/>\n"
-    " 'fact': <function factorial at 0x...>,<br/>\n"
-    " 'factorial': <function factorial at 0x...>,<br/>\n"
-    " 'im': <function imag at 0x...>,<br/>\n"
-    " 'kronecker': <function kronecker at 0x...>,<br/>\n"
-    " 'ln': <function log at 0x...>,<br/>\n"
-    " 'log10': <function log10 at 0x...>,<br/>\n"
-    " 'log2': <function log2 at 0x...>,<br/>\n"
-    " 're': <function real at 0x...>,<br/>\n"
-    " 'sec': <function sec at 0x...>,<br/>\n"
-    " 'sech': <function sech at 0x...>,<br/>\n"
-    " 'sinh': <function sinh at 0x...>,<br/>\n"
-    " 'sqrt': <function sqrt at 0x...>,<br/>\n"
-    " 'square': <function <lambda> at 0x...>,<br/>\n"
-    " 'tanh': <function tanh at 0x...>}}<br/>\n"
+    "{{{u}'abs': <function absolute at 0x...>,<br/>\n"
+    " {u}'arccos': <function arccos at 0x...>,<br/>\n"
+    " {u}'arccosh': <function arccosh at 0x...>,<br/>\n"
+    " {u}'arccot': <function arccot at 0x...>,<br/>\n"
+    " {u}'arccoth': <function arccoth at 0x...>,<br/>\n"
+    " {u}'arccsc': <function arccsc at 0x...>,<br/>\n"
+    " {u}'arccsch': <function arccsch at 0x...>,<br/>\n"
+    " {u}'arcsec': <function arcsec at 0x...>,<br/>\n"
+    " {u}'arcsech': <function arcsech at 0x...>,<br/>\n"
+    " {u}'arcsin': <function arcsin at 0x...>,<br/>\n"
+    " {u}'arcsinh': <function arcsinh at 0x...>,<br/>\n"
+    " {u}'arctan': <function arctan at 0x...>,<br/>\n"
+    " {u}'arctan2': <function arctan2 at 0x...>,<br/>\n"
+    " {u}'arctanh': <function arctanh at 0x...>,<br/>\n"
+    " {u}'conj': <ufunc 'conjugate'>,<br/>\n"
+    " {u}'cosh': <function cosh at 0x...>,<br/>\n"
+    " {u}'cot': <function cot at 0x...>,<br/>\n"
+    " {u}'coth': <function coth at 0x...>,<br/>\n"
+    " {u}'csc': <function csc at 0x...>,<br/>\n"
+    " {u}'csch': <function csch at 0x...>,<br/>\n"
+    " {u}'exp': <function exp at 0x...>,<br/>\n"
+    " {u}'f': <function random_function at 0x...>,<br/>\n"
+    " {u}'fact': <function factorial at 0x...>,<br/>\n"
+    " {u}'factorial': <function factorial at 0x...>,<br/>\n"
+    " {u}'im': <function imag at 0x...>,<br/>\n"
+    " {u}'kronecker': <function kronecker at 0x...>,<br/>\n"
+    " {u}'ln': <function log at 0x...>,<br/>\n"
+    " {u}'log10': <function log10 at 0x...>,<br/>\n"
+    " {u}'log2': <function log2 at 0x...>,<br/>\n"
+    " {u}'re': <function real at 0x...>,<br/>\n"
+    " {u}'sec': <function sec at 0x...>,<br/>\n"
+    " {u}'sech': <function sech at 0x...>,<br/>\n"
+    " {u}'sinh': <function sinh at 0x...>,<br/>\n"
+    " {u}'sqrt': <function sqrt at 0x...>,<br/>\n"
+    " {u}'square': <function <lambda> at 0x...>,<br/>\n"
+    " {u}'tanh': <function tanh at 0x...>}}<br/>\n"
     "Functions available during evaluation and disallowed in answer:<br/>\n"
-    "{{'cos': <function cos at 0x...>,<br/>\n"
-    " 'sin': <function sin at 0x...>,<br/>\n"
-    " 'tan': <function tan at 0x...>}}<br/>\n"
+    "{{{u}'cos': <function cos at 0x...>,<br/>\n"
+    " {u}'sin': <function sin at 0x...>,<br/>\n"
+    " {u}'tan': <function tan at 0x...>}}<br/>\n"
     "<br/>\n"
     "<br/>\n"
     "==========================================<br/>\n"
     "Evaluation Data for Sample Number 1 of 2<br/>\n"
     "==========================================<br/>\n"
     "Variables:<br/>\n"
-    "{{'e': 2.718281828459045,<br/>\n"
-    " 'i': 1j,<br/>\n"
-    " 'j': 1j,<br/>\n"
-    " 'pi': 3.141592653589793,<br/>\n"
-    " 'x': 3.195254015709299,<br/>\n"
-    " 'y': 3.860757465489678,<br/>\n"
-    " 'z': (2.205526752143288+2.0897663659937935j)}}<br/>\n"
+    "{{{u}'e': 2.718281828459045,<br/>\n"
+    " {u}'i': 1j,<br/>\n"
+    " {u}'j': 1j,<br/>\n"
+    " {u}'pi': 3.141592653589793,<br/>\n"
+    " {u}'x': 3.195254015709299,<br/>\n"
+    " {u}'y': 3.860757465489678,<br/>\n"
+    " {u}'z': (2.205526752143288+2.0897663659937935j)}}<br/>\n"
     "Student Eval: (14.7111745179+2.08976636599j)<br/>\n"
     "Compare to:  [(14.711174517877566+2.0897663659937935j)]<br/>\n"
     "<br/>\n"
@@ -569,13 +571,13 @@ def test_fg_debug_log():
     "Evaluation Data for Sample Number 2 of 2<br/>\n"
     "==========================================<br/>\n"
     "Variables:<br/>\n"
-    "{{'e': 2.718281828459045,<br/>\n"
-    " 'i': 1j,<br/>\n"
-    " 'j': 1j,<br/>\n"
-    " 'pi': 3.141592653589793,<br/>\n"
-    " 'x': 2.694619197355619,<br/>\n"
-    " 'y': 3.5835764522666245,<br/>\n"
-    " 'z': (1.875174422525385+2.7835460015641598j)}}<br/>\n"
+    "{{{u}'e': 2.718281828459045,<br/>\n"
+    " {u}'i': 1j,<br/>\n"
+    " {u}'j': 1j,<br/>\n"
+    " {u}'pi': 3.141592653589793,<br/>\n"
+    " {u}'x': 2.694619197355619,<br/>\n"
+    " {u}'y': 3.5835764522666245,<br/>\n"
+    " {u}'z': (1.875174422525385+2.7835460015641598j)}}<br/>\n"
     "Student Eval: (11.9397106851+2.78354600156j)<br/>\n"
     "Compare to:  [(11.93971068506166+2.7835460015641598j)]<br/>\n"
     "<br/>\n"
@@ -585,10 +587,10 @@ def test_fg_debug_log():
     "==========================================<br/>\n"
     "Comparer Function: <function equality_comparer at 0x...><br/>\n"
     "Comparison Results:<br/>\n"
-    "[{{'grade_decimal': 1.0, 'msg': '', 'ok': True}},<br/>\n"
-    " {{'grade_decimal': 1.0, 'msg': '', 'ok': True}}]<br/>\n"
+    "[{{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}},<br/>\n"
+    " {{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}}]<br/>\n"
     "</pre>"
-    ).format(version=VERSION)
+    ).format(version=VERSION, u=UNICODE_PREFIX)
     expected = round_decimals_in_string(message)
     result_msg = round_decimals_in_string(result['msg']).replace(
         'test_fg_debug_log.<locals>.', '')
@@ -672,14 +674,14 @@ def test_ng_config():
         )
 
     expect = ("extra keys not allowed @ data\['sample_from'\]\['x'\]. Got "
-              "RealInterval\({'start': 1, 'stop': 5}\)")
+              "RealInterval\({u?'start': 1, u?'stop': 5}\)")
     with raises(Error, match=expect):
         NumericalGrader(
             answers="1",
             sample_from={"x": RealInterval()}
         )
 
-    expect = "not a valid value for dictionary value @ data\['user_functions'\]\['f'\]. " + \
+    expect = "not a valid value for dictionary value @ data\['user_functions'\]\[u?'f'\]. " + \
              "Got RandomFunction"
     with raises(Error, match=expect):
         NumericalGrader(
@@ -687,7 +689,7 @@ def test_ng_config():
             user_functions={"f": RandomFunction()}
         )
 
-    expect = "not a valid value for dictionary value @ data\['user_functions'\]\['f'\]. " + \
+    expect = "not a valid value for dictionary value @ data\['user_functions'\]\[u?'f'\]. " + \
              "Got \[<ufunc 'sin'>, <ufunc 'cos'>\]"
     with raises(Error, match=expect):
         NumericalGrader(

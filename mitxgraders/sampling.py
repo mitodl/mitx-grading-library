@@ -24,18 +24,20 @@ Contains some helper functions used in grading formulae:
 
 All of these classes perform random sampling. To obtain a sample, use class.gen_sample()
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 from numbers import Number
 import abc
 import random
+import six
 import numpy as np
 from voluptuous import Schema, Required, All, Coerce, Any, Extra
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
-    has_keys_of_type, is_shape_specification)
+    has_keys_of_type, is_shape_specification, text_string)
+from mitxgraders.helpers.compatibility import coerce_string_keys_to_text_type
 from mitxgraders.helpers.calc import (
     METRIC_SUFFIXES, CalcError, evaluator, MathArray)
 
@@ -567,8 +569,8 @@ class DependentSampler(VariableSamplingSet):
 
     # Take in an individual or tuple of numbers
     schema_config = Schema({
-        Required('depends'): [str],
-        Required('formula'): str
+        Required('depends'): [text_string],
+        Required('formula'): text_string
     })
 
     def gen_sample(self):
@@ -668,8 +670,16 @@ def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes, cons
         sample_list.append(sample_dict)
     return sample_list
 
+# Used by NumericalGrader
+schema_user_functions_no_random = All(
+    has_keys_of_type(six.string_types),
+    coerce_string_keys_to_text_type,
+    {Extra: is_callable}
+)
+# Used by FormulaGrader and friends
 schema_user_functions = All(
-    has_keys_of_type(str),
+    has_keys_of_type(six.string_types),
+    coerce_string_keys_to_text_type,
     {Extra: Any(is_callable,
                 All([is_callable], Coerce(SpecificFunctions)),
                 FunctionSamplingSet)},
@@ -724,7 +734,8 @@ def construct_functions(default_functions, user_funcs):
 
 def validate_user_constants(*allow_types):
     return All(
-        has_keys_of_type(str),
+        has_keys_of_type(six.string_types),
+        coerce_string_keys_to_text_type,
         {Extra: Any(*allow_types)},
     )
 
@@ -740,10 +751,17 @@ def construct_constants(default_variables, user_consts):
     ...     'e': 2.718281828459045,
     ...     'j': 1j
     ... }
-    >>> construct_constants(default_variables, {})
-    {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'j': 1j}
-    >>> construct_constants(default_variables, {"T": 1.5})
-    {'i': 1j, 'pi': 3.141592653589793, 'e': 2.718281828459045, 'T': 1.5, 'j': 1j}
+    >>> construct_constants(default_variables, {}) == default_variables
+    True
+
+    >>> construct_constants(default_variables, {"T": 1.5}) == {
+    ...     'i': 1j,
+    ...     'pi': 3.141592653589793,
+    ...     'e': 2.718281828459045,
+    ...     'T': 1.5, 'j': 1j
+    ... }
+    True
+
     """
     constants = default_variables.copy()
 
@@ -761,8 +779,9 @@ def construct_suffixes(default_suffixes, metric=False):
     Usage
     =====
     >>> default_suffixes={'%': 0.01}
-    >>> construct_suffixes(default_suffixes)
-    {'%': 0.01}
+    >>> construct_suffixes(default_suffixes) == {'%': 0.01}
+    True
+
     >>> suff = construct_suffixes(default_suffixes, metric=True)
     >>> suff['G'] == 1e9
     True

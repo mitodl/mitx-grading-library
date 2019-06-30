@@ -827,7 +827,7 @@ def test_docs():
     submissions = ['1', '-1', '0', '-1', '0', '1']
     assert grader(None, submissions) == expected_result
 
-def test_errors():
+def test_config_options_errors():
     """Tests to ensure that errors are raised appropriately"""
     # All answers have same length in tuple
     with raises(ConfigError, match="All possible list answers must have the same length"):
@@ -851,14 +851,21 @@ def test_errors():
         )
         grader(None, ["Hello"])
 
+def test_student_input_errors():
+    grader = ListGrader(
+        answers=["hello", "there"],
+        subgraders=StringGrader()
+    )
+
     # Bad input
-    msg = "Expected answer to have {list}, but received {tuple}".format(list=list, tuple=tuple)
-    with raises(ConfigError, match=msg):
-        grader = ListGrader(
-            answers=["hello", "there"],
-            subgraders=StringGrader()
-        )
+    not_list = "Expected student_input to be a list of text strings, but received {tuple}".format(tuple=tuple)
+    with raises(ConfigError, match=not_list):
         grader(None, ("hello", "there"))
+
+    bad_list_entry = ("Expected a list of text strings for student_input, but "
+                      "item at position 1 has {int_type}").format(int_type=int)
+    with raises(ConfigError, match=bad_list_entry):
+        grader(None, ["cat", 7, "dog"])
 
 def test_nested_debug():
     """Ensure that nested debug flags work properly"""

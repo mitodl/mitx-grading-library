@@ -3,11 +3,13 @@ validatorfuncs.py
 
 Stand-alone validator functions for use in voluptuous Schema
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
+import six
 from numbers import Number
 from inspect import getargspec, isbuiltin
 from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth, Coerce
+from mitxgraders.helpers.compatibility import ensure_text
 
 def Positive(thetype):
     """Demand a positive number type"""
@@ -22,7 +24,7 @@ def NonNegative(thetype):
 
 def PercentageString(value):
     """Validate that a string can be interpreted as a positive percentage."""
-    if isinstance(value, str):
+    if isinstance(value, six.string_types):
         work = value.strip()
         if work.endswith("%"):
             try:
@@ -95,9 +97,11 @@ def all_unique(iterable):
 
     Raises an error if any items are duplicated:
     >>> iterable = ['a', 0, '1', 'a', '5', 0, '0']
-    >>> all_unique(iterable)
-    Traceback (most recent call last):
-    Invalid: items should be unique, but have unexpected duplicates: ['a', 0]
+    >>> try:
+    ...     all_unique(iterable)
+    ... except Invalid as error:
+    ...     print(error)
+    items should be unique, but have unexpected duplicates: ['a', 0]
     """
     seen = set()
     duplicates = set()
@@ -125,17 +129,18 @@ def has_keys_of_type(thetype):
 
     Returns argument if valid:
     >>> valid = {'0': 'a', '1': 'b', 'cat': [1, 2]}
-    >>> validator = has_keys_of_type(str)
+    >>> validator = has_keys_of_type(six.text_type)
     >>> validator(valid) == valid
     True
 
     Raises error if argument has invalid keys:
-    >>> invalid_keys = {'0': 'a', 1: 'b', 'cat': [1, 2]}
+    >>> validator = has_keys_of_type(int)
+    >>> invalid_keys = {0: 'a', 1: 'b', 3.14: 'dog'}
     >>> try:                                                # doctest: +ELLIPSIS
     ...     validator(invalid_keys)
     ... except Invalid as error:
     ...     print(error)
-    1 is not a valid key, must be of <... 'str'>
+    3.14 is not a valid key, must be of <... 'int'>
 
     or if argument is not a dictionary:
     >>> not_dict = 5
@@ -143,15 +148,20 @@ def has_keys_of_type(thetype):
     ...     validator(not_dict)
     ... except Invalid as error:
     ...     print(error)
-    expected a dictionary with keys of <... 'str'>
+    expected a dictionary with keys of <... 'int'>
     """
+    if thetype == six.string_types:
+        formatted_thetype = 'type string'
+    else:
+        formatted_thetype = six.text_type(thetype)
+
     def validator(thedict):
         if not isinstance(thedict, dict):
-            raise Invalid('expected a dictionary with keys of {}'.format(thetype))
+            raise Invalid('expected a dictionary with keys of {}'.format(formatted_thetype))
         for key in thedict:
             if not isinstance(key, thetype):
                 raise Invalid("{key} is not a valid key, must be of {thetype}"
-                              .format(key=key, thetype=thetype))
+                              .format(key=key, thetype=formatted_thetype))
 
         return thedict
     return validator
@@ -359,3 +369,13 @@ def Nullable(schema):
     Indicates that a value could be None or satisfy schema.
     """
     return Any(None, schema)
+
+def text_string(obj):
+    """
+    Voluptuous validator that expects text strings and coerces Python 2 string
+    literals to unicode.
+    """
+    if isinstance(obj, six.string_types):
+        return ensure_text(obj)
+
+    raise Invalid('expected str (or unicode)')

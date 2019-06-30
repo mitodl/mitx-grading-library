@@ -4,11 +4,11 @@ stringgrader.py
 Class for grading inputs that correspond to a text string
 * StringGrader
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 import re
 from voluptuous import Required, Any
 from mitxgraders.baseclasses import ItemGrader
-from mitxgraders.helpers.validatorfuncs import NonNegative
+from mitxgraders.helpers.validatorfuncs import NonNegative, text_string
 from mitxgraders.exceptions import InvalidInput, ConfigError
 
 # Set the objects to be imported from this grader
@@ -84,9 +84,9 @@ class StringGrader(ItemGrader):
             Required('min_length', default=0): NonNegative(int),
             Required('min_words', default=0): NonNegative(int),
             Required('explain_minimums', default='err'): Any('err', 'msg', None),
-            Required('validation_pattern', default=None): Any(str, None),
+            Required('validation_pattern', default=None): Any(text_string, None),
             Required('explain_validation', default='err'): Any('err', 'msg', None),
-            Required('invalid_msg', default='Your input is not in the expected format'): str
+            Required('invalid_msg', default='Your input is not in the expected format'): text_string
             })
 
     def clean_input(self, input):
@@ -96,7 +96,7 @@ class StringGrader(ItemGrader):
 
         Also converts tabs and newlines spaces for the purpose of grading.
         """
-        cleaned = str(input)
+        cleaned = text_string(input)
 
         # Convert \t and newline characters (\r and \n) to spaces
         # Note: there is no option for this conversion

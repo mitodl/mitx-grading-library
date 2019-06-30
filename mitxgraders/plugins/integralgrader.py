@@ -5,10 +5,11 @@ Contains IntegralGrader, a class for grading an integral problem, consisting of 
 and upper limits, and integration variable, and an integrand.
 """
 
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 from functools import wraps
 from numbers import Number
+import six
 from scipy import integrate
 from numpy import real, imag
 from voluptuous import Schema, Required, Any, All, Extra, Length, Coerce
@@ -29,7 +30,8 @@ from mitxgraders.helpers.calc import (
     within_tolerance, evaluator, DEFAULT_VARIABLES, DEFAULT_FUNCTIONS)
 from mitxgraders.helpers.calc.mathfuncs import merge_dicts
 from mitxgraders.helpers.validatorfuncs import (
-    Positive, NonNegative, all_unique, PercentageString, is_callable)
+    Positive, NonNegative, all_unique, PercentageString, is_callable,
+    text_string)
 
 __all__ = ["IntegralGrader"]
 
@@ -197,10 +199,10 @@ class IntegralGrader(AbstractGrader):
         # Append options
         return schema.extend({
             Required('answers'): {
-                Required('lower'): str,
-                Required('upper'): str,
-                Required('integrand'): str,
-                Required('integration_variable'): str
+                Required('lower'): text_string,
+                Required('upper'): text_string,
+                Required('integrand'): text_string,
+                Required('integration_variable'): text_string
             },
             Required('input_positions', default=default_input_positions): {
                 Required('lower', default=None): Any(None, Positive(int)),
@@ -218,22 +220,17 @@ class IntegralGrader(AbstractGrader):
             Required('user_constants', default={}): validate_user_constants(Number),
             # Blacklist/Whitelist have additional validation that can't happen here, because
             # their validation is correlated with each other
-            Required('blacklist', default=[]): [str],
+            Required('blacklist', default=[]): [text_string],
             Required('whitelist', default=[]): Any(
                 All([None], Length(min=1, max=1)),
-                [str]
+                [text_string]
             ),
             Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
             Required('samples', default=1): Positive(int),  # default changed to 1
-            Required('variables', default=[]): All([str], all_unique),
+            Required('variables', default=[]): All([text_string], all_unique),
             Required('sample_from', default={}): dict,
             Required('failable_evals', default=0): NonNegative(int)
         })
-
-    schema_user_consts = All(
-        has_keys_of_type(str),
-        {Extra: Any(Number)},
-    )
 
     debug_appendix_template = (
         "\n"
@@ -371,7 +368,7 @@ class IntegralGrader(AbstractGrader):
             return result
         except IntegrationError as error:
             msg = "There appears to be an error with the integral you entered: {}"
-            raise IntegrationError(msg.format(str(error)))
+            raise IntegrationError(msg.format(six.text_type(error)))
 
     def raw_check(self, answer, cleaned_input):
         """Perform the numerical check of student_input vs answer"""
@@ -411,7 +408,7 @@ class IntegralGrader(AbstractGrader):
                 )
             except IntegrationError as error:
                 msg = "Integration Error with author's stored answer: {}"
-                raise ConfigError(msg.format(str(error)))
+                raise ConfigError(msg.format(six.text_type(error)))
 
             student_re, student_im, used_funcs = self.evaluate_int(
                 cleaned_input['integrand'],

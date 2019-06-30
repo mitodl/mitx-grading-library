@@ -1,4 +1,4 @@
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 from numbers import Number
 from mitxgraders.helpers.calc.math_array import MathArray
@@ -25,8 +25,8 @@ def get_description(obj, detailed=True):
     'vector'
 
     Other objects return their class name:
-    >>> get_description("puppy")
-    'str'
+    >>> get_description({})
+    'dict'
     """
     if isinstance(obj, Number):
         return 'scalar'

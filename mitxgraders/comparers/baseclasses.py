@@ -4,6 +4,7 @@ Defines baseclasses for comparers.
 Note: Any callable object with the correct signature can be used as a comparer
 function. We use classes for comparer functions that have configuration options.
 """
+from __future__ import print_function, division, absolute_import, unicode_literals
 import abc
 from mitxgraders.baseclasses import ObjectWithSchema
 

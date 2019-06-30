@@ -47,7 +47,7 @@ Correlated Comparers
 ====================
 See ./baseclasses.py and ./linear_comparer.py for examples.
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 from numbers import Number
 import numpy as np
@@ -223,10 +223,13 @@ def vector_span_comparer(comparer_params_eval, student_eval, utils):
 
     Student input should be nonzero:
     >>> result = grader(None, '[0, 0, 0]')
-    >>> result['ok']
-    False
-    >>> result['msg']
-    'Input should be a nonzero vector.'
+    >>> expected = {
+    ...     'ok': False,
+    ...     'grade_decimal': 0.0,
+    ...     'msg': 'Input should be a nonzero vector.'
+    ... }
+    >>> result == expected
+    True
 
     Input shape is validated:
     >>> grader(None, '5')

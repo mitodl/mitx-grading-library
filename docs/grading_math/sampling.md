@@ -90,8 +90,7 @@ Sample real matrices of a specific shape and norm. (`RealMatrices` uses the Frob
 >>> # Sample 3 by 2 real matrices with norm between 5 and 10
 >>> sampler = RealMatrices(shape=[3, 2], norm=[5, 10])
 >>> # the default is shape=[2, 2] and norm=[1, 5]
->>> default_sampler = RealMatrices()
->>> default_sampler == RealMatrices(shape=[2, 2], norm=[1, 5])
+>>> RealMatrices() == RealMatrices({'norm': [1, 5], 'shape': (2, 2)})
 True
 
 ```
@@ -106,8 +105,8 @@ Sample square matrices of a given dimension consisting of the identity matrix mu
 >>> # Sample 3x3 matrices consisting of a random number between 1 and 3 multiplying the identity
 >>> sampler = IdentityMatrixMultiples(dimension=3, sampler=[1, 3])
 >>> # The default is dimension=2 and sampler=[1, 5]
->>> IdentityMatrixMultiples()
-IdentityMatrixMultiples({'dimension': 2, 'sampler': RealInterval({'start': 1, 'stop': 5})})
+>>> IdentityMatrixMultiples() == IdentityMatrixMultiples(dimension=2, sampler=[1, 5])
+True
 
 ```
 

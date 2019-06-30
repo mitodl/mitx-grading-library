@@ -7,14 +7,14 @@ Classes for grading inputs that look like lists:
 
 Both work by farming out the individual objects to other graders.
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 import numpy as np
 from voluptuous import Required, Any
 from mitxgraders.helpers import munkres
 from mitxgraders.baseclasses import AbstractGrader, ItemGrader
 from mitxgraders.exceptions import ConfigError, MissingInput
-from mitxgraders.helpers.validatorfuncs import Positive
+from mitxgraders.helpers.validatorfuncs import Positive, text_string
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -348,6 +348,10 @@ class ListGrader(AbstractGrader):
                           "instead of ListGrader"
                     raise ConfigError(msg.format(group_idx, num_items, type(subgrader).__name__))
 
+    @staticmethod
+    def ensure_text_inputs(student_input):
+        return super(ListGrader, ListGrader).ensure_text_inputs(student_input, allow_single=False)
+
     def check(self, answers, student_input, **kwargs):
         """Checks student_input against answers, which may be provided"""
         # If no answers provided, use the internal configuration
@@ -368,14 +372,8 @@ class ListGrader(AbstractGrader):
         else:
             self.config['subgraders'].debuglog = self.debuglog
 
-        # Go and grade the responses
-        if isinstance(student_input, list):
-            # Compute the results for each answer
-            results = [self.perform_check(answer_list, student_input) for answer_list in answers]
-            return self.get_best_result(results)
-        else:
-            msg = "Expected answer to have {0}, but received {1}"
-            raise ConfigError(msg.format(list, type(student_input)))
+        results = [self.perform_check(answer_list, student_input) for answer_list in answers]
+        return self.get_best_result(results)
 
     @staticmethod
     def groupify_list(grouping, thelist):
@@ -618,7 +616,7 @@ class SingleListGrader(ItemGrader):
         return schema.extend({
             Required('ordered', default=False): bool,
             Required('length_error', default=False): bool,
-            Required('delimiter', default=','): str,
+            Required('delimiter', default=','): text_string,
             Required('partial_credit', default=True): bool,
             Required('subgrader'): ItemGrader,
             Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
