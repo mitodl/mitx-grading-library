@@ -50,14 +50,13 @@ def ensure_text(s, encoding='utf-8', errors='strict'):
         raise TypeError("not expecting type '%s'" % type(s))
 
 def coerce_string_keys_to_text_type(thedict):
-    seen = set()
+    """
+    Ensures that dictionary string keys are text strings.
+    """
     result = {}
     for key in thedict:
         if isinstance(key, six.string_types):
             new_key = ensure_text(key)
-            if new_key in seen:
-                raise ValueError('after coercion, key {} would be duplicate'.format(key))
-            seen.add(new_key)
             result[new_key] = thedict[key]
         else:
             result[key] = thedict[key]

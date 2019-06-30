@@ -223,15 +223,14 @@ class AbstractGrader(ObjectWithSchema):
                 return Schema(text_string)(student_input)
         except MultipleInvalid as error:
             if allow_lists:
-                pos = error.path[0]
+                pos = error.path[0] if error.path else None
 
         # The given student_input is invalid, so raise the appropriate error message
         if allow_lists and allow_single:
             msg = ("The student_input passed to a grader should be:\n"
                    " - a text string for problems with a single input box\n"
                    " - a list of text strings for problems with multiple input boxes\n"
-                   "Received student_input of {}"
-                  ).format(type(student_input))
+                   "Received student_input of {}").format(type(student_input))
         elif allow_lists and not isinstance(student_input, list):
             msg = ("Expected student_input to be a list of text strings, but "
                    "received {}"

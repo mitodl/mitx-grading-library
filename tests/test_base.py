@@ -4,6 +4,7 @@ Tests of base class functionality
 from __future__ import print_function, division, absolute_import
 
 import sys
+import six
 from imp import reload
 from pytest import raises
 from voluptuous import Error
@@ -289,3 +290,49 @@ def test_error_handing():
     with raises(StudentFacingError, match=match):
         grader = MockGrader(error=ValueError('Rats!\nBats!'))
         grader(None, ['Cats!', 'Gnats!'])
+
+def test_ensure_text_inputs():
+    ensure_text_inputs = AbstractGrader.ensure_text_inputs
+
+    # Lists are ok
+    valid_inputs = ['cat', six.u('dog')]
+    if six.PY2:
+        assert not isinstance(valid_inputs[0], six.text_type)
+        assert isinstance(valid_inputs[1], six.text_type)
+    result = ensure_text_inputs(valid_inputs)
+    assert all(map(six.text_type, result))
+
+    # single text is ok
+    assert isinstance(ensure_text_inputs('cat'), six.text_type)
+    assert isinstance(ensure_text_inputs(six.u('cat')), six.text_type)
+
+    # empty lists are ok:
+    assert ensure_text_inputs([]) == []
+
+def test_ensure_text_inputs_errors():
+    ensure_text_inputs = AbstractGrader.ensure_text_inputs
+
+    msg = ("The student_input passed to a grader should be:\n"
+           " - a text string for problems with a single input box\n"
+           " - a list of text strings for problems with multiple input boxes\n"
+           "Received student_input of {}").format(int)
+    with raises(ConfigError, match=msg):
+        ensure_text_inputs(5)
+
+    msg = ("Expected student_input to be a list of text strings, but "
+           "received {}").format(int)
+    with raises(ConfigError, match=msg):
+        ensure_text_inputs(5, allow_single=False)
+
+    msg = ("Expected a list of text strings for student_input, but "
+           "item at position 1 has {}").format(int)
+    with raises(ConfigError, match=msg):
+        ensure_text_inputs(['cat', 5], allow_single=False)
+
+    msg = "Expected string for student_input, received {}".format(int)
+    with raises(ConfigError,  match=msg):
+        ensure_text_inputs(5, allow_lists=False)
+
+    msg = "At least one of \(allow\_lists, allow\_single\) must be True."
+    with raises(ValueError,  match=msg):
+        ensure_text_inputs('cat', allow_lists=False, allow_single=False)
