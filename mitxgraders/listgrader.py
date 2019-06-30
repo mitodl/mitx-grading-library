@@ -348,9 +348,9 @@ class ListGrader(AbstractGrader):
                           "instead of ListGrader"
                     raise ConfigError(msg.format(group_idx, num_items, type(subgrader).__name__))
 
-    @classmethod
-    def ensure_text_inputs(cls, student_input):
-        return super(ListGrader, cls).ensure_text_inputs(student_input, allow_single=False)
+    @staticmethod
+    def ensure_text_inputs(student_input):
+        return super(ListGrader, ListGrader).ensure_text_inputs(student_input, allow_single=False)
 
     def check(self, answers, student_input, **kwargs):
         """Checks student_input against answers, which may be provided"""

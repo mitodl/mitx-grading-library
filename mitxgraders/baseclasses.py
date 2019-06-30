@@ -207,12 +207,14 @@ class AbstractGrader(ObjectWithSchema):
         content = "\n".join(self.debuglog)
         return "<pre>{content}</pre>".format(content=content)
 
-    @classmethod
-    def ensure_text_inputs(cls, student_input, allow_lists=True, allow_single=True):
+    @staticmethod
+    def ensure_text_inputs(student_input, allow_lists=True, allow_single=True):
         """
-        Ensures that student_input is a list of text strings.
+        Ensures that student_input is a list of text strings or a single text string.
 
-        NOTE: Overriden by ItemGrader to ensure input is a single text string.
+        NOTE:
+            - Overriden by ItemGrader to ensure input is a single text string.
+            - Overriden by ListGrader to ensure input is a list of text strings.
         """
         list_errmsg = None
         single_errmsg = None
@@ -227,7 +229,7 @@ class AbstractGrader(ObjectWithSchema):
                     "item at position {pos} has {thetype}"
                     .format(pos=pos, thetype=type(student_input[pos])))
 
-        if allow_lists and not isinstance(student_input, list):
+        elif allow_lists and not isinstance(student_input, list):
             list_errmsg = (
                 "Expected student_input to be a list of text strings, but "
                 "received {}".format(type(student_input)))
@@ -251,7 +253,7 @@ class AbstractGrader(ObjectWithSchema):
         elif allow_single:
             raise ConfigError(single_errmsg)
         else:
-            raise ValueError('at least one of (allow_lists, allow_single) must be True.')
+            raise ValueError('At least one of (allow_lists, allow_single) must be True.')
 
         try:
             if allow_single:
@@ -498,6 +500,6 @@ class ItemGrader(AbstractGrader):
 
         return super(ItemGrader, self).__call__(expect, student_input)
 
-    @classmethod
-    def ensure_text_inputs(cls, student_input):
-        return super(ItemGrader, cls).ensure_text_inputs(student_input, allow_lists=False)
+    @staticmethod
+    def ensure_text_inputs(student_input):
+        return super(ItemGrader, ItemGrader).ensure_text_inputs(student_input, allow_lists=False)
