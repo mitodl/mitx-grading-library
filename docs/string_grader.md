@@ -117,7 +117,9 @@ Note that this will even accept a blank (empty) response. To reject empty respon
 ...     accept_nonempty=True,
 ...     explain_minimums=None
 ... )
->>> grader(None, 'dog') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
+>>> grader(None, 'dog') == {'grade_decimal': 1,
+...                         'msg': 'Your answer has been recorded.',
+...                         'ok': True}
 True
 >>> grader(None, '') == {'grade_decimal': 0, 'msg': '', 'ok': False}
 True
@@ -136,9 +138,13 @@ You may want students to have to write a certain amount of characters or words i
 ...     min_words=3,    # Require at least 3 words
 ...     explain_minimums='msg'
 ... )
->>> grader(None, 'This is a long answer') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
+>>> grader(None, 'This is a long answer') == {'grade_decimal': 1,
+...                                           'msg': 'Your answer has been recorded.',
+...                                           'ok': True}
 True
->>> grader(None, 'too short') == {'grade_decimal': 0, 'msg': 'Your response is too short (2/3 words)', 'ok': False}
+>>> grader(None, 'too short') == {'grade_decimal': 0,
+...                               'msg': 'Your response is too short (2/3 words)',
+...                               'ok': False}
 True
 
 ```
@@ -178,9 +184,13 @@ Here is an example of using a validation pattern to accept inputs that look like
 ...     strip_all=True,   # Removes all spaces from the input
 ...     accept_any=True
 ... )
->>> grader(None, 'NH_3') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+>>> grader(None, 'NH_3') == {'grade_decimal': 1,
+...                          'msg': '',
+...                          'ok': True}
 True
->>> grader(None, 'KCl') == {'grade_decimal': 0, 'msg': 'Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen', 'ok': False}
+>>> grader(None, 'KCl') == {'grade_decimal': 0,
+...                          'msg': 'Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen',
+...                          'ok': False}
 True
 
 ```

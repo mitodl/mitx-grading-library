@@ -148,3 +148,10 @@ Any `.py` file stored in the `plugins` folder will be automatically loaded. All 
 You can define custom grading classes in your plugin. To learn how this works, we recommend copying the code from `stringgrader.py`, renaming the class, and building a simple plugin based on `StringGrader`.
 
 We are happy to include user-contributed plugins in the repository for this library. If you have built a plugin that you would like to see combined into this library, please contact the authors through [github](https://github.com/mitodl/mitx-grading-library). We are also willing to consider incorporating good plugins into the library itself.
+
+
+## Testing docs
+
+We're trying to make all of our examples test against the library. To invoke tests of the documentation, you can run the following command:
+
+`python -m pytest --no-cov --disable-warnings docs/*`
