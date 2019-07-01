@@ -198,3 +198,25 @@ def test_suffix_capitalization_error():
     match = "Invalid Input: m not permitted directly after a number \(did you mean M\?\)"
     with raises(CalcError, match=match):
         evaluator('5m', variables, functions, suffixes)
+
+
+def test_floor2ceiling():
+    value, used = evaluator('floor(1.5)')
+    assert value == 1
+    value, used = evaluator('ceil(1.5)')
+    assert value == 2
+    value, used = evaluator('floor(-1.5)')
+    assert value == -2
+    value, used = evaluator('ceil(-1.5)')
+    assert value == -1
+
+    # floor and ceil are somewhat unusual in that they do not work with complex arguments
+    # Make sure that these are handled appropriately
+    msg = (r"There was an error evaluating floor\(...\). "
+           "Its input does not seem to be in its domain.")
+    with raises(CalcError, match=msg):
+        evaluator('floor(1+i)')
+    msg = (r"There was an error evaluating ceil\(...\). "
+           "Its input does not seem to be in its domain.")
+    with raises(CalcError, match=msg):
+        evaluator('ceil(1+i)')

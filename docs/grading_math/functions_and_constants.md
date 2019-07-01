@@ -40,6 +40,8 @@ By default, all of the following functions are made available to students in `Fo
 - `arcsech(x)` Inverse Hyperbolic Secant*
 - `arccsch(x)` Inverse Hyperbolic Cosecant*
 - `arccoth(x)` Inverse Hyperbolic Cotangent*
+- `floor(x)` Floor function (applies only to real numbers)
+- `ceil(x)` Ceiling function (applies only to real numbers)
 - `re(x)` Real part of a complex expression*
 - `im(x)` Imaginary part of a complex expression*
 - `conj(x)` Complex conjugate of a complex expression*
