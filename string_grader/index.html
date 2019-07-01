@@ -393,6 +393,7 @@ True</code></pre>
 True
 &gt;&gt;&gt; grader(None, '(2)(1)') == {'grade_decimal': 0, 'msg': '', 'ok': False}
 True
+&gt;&gt;&gt; from mitxgraders.exceptions import InvalidInput
 &gt;&gt;&gt; try:
 ...     grader(None, '(a)(2)')
 ... except InvalidInput as error:
