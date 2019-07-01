@@ -208,6 +208,7 @@ Here, we use validation to ensure that the student input matches the desired for
 True
 >>> grader(None, '(2)(1)') == {'grade_decimal': 0, 'msg': '', 'ok': False}
 True
+>>> from mitxgraders.exceptions import InvalidInput
 >>> try:
 ...     grader(None, '(a)(2)')
 ... except InvalidInput as error:
