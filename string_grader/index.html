@@ -389,6 +389,10 @@ True</code></pre>
 ...     explain_validation='err',
 ...     strip_all=True   # Removes all spaces from the input
 ... )
+&gt;&gt;&gt; grader(None, '(1)(2)') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, '(2)(1)') == {'grade_decimal': 0, 'msg': '', 'ok': False}
+True
 &gt;&gt;&gt; grader(None, '(a)(2)')
 Traceback (most recent call last):
 InvalidInput: Your input is not in the expected format</code></pre>
@@ -396,7 +400,7 @@ InvalidInput: Your input is not in the expected format</code></pre>
 
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to a <code>StringGrader</code>.</p>
-<pre class="codehilite"><code class="language-pycon">grader = SingleListGrader(
+<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
     case_sensitive=bool,  # default True
     strip=bool,  # default True
     clean_spaces=bool,  # default True
