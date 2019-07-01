@@ -232,13 +232,16 @@ def is_shape_specification(min_dim=1, max_dim=None):
 
     Valid inputs are standardized to tuples:
     >>> vec_or_mat = Schema(is_shape_specification(min_dim=1, max_dim=2))
-    >>> map(vec_or_mat, [3, (3,), [3], (4, 2), [4, 2] ])
+    >>> valid_examples = [3, (3,), [3], (4, 2), [4, 2] ]
+    >>> [vec_or_mat(item) for item in valid_examples]
     [(3,), (3,), (3,), (4, 2), (4, 2)]
 
     Invalid inputs raise a useful error:
-    >>> vec_or_mat(0)                               # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    MultipleInvalid: expected shape specification to be a positive integer,...
+    >>> try:                                                # doctest: +ELLIPSIS
+    ...     vec_or_mat(0)
+    ... except Invalid as error:
+    ...     print(error)
+    expected shape specification to be a positive integer,...
     """
 
     msg = ('expected shape specification to be a positive integer, or a '

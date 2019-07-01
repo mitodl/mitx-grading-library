@@ -49,12 +49,16 @@ def number_validator(obj):
     True
 
     Provides a useful error message:
-    >>> number_validator(MathArray([1, 2, 3]))
-    Traceback (most recent call last):
-    Invalid: received a vector of length 3, expected a scalar
-    >>> number_validator([1, 2, 3])
-    Traceback (most recent call last):
-    Invalid: received a list, expected a scalar
+    >>> try:
+    ...     number_validator(MathArray([1, 2, 3]))
+    ... except Invalid as error:
+    ...     print(error)
+    received a vector of length 3, expected a scalar
+    >>> try:
+    ...     number_validator([1, 2, 3])
+    ... except Invalid as error:
+    ...     print(error)
+    received a list, expected a scalar
 
     """
     if isinstance(obj, Number):
@@ -82,33 +86,41 @@ def make_shape_validator(shape):
     MathArray([1, 2, 3, 4])
 
     Provides useful error messages if obj is a number or MathArray:
-    >>> validate_vec4(MathArray([[1, 2, 3], [4, 5, 6]]))
-    Traceback (most recent call last):
-    Invalid: received a matrix of shape (rows: 2, cols: 3), expected a vector of length 4
-    >>> validate_vec4(5)
-    Traceback (most recent call last):
-    Invalid: received a scalar, expected a vector of length 4
+    >>> try:
+    ...     validate_vec4(MathArray([[1, 2, 3], [4, 5, 6]]))
+    ... except Invalid as error:
+    ...     print(error)
+    received a matrix of shape (rows: 2, cols: 3), expected a vector of length 4
+    >>> try:
+    ...     validate_vec4(5)
+    ... except Invalid as error:
+    ...     print(error)
+    received a scalar, expected a vector of length 4
 
     Fallback error message shows Python type:
-    >>> validate_vec4({})
-    Traceback (most recent call last):
-    Invalid: received a dict, expected a vector of length 4
+    >>> try:
+    ...     validate_vec4({})
+    ... except Invalid as error:
+    ...     print(error)
+    received a dict, expected a vector of length 4
 
     Instead of specifying a tuple shape, you can specify 'square' to demand
     square matrices of any dimension.
     >>> validate_square = make_shape_validator('square')
     >>> square2 = MathArray([[1, 2], [3, 4]])
     >>> square3 = MathArray([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> validate_square(square2)
+    >>> validate_square(square2)                # doctest: +NORMALIZE_WHITESPACE
     MathArray([[1, 2],
            [3, 4]])
-    >>> validate_square(square3)
+    >>> validate_square(square3)                # doctest: +NORMALIZE_WHITESPACE
     MathArray([[1, 2, 3],
            [4, 5, 6],
            [7, 8, 9]])
-    >>> validate_square(MathArray([1, 2, 3, 4]))
-    Traceback (most recent call last):
-    Invalid: received a vector of length 4, expected a square matrix
+    >>> try:
+    ...     validate_square(MathArray([1, 2, 3, 4]))
+    ... except Invalid as error:
+    ...     print(error)
+    received a vector of length 4, expected a square matrix
     """
     def shape_validator(obj):
         if isinstance(obj, MathArray):
@@ -167,14 +179,18 @@ class SpecifyDomain(ObjectWithSchema):
     If inputs are bad, student-facing ArgumentShapeErrors are thrown:
     >>> a = MathArray([2, -1, 3])
     >>> b = MathArray([-1, 4])
-    >>> cross(a, b)                                 # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    ArgumentShapeError: There was an error evaluating function cross(...)
+    >>> try:
+    ...     cross(a, b)
+    ... except ArgumentShapeError as error:
+    ...     print(error)
+    There was an error evaluating function cross(...)
     1st input is ok: received a vector of length 3 as expected
     2nd input has an error: received a vector of length 2, expected a vector of length 3
-    >>> cross(a)
-    Traceback (most recent call last):
-    ArgumentError: Wrong number of arguments passed to cross(...): Expected 2 inputs, but received 1.
+    >>> try:
+    ...     cross(a)
+    ... except ArgumentError as error:
+    ...     print(error)
+    Wrong number of arguments passed to cross(...): Expected 2 inputs, but received 1.
 
     To specify that an input should be a an array of specific size, use a list or tuple
     for that shape value. Below, [3, 2] specifies a 3 by 2 matrix (the tuple
@@ -184,9 +200,11 @@ class SpecifyDomain(ObjectWithSchema):
     ... def f(x, y, z):
     ...     pass # implement complicated stuff here
     >>> square_mat = MathArray([[1, 2], [3, 4]])
-    >>> f(1, 2, 3, square_mat)                                      # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    ArgumentShapeError: There was an error evaluating function f(...)
+    >>> try:
+    ...     f(1, 2, 3, square_mat)
+    ... except ArgumentShapeError as error:
+    ...     print(error)
+    There was an error evaluating function f(...)
     1st input is ok: received a scalar as expected
     2nd input has an error: received a scalar, expected a matrix of shape (rows: 3, cols: 2)
     3rd input has an error: received a scalar, expected a vector of length 2
