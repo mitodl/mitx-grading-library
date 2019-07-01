@@ -594,6 +594,9 @@ class SingleListGrader(ItemGrader):
         length_error (bool): Whether to raise an error if the student input has the wrong
             number of entries (default False)
 
+        missing_error (bool): Whether to raise an error if the student input has any blank
+            entries (default True)
+
         delimiter (str): Single character to use as the delimiter between entries (default ',')
 
         partial_credit (bool): Whether to award partial credit for a partly-correct answer
@@ -616,6 +619,7 @@ class SingleListGrader(ItemGrader):
         return schema.extend({
             Required('ordered', default=False): bool,
             Required('length_error', default=False): bool,
+            Required('missing_error', default=True): bool,
             Required('delimiter', default=','): text_string,
             Required('partial_credit', default=True): bool,
             Required('subgrader'): ItemGrader,
@@ -691,6 +695,20 @@ class SingleListGrader(ItemGrader):
         """Check student_input against a given answer list"""
         answers = answer  # Rename from the ItemGrader name
         student_list = student_input.split(self.config['delimiter'])
+
+        # Check for empty entries in the list
+        if self.config['missing_error']:
+            bad_items = []
+            for idx, item in enumerate(item.strip() for item in student_list):
+                if item == "":
+                    bad_items.append(idx + 1)
+            if bad_items:
+                if len(bad_items) == 1:
+                    msg = 'List error: Empty entry detected in position '
+                else:
+                    msg = 'List error: Empty entries detected in positions '
+                msg += ', '.join(map(str, bad_items))
+                raise MissingInput(msg)
 
         if self.config['length_error'] and len(answers) != len(student_list):
             msg = 'List length error: Expected {} terms in the list, but received {}. ' + \

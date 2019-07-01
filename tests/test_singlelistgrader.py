@@ -328,14 +328,38 @@ def test_errors():
     """Tests to ensure that errors are raised appropriately"""
     # All answers have same length in tuple
     with raises(ConfigError, match="All possible list answers must have the same length"):
-        grader = SingleListGrader(
+        SingleListGrader(
             answers=(["1", "2", "3"], ["1", "2"]),
             subgrader=StringGrader()
         )
 
     # Answers must not be empty
     with raises(ConfigError, match="Cannot have an empty list of answers"):
-        grader = SingleListGrader(
+        SingleListGrader(
             answers=([], []),
             subgrader=StringGrader()
         )
+
+    # Empty entries raises an error
+    grader = SingleListGrader(
+        answers=['1', '2', '3'],
+        subgrader=StringGrader()
+    )
+    with raises(MissingInput, match="List error: Empty entry detected in position 1"):
+        grader(None, ',1,2,3')
+    with raises(MissingInput, match="List error: Empty entry detected in position 4"):
+        grader(None, '1,2,3,')
+    with raises(MissingInput, match="List error: Empty entry detected in position 2"):
+        grader(None, '1,,2,3')
+    with raises(MissingInput, match="List error: Empty entries detected in positions 1, 3"):
+        grader(None, ',1,,2,3')
+
+    grader = SingleListGrader(
+        answers=['1', '2', '3'],
+        subgrader=StringGrader(),
+        missing_error=False
+    )
+    grader(None, ',1,2,3')['grade_decimal'] = 0.75
+    grader(None, '1,2,3,')['grade_decimal'] = 0.75
+    grader(None, '1,,2,3')['grade_decimal'] = 0.75
+    grader(None, ',1,2,3,')['grade_decimal'] = 0.6
