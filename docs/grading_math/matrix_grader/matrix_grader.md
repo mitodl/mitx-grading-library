@@ -164,9 +164,11 @@ Vectors are distinct from single-row matrices and single-column matrices, and ca
 >>> vec = MathArray([1, 2, 3])
 >>> row = MathArray([[1, 2, 3]])
 >>> col = MathArray([[1], [2], [3]])
->>> vec + row # raises error
-Traceback (most recent call last):
-MathArrayShapeError: Cannot add/subtract a vector of length 3 with a matrix of shape (rows: 1, cols: 3).
+>>> try:
+...     vec + row # raises error
+... except StudentFacingError as error:
+...     print(error)
+Cannot add/subtract a vector of length 3 with a matrix of shape (rows: 1, cols: 3).
 
 >>> A = MathArray([[1, 2, 3], [4, 5, 6]])
 >>> A * vec # matrix * vector
@@ -200,20 +202,26 @@ Some sample error messages:
 | `'A^2'`   | No  |  Cannot raise a non-square matrix to powers.    |
 | `'B^2'`   | Yes |  n/a    |
 
-<!-- Test the messages -->
+<!-- Test the messages (internal verification, not shown in docs) -->
 <!-- ```pycon
->>> A + B
-Traceback (most recent call last):
-MathArrayShapeError: Cannot add/subtract a matrix of shape (rows: 3, cols: 2) with a matrix of shape (rows: 2, cols: 2).
+>>> from mitxgraders.helpers.calc.exceptions import MathArrayShapeError
+>>> try:
+...     A + B
+... except MathArrayShapeError as error:
+...     print(error)
+Cannot add/subtract a matrix of shape (rows: 3, cols: 2) with a matrix of shape (rows: 2, cols: 2).
 
+>>> try:
+...     v*A
+... except MathArrayShapeError as error:
+...     print(error)
+Cannot multiply a vector of length 2 with a matrix of shape (rows: 3, cols: 2).
 
->>> v*A
-Traceback (most recent call last):
-MathArrayShapeError: Cannot multiply a vector of length 2 with a matrix of shape (rows: 3, cols: 2).
-
->>> A**2
-Traceback (most recent call last):
-MathArrayShapeError: Cannot raise a non-square matrix to powers.
+>>> try:
+...     A**2
+... except MathArrayShapeError as error:
+...     print(error)
+Cannot raise a non-square matrix to powers.
 
 ``` -->
 

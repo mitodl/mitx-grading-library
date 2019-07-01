@@ -131,10 +131,12 @@ The options passed to a grading class undergo extensive validation and graders w
 A few error messages serve only as warnings. For example, if you attempt to configure a `FormulaGrader` with `pi` as a variable, you will receive a warning:
 
 ```pycon
->>> from mitxgraders import FormulaGrader
->>> grader = FormulaGrader(variables=['pi'])
-Traceback (most recent call last):
-ConfigError: Warning: 'variables' contains entries 'pi' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
+>>> from mitxgraders import *
+>>> try:
+...     grader = FormulaGrader(variables=['pi'])
+... except ConfigError as error:
+...     print(error)
+Warning: 'variables' contains entries 'pi' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
 
 ```
 
