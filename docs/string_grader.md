@@ -204,6 +204,10 @@ Here, we use validation to ensure that the student input matches the desired for
 ...     explain_validation='err',
 ...     strip_all=True   # Removes all spaces from the input
 ... )
+>>> grader(None, '(1)(2)') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+>>> grader(None, '(2)(1)') == {'grade_decimal': 0, 'msg': '', 'ok': False}
+True
 >>> grader(None, '(a)(2)')
 Traceback (most recent call last):
 InvalidInput: Your input is not in the expected format
@@ -214,7 +218,7 @@ InvalidInput: Your input is not in the expected format
 ## Option Listing
 
 Here is the full list of options specific to a `StringGrader`.
-```pycon
+```python
 grader = SingleListGrader(
     case_sensitive=bool,  # default True
     strip=bool,  # default True
