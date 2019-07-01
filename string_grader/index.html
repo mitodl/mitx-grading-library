@@ -236,7 +236,7 @@
 <h1 id="stringgrader">StringGrader<a class="headerlink" href="#stringgrader" title="Permanent link"> # </a></h1>
 <p>The <code>StringGrader</code> class grades text inputs. It can perform comparisons to expected answers or patterns, and can also accept arbitrary input. It is the simplest grading class, both in code and in usage.</p>
 <p>To use a <code>StringGrader</code> in its simplest form, simply pass in the set of answers you want to grade, as described in the <a href="../item_grader/">ItemGrader documentation</a>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import StringGrader
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
 &gt;&gt;&gt; grader = StringGrader(
 ...     answers='cat'
 ... )
@@ -300,7 +300,7 @@ True</code></pre>
 
 <p>This will accept <code>Cat</code>, <code>cat</code> and <code>CAT</code>. By default, <code>case_sensitive=True</code>.</p>
 <h2 id="accepting-anything-within-reason">Accepting anything (within reason!)<a class="headerlink" href="#accepting-anything-within-reason" title="Permanent link"> # </a></h2>
-<p>Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). To do this, to set the <code>accept_any</code> flag, which will literally accept anything that is entered into the textbox.</p>
+<p>Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). This can be useful, for example, when asking for a free response to a prompt, and can be used in conjunction with validation (see below) to accept a variety of answers that satisfy a given pattern. To do this, set the <code>accept_any</code> flag, which will literally accept anything that is entered into the textbox.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
 ...     answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
 ...     accept_any=True
@@ -393,7 +393,6 @@ True</code></pre>
 True
 &gt;&gt;&gt; grader(None, '(2)(1)') == {'grade_decimal': 0, 'msg': '', 'ok': False}
 True
-&gt;&gt;&gt; from mitxgraders.exceptions import InvalidInput
 &gt;&gt;&gt; try:
 ...     grader(None, '(a)(2)')
 ... except InvalidInput as error:
