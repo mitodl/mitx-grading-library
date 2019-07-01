@@ -356,7 +356,7 @@ grader = FakeGradingClass(config)</code></pre>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import FormulaGrader
 &gt;&gt;&gt; grader = FormulaGrader(variables=['pi'])
 Traceback (most recent call last):
-ConfigError: Warning: 'variables' contains entries '['pi']' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</code></pre>
+ConfigError: Warning: 'variables' contains entries 'pi' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</code></pre>
 
 
 <p>As the warning message says, if you really want to override the default value of <code>'pi'</code> (not recommended!) then you can suppress this warning by setting <code>suppress_warnings=True</code>.</p>
@@ -418,5 +418,5 @@ ConfigError: Warning: 'variables' contains entries '['pi']' which will override 
 
 <!--
 MkDocs version : 0.17.5
-Build Date UTC : 2019-06-26 02:29:30
+Build Date UTC : 2019-07-01 15:00:35
 -->

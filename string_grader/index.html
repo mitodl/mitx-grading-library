@@ -219,11 +219,13 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#stringgrader">StringGrader</a></li>
+            <li class="second-level"><a href="#cleaning-input">Cleaning Input</a></li>
+                
             <li class="second-level"><a href="#case-sensitive">Case Sensitive</a></li>
                 
-            <li class="second-level"><a href="#stripping-input">Stripping Input</a></li>
-                
             <li class="second-level"><a href="#accepting-anything">Accepting Anything</a></li>
+                
+            <li class="second-level"><a href="#validating-input">Validating Input</a></li>
                 
             <li class="second-level"><a href="#option-listing">Option Listing</a></li>
                 
@@ -232,46 +234,168 @@
         <div class="col-md-9" role="main">
 
 <h1 id="stringgrader">StringGrader<a class="headerlink" href="#stringgrader" title="Permanent link"> # </a></h1>
-<p>The <code>StringGrader</code> class does a letter-for-letter comparison of the student's answer with the expected answer. It is the simplest grading class, both in code and in usage.</p>
-<p>To use a <code>StringGrader</code>, simply pass in the set of answers you want to grade, as described in the <a href="../item_grader/">ItemGrader documentation</a>.</p>
-<pre class="codehilite"><code class="language-python">grader = StringGrader(
-    answers='cat'
-)</code></pre>
+<p>The <code>StringGrader</code> class grades text inputs. It can perform comparisons to expected answers or patterns, and can also accept arbitrary input. It is the simplest grading class, both in code and in usage.</p>
+<p>To use a <code>StringGrader</code> in its simplest form, simply pass in the set of answers you want to grade, as described in the <a href="../item_grader/">ItemGrader documentation</a>.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import StringGrader
+&gt;&gt;&gt; grader = StringGrader(
+...     answers='cat'
+... )
+&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'CAT') == {'grade_decimal': 0, 'msg': '', 'ok': False}
+True
+&gt;&gt;&gt; grader(None, 'Cat') == {'grade_decimal': 0, 'msg': '', 'ok': False}
+True</code></pre>
 
 
 <p>This will accept the answer of <code>cat</code>, but not <code>CAT</code> or <code>Cat</code>, as grading is case-sensitive by default.</p>
-<h2 id="case-sensitive">Case Sensitive<a class="headerlink" href="#case-sensitive" title="Permanent link"> # </a></h2>
-<p>To perform case-insensitive grading, pass in the appropriate flag as follows.</p>
-<pre class="codehilite"><code class="language-python">grader = StringGrader(
-    answers='Cat',
-    case_sensitive=False
-)</code></pre>
-
-
-<p>This will accept <code>Cat</code>, <code>cat</code> and <code>CAT</code>. By default, <code>case_sensitive=True</code>.</p>
-<h2 id="stripping-input">Stripping Input<a class="headerlink" href="#stripping-input" title="Permanent link"> # </a></h2>
+<h2 id="cleaning-input">Cleaning Input<a class="headerlink" href="#cleaning-input" title="Permanent link"> # </a></h2>
 <p>Leading or trailing spaces in an answer rarely change the meaning of the answer. Hence, by default, we strip all leading and trailing spaces from the student input and author-specified answers before comparison. If you want to keep those spaces around for the comparison, you need to disable strip.</p>
-<pre class="codehilite"><code class="language-python">grader = StringGrader(
-    answers='cat',
-    strip=False
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
+...     answers='cat',
+...     strip=False
+... )
+&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, ' cat') == {'grade_decimal': 0, 'msg': '', 'ok': False}
+True</code></pre>
 
 
 <p>This will accept <code>cat</code>, but will reject answers with leading or trailing spaces. By default, <code>strip=True</code>.</p>
+<p>Similarly, if a student uses two (or more) spaces instead of one, that rarely changes the meaning. By default, we convert consecutive spaces into a single space before comparison (this applies to both the instructor-provided answer and the student-provided response). If you want to disable this behavior, you can set <code>clean_spaces=False</code> as follows.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
+...     answers='two  spaces',
+...     clean_spaces=False
+... )
+&gt;&gt;&gt; grader(None, 'two  spaces') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'two spaces') == {'grade_decimal': 0, 'msg': '', 'ok': False}
+True</code></pre>
+
+
+<p>Here, the answer is <code>two  spaces</code>, complete with two spaces. A students' answer of <code>two spaces</code> (with a single space) would be graded incorrect.</p>
+<p>Finally, you may have a situation where spaces are completely irrelevant (e.g., when grading a mathematical expression). To instruct the grader to completely ignore all spaces, set <code>strip_all=True</code>.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
+...     answers='(12)(34)',
+...     strip_all=True
+... )
+&gt;&gt;&gt; grader(None, '(1 2) (3 4)') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True</code></pre>
+
+
+<p>This grader will accept <code>(1 2) (3 4)</code>, ignoring all spaces in the provided answer.</p>
+<h2 id="case-sensitive">Case Sensitive<a class="headerlink" href="#case-sensitive" title="Permanent link"> # </a></h2>
+<p>To perform case-insensitive grading, pass in the appropriate flag as follows.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
+...     answers='Cat',
+...     case_sensitive=False
+... )
+&gt;&gt;&gt; grader(None, 'Cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'CAT') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True</code></pre>
+
+
+<p>This will accept <code>Cat</code>, <code>cat</code> and <code>CAT</code>. By default, <code>case_sensitive=True</code>.</p>
 <h2 id="accepting-anything">Accepting Anything<a class="headerlink" href="#accepting-anything" title="Permanent link"> # </a></h2>
-<p>Sometimes you may just want to accept anything that a student provides. There are two options that allow you to do this. The first is <code>accept_any</code>, which will literally accept anything that is entered into the textbox. The second is <code>accept_nonempty</code>, which requires the textbox to contain a non-empty submission (blank spaces are stripped). <code>accept_any</code> has priority over <code>accept_nonempty</code>.</p>
-<pre class="codehilite"><code class="language-python">grader = StringGrader(
-    answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
-    accept_any=True
-)</code></pre>
+<p>Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). To do this, to set the <code>accept_any</code> flag, which will literally accept anything that is entered into the textbox.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
+...     answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
+...     accept_any=True
+... )
+&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, '') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
+True</code></pre>
 
 
-<p>Note that when either of these options are set to True, it is meaningless to provide more than one answer to check against, as they will all be graded as correct. Also note that you do not need to provide any answer at all in this situation.</p>
+<p>Note that this will even accept a blank (empty) response. To reject empty responses, you can instead use the <code>accept_nonempty</code> flag, which requires at least one character to be submitted (after input cleaning).</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
+...     answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
+...     accept_nonempty=True,
+...     explain_minimums=None
+... )
+&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, '') == {'grade_decimal': 0, 'msg': '', 'ok': False}
+True</code></pre>
+
+
+<p>Note that when either <code>accept_any</code> or <code>accept_nonempty</code> are set to True, you do not need to provide any answer to check against.</p>
+<p>You may want students to have to write a certain amount of characters or words in order to get credit. Two flags are available to facilitate this: <code>min_length</code> and <code>min_words</code>, which set a minimum number of characters and words to be awarded credit, respectively (both default to zero). You can use both of these options together if desired.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
+...     answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
+...     accept_any=True,
+...     min_length=10,  # Require at least 10 characters (after cleaning input)
+...     min_words=3,    # Require at least 3 words
+...     explain_minimums='msg'
+... )
+&gt;&gt;&gt; grader(None, 'This is a long answer') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'too short') == {'grade_decimal': 0, 'msg': 'Your response is too short (2/3 words)', 'ok': False}
+True</code></pre>
+
+
+<p>Note that punctuation doesn't break a word for the purpose of word counting, so <code>isn't word-counting fun?</code> will only count as three words. If <code>accept_nonempty</code> and <code>min_length</code> are both used, the more stringent requirement is the one that is used.</p>
+<p>When a student's answer is rejected because it doesn't meet the minimum requirements, there are three types of feedback that you can provide, controlled by the <code>explain_minimums</code> flag:</p>
+<ul>
+<li>The student receives an error message describing how many words/characters they have, compared to how many are required. This does not consume an attempt (<code>explain_minimums='err'</code>, default)</li>
+<li>The student is graded incorrect, but a message is provided describing how many words/characters they have, compared to how many are required. This does consume an attempt (<code>explain_minimums='msg'</code>)</li>
+<li>The student is graded incorrect, and no explanation is given. This does consume an attempt (<code>explain_minimums=None</code>)</li>
+</ul>
+<p>The flags <code>min_length</code>, <code>min_words</code> and <code>explain_minimums</code> are all ignored if not using <code>accept_any</code> or <code>accept_nonempty</code>.</p>
+<h2 id="validating-input">Validating Input<a class="headerlink" href="#validating-input" title="Permanent link"> # </a></h2>
+<p>Sometimes, you may want to validate student input against a pattern. This can be useful if the student response simply needs to follow a given pattern, or if you want to reject student responses that don't conform to the required format. Validation can be used both when comparing against an expected response, or when using <code>accept_any</code> (and variants).</p>
+<p>Validation is performed by constructing a python regular expressions (regex) pattern, stored in the <code>validation_pattern</code> flag (if you are unfamiliar with regular expressions, there are many excellent tutorials available online to get you started!). After input cleaning, the student input is checked against the pattern for a match. If no match is found, the desired response is returned. Expected answers are also checked against the pattern; if a possible answer does not conform to the pattern, then a <code>ConfigError</code> is raised.</p>
+<p>When a response doesn't satisfy the given pattern, there are three types of feedback that you can provide, controlled by the <code>explain_validation</code> flag:</p>
+<ul>
+<li>The student receives an error message. This does not consume an attempt (<code>explain_validation='err'</code>, default)</li>
+<li>The student is graded incorrect, but receives a message. This does consume an attempt (<code>explain_validation='msg'</code>)</li>
+<li>The student is graded incorrect, and no explanation is given. This does consume an attempt (<code>explain_validation=None</code>)</li>
+</ul>
+<p>In the first two cases, the message provided is given by the <code>invalid_msg</code> flag, which defaults to <code>Your input is not in the expected format</code>.</p>
+<p>Here is an example of using a validation pattern to accept inputs that look like chemical formulae for organic molecules. Note that anything that matches the pattern will be accepted.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
+...     validation_pattern=r'([CNOH](_[0-9])?)+',
+...     explain_validation='msg',
+...     invalid_msg='Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen',
+...     strip_all=True,   # Removes all spaces from the input
+...     accept_any=True
+... )
+&gt;&gt;&gt; grader(None, 'NH_3') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'KCl') == {'grade_decimal': 0, 'msg': 'Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen', 'ok': False}
+True</code></pre>
+
+
+<p>Here, we use validation to ensure that the student input matches the desired format before comparing to the answer, and give the student an error message if their input doesn't match the specification.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
+...     answers='(1)(2)',
+...     validation_pattern=r'\([0-9]\)\([0-9]\)',
+...     explain_validation='err',
+...     strip_all=True   # Removes all spaces from the input
+... )
+&gt;&gt;&gt; grader(None, '(a)(2)')
+Traceback (most recent call last):
+InvalidInput: Your input is not in the expected format</code></pre>
+
+
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to a <code>StringGrader</code>.</p>
-<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    case_sensitive=bool (default True),
-    strip=bool (default False)
+<pre class="codehilite"><code class="language-pycon">grader = SingleListGrader(
+    case_sensitive=bool,  # default True
+    strip=bool,  # default True
+    clean_spaces=bool,  # default True
+    strip_all=bool,  # default False
+    accept_any=bool,  # default False
+    accept_nonempty=bool,  # default False
+    min_words=int &gt;= 0,  # default 0
+    min_length=int &gt;= 0,  # default 0
+    explain_minimums=('err', 'msg', None),  # default 'err'
 )</code></pre></div>
         
     </div>

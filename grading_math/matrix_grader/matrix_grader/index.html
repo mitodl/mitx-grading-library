@@ -266,15 +266,18 @@
 
 
 <p>The next few lines call the grader as a check function. The inputs <code>'4*A*B^2*v'</code> and <code>'4*A*B*B*v'</code> are correct:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader1(None, '4*A*B^2*v')
-{'grade_decimal': 1, 'msg': '', 'ok': True}
-&gt;&gt;&gt; grader1(None, '4*A*B*B*v')
-{'grade_decimal': 1, 'msg': '', 'ok': True}</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; result = grader1(None, '4*A*B^2*v')
+&gt;&gt;&gt; result == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; result = grader1(None, '4*A*B*B*v')
+&gt;&gt;&gt; result == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True</code></pre>
 
 
 <p>while the input <code>'4*B*A*B*v'</code> is incorrect because the matrix-sampled variables are non-commutative:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader1(None, '4*B*A*B*v')
-{'msg': '', 'grade_decimal': 0, 'ok': False}</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; result = grader1(None, '4*B*A*B*v')
+&gt;&gt;&gt; result == {'msg': '', 'grade_decimal': 0, 'ok': False}
+True</code></pre>
 
 
 <h2 id="matrix-sampling">Matrix Sampling<a class="headerlink" href="#matrix-sampling" title="Permanent link"> # </a></h2>
@@ -622,8 +625,8 @@ MathArrayShapeError: Cannot raise a non-square matrix to powers.
 &gt;&gt;&gt; try:
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
-...     str(error.message) # students see this error message
-&quot;Unable to parse vector/matrix. If you're trying to enter a matrix, this is most likely caused by an unequal number of elements in each row.&quot;</code></pre>
+...     print(error) # students see this error message
+Unable to parse vector/matrix. If you're trying to enter a matrix, this is most likely caused by an unequal number of elements in each row.</code></pre>
 
 
 <p>Such parse errors are <strong>always</strong> displayed to students.</p>
@@ -636,8 +639,8 @@ MathArrayShapeError: Cannot raise a non-square matrix to powers.
 &gt;&gt;&gt; try:
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
-...     str(error.message) # students see this error message
-'Cannot add/subtract a vector of length 3 with a vector of length 2.'</code></pre>
+...     print(error) # students see this error message
+Cannot add/subtract a vector of length 3 with a vector of length 2.</code></pre>
 
 
 <p>If you would rather mark the student incorrect when shape errors occur (and also consume an attempt), set <code>shape_errors=False</code>.</p>
@@ -647,22 +650,23 @@ MathArrayShapeError: Cannot raise a non-square matrix to powers.
 ...     answers='[1, 2, 3]',
 ... )
 &gt;&gt;&gt; student_input = '[1, 2, -3]' # wrong answer
-&gt;&gt;&gt; grader(None, student_input) # grade the input like edX would
-{'msg': '', 'grade_decimal': 0, 'ok': False}
+&gt;&gt;&gt; result = grader(None, student_input) # grade the input like edX would
+&gt;&gt;&gt; result == {'msg': '', 'grade_decimal': 0, 'ok': False}
+True
 
 &gt;&gt;&gt; student_input = '[1, 2, 3, 4]' # too many components
 &gt;&gt;&gt; try:
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
-...     str(error.message) # students see this error message
-'Expected answer to be a vector, but input is a vector of incorrect shape'
+...     print(error) # students see this error message
+Expected answer to be a vector, but input is a vector of incorrect shape
 
 &gt;&gt;&gt; student_input = '0' # scalar; should be a vector
 &gt;&gt;&gt; try:
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
-...     str(error.message) # students see this error message
-'Expected answer to be a vector, but input is a scalar'</code></pre>
+...     print(error) # students see this error message
+Expected answer to be a vector, but input is a scalar</code></pre>
 
 
 <p>The default handling of shape errors that arise when comparing student input to author's answer is:</p>
@@ -684,8 +688,13 @@ MathArrayShapeError: Cannot raise a non-square matrix to powers.
 ...     }
 ... )
 &gt;&gt;&gt; student_input = '0' # wrong shape
-&gt;&gt;&gt; grader(None, student_input) # grade the input like edX would
-{'grade_decimal': 0, 'msg': 'Expected answer to be a vector of length 3, but input is a scalar', 'ok': False}</code></pre>
+&gt;&gt;&gt; result = grader(None, student_input) # grades the input like edX would
+&gt;&gt;&gt; result == {
+...   'grade_decimal': 0,
+...   'msg': 'Expected answer to be a vector of length 3, but input is a scalar',
+...   'ok': False
+... }
+True</code></pre>
 
 
 <h3 id="hiding-all-messages">Hiding all messages<a class="headerlink" href="#hiding-all-messages" title="Permanent link"> # </a></h3>

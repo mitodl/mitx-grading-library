@@ -270,7 +270,7 @@
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; try:
 ...     grader_1(None, 'rot(v, theta, [0, 0, 1])')
 ... except StudentFacingError as error:
-...     print(error.message)
+...     print(error)
 There was an error evaluating rot(...). Its input does not seem to be in its domain.</code></pre>
 
 
@@ -299,7 +299,7 @@ There was an error evaluating rot(...). Its input does not seem to be in its dom
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; try:
 ...     grader_2(None, 'rot(v, theta, [0, 0, 1])')
 ... except StudentFacingError as error:
-...     print(error.message.replace('&lt;br/&gt;', '\n'))
+...     print(str(error).replace('&lt;br/&gt;', '\n'))
 There was an error evaluating function rot(...)
 1st input is ok: received a vector of length 3 as expected
 2nd input has an error: received a scalar, expected a vector of length 3
