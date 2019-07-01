@@ -393,9 +393,11 @@ True</code></pre>
 True
 &gt;&gt;&gt; grader(None, '(2)(1)') == {'grade_decimal': 0, 'msg': '', 'ok': False}
 True
-&gt;&gt;&gt; grader(None, '(a)(2)')
-Traceback (most recent call last):
-InvalidInput: Your input is not in the expected format</code></pre>
+&gt;&gt;&gt; try:
+...     grader(None, '(a)(2)')
+... except InvalidInput as error:
+...     print(error)
+Your input is not in the expected format</code></pre>
 
 
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
