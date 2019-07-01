@@ -63,7 +63,7 @@ grader = SingleListGrader(
 
 If you give this `cat`, it will tell you that you've got the wrong length, and won't use up an attempt.
 
-`Length_error` is False by default. If you set `length_error` to True, then all answers in a tuple of lists (rather than a single answer list) must have the same length.
+By default, `length_error` is set to False. If you set `length_error` to True, then all answers in a tuple of lists (rather than a single answer list) must have the same length.
 
 
 ## Empty Entries
