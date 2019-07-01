@@ -265,7 +265,9 @@ ELEMENTWISE_FUNCTIONS = {
     'arctanh': np.lib.scimath.arctanh,
     'arcsech': arcsech,
     'arccsch': arccsch,
-    'arccoth': arccoth
+    'arccoth': arccoth,
+    'floor': np.floor,
+    'ceil': np.ceil
 }
 
 def has_one_scalar_input(display_name):
