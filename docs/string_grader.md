@@ -91,7 +91,7 @@ True
 This will accept `Cat`, `cat` and `CAT`. By default, `case_sensitive=True`.
 
 
-## Accepting Anything
+## Accepting anything (within reason!)
 
 Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). To do this, to set the `accept_any` flag, which will literally accept anything that is entered into the textbox.
 
@@ -229,5 +229,8 @@ grader = SingleListGrader(
     min_words=int >= 0,  # default 0
     min_length=int >= 0,  # default 0
     explain_minimums=('err', 'msg', None),  # default 'err'
+    validation_pattern=str,  # default None
+    explain_validation=('err', 'msg', None),  # default 'err'
+    invalid_msg=str,  # default 'Your input is not in the expected format'
 )
 ```
