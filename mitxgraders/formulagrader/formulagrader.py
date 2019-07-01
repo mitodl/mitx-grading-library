@@ -72,13 +72,14 @@ def validate_forbidden_strings_not_used(expr, forbidden_strings, forbidden_msg):
     True
 
     Fails validation if any forbidden string is used:
-    >>> validate_forbidden_strings_not_used(
-    ... 'sin(x+x)',
-    ... ['*x', '+ x', '- x'],
-    ... 'A forbidden string was used!'
-    ... )
-    Traceback (most recent call last):
-    InvalidInput: A forbidden string was used!
+    >>> try:
+    ...     validate_forbidden_strings_not_used(
+    ...         'sin(x+x)',
+    ...         ['*x', '+ x', '- x'],
+    ...         'A forbidden string was used!')
+    ... except InvalidInput as error:
+    ...     print(error)
+    A forbidden string was used!
     """
     stripped_expr = expr.replace(' ', '')
     for forbidden in forbidden_strings:
@@ -101,14 +102,15 @@ def validate_only_permitted_functions_used(used_funcs, permitted_functions):
     ... set(['f', 'g', 'sin', 'cos'])
     ... )
     True
-    >>> validate_only_permitted_functions_used(
-    ... set(['f', 'Sin', 'h']),
-    ... set(['f', 'g', 'sin', 'cos'])
-    ... )
-    Traceback (most recent call last):
-    InvalidInput: Invalid Input: function(s) 'h', 'Sin' not permitted in answer
+    >>> try:
+    ...     validate_only_permitted_functions_used(
+    ...         set(['f', 'Sin', 'h']),
+    ...         set(['f', 'g', 'sin', 'cos']))
+    ... except InvalidInput as error:
+    ...     print(error)
+    Invalid Input: function(s) 'Sin', 'h' not permitted in answer
     """
-    used_not_permitted = [f for f in used_funcs if f not in permitted_functions]
+    used_not_permitted = sorted([f for f in used_funcs if f not in permitted_functions])
     if used_not_permitted:
         func_names = ", ".join(["'{f}'".format(f=f) for f in used_not_permitted])
         message = "Invalid Input: function(s) {} not permitted in answer".format(func_names)
@@ -167,14 +169,15 @@ def get_permitted_functions(default_funcs, whitelist, blacklist, always_allowed)
     Blacklist and whitelist cannot be simultaneously used:
     >>> default_funcs = {'sin': None, 'cos': None, 'tan': None}
     >>> always_allowed = {'f1': None, 'f2': None}
-    >>> get_permitted_functions(
-    ...     default_funcs,
-    ...     ['sin'],
-    ...     ['cos'],
-    ...     always_allowed
-    ... )
-    Traceback (most recent call last):
-    ValueError: whitelist and blacklist cannot both be non-empty
+    >>> try:
+    ...     get_permitted_functions(
+    ...         default_funcs,
+    ...         ['sin'],
+    ...         ['cos'],
+    ...         always_allowed)
+    ... except ValueError as error:
+    ...     print(error)
+    whitelist and blacklist cannot both be non-empty
     """
     # should never trigger except in doctest above,
     # Grader's config validation should raise an error first
@@ -200,12 +203,13 @@ def validate_required_functions_used(used_funcs, required_funcs):
     ... ['cos', 'f']
     ... )
     True
-    >>> validate_required_functions_used(
-    ... ['sin', 'cos', 'F', 'g'],
-    ... ['cos', 'f']
-    ... )
-    Traceback (most recent call last):
-    InvalidInput: Invalid Input: Answer must contain the function f
+    >>> try:
+    ...     validate_required_functions_used(
+    ...     ['sin', 'cos', 'F', 'g'],
+    ...     ['cos', 'f'])
+    ... except InvalidInput as error:
+    ...     print(error)
+    Invalid Input: Answer must contain the function f
     """
     for func in required_funcs:
         if func not in used_funcs:
@@ -262,21 +266,25 @@ def validate_no_collisions(config, keys):
 
     Duplicate entries raise a ConfigError:
     >>> keys = ['variables', 'user_constants', 'numbered_vars']
-    >>> validate_no_collisions({
-    ...     'variables':['a', 'b', 'c', 'x', 'y'],
-    ...     'user_constants':{'x': 5, 'y': 10},
-    ...     'numbered_vars':['phi', 'psi']
-    ... }, keys)
-    Traceback (most recent call last):
-    ConfigError: 'user_constants' and 'variables' contain duplicate entries: ['x', 'y']
+    >>> try:
+    ...     validate_no_collisions({
+    ...         'variables':['a', 'b', 'c', 'x', 'y'],
+    ...         'user_constants':{'x': 5, 'y': 10},
+    ...         'numbered_vars':['phi', 'psi']
+    ...         }, keys)
+    ... except ConfigError as error:
+    ...     print(error)
+    'user_constants' and 'variables' contain duplicate entries: ['x', 'y']
 
-    >>> validate_no_collisions({
-    ...     'variables':['a', 'psi', 'phi', 'X', 'Y'],
-    ...     'user_constants':{'x': 5, 'y': 10},
-    ...     'numbered_vars':['phi', 'psi']
-    ... }, keys)
-    Traceback (most recent call last):
-    ConfigError: 'numbered_vars' and 'variables' contain duplicate entries: ['phi', 'psi']
+    >>> try:
+    ...     validate_no_collisions({
+    ...         'variables':['a', 'psi', 'phi', 'X', 'Y'],
+    ...         'user_constants':{'x': 5, 'y': 10},
+    ...         'numbered_vars':['phi', 'psi']
+    ...         }, keys)
+    ... except ConfigError as error:
+    ...     print(error)
+    'numbered_vars' and 'variables' contain duplicate entries: ['phi', 'psi']
 
     Without duplicates, return True
     >>> validate_no_collisions({
@@ -308,13 +316,12 @@ def warn_if_override(config, key, defaults):
     =====
 
     >>> config = {'vars': ['a', 'b', 'cat', 'psi', 'pi']}
-    >>> warn_if_override(
-    ... config,
-    ... 'vars',
-    ... {'cat': 1, 'pi': 2}
-    ... ) # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    ConfigError: Warning: 'vars' contains entries 'cat', 'pi' ...
+    >>> defaults = {'cat': 1, 'pi': 2}
+    >>> try:
+    ...     warn_if_override(config, 'vars', defaults) # doctest: +ELLIPSIS
+    ... except ConfigError as error:
+    ...     print(error)
+    Warning: 'vars' contains entries 'cat', 'pi' ...
 
     >>> config = {'vars': ['a', 'b', 'cat', 'psi', 'pi'], 'suppress_warnings': True}
     >>> warn_if_override(

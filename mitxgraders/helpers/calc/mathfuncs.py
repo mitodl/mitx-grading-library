@@ -128,7 +128,7 @@ def real(z):
     >>> isinstance(real(2+3j), float)
     True
 
-    Can be used with arrays, too:
+    Can be used with arrays, too:               # doctest: +NORMALIZE_WHITESPACE
     >>> real(np.array([1+10j, 2+20j, 3+30j]))
     array([ 1.,  2.,  3.])
     """
@@ -190,9 +190,11 @@ def factorial(z):
     True
 
     Throws errors at poles:
-    >>> factorial(-2)                           # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    FunctionEvalError: Error evaluating factorial() or fact() in input...
+    >>> try:                                                # doctest: +ELLIPSIS
+    ...     factorial(-2)
+    ... except FunctionEvalError as error:
+    ...     print(error)
+    Error evaluating factorial() or fact() in input...
     """
 
     try:
@@ -442,18 +444,20 @@ def is_nearly_zero(x, tolerance, reference=None):
     False
 
     Works for arrays, too:
-    >>> x = np.array([[1, 1], [1, -1]])/10
-    >>> round(np.linalg.norm(x), 6)
-    0.2
-    >>> is_nearly_zero(x, '5%', reference=10)
+    >>> x = np.array([[1, 1], [0, -1]])
+    >>> np.linalg.norm(x)                                   # doctest: +ELLIPSIS
+    1.732050...
+    >>> is_nearly_zero(x, '18%', reference=10)
     True
-    >>> is_nearly_zero(x, '1.5%', reference=10)
+    >>> is_nearly_zero(x, '17%', reference=10)
     False
 
     A ValueError is raised when percentage tolerance is used without reference:
-    >>> is_nearly_zero(0.4, '3%')
-    Traceback (most recent call last):
-    ValueError: When tolerance is a percentage, reference must not be None.
+    >>> try:
+    ...     is_nearly_zero(0.4, '3%')
+    ... except ValueError as error:
+    ...     print(error)
+    When tolerance is a percentage, reference must not be None.
     """
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
