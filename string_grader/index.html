@@ -223,7 +223,7 @@
                 
             <li class="second-level"><a href="#case-sensitive">Case Sensitive</a></li>
                 
-            <li class="second-level"><a href="#accepting-anything">Accepting Anything</a></li>
+            <li class="second-level"><a href="#accepting-anything-within-reason">Accepting anything (within reason!)</a></li>
                 
             <li class="second-level"><a href="#validating-input">Validating Input</a></li>
                 
@@ -299,7 +299,7 @@ True</code></pre>
 
 
 <p>This will accept <code>Cat</code>, <code>cat</code> and <code>CAT</code>. By default, <code>case_sensitive=True</code>.</p>
-<h2 id="accepting-anything">Accepting Anything<a class="headerlink" href="#accepting-anything" title="Permanent link"> # </a></h2>
+<h2 id="accepting-anything-within-reason">Accepting anything (within reason!)<a class="headerlink" href="#accepting-anything-within-reason" title="Permanent link"> # </a></h2>
 <p>Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). To do this, to set the <code>accept_any</code> flag, which will literally accept anything that is entered into the textbox.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
 ...     answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
@@ -410,6 +410,9 @@ InvalidInput: Your input is not in the expected format</code></pre>
     min_words=int &gt;= 0,  # default 0
     min_length=int &gt;= 0,  # default 0
     explain_minimums=('err', 'msg', None),  # default 'err'
+    validation_pattern=str,  # default None
+    explain_validation=('err', 'msg', None),  # default 'err'
+    invalid_msg=str,  # default 'Your input is not in the expected format'
 )</code></pre></div>
         
     </div>
