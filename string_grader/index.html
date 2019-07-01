@@ -319,7 +319,9 @@ True</code></pre>
 ...     accept_nonempty=True,
 ...     explain_minimums=None
 ... )
-&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
+&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 1,
+...                         'msg': 'Your answer has been recorded.',
+...                         'ok': True}
 True
 &gt;&gt;&gt; grader(None, '') == {'grade_decimal': 0, 'msg': '', 'ok': False}
 True</code></pre>
@@ -334,9 +336,13 @@ True</code></pre>
 ...     min_words=3,    # Require at least 3 words
 ...     explain_minimums='msg'
 ... )
-&gt;&gt;&gt; grader(None, 'This is a long answer') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
+&gt;&gt;&gt; grader(None, 'This is a long answer') == {'grade_decimal': 1,
+...                                           'msg': 'Your answer has been recorded.',
+...                                           'ok': True}
 True
-&gt;&gt;&gt; grader(None, 'too short') == {'grade_decimal': 0, 'msg': 'Your response is too short (2/3 words)', 'ok': False}
+&gt;&gt;&gt; grader(None, 'too short') == {'grade_decimal': 0,
+...                                           'msg': 'Your response is too short (2/3 words)',
+...                                           'ok': False}
 True</code></pre>
 
 
@@ -366,9 +372,13 @@ True</code></pre>
 ...     strip_all=True,   # Removes all spaces from the input
 ...     accept_any=True
 ... )
-&gt;&gt;&gt; grader(None, 'NH_3') == {'grade_decimal': 1, 'msg': '', 'ok': True}
+&gt;&gt;&gt; grader(None, 'NH_3') == {'grade_decimal': 1,
+...                          'msg': '',
+...                          'ok': True}
 True
-&gt;&gt;&gt; grader(None, 'KCl') == {'grade_decimal': 0, 'msg': 'Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen', 'ok': False}
+&gt;&gt;&gt; grader(None, 'KCl') == {'grade_decimal': 0,
+...                          'msg': 'Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen',
+...                          'ok': False}
 True</code></pre>
 
 
