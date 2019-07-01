@@ -5,7 +5,7 @@ The `StringGrader` class grades text inputs. It can perform comparisons to expec
 To use a `StringGrader` in its simplest form, simply pass in the set of answers you want to grade, as described in the [ItemGrader documentation](item_grader.md).
 
 ```pycon
->>> from mitxgraders import StringGrader
+>>> from mitxgraders import *
 >>> grader = StringGrader(
 ...     answers='cat'
 ... )
@@ -93,7 +93,7 @@ This will accept `Cat`, `cat` and `CAT`. By default, `case_sensitive=True`.
 
 ## Accepting anything (within reason!)
 
-Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). To do this, to set the `accept_any` flag, which will literally accept anything that is entered into the textbox.
+Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). This can be useful, for example, when asking for a free response to a prompt, and can be used in conjunction with validation (see below) to accept a variety of answers that satisfy a given pattern. To do this, set the `accept_any` flag, which will literally accept anything that is entered into the textbox.
 
 ```pycon
 >>> grader = StringGrader(
@@ -208,7 +208,6 @@ Here, we use validation to ensure that the student input matches the desired for
 True
 >>> grader(None, '(2)(1)') == {'grade_decimal': 0, 'msg': '', 'ok': False}
 True
->>> from mitxgraders.exceptions import InvalidInput
 >>> try:
 ...     grader(None, '(a)(2)')
 ... except InvalidInput as error:

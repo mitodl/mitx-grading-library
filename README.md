@@ -41,7 +41,7 @@ To install:
 0. (Optional) Create and activate a new python virtual environment.
 1. Clone this repository and `cd` into it.
 2. Run `pip install -r requirements.txt` to install the requirements specified in `requirements.txt`.
-3. Run `pytest` to check that tests are passing.
+3. Run `pytest` to check that tests are passing. (To invoke tests of just the documentation, you can run the following command: `python -m pytest --no-cov --disable-warnings docs/*`)
 
 
 ## FAQ
