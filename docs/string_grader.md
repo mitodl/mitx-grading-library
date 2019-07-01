@@ -208,9 +208,11 @@ Here, we use validation to ensure that the student input matches the desired for
 True
 >>> grader(None, '(2)(1)') == {'grade_decimal': 0, 'msg': '', 'ok': False}
 True
->>> grader(None, '(a)(2)')
-Traceback (most recent call last):
-InvalidInput: Your input is not in the expected format
+>>> try:
+...     grader(None, '(a)(2)')
+... except InvalidInput as error:
+...     print(error)
+Your input is not in the expected format
 
 ```
 
