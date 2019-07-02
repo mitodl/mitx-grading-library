@@ -51,25 +51,98 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 
 from numbers import Number
 import numpy as np
+
+from voluptuous import Schema, Required
+
 from mitxgraders.exceptions import InputTypeError, StudentFacingError
+from mitxgraders.helpers.validatorfuncs import is_callable
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 from mitxgraders.helpers.calc.math_array import are_same_length_vectors, is_vector
+from mitxgraders.comparers.baseclasses import Comparer
 
-def equality_comparer(comparer_params_eval, student_eval, utils):
+class EqualityComparer(Comparer):
     """
-    Default comparer function used by FormulaGrader, NumericalGrader,
-    and MatrixGrader. Checks for equality.
-
-    comparer_params: ['expected_input']
+    This comparer checks for equality between the student and instructor results,
+    up to a desired tolerance.
     """
-    expected_input = comparer_params_eval[0]
+    schema_config = Schema({
+        # Schema is presently empty, as EqualityComparer currently has no options to set
+    })
 
-    if hasattr(utils, 'validate_shape'):
-        # in numpy, scalars have empty tuples as their shapes
-        shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
-        utils.validate_shape(student_eval, shape)
+    def __call__(self, comparer_params_eval, student_eval, utils):
+        expected_input = comparer_params_eval[0]
 
-    return utils.within_tolerance(expected_input, student_eval)
+        if hasattr(utils, 'validate_shape'):
+            # in numpy, scalars have empty tuples as their shapes
+            shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
+            utils.validate_shape(student_eval, shape)
+
+        return utils.within_tolerance(expected_input, student_eval)
+
+equality_comparer = EqualityComparer()
+
+class ApplyFunctionComparer(Comparer):
+    """
+    This comparer applies a given function to the student and instructor evaluations before
+    comparing for equality.
+
+    comparer_params: ['expect']  # Expression before application of function!
+
+    The following example applies cosine to the expected answer and student input
+    before comparison:
+    >>> from mitxgraders import *
+    >>> import numpy as np
+    >>> grader = FormulaGrader(
+    ...     answers={
+    ...         'comparer': ApplyFunctionComparer(function=np.cos),
+    ...         'comparer_params': ['x']
+    ...     },
+    ...     variables=['x']
+    ... )
+    >>> grader(None, 'x')['ok']
+    True
+    >>> grader(None, '-x')['ok']
+    True
+    >>> grader(None, 'x + 2*pi')['ok']
+    True
+    >>> grader(None, 'x + pi')['ok']
+    False
+
+    The following example takes the norm of the expected answer and student input
+    before comparison:
+    >>> from mitxgraders import *
+    >>> grader = MatrixGrader(
+    ...     answers={
+    ...         'comparer': ApplyFunctionComparer(function=np.linalg.norm),
+    ...         'comparer_params': ['[1, 0, 0]']
+    ...     }
+    ... )
+    >>> grader(None, '[1, 0, 0]')['ok']
+    True
+    >>> grader(None, '[0, 1, 0]')['ok']
+    True
+    >>> grader(None, '[1/sqrt(2), 0, 1/sqrt(2)]')['ok']
+    True
+
+    """
+    schema_config = Schema({
+        Required('function'): is_callable
+    })
+
+    def __call__(self, comparer_params_eval, student_eval, utils):
+        # Validate in the same manner as EqualityComparer
+        expected_input = comparer_params_eval[0]
+
+        if hasattr(utils, 'validate_shape'):
+            # in numpy, scalars have empty tuples as their shapes
+            shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
+            utils.validate_shape(student_eval, shape)
+
+        # Apply the given function
+        transformed_expect = self.config['function'](expected_input)
+        transformed_student = self.config['function'](student_eval)
+
+        return utils.within_tolerance(transformed_expect, transformed_student)
 
 def between_comparer(comparer_params_eval, student_eval, utils):
     """
