@@ -55,7 +55,7 @@ import numpy as np
 from voluptuous import Schema, Required
 
 from mitxgraders.exceptions import InputTypeError, StudentFacingError
-from mitxgraders.helpers.validatorfuncs import is_callable
+from mitxgraders.helpers.validatorfuncs import is_callable, Nullable
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 from mitxgraders.helpers.calc.math_array import are_same_length_vectors, is_vector
 from mitxgraders.comparers.baseclasses import Comparer
@@ -63,38 +63,30 @@ from mitxgraders.comparers.baseclasses import Comparer
 class EqualityComparer(Comparer):
     """
     This comparer checks for equality between the student and instructor results,
-    up to a desired tolerance.
-    """
-    schema_config = Schema({
-        # Schema is presently empty, as EqualityComparer currently has no options to set
-    })
+    up to a desired tolerance. If desired, a transforming function can be applied
+    before the comparison is carried out.
 
-    def __call__(self, comparer_params_eval, student_eval, utils):
-        expected_input = comparer_params_eval[0]
+    comparer_params: ['expect']
 
-        if hasattr(utils, 'validate_shape'):
-            # in numpy, scalars have empty tuples as their shapes
-            shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
-            utils.validate_shape(student_eval, shape)
-
-        return utils.within_tolerance(expected_input, student_eval)
-
-equality_comparer = EqualityComparer()
-
-class ApplyFunctionComparer(Comparer):
-    """
-    This comparer applies a given function to the student and instructor evaluations before
-    comparing for equality.
-
-    comparer_params: ['expect']  # Expression before application of function!
+    By default, equality_comparer is used in FormulaGrader, NumericalGrader and MatrixGrader.
+    >>> from mitxgraders import *
+    >>> equality_comparer == EqualityComparer()
+    True
+    >>> grader = FormulaGrader(
+    ...     answers='2*x',
+    ...     variables=['x']
+    ... )
+    >>> grader(None, 'x')['ok']
+    False
+    >>> grader(None, 'x*2')['ok']
+    True
 
     The following example applies cosine to the expected answer and student input
     before comparison:
-    >>> from mitxgraders import *
     >>> import numpy as np
     >>> grader = FormulaGrader(
     ...     answers={
-    ...         'comparer': ApplyFunctionComparer(function=np.cos),
+    ...         'comparer': EqualityComparer(transform=np.cos),
     ...         'comparer_params': ['x']
     ...     },
     ...     variables=['x']
@@ -109,13 +101,10 @@ class ApplyFunctionComparer(Comparer):
     False
 
     The following example takes the norm of the expected answer and student input
-    before comparison:
-    >>> from mitxgraders import *
+    before comparison. Note the different method of changing the comparer.
+    >>> FormulaGrader.set_default_comparer(EqualityComparer(transform=np.linalg.norm))
     >>> grader = MatrixGrader(
-    ...     answers={
-    ...         'comparer': ApplyFunctionComparer(function=np.linalg.norm),
-    ...         'comparer_params': ['[1, 0, 0]']
-    ...     }
+    ...     answers='[1, 0, 0]'
     ... )
     >>> grader(None, '[1, 0, 0]')['ok']
     True
@@ -123,14 +112,14 @@ class ApplyFunctionComparer(Comparer):
     True
     >>> grader(None, '[1/sqrt(2), 0, 1/sqrt(2)]')['ok']
     True
+    >>> FormulaGrader.reset_default_comparer()
 
     """
     schema_config = Schema({
-        Required('function'): is_callable
+        Required('transform', default=None): Nullable(is_callable)
     })
 
     def __call__(self, comparer_params_eval, student_eval, utils):
-        # Validate in the same manner as EqualityComparer
         expected_input = comparer_params_eval[0]
 
         if hasattr(utils, 'validate_shape'):
@@ -138,11 +127,14 @@ class ApplyFunctionComparer(Comparer):
             shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
             utils.validate_shape(student_eval, shape)
 
-        # Apply the given function
-        transformed_expect = self.config['function'](expected_input)
-        transformed_student = self.config['function'](student_eval)
+        # If provided, apply the transform function
+        if self.config['transform'] is not None:
+            expected_input = self.config['transform'](expected_input)
+            student_eval = self.config['transform'](student_eval)
 
-        return utils.within_tolerance(transformed_expect, transformed_student)
+        return utils.within_tolerance(expected_input, student_eval)
+
+equality_comparer = EqualityComparer()
 
 def between_comparer(comparer_params_eval, student_eval, utils):
     """
