@@ -709,7 +709,7 @@ class FormulaGrader(ItemGrader):
                                           self.suffixes,
                                           self.constants)
 
-        func_samples = gen_symbols_samples(self.random_funcs.keys(),
+        func_samples = gen_symbols_samples(list(self.random_funcs.keys()),
                                            self.config['samples'],
                                            self.random_funcs,
                                            self.functions,

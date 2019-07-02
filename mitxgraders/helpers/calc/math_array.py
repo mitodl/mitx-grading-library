@@ -16,8 +16,8 @@ def is_number_zero(value):
     """
     Tests whether a value is the scalar number 0.
 
-    >>> map(is_number_zero, [0, 0.0, 0j])
-    [True, True, True]
+    >>> is_number_zero(0), is_number_zero(0.0), is_number_zero(0)
+    (True, True, True)
     >>> is_number_zero(np.matrix([0, 0, 0]))
     False
     """
@@ -434,10 +434,10 @@ def identity(n):
 
     Usage:
 
-    >>> identity(2)
+    >>> identity(2)                             # doctest: +NORMALIZE_WHITESPACE
     MathArray([[ 1.,  0.],
            [ 0.,  1.]])
-    >>> identity(3)
+    >>> identity(3)                             # doctest: +NORMALIZE_WHITESPACE
     MathArray([[ 1.,  0.,  0.],
            [ 0.,  1.,  0.],
            [ 0.,  0.,  1.]])
