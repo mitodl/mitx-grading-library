@@ -22,13 +22,20 @@ To receive full points for this problem, a student would enter `cat, dog` or `do
 You can use a tuple of lists to specify multiple lists of answers, just like normal ItemGraders.
 
 ```pycon
-grader = SingleListGrader(
-    answers=(
-        [('cat', 'feline'), 'dog'],
-        ['goat', 'vole'],
-    ),
-    subgrader=StringGrader()
-)
+>>> grader = SingleListGrader(
+...     answers=(
+...         [('cat', 'feline'), 'dog'],
+...         ['goat', 'vole'],
+...     ),
+...     subgrader=StringGrader()
+... )
+>>> grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+>>> grader(None, 'dog, feline') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+>>> grader(None, 'cat, vole') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
+True
+
 ```
 
 Now, `cat, dog` and `goat, vole` will get full grades. But mixes won't: `cat, vole` will score half credit.
@@ -39,11 +46,16 @@ Now, `cat, dog` and `goat, vole` will get full grades. But mixes won't: `cat, vo
 By default a SingleListGrader doesn't care which order the input is given in. If you want the answers and the student input to be compared in order, set `ordered=True`.
 
 ```pycon
-grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader(),
-    ordered=True
-)
+>>> grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     ordered=True
+... )
+>>> grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+>>> grader(None, 'dog, cat') == {'grade_decimal': 0.0, 'msg': '', 'ok': False}
+True
+
 ```
 
 Now `cat, dog` will receive full grades, but `dog, cat` will be marked wrong. Note that `cat` will receive half credit, but `dog` will receive zero, as dog is incorrect in the first position. Ordered is false by default.
@@ -54,11 +66,23 @@ Now `cat, dog` will receive full grades, but `dog, cat` will be marked wrong. No
 If students are asked to enter a list of three items but only enter two, should this use up an attempt, or present an error message? If you want to present an error message, turn on length checking.
 
 ```pycon
-grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader(),
-    length_error=True
-)
+>>> grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+... )
+>>> grader(None, 'cat, dog, unicorn') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
+True
+>>> grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     length_error=True
+... )
+>>> try:
+...     grader(None, 'cat')
+... except MissingInput as error:
+...     print(error)
+List length error: Expected 2 terms in the list, but received 1. Separate items with character ","
+
 ```
 
 If you give this `cat`, it will tell you that you've got the wrong length, and won't use up an attempt.
@@ -96,23 +120,31 @@ True
 You can use whatever delimiter you like. The default is a comma (`,`). The following uses a semicolon as a delimiter. We recommend not using multi-character delimiters, but do not disallow it.
 
 ```pycon
-grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader(),
-    delimiter=';'
-)
+>>> grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     delimiter=';'
+... )
+>>> grader(None, 'cat; dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+
 ```
 
 By using different delimiters, it is possible to nest SingleListGraders:
 
 ```pycon
-grader = SingleListGrader(
-    answers=[['a', 'b'], ['c', 'd']],
-    subgrader=SingleListGrader(
-        subgrader=StringGrader()
-    ),
-    delimiter=';'
-)
+>>> grader = SingleListGrader(
+...     answers=[['a', 'b'], ['c', 'd']],
+...     subgrader=SingleListGrader(
+...         subgrader=StringGrader()
+...     ),
+...     delimiter=';'
+... )
+>>> grader(None, 'd, c; a, b') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+>>> grader(None, 'a, c; d, b') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
+True
+
 ```
 
 Here the expected student input is `a, b; c, d`. It will also take `b, a; d, c` or `c, d; a, b` due to the unordered nature of both lists. However, `a, c; d, b` is only worth half points.
@@ -123,11 +155,14 @@ Here the expected student input is `a, b; c, d`. It will also take `b, a; d, c` 
 By default, partial credit is awarded to partially correct answers. Answers that have insufficient items lose points, as do answers that have too many items. To turn off partial credit, set partial_credit to False. It is True by default.
 
 ```pycon
-grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader(),
-    partial_credit=False
-)
+>>> grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     partial_credit=False
+... )
+>>> grader(None, 'cat, octopus') == {'grade_decimal': 0.0, 'msg': '', 'ok': False}
+True
+
 ```
 
 Now `cat, octopus` will receive a grade of zero.
@@ -138,11 +173,14 @@ Now `cat, octopus` will receive a grade of zero.
 Messages from the individual items are all concatenated together and presented to the student. It is also possible to have a `wrong_msg` on the `SingleListGrader`, which is presented to the student if the score is zero and there are no other messages, just like on an `ItemGrader`.
 
 ```pycon
-grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader(),
-    wrong_msg='Try again!'
-)
+>>> grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     wrong_msg='Try again!'
+... )
+>>> grader(None, 'wolf, feline') == {'grade_decimal': 0.0, 'msg': 'Try again!', 'ok': False}
+True
+
 ```
 
 

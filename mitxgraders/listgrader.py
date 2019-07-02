@@ -698,10 +698,8 @@ class SingleListGrader(ItemGrader):
 
         # Check for empty entries in the list
         if self.config['missing_error']:
-            bad_items = []
-            for idx, item in enumerate(item.strip() for item in student_list):
-                if item == "":
-                    bad_items.append(idx + 1)
+            bad_items = [idx+1 for (idx, item) in enumerate(student_list)
+                         if item.strip() == '']
             if bad_items:
                 if len(bad_items) == 1:
                     msg = 'List error: Empty entry detected in position '
