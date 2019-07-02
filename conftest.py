@@ -6,7 +6,7 @@ try:
     # causes problems for doctests.
     #
     # Setting the printer to legacy 1.13 combined with the doctest directive
-    # NORMALIZE_WHITESPACE is fixes the issue.
+    # NORMALIZE_WHITESPACE fixes the issue.
     np.set_printoptions(legacy='1.13')
     body = "# Setting numpy to print in legacy mode"
     msg = "{header}\n{body}\n{footer}".format(header='#'*40, footer='#'*40, body=body)
