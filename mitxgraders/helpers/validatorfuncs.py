@@ -193,10 +193,10 @@ def is_callable_with_args(num_args):
     >>> is_callable_with_args(1)(foo) == foo
     True
     >>> try:                                                # doctest: +ELLIPSIS
-    ...     is_callable_with_args(1)(Foo)
+    ...     is_callable_with_args(2)(foo)
     ... except Invalid as error:
     ...     print(error)
-    Expected function... to have 1 arguments, instead it has 2
+    Expected function ... to have 2 arguments, instead it has 1
     """
     def _validate(func):
         # first, check that the function is callable

@@ -42,6 +42,24 @@ def get_number_of_args_py2(callable_obj):
           raises a DeprecationWarning in Python 3.
         - in Python 3, use the much simpler signature-based
           get_number_of_args_py3 funciton instead.
+        - Cannot handle class constructors
+
+    Usage
+    =====
+    See documetnation for get_number_of_args.
+
+    Note, however, that this function cannot handle class constructors:
+
+    >>> class Foo(object):
+    ...     def __init__(self, x, y):
+    ...         pass
+    >>> try:                                                # doctest: +ELLIPSIS
+    ...     get_number_of_args_py2(Foo)
+    ... except ValueError as error:
+    ...     print(error)
+    Cannot detect number of arguments for <class '...Foo'>
+
+
     """
 
     if inspect.isbuiltin(callable_obj):
@@ -57,11 +75,14 @@ def get_number_of_args_py2(callable_obj):
             func = callable_obj
             # see https://docs.python.org/2/library/inspect.html#inspect.inspect.getargspec
             # defaults might be None, or something weird for Mock functions
-            args, _, _, defaults = inspect.getargspec(func)
+        elif inspect.isclass(callable_obj):
+            # We don't need this anyway
+            raise ValueError("Cannot detect number of arguments for {}".format(callable_obj))
         else:
-            # Callable object
+            # callable object instance
             func = callable_obj.__call__
-            args, _, _, defaults = inspect.getargspec(func)
+
+        args, _, _, defaults = inspect.getargspec(func)
 
     try:
         num_args = len(args) - len(defaults)
@@ -124,15 +145,16 @@ def get_number_of_args(callable_obj):
     >>> get_number_of_args(foo.do_stuff) # bound, is automatically passed self as argument
     3
 
-    Works for bound and unbound callable objects
+    Works for callable objects instances:
     >>> class Bar:
     ...     def __call__(self, x, y):
     ...         return x + y
-    >>> get_number_of_args(Bar) # unbound, is NOT automatically passed self as argument
-    3
     >>> bar = Bar()
-    >>> get_number_of_args(bar) # bound, is automatically passed self as argument
+    >>> get_number_of_args(bar) # bound instance, is automatically passed self as argument
     2
+
+    Note about class constructors: In Python 2, get_number_of_args(Bar) will
+    raise an error; in Python 3, the number of arguments of __init__ is returned.
 
     Works on built-in functions (assuming their docstring is correct)
     >>> import math
