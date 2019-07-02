@@ -223,6 +223,8 @@
                 
             <li class="second-level"><a href="#length-checking">Length Checking</a></li>
                 
+            <li class="second-level"><a href="#empty-entries">Empty Entries</a></li>
+                
             <li class="second-level"><a href="#choosing-delimiters">Choosing Delimiters</a></li>
                 
             <li class="second-level"><a href="#turning-partial-credit-off">Turning Partial Credit Off</a></li>
@@ -237,93 +239,152 @@
 
 <h1 id="singlelistgrader">SingleListGrader<a class="headerlink" href="#singlelistgrader" title="Permanent link"> # </a></h1>
 <p>If you want a response to be a delimiter-separated list of items, you can use a special ItemGrader called <code>SingleListGrader</code> to perform the grading. You need to specify a subgrader (which must be an ItemGrader, and could even be another SingleListGrader) to evaluate each individual item. The basic usage is as follows.</p>
-<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader()
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
+&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader()
+... )
+&gt;&gt;&gt; grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'dog, cat') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'cat, octopus') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
+True</code></pre>
 
 
 <p>To receive full points for this problem, a student would enter <code>cat, dog</code> or <code>dog, cat</code> into the input box. Entering <code>cat, octopus</code> or just <code>cat</code> will receive half points. The <code>answers</code> key is a python list of the individual answers you wish to use.</p>
 <p>You can use a tuple of lists to specify multiple lists of answers, just like normal ItemGraders.</p>
-<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    answers=(
-        [('cat', 'feline'), 'dog'],
-        ['goat', 'vole'],
-    ),
-    subgrader=StringGrader()
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=(
+...         [('cat', 'feline'), 'dog'],
+...         ['goat', 'vole'],
+...     ),
+...     subgrader=StringGrader()
+... )
+&gt;&gt;&gt; grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'dog, feline') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'cat, vole') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
+True</code></pre>
 
 
 <p>Now, <code>cat, dog</code> and <code>goat, vole</code> will get full grades. But mixes won't: <code>cat, vole</code> will score half credit.</p>
 <h2 id="ordered-input">Ordered Input<a class="headerlink" href="#ordered-input" title="Permanent link"> # </a></h2>
 <p>By default a SingleListGrader doesn't care which order the input is given in. If you want the answers and the student input to be compared in order, set <code>ordered=True</code>.</p>
-<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader(),
-    ordered=True
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     ordered=True
+... )
+&gt;&gt;&gt; grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'dog, cat') == {'grade_decimal': 0.0, 'msg': '', 'ok': False}
+True</code></pre>
 
 
 <p>Now <code>cat, dog</code> will receive full grades, but <code>dog, cat</code> will be marked wrong. Note that <code>cat</code> will receive half credit, but <code>dog</code> will receive zero, as dog is incorrect in the first position. Ordered is false by default.</p>
 <h2 id="length-checking">Length Checking<a class="headerlink" href="#length-checking" title="Permanent link"> # </a></h2>
 <p>If students are asked to enter a list of three items but only enter two, should this use up an attempt, or present an error message? If you want to present an error message, turn on length checking.</p>
-<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader(),
-    length_error=True
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+... )
+&gt;&gt;&gt; grader(None, 'cat, dog, unicorn') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
+True
+&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     length_error=True
+... )
+&gt;&gt;&gt; try:
+...     grader(None, 'cat')
+... except MissingInput as error:
+...     print(error)
+List length error: Expected 2 terms in the list, but received 1. Separate items with character &quot;,&quot;</code></pre>
 
 
 <p>If you give this <code>cat</code>, it will tell you that you've got the wrong length, and won't use up an attempt.</p>
-<p>Length_error is false by default. If you set length_error to True, then all answers in a tuple of lists (rather than a single answer list) must have the same length.</p>
+<p>By default, <code>length_error</code> is set to False. If you set <code>length_error</code> to True, then all answers in a tuple of lists (rather than a single answer list) must have the same length.</p>
+<h2 id="empty-entries">Empty Entries<a class="headerlink" href="#empty-entries" title="Permanent link"> # </a></h2>
+<p>In order to protect students from typos, the grader returns an error if a student's response has an empty entry (or an entry that just contains spaces). If you want students to be able to enter a list with an empty entry, you need to disable this behavior by setting <code>missing_error=False</code>.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader()
+... )
+&gt;&gt;&gt; try:
+...     grader(None, 'cat, dog,')
+... except MissingInput as error:
+...     print(error)
+List error: Empty entry detected in position 3
+&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     missing_error=False
+... )
+&gt;&gt;&gt; grader(None, 'cat, dog,') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
+True</code></pre>
+
+
 <h2 id="choosing-delimiters">Choosing Delimiters<a class="headerlink" href="#choosing-delimiters" title="Permanent link"> # </a></h2>
 <p>You can use whatever delimiter you like. The default is a comma (<code>,</code>). The following uses a semicolon as a delimiter. We recommend not using multi-character delimiters, but do not disallow it.</p>
-<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader(),
-    delimiter=';'
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     delimiter=';'
+... )
+&gt;&gt;&gt; grader(None, 'cat; dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True</code></pre>
 
 
 <p>By using different delimiters, it is possible to nest SingleListGraders:</p>
-<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    answers=[['a', 'b'], ['c', 'd']],
-    subgrader=SingleListGrader(
-        subgrader=StringGrader()
-    ),
-    delimiter=';'
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=[['a', 'b'], ['c', 'd']],
+...     subgrader=SingleListGrader(
+...         subgrader=StringGrader()
+...     ),
+...     delimiter=';'
+... )
+&gt;&gt;&gt; grader(None, 'd, c; a, b') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader(None, 'a, c; d, b') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
+True</code></pre>
 
 
 <p>Here the expected student input is <code>a, b; c, d</code>. It will also take <code>b, a; d, c</code> or <code>c, d; a, b</code> due to the unordered nature of both lists. However, <code>a, c; d, b</code> is only worth half points.</p>
 <h2 id="turning-partial-credit-off">Turning Partial Credit Off<a class="headerlink" href="#turning-partial-credit-off" title="Permanent link"> # </a></h2>
 <p>By default, partial credit is awarded to partially correct answers. Answers that have insufficient items lose points, as do answers that have too many items. To turn off partial credit, set partial_credit to False. It is True by default.</p>
-<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader(),
-    partial_credit=False
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     partial_credit=False
+... )
+&gt;&gt;&gt; grader(None, 'cat, octopus') == {'grade_decimal': 0.0, 'msg': '', 'ok': False}
+True</code></pre>
 
 
 <p>Now <code>cat, octopus</code> will receive a grade of zero.</p>
 <h2 id="messages">Messages<a class="headerlink" href="#messages" title="Permanent link"> # </a></h2>
 <p>Messages from the individual items are all concatenated together and presented to the student. It is also possible to have a <code>wrong_msg</code> on the <code>SingleListGrader</code>, which is presented to the student if the score is zero and there are no other messages, just like on an <code>ItemGrader</code>.</p>
-<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader(),
-    wrong_msg='Try again!'
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
+...     answers=['cat', 'dog'],
+...     subgrader=StringGrader(),
+...     wrong_msg='Try again!'
+... )
+&gt;&gt;&gt; grader(None, 'wolf, feline') == {'grade_decimal': 0.0, 'msg': 'Try again!', 'ok': False}
+True</code></pre>
 
 
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to a <code>SingleListGrader</code>.</p>
 <pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    answers=list or tuple of lists,
+    answers=list,  # Or tuple of lists
     subgrader=ItemGrader(),
-    partial_credit=bool (default True),
-    ordered=bool (default False),
-    length_error=bool (default False),
-    delimiter=string (default ',')
+    partial_credit=bool,  # default True
+    ordered=bool,  # default False
+    length_error=bool,  # default False
+    missing_error=bool,  # default True
+    delimiter=str,  # default ','
 )</code></pre></div>
         
     </div>
