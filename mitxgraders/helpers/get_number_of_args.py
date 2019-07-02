@@ -86,6 +86,11 @@ def get_number_of_args_py3(callable_obj):
         - based on inspect.signature
         - in Python 2, use getargspec-based get_number_of_args_py3 instead
     """
+    if hasattr(callable_obj, "nin"):
+        # Matches RandomFunction or numpy ufunc
+        # Sadly, even Py3's inspect.signature can't handle numpy ufunc...
+        return callable_obj.nin
+
     params = inspect.signature(callable_obj).parameters
     empty = inspect.Parameter.empty
     return sum([params[key].default == empty for key in params])
