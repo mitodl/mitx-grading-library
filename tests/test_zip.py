@@ -8,6 +8,13 @@ import os
 import pytest
 import mitxgraders
 
+try:
+    # for Python 3
+    from importlib import reload
+except ImportError:
+    # reload is builtin in Python 2
+    pass
+
 @pytest.fixture()
 def loadzip():
     """pytest fixture to dynamically load the library from python_lib.zip"""
