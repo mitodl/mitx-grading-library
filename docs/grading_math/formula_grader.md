@@ -161,7 +161,7 @@ grader = FormulaGrader(
 )
 ```
 
-This allows you to grade mathematical expressions that involve unknown functions, such as the differential equation described in this example.
+This allows you to grade mathematical expressions that involve unknown functions, such as the differential equation described in this example. See [Sampling](sampling.md#randomfunction) for further options associated with `RandomFunction`.
 
 
 ## Constants
