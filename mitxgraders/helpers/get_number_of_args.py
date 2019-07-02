@@ -46,7 +46,7 @@ def get_number_of_args_py2(callable_obj):
 
     Usage
     =====
-    See documetnation for get_number_of_args.
+    See documentation for get_number_of_args.
 
     Note, however, that this function cannot handle class constructors:
 
@@ -105,7 +105,7 @@ def get_number_of_args_py3(callable_obj):
 
     NOTES:
         - based on inspect.signature
-        - in Python 2, use getargspec-based get_number_of_args_py3 instead
+        - in Python 2, use getargspec-based get_number_of_args_py2 instead
     """
     if hasattr(callable_obj, "nin"):
         # Matches RandomFunction or numpy ufunc

@@ -16,7 +16,7 @@ def is_number_zero(value):
     """
     Tests whether a value is the scalar number 0.
 
-    >>> is_number_zero(0), is_number_zero(0.0), is_number_zero(0)
+    >>> is_number_zero(0), is_number_zero(0.0), is_number_zero(0j)
     (True, True, True)
     >>> is_number_zero(np.matrix([0, 0, 0]))
     False
