@@ -18,12 +18,12 @@ def get_linear_fit_error(x, y):
     Zero error in a linear relationship:
     >>> x = np.array([2, 5, 8])
     >>> result = get_linear_fit_error(x, 2*x + 1)
-    >>> round(result, 8)
+    >>> round(result, 6)
     0.0
     """
     A = np.vstack([x, np.ones(len(x))]).T
     _, residuals, _, _ = np.linalg.lstsq(A, y, rcond=-1)
-    return np.sqrt(residuals)
+    return np.sqrt(np.linalg.norm(residuals))
 
 def get_proportional_fit_error(x, y):
     """
@@ -38,17 +38,17 @@ def get_proportional_fit_error(x, y):
     Reveals error if relationship is not proportional:
     >>> x = np.array([2, 5, 8])
     >>> result = get_proportional_fit_error(x, 2*x + 1)
-    >>> round(result, 8)
-    0.76200076
+    >>> result                                 # doctest: +ELLIPSIS
+    0.76200...
 
     Zero error in a proportional relationship:
     >>> result = get_proportional_fit_error(x, 2*x)
-    >>> round(result, 8)
+    >>> round(result, 6)
     0.0
     """
     A = np.vstack(x)
     _, residuals, _, _ = np.linalg.lstsq(A, y, rcond=-1)
-    return np.sqrt(residuals)
+    return np.sqrt(np.linalg.norm(residuals))
 
 def get_offset_fit_error(x, y):
     """
@@ -63,12 +63,12 @@ def get_offset_fit_error(x, y):
     Reveals error if relationship is not constant-offset:
     >>> x = np.array([2, 5, 8])
     >>> result = get_offset_fit_error(x, 2*x + 1)
-    >>> round(result, 8)
-    4.24264069
+    >>> result                                              # doctest: +ELLIPSIS
+    4.242640...
 
     Zero error in a constant-offset relationship:
     >>> result = get_offset_fit_error(x, x + 5)
-    >>> round(result, 8)
+    >>> round(result, 6)
     0.0
     """
     mean = np.mean(y - x)
