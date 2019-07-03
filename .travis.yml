@@ -10,8 +10,6 @@ matrix:
     env: COVERALLS_PARALLEL=true
     script:
       - pytest --cov=mitxgraders --cov-report=term-missing
-    notifications:
-      webhooks: https://coveralls.io/webhook
     after_success:
       - coveralls
 
@@ -25,8 +23,6 @@ matrix:
     env: COVERALLS_PARALLEL=true
     script:
       - pytest --cov=mitxgraders --cov-report=term-missing
-    notifications:
-      webhooks: https://coveralls.io/webhook
     after_success:
       - coveralls
 
