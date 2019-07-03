@@ -7,6 +7,7 @@ and upper limits, and integration variable, and an integrand.
 
 from __future__ import print_function, division, absolute_import, unicode_literals
 
+import pprint as pp
 from functools import wraps
 from numbers import Number
 import six
@@ -434,7 +435,7 @@ class IntegralGrader(AbstractGrader):
 
             self.log(self.debug_appendix_template.format(
                 samplenum=i,
-                variables=varscope,
+                variables=pp.pformat(varscope),
                 student_re_eval=student_re[0],
                 student_re_error=student_re[1],
                 student_re_neval=student_re[2]['neval'],
