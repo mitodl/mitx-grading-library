@@ -956,10 +956,12 @@ class MathExpression(object):
             array = MathArray(parse_result)
         except ValueError:
             # This happens, for example, with np.array([1, 2, [3]])
+            # when using numpy version 1.6
             raise UnableToParse(shape_message)
 
         if array.dtype == 'object':
-            # This happens, for example, with np.array([[1], 2, 3])
+            # This happens, for example, with np.array([[1], 2, 3]),
+            # OR with with np.array([1, 2, [3]]) in recent versions of numpy
             raise UnableToParse(shape_message)
 
         if array.ndim > metadata_dict['max_array_dim_used']:
