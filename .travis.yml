@@ -7,8 +7,11 @@ matrix:
     install:
       - pip install -r requirements.txt
       - pip install python-coveralls
+    env: COVERALLS_PARALLEL=true
     script:
       - pytest --cov=mitxgraders --cov-report=term-missing
+    notifications:
+      webhooks: https://coveralls.io/webhook
     after_success:
       - coveralls
 
@@ -19,8 +22,11 @@ matrix:
     install:
       - pip install -r requirements3.txt
       - pip install python-coveralls
+    env: COVERALLS_PARALLEL=true
     script:
       - pytest --cov=mitxgraders --cov-report=term-missing
+    notifications:
+      webhooks: https://coveralls.io/webhook
     after_success:
       - coveralls
 
