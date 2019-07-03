@@ -93,9 +93,11 @@ def between_comparer(comparer_params_eval, student_eval, utils):
     True
 
     Input must be real:
-    >>> grader(None, '5e8+2e6*i')['ok']
-    Traceback (most recent call last):
-    InputTypeError: Input must be real.
+    >>> try:
+    ...     grader(None, '5e8+2e6*i')['ok']
+    ... except InputTypeError as error:
+    ...     print(error)
+    Input must be real.
     """
     start, stop = comparer_params_eval
 
@@ -232,9 +234,11 @@ def vector_span_comparer(comparer_params_eval, student_eval, utils):
     True
 
     Input shape is validated:
-    >>> grader(None, '5')
-    Traceback (most recent call last):
-    InputTypeError: Expected answer to be a vector, but input is a scalar
+    >>> try:
+    ...     grader(None, '5')
+    ... except InputTypeError as error:
+    ...     print(error)
+    Expected answer to be a vector, but input is a scalar
 
     Multiple vectors can be provided:
     >>> grader = MatrixGrader(
@@ -261,9 +265,11 @@ def vector_span_comparer(comparer_params_eval, student_eval, utils):
     ...         'comparer': vector_span_comparer
     ...     },
     ... )
-    >>> grader(None, '[1, 2, 3]')               # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    StudentFacingError: Problem Configuration Error: ...to equal-length vectors
+    >>> try:
+    ...     grader(None, '[1, 2, 3]')               # doctest: +ELLIPSIS
+    ... except StudentFacingError as error:
+    ...     print(error)
+    Problem Configuration Error: ...to equal-length vectors
     """
 
     # Validate the comparer params
@@ -337,9 +343,11 @@ def vector_phase_comparer(comparer_params_eval, student_eval, utils):
     ...         'comparer': vector_phase_comparer
     ...     },
     ... )
-    >>> grader(None, '[1, 2, 3]')               # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    StudentFacingError: Problem Configuration Error: ...to a single vector.
+    >>> try:
+    ...     grader(None, '[1, 2, 3]')               # doctest: +ELLIPSIS
+    ... except StudentFacingError as error:
+    ...     print(error)
+    Problem Configuration Error: ...to a single vector.
     """
     # Validate that author comparer_params evaluate to a single vector
     if not len(comparer_params_eval) == 1 and is_vector(comparer_params_eval[0]):

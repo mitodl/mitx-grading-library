@@ -446,10 +446,18 @@ def test_fg_custom_comparers():
         reduced = student_input % (360)
         return utils.within_tolerance(answer, reduced) and student_input > min_value
 
-    mocked = mock.Mock(side_effect=is_coterminal_and_large,
-                # The next two kwargs ensure that the Mock behaves nicely for inspect.getargspec
-                spec=is_coterminal_and_large,
-                func_code=is_coterminal_and_large.func_code,)
+    if six.PY3:
+        mocked = mock.create_autospec(is_coterminal_and_large,
+                                      side_effect=is_coterminal_and_large)
+    else:
+        # The last two kwargs ensure that the Mock behaves nicely
+        # for inspect.getargspec in Python 2
+        # but this does NOT work in Python 3, where create_autospec
+        # is needed
+        mocked = mock.Mock(side_effect=is_coterminal_and_large,
+                           spec=is_coterminal_and_large,
+                           func_code=is_coterminal_and_large.__code__)
+
 
     grader = FormulaGrader(
         answers={

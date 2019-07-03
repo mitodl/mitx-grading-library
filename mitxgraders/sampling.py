@@ -655,7 +655,7 @@ def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes, cons
         }
         while unevaluated_dependents:
             progress_made = False
-            for symbol, dependencies in unevaluated_dependents.items():
+            for symbol, dependencies in list(unevaluated_dependents.items()):
                 if is_subset(dependencies, sample_dict):
                     sample_dict[symbol] = sample_from[symbol].compute_sample(
                         sample_dict, functions, suffixes)

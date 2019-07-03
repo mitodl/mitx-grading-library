@@ -116,9 +116,11 @@ class BracketValidator(object):
 
     >>> BV = BracketValidator
     >>> expr = '1 + ( ( x + 1 )^2 + ( + [T_{1'
-    >>> BV.validate(expr)                           # doctest: +NORMALIZE_WHITESPACE
-    Traceback (most recent call last):
-    UnbalancedBrackets: Invalid Input:
+    >>> try:
+    ...     BV.validate(expr)# doctest:                 +NORMALIZE_WHITESPACE
+    ... except UnbalancedBrackets as error:
+    ...     print(error)
+    Invalid Input:
     1 curly brace was opened without being closed (highlighted below)
     2 parentheses were opened without being closed (highlighted below)
     1 square bracket was opened without being closed (highlighted below)
@@ -269,11 +271,8 @@ def cast_np_numeric_as_builtin(obj, map_across_lists=False):
     >>> z = 3 + 2j
     >>> z128 = np.complex128(z)
     >>> examples = [x, x64, y, y64, z, z128]
-    >>> [
-    ...     type(cast_np_numeric_as_builtin(example))
-    ...     for example in examples
-    ... ] == [float, float, int, int, complex, complex]
-    True
+    >>> [type(cast_np_numeric_as_builtin(ex)).__name__ for ex in examples]
+    ['float', 'float', 'int', 'int', 'complex', 'complex']
 
     Leaves MathArrays alone:
     >>> from mitxgraders.helpers.calc.math_array import MathArray
@@ -284,8 +283,8 @@ def cast_np_numeric_as_builtin(obj, map_across_lists=False):
     Optionally, map across a list:
     >>> target = [np.float64(1.0), np.float64(2.0)]
     >>> result = cast_np_numeric_as_builtin(target, map_across_lists=True)
-    >>> [type(item) for item in result]
-    [<type 'float'>, <type 'float'>]
+    >>> [type(item).__name__ for item in result]
+    ['float', 'float']
 
     """
     if isinstance(obj, np.number):
@@ -803,9 +802,11 @@ class MathExpression(object):
         validate that the correct number of arguments are passed:
 
         >>> def h(x, y): return x + y
-        >>> MathExpression.eval_function(['h', [1, 2, 3]], {"h": h})
-        Traceback (most recent call last):
-        ArgumentError: Wrong number of arguments passed to h(...): Expected 2 inputs, but received 3.
+        >>> try:
+        ...     MathExpression.eval_function(['h', [1, 2, 3]], {"h": h})
+        ... except ArgumentError as error:
+        ...     print(error)
+        Wrong number of arguments passed to h(...): Expected 2 inputs, but received 3.
 
         However, if the function to be evaluated has a truthy 'validated'
         property, we assume it does its own validation and we do not check the
@@ -817,9 +818,11 @@ class MathExpression(object):
         ...         raise StudentFacingError('I need two inputs!')
         ...     return args[0]*args[1]
         >>> g.validated = True
-        >>> MathExpression.eval_function(['g', [1]], {"g": g})
-        Traceback (most recent call last):
-        StudentFacingError: I need two inputs!
+        >>> try:
+        ...     MathExpression.eval_function(['g', [1]], {"g": g})
+        ... except StudentFacingError as error:
+        ...     print(error)
+        I need two inputs!
         """
         # Obtain the function and arguments
         name, args = parse_result
@@ -897,16 +900,16 @@ class MathExpression(object):
         2
 
         >>> metadata_dict = { 'max_array_dim_used': 0 }
-        >>> MathExpression.eval_array([
-        ...     [1, 2],
+        >>> MathExpression.eval_array([         # doctest: +NORMALIZE_WHITESPACE
+        ...     [1 , 2],
         ...     [3, 4]
         ... ], metadata_dict)
-        MathArray([[1, 2],
-               [3, 4]])
+        MathArray([[1,  2],
+                [3,  4]])
 
         In practice, this is called recursively:
         >>> metadata_dict = { 'max_array_dim_used': 0 }
-        >>> MathExpression.eval_array([
+        >>> MathExpression.eval_array([         # doctest: +NORMALIZE_WHITESPACE
         ...     MathExpression.eval_array([1, 2, 3], metadata_dict),
         ...     MathExpression.eval_array([4, 5, 6], metadata_dict)
         ... ], metadata_dict)
@@ -917,7 +920,7 @@ class MathExpression(object):
 
         One complex entry will convert everything to complex:
         >>> metadata_dict = { 'max_array_dim_used': 0 }
-        >>> MathExpression.eval_array([
+        >>> MathExpression.eval_array([         # doctest: +NORMALIZE_WHITESPACE
         ...     MathExpression.eval_array([1, 2j, 3], metadata_dict),
         ...     MathExpression.eval_array([4, 5, 6], metadata_dict)
         ... ], metadata_dict)
@@ -926,20 +929,24 @@ class MathExpression(object):
 
         We try to detect shape errors:
         >>> metadata_dict = { 'max_array_dim_used': 0 }
-        >>> MathExpression.eval_array([                      # doctest: +ELLIPSIS
-        ...     MathExpression.eval_array([1, 2, 3], metadata_dict),
-        ...     4
-        ... ], metadata_dict)
-        Traceback (most recent call last):
-        UnableToParse: Unable to parse vector/matrix. If you're trying ...
+        >>> try:                                            # doctest: +ELLIPSIS
+        ...     MathExpression.eval_array([
+        ...         MathExpression.eval_array([1, 2, 3], metadata_dict),
+        ...         4
+        ...     ], metadata_dict)
+        ... except UnableToParse as error:
+        ...     print(error)
+        Unable to parse vector/matrix. If you're trying ...
         >>> metadata_dict = { 'max_array_dim_used': 0 }
-        >>> MathExpression.eval_array([                      # doctest: +ELLIPSIS
-        ...     2.0,
-        ...     MathExpression.eval_array([1, 2, 3], metadata_dict),
-        ...     4
-        ... ], metadata_dict)
-        Traceback (most recent call last):
-        UnableToParse: Unable to parse vector/matrix. If you're trying ...
+        >>> try:                                            # doctest: +ELLIPSIS
+        ...     MathExpression.eval_array([
+        ...         2.0,
+        ...         MathExpression.eval_array([1, 2, 3], metadata_dict),
+        ...         4
+        ...     ], metadata_dict)
+        ... except UnableToParse as error:
+        ...     print(error)
+        Unable to parse vector/matrix. If you're trying ...
         """
         shape_message = ("Unable to parse vector/matrix. If you're trying to "
                          "enter a matrix, this is most likely caused by an "
@@ -1061,9 +1068,11 @@ class MathExpression(object):
         =====
         >>> MathExpression.eval_product([2,"*",3,"/",4])
         1.5
-        >>> MathExpression.eval_product([2,"*",3,"+",4])
-        Traceback (most recent call last):
-        CalcError: Unexpected symbol + in eval_product
+        >>> try:
+        ...     MathExpression.eval_product([2,"*",3,"+",4])
+        ... except CalcError as error:
+        ...     print(error)
+        Unexpected symbol + in eval_product
         """
         double_vector_mult_has_occured = False
         triple_vector_mult_error = CalcError(
@@ -1109,9 +1118,11 @@ class MathExpression(object):
         1
         >>> MathExpression.eval_sum(["+",2,"+",3,"-",4])
         1
-        >>> MathExpression.eval_sum(["+",2,"*",3,"-",4])
-        Traceback (most recent call last):
-        CalcError: Unexpected symbol * in eval_sum
+        >>> try:
+        ...     MathExpression.eval_sum(["+",2,"*",3,"-",4])
+        ... except CalcError as error:
+        ...     print(error)
+        Unexpected symbol * in eval_sum
         """
         data = parse_result[:]
         result = data.pop(0)
@@ -1182,9 +1193,11 @@ def evaluator(formula,
     nan
 
     Submissions that generate infinities will raise an error:
-    >>> evaluator("inf", variables={'inf': float('inf')})[0]  # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    CalcOverflowError: Numerical overflow occurred. Does your expression generate ...
+    >>> try:                                                # doctest: +ELLIPSIS
+    ...     evaluator("inf", variables={'inf': float('inf')})[0]
+    ... except CalcOverflowError as error:
+    ...     print(error)
+    Numerical overflow occurred. Does your expression generate ...
 
     Unless you specify that infinity is ok:
     >>> evaluator("inf", variables={'inf': float('inf')}, allow_inf=True)[0]
