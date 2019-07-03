@@ -3,7 +3,6 @@ Tests for FormulaGrader and NumericalGrader
 """
 from __future__ import print_function, division, absolute_import
 
-import six
 from pytest import raises
 import numpy as np
 from voluptuous import Error, MultipleInvalid
@@ -446,28 +445,14 @@ def test_fg_custom_comparers():
         reduced = student_input % (360)
         return utils.within_tolerance(answer, reduced) and student_input > min_value
 
-    if six.PY3:
-        mocked = mock.create_autospec(is_coterminal_and_large,
-                                      side_effect=is_coterminal_and_large)
-    else:
-        # The last two kwargs ensure that the Mock behaves nicely
-        # for inspect.getargspec in Python 2
-        # but this does NOT work in Python 3, where create_autospec
-        # is needed
-        mocked = mock.Mock(side_effect=is_coterminal_and_large,
-                           spec=is_coterminal_and_large,
-                           func_code=is_coterminal_and_large.__code__)
-
-
     grader = FormulaGrader(
         answers={
-            'comparer': mocked,
+            'comparer': is_coterminal_and_large,
             'comparer_params': ['150 + 50', '360 * 2'],
         },
         tolerance='1%'
     )
     assert grader(None, '200 + 3*360') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-    mocked.assert_called_with([200, 720], 1280, grader.comparer_utils)
 
     assert grader(None, '199 + 3*360') == {'grade_decimal': 1, 'msg': '', 'ok': True}
     assert grader(None, '197 + 3*360') == {'grade_decimal': 0, 'msg': '', 'ok': False}

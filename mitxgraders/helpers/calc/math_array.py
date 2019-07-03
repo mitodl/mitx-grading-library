@@ -385,7 +385,8 @@ class MathArray(np.ndarray):
         raise TypeError("Cannot raise {type} to power of {self.shape_name}."
                         .format(type=type(other), self=self))
 
-    # in-place operations
+    # fake in-place operations
+    # they enable in-place syntax but return new objects
 
     def __iadd__(self, other):
         return self.__add__(other)

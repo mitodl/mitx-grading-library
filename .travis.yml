@@ -12,6 +12,18 @@ matrix:
     after_success:
       - coveralls
 
+  - language: python
+    python:
+      - "3.7"
+    dist: xenial
+    install:
+      - pip install -r requirements3.txt
+      - pip install python-coveralls
+    script:
+      - pytest --cov=mitxgraders --cov-report=term-missing
+    after_success:
+      - coveralls
+
   - language: node_js
     node_js:
       - "node"

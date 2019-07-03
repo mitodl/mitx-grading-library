@@ -755,7 +755,7 @@ class MathExpression(object):
         """
         result = float(parse_result[0])
         if len(parse_result) == 2:
-            result *= suffixes[parse_result[1]]
+            result = result * suffixes[parse_result[1]]
         return result
 
     @staticmethod
@@ -956,10 +956,12 @@ class MathExpression(object):
             array = MathArray(parse_result)
         except ValueError:
             # This happens, for example, with np.array([1, 2, [3]])
+            # when using numpy version 1.6
             raise UnableToParse(shape_message)
 
         if array.dtype == 'object':
-            # This happens, for example, with np.array([[1], 2, 3])
+            # This happens, for example, with np.array([[1], 2, 3]),
+            # OR with with np.array([1, 2, [3]]) in recent versions of numpy
             raise UnableToParse(shape_message)
 
         if array.ndim > metadata_dict['max_array_dim_used']:
@@ -1086,14 +1088,16 @@ class MathExpression(object):
             op = data.pop(0)
             value = data.pop(0)
             if op == '/':
-                result /= value
+                # Don't use in-place ops, it conflicts with numpy version 1.16
+                # 'same-type' casting
+                result = result/value
             elif op == '*':
                 if is_vector(value):
                     if double_vector_mult_has_occured:
                         raise triple_vector_mult_error
                     elif is_vector(result):
                         double_vector_mult_has_occured = True
-                result *= value
+                result = result*value
             else:
                 raise CalcError("Unexpected symbol {} in eval_product".format(op))
 
@@ -1132,9 +1136,9 @@ class MathExpression(object):
             op = data.pop(0)
             num = data.pop(0)
             if op == '+':
-                result += num
+                result = result + num
             elif op == '-':
-                result -= num
+                result = result - num
             else:
                 raise CalcError("Unexpected symbol {} in eval_sum".format(op))
         return result

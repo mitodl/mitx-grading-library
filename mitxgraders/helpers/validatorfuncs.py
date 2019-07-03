@@ -5,6 +5,7 @@ Stand-alone validator functions for use in voluptuous Schema
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
+from collections import defaultdict
 from numbers import Number
 import six
 from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth, Coerce
@@ -96,20 +97,19 @@ def all_unique(iterable):
     True
 
     Raises an error if any items are duplicated:
-    >>> iterable = ['a', 0, '1', 'a', '5', 0, '0']
+    >>> iterable = ['a', 0, '1', 'a', '5', 0, 0, '0']
     >>> try:
     ...     all_unique(iterable)
     ... except Invalid as error:
     ...     print(error)
     items should be unique, but have unexpected duplicates: ['a', 0]
     """
-    seen = set()
-    duplicates = set()
+    counts = defaultdict(int)
+    duplicates = []
     for item in iterable:
-        if item in seen:
-            duplicates.add(item)
-        else:
-            seen.add(item)
+        if counts[item] == 1:
+            duplicates.append(item)
+        counts[item] += 1
 
     if duplicates:
         msg = 'items should be unique, but have unexpected duplicates: {duplicates}'

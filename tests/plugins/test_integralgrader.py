@@ -6,6 +6,7 @@ from mitxgraders import CalcError
 from mitxgraders.plugins.integralgrader import IntegralGrader, IntegrationError
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.helpers.compatibility import UNICODE_PREFIX
+from tests.helpers import round_decimals_in_string
 
 # Configuration Error Test
 def test_wrong_number_of_inputs_raises_error():
@@ -517,7 +518,13 @@ def test_debug_message():
         "==============================================<br/>\n"
         "Integration Data for Sample Number 0<br/>\n"
         "==============================================<br/>\n"
-        "Variables: {{{u}'infty': inf, {u}'e': 2.718281828459045, {u}'i': 1j, {u}'j': 1j, {u}'s': 5.530375019455111, {u}'x': 5.530375019455111, {u}'pi': 3.141592653589793}}<br/>\n"
+        "Variables: {{{u}'e': 2.718281828459045,<br/>\n"
+        " {u}'i': 1j,<br/>\n"
+        " {u}'infty': inf,<br/>\n"
+        " {u}'j': 1j,<br/>\n"
+        " {u}'pi': 3.141592653589793,<br/>\n"
+        " {u}'s': 5.530375019455111,<br/>\n"
+        " {u}'x': 5.530375019455111}}<br/>\n"
         "<br/>\n"
         "========== Student Integration Data, Real Part<br/>\n"
         "Numerical Value: 0.685802339677<br/>\n"
@@ -541,7 +548,13 @@ def test_debug_message():
         "==============================================<br/>\n"
         "Integration Data for Sample Number 1<br/>\n"
         "==============================================<br/>\n"
-            "Variables: {{{u}'infty': inf, {u}'e': 2.718281828459045, {u}'i': 1j, {u}'j': 1j, {u}'s': 5.530375019455111, {u}'x': 5.530375019455111, {u}'pi': 3.141592653589793}}<br/>\n"
+        "Variables: {{{u}'e': 2.718281828459045,<br/>\n"
+        " {u}'i': 1j,<br/>\n"
+        " {u}'infty': inf,<br/>\n"
+        " {u}'j': 1j,<br/>\n"
+        " {u}'pi': 3.141592653589793,<br/>\n"
+        " {u}'s': 5.530375019455111,<br/>\n"
+        " {u}'x': 5.530375019455111}}<br/>\n"
         "<br/>\n"
         "========== Student Integration Data, Real Part<br/>\n"
         "Numerical Value: 0.685802339677<br/>\n"
@@ -562,9 +575,11 @@ def test_debug_message():
         "Number of integrand evaluations: None<br/>\n"
         "</pre>"
     ).format(version=__version__, u=UNICODE_PREFIX)
-    expected_result = {'ok': True, 'grade_decimal': 1, 'msg': expected_message}
+    expected_message = round_decimals_in_string(expected_message)
     result = grader(None, student_input)
-    assert expected_result == result
+    assert result['ok'] is True
+    assert result['grade_decimal'] == 1.0
+    assert expected_message == round_decimals_in_string(result['msg'])
 
 def test_debug_message_complex_integrand():
     grader = IntegralGrader(
@@ -590,7 +605,13 @@ def test_debug_message_complex_integrand():
         "==============================================<br/>\n"
         "Integration Data for Sample Number 0<br/>\n"
         "==============================================<br/>\n"
-        "Variables: {{{u}'infty': inf, {u}'e': 2.718281828459045, {u}'i': 1j, {u}'j': 1j, {u}'s': 1.8831785881043805, {u}'x': 0.022981166359782736, {u}'pi': 3.141592653589793}}<br/>\n"
+        "Variables: {{{u}'e': 2.718281828459045,<br/>\n"
+        " {u}'i': 1j,<br/>\n"
+        " {u}'infty': inf,<br/>\n"
+        " {u}'j': 1j,<br/>\n"
+        " {u}'pi': 3.141592653589793,<br/>\n"
+        " {u}'s': 1.8831785881043805,<br/>\n"
+        " {u}'x': 0.022981166359782736}}<br/>\n"
         "<br/>\n"
         "========== Student Integration Data, Real Part<br/>\n"
         "Numerical Value: 7.453559925<br/>\n"
@@ -611,10 +632,11 @@ def test_debug_message_complex_integrand():
         "Number of integrand evaluations: 21<br/>\n"
         "</pre>"
     ).format(version=__version__, u=UNICODE_PREFIX)
-    expected_result = {'ok': False, 'grade_decimal': 0, 'msg': expected_message}
+    expected_message = round_decimals_in_string(expected_message)
     result = grader(None, student_input)
-    print(result['msg'])
-    assert expected_result == result
+    assert result['ok'] is False
+    assert result['grade_decimal'] == 0.0
+    assert expected_message == round_decimals_in_string(result['msg'])
 
 def test_error_catching():
     grader = IntegralGrader(

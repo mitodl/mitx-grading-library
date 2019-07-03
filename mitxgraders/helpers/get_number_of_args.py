@@ -1,22 +1,26 @@
 import inspect
 import six
 
-def get_builtin_positional_args(obj):
+def get_builtin_positional_args_py2(obj):
     """
     Get the number of position arguments on a built-in function by inspecting
     its docstring. (Built-in functions cannot be inspected by inspect.inspect.getargspec.)
 
-    NOTE:
-        - works in Python 3, but intended for Python 2
-
-    >>> pow.__doc__     # doctest: +ELLIPSIS
-    'pow(x, y[, z]) -> number...
-    >>> get_builtin_positional_args(pow)
-    2
+    NOTES:
+        - Only works in Python 2: depends on structure of builtin docstrings,
+          which changed from py2 to py3
     """
     # Built-in functions cannot be inspected by
     # inspect.inspect.getargspec. We have to try and parse
     # the __doc__ attribute of the function.
+    # In Python 2, builtin docstrings begin with a line that reveals
+    # the signature, for example, pow.__doc__ looks like:
+    # """
+    # pow(...)
+    # pow(x, y[, z]) -> number
+    #
+    # With two arguments, equivalent to x**y...
+    # """
     docstr = obj.__doc__
     if docstr:
         items = docstr.split('\n')
@@ -65,7 +69,7 @@ def get_number_of_args_py2(callable_obj):
     if inspect.isbuiltin(callable_obj):
         # Built-in function
         func = callable_obj
-        return get_builtin_positional_args(func)
+        return get_builtin_positional_args_py2(func)
     elif hasattr(callable_obj, "nin"):
         # Matches RandomFunction or numpy ufunc
         return callable_obj.nin
@@ -160,6 +164,8 @@ def get_number_of_args(callable_obj):
     >>> import math
     >>> get_number_of_args(math.sin)
     1
+    >>> get_number_of_args(pow)
+    2
 
     Works on numpy ufuncs
     >>> import numpy as np
