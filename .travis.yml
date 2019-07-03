@@ -1,9 +1,11 @@
 # Travis continuous integration configuration file
 matrix:
   include:
+  - dist: xenial
   - language: python
     python:
       - "2.7"
+      - "3.7"
     install:
       - pip install -r requirements.txt
       - pip install python-coveralls
