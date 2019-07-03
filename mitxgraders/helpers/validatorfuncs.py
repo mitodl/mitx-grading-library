@@ -104,10 +104,10 @@ def all_unique(iterable):
     items should be unique, but have unexpected duplicates: ['a', 0]
     """
     seen = set()
-    duplicates = set()
+    duplicates = []
     for item in iterable:
         if item in seen:
-            duplicates.add(item)
+            duplicates.append(item)
         else:
             seen.add(item)
 
