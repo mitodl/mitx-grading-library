@@ -401,7 +401,7 @@ class IdentityMatrixMultiples(AbstractSquareMatrices):
     The resulting samples are simply a scalar times the identity matrix:
     >>> matrices = IdentityMatrixMultiples()
     >>> m = matrices.gen_sample()
-    >>> m == m[0, 0] * np.eye(2)
+    >>> m == m[0, 0] * np.eye(2)                # doctest: +NORMALIZE_WHITESPACE
     MathArray([[ True,  True],
            [ True,  True]], dtype=bool)
     """
