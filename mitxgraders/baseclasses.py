@@ -18,6 +18,9 @@ from mitxgraders.version import __version__
 from mitxgraders.exceptions import ConfigError, MITxError, StudentFacingError
 from mitxgraders.helpers.validatorfuncs import text_string
 
+if False:
+    print("Just checking that coverage drops")
+
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""
 
