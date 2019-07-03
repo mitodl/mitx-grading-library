@@ -6,7 +6,7 @@ matrix:
       - "2.7"
     install:
       - pip install -r requirements.txt
-      - pip install --user codecov
+      - pip install codecov
     script:
       - pytest --cov=mitxgraders --cov-report=term-missing
     after_success:
@@ -18,7 +18,7 @@ matrix:
     dist: xenial
     install:
       - pip install -r requirements3.txt
-      - pip install --user codecov
+      - pip install codecov
     script:
       - pytest --cov=mitxgraders --cov-report=term-missing
     after_success:
