@@ -595,7 +595,7 @@ def test_fg_debug_log():
     "==========================================<br/>\n"
     "Comparison Data for All 2 Samples<br/>\n"
     "==========================================<br/>\n"
-    "Comparer Function: <function equality_comparer at 0x...><br/>\n"
+    "Comparer Function: EqualityComparer({{{u}'transform': None}})<br/>\n"
     "Comparison Results:<br/>\n"
     "[{{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}},<br/>\n"
     " {{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}}]<br/>\n"

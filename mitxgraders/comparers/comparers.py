@@ -51,25 +51,90 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 
 from numbers import Number
 import numpy as np
+
+from voluptuous import Schema, Required
+
 from mitxgraders.exceptions import InputTypeError, StudentFacingError
+from mitxgraders.helpers.validatorfuncs import is_callable, Nullable
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 from mitxgraders.helpers.calc.math_array import are_same_length_vectors, is_vector
+from mitxgraders.comparers.baseclasses import Comparer
 
-def equality_comparer(comparer_params_eval, student_eval, utils):
+class EqualityComparer(Comparer):
     """
-    Default comparer function used by FormulaGrader, NumericalGrader,
-    and MatrixGrader. Checks for equality.
+    This comparer checks for equality between the student and instructor results,
+    up to a desired tolerance. If desired, a transforming function can be applied
+    before the comparison is carried out.
 
-    comparer_params: ['expected_input']
+    comparer_params: ['expect']
+
+    By default, equality_comparer is used in FormulaGrader, NumericalGrader and MatrixGrader.
+    >>> from mitxgraders import *
+    >>> equality_comparer == EqualityComparer()
+    True
+    >>> grader = FormulaGrader(
+    ...     answers='2*x',
+    ...     variables=['x']
+    ... )
+    >>> grader(None, 'x')['ok']
+    False
+    >>> grader(None, 'x*2')['ok']
+    True
+
+    The following example applies cosine to the expected answer and student input
+    before comparison:
+    >>> import numpy as np
+    >>> grader = FormulaGrader(
+    ...     answers={
+    ...         'comparer': EqualityComparer(transform=np.cos),
+    ...         'comparer_params': ['x']
+    ...     },
+    ...     variables=['x']
+    ... )
+    >>> grader(None, 'x')['ok']
+    True
+    >>> grader(None, '-x')['ok']
+    True
+    >>> grader(None, 'x + 2*pi')['ok']
+    True
+    >>> grader(None, 'x + pi')['ok']
+    False
+
+    The following example takes the norm of the expected answer and student input
+    before comparison. Note the different method of changing the comparer.
+    >>> FormulaGrader.set_default_comparer(EqualityComparer(transform=np.linalg.norm))
+    >>> grader = MatrixGrader(
+    ...     answers='[1, 0, 0]'
+    ... )
+    >>> grader(None, '[1, 0, 0]')['ok']
+    True
+    >>> grader(None, '[0, 1, 0]')['ok']
+    True
+    >>> grader(None, '[1/sqrt(2), 0, 1/sqrt(2)]')['ok']
+    True
+    >>> FormulaGrader.reset_default_comparer()
+
     """
-    expected_input = comparer_params_eval[0]
+    schema_config = Schema({
+        Required('transform', default=None): Nullable(is_callable)
+    })
 
-    if hasattr(utils, 'validate_shape'):
-        # in numpy, scalars have empty tuples as their shapes
-        shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
-        utils.validate_shape(student_eval, shape)
+    def __call__(self, comparer_params_eval, student_eval, utils):
+        expected_input = comparer_params_eval[0]
 
-    return utils.within_tolerance(expected_input, student_eval)
+        if hasattr(utils, 'validate_shape'):
+            # in numpy, scalars have empty tuples as their shapes
+            shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
+            utils.validate_shape(student_eval, shape)
+
+        # If provided, apply the transform function
+        if self.config['transform'] is not None:
+            expected_input = self.config['transform'](expected_input)
+            student_eval = self.config['transform'](student_eval)
+
+        return utils.within_tolerance(expected_input, student_eval)
+
+equality_comparer = EqualityComparer()
 
 def between_comparer(comparer_params_eval, student_eval, utils):
     """
