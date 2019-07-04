@@ -2,11 +2,12 @@
 matrixsampling.py
 
 Contains classes for sampling vector/matrix/tensor values:
-* ArraySamplingSet
 * RealVectors
 * ComplexVectors
 * RealMatrices
 * ComplexMatrices
+* RealTensors
+* ComplexTensors
 * IdentityMatrixMultiples
 * SquareMatrices
 * OrthogonalMatrices
@@ -17,13 +18,14 @@ from __future__ import division
 import abc
 import numpy as np
 
+class Unavailable(object):
+    def rvs(self, dimension):
+        raise NotImplementedError('This feature requires newer versions of numpy '
+                                  'and scipy than are available.')
+
 try:
     from scipy.stats import ortho_group, special_ortho_group, unitary_group
 except ImportError:
-    class Unavailable(object):
-        def rvs(self, dimension):
-            raise NotImplementedError('This feature requires newer versions of numpy '
-                                      'and scipy than are available.')
     ortho_group = Unavailable()
     special_ortho_group = Unavailable()
     unitary_group = Unavailable()
@@ -37,11 +39,12 @@ from mitxgraders.helpers.calc import MathArray
 
 # Set the objects to be imported from this grader
 __all__ = [
-    "ArraySamplingSet",
     "RealVectors",
     "ComplexVectors",
     "RealMatrices",
     "ComplexMatrices",
+    "RealTensors",
+    "ComplexTensors",
     "IdentityMatrixMultiples",
     "SquareMatrices",
     "OrthogonalMatrices",
@@ -54,6 +57,7 @@ class Retry(Exception):
     constraints, and a new random draw should be taken.
     """
 
+
 class ArraySamplingSet(VariableSamplingSet):
     """
     Represents a set from which random array variable samples are taken.
@@ -61,8 +65,7 @@ class ArraySamplingSet(VariableSamplingSet):
     The norm used is standard Euclidean norm: root-sum of all entries in the array.
 
     This is the most low-level array sampling set we have, and is subclassed for various
-    specific purposes (especially vectors and matrices). As there is presently no subclass
-    for tensors, this class is not abstract.
+    specific purposes.
 
     Config:
     =======
@@ -73,26 +76,10 @@ class ArraySamplingSet(VariableSamplingSet):
             list [start, stop] or a dictionary {'start':start, 'stop':stop}.
             (default [1, 5])
         - complex (bool): Whether or not the matrix is complex (default False)
-
-    Usage
-    ========
-    Sample tensors with shape [4, 2, 5]:
-    >>> real_tensors = ArraySamplingSet(shape=[4, 2, 5])
-    >>> sample = real_tensors.gen_sample()
-    >>> sample.shape
-    (4, 2, 5)
-
-    Samples are of class MathArray:
-    >>> isinstance(sample, MathArray)
-    True
-
-    Specify a range for the tensor's norm:
-    >>> real_tensors = ArraySamplingSet(shape=[4, 2, 5], norm=[10, 20])
-    >>> sample = real_tensors.gen_sample()
-    >>> 10 < np.linalg.norm(sample) < 20
-    True
-
     """
+    # This is an abstract base class
+    __metaclass__ = abc.ABCMeta
+
     schema_config = Schema({
         Required('shape'): is_shape_specification(min_dim=1),
         Required('norm', default=[1, 5]): NumberRange(),
@@ -108,12 +95,24 @@ class ArraySamplingSet(VariableSamplingSet):
 
     def gen_sample(self):
         """
-        Generates a random matrix of shape and norm determined by config. After
+        Generates an array sample and returns it as a MathArray.
+
+        This calls generate_sample, which is the routine that should be subclassed if
+        needed, rather than this one.
+        """
+        array = self.generate_sample()
+        return MathArray(array)
+
+    def generate_sample(self):
+        """
+        Generates a random array of shape and norm determined by config. After
         generation, the apply_symmetry and normalize functions are applied to the result.
         These functions may be shadowed by a subclass.
 
         If apply_symmetry or normalize raise the Retry exception, a new sample is
         generated, and the procedure starts anew.
+
+        Returns a numpy array.
         """
         # Loop until a good sample is found
         loops = 0
@@ -134,8 +133,8 @@ class ArraySamplingSet(VariableSamplingSet):
                 # Normalize the result
                 array = self.normalize(array)
 
-                # Convert the array to a MathArray and return it
-                return MathArray(array)
+                # Return the result
+                return array
             except Retry:
                 continue
 
@@ -226,6 +225,84 @@ class ComplexVectors(VectorSamplingSet):
     })
 
 
+class TensorSamplingSet(ArraySamplingSet):
+    """
+    Sampling set of tensors. This is an abstract class; you should use RealTensors or
+    ComplexTensors instead.
+
+    Config:
+    =======
+        Same as ArraySamplingSet, but:
+            - shape must be a tuple with at least 3 dimensions
+    """
+    # This is an abstract base class
+    __metaclass__ = abc.ABCMeta
+
+    schema_config = ArraySamplingSet.schema_config.extend({
+        Required('shape'): is_shape_specification(min_dim=3)
+    })
+
+
+class RealTensors(TensorSamplingSet):
+    """
+    Sampling set of real tensors.
+
+    Config:
+    =======
+        Same as TensorSamplingSet, but:
+            - complex is always False
+
+    Usage:
+    ======
+    Sample tensors with shape [4, 2, 5]:
+    >>> real_tensors = RealTensors(shape=[4, 2, 5])
+    >>> sample = real_tensors.gen_sample()
+    >>> sample.shape
+    (4, 2, 5)
+
+    Samples are of class MathArray:
+    >>> isinstance(sample, MathArray)
+    True
+
+    Specify a range for the tensor's norm:
+    >>> real_tensors = RealTensors(shape=[4, 2, 5], norm=[10, 20])
+    >>> sample = real_tensors.gen_sample()
+    >>> 10 < np.linalg.norm(sample) < 20
+    True
+
+    """
+    schema_config = TensorSamplingSet.schema_config.extend({
+        Required('complex', default=False): False
+    })
+
+
+class ComplexTensors(TensorSamplingSet):
+    """
+    Sampling set of complex tensors.
+
+    Config:
+    =======
+        Same as TensorSamplingSet, but:
+            - complex is always True
+
+    Usage:
+    ======
+    Sample tensors with shape [4, 2, 5]:
+    >>> tensors = ComplexTensors(shape=[4, 2, 5])
+    >>> t = tensors.gen_sample()
+    >>> t.shape
+    (4, 2, 5)
+
+    Complex tensors have complex components:
+    >>> np.array_equal(t, np.conj(t))
+    False
+
+    """
+    schema_config = TensorSamplingSet.schema_config.extend({
+        Required('complex', default=True): True
+    })
+
+
 class MatrixSamplingSet(ArraySamplingSet):
     """
     Base sampling set of matrices. This is an abstract base class; you should
@@ -294,13 +371,13 @@ class RealMatrices(GeneralMatrices):
     >>> from mitxgraders.helpers.calc import within_tolerance
     >>> matrices = RealMatrices(triangular='upper')
     >>> m = matrices.gen_sample()
-    >>> within_tolerance(m, np.triu(m), 0)
+    >>> within_tolerance(m, MathArray(np.triu(m)), 0)
     True
 
     and lower triangular matrices:
     >>> matrices = RealMatrices(triangular='lower')
     >>> m = matrices.gen_sample()
-    >>> within_tolerance(m, np.tril(m), 0)
+    >>> within_tolerance(m, MathArray(np.tril(m)), 0)
     True
 
     """
@@ -395,9 +472,9 @@ class IdentityMatrixMultiples(SquareMatrixSamplingSet):
     The resulting samples are simply a scalar times the identity matrix:
     >>> matrices = IdentityMatrixMultiples()
     >>> m = matrices.gen_sample()
-    >>> m == m[0, 0] * np.eye(2)
-    MathArray([[ True,  True],
-           [ True,  True]], dtype=bool)
+    >>> np.array_equal(m, m[0, 0] * np.eye(2))
+    True
+
     """
     # Sampling set for the multiplicative constant
     # Accept anything that FormulaGrader would accept for a sampling set, restricted to
@@ -409,7 +486,7 @@ class IdentityMatrixMultiples(SquareMatrixSamplingSet):
                                                          All(list, Coerce(RealInterval)))
     })
 
-    def gen_sample(self):
+    def generate_sample(self):
         """
         Generates an identity matrix of specified dimension multiplied by a random scalar
         """
@@ -417,8 +494,8 @@ class IdentityMatrixMultiples(SquareMatrixSamplingSet):
         scaling = self.config['sampler'].gen_sample()
         # Create the numpy matrix
         array = scaling * np.eye(self.config['dimension'])
-        # Return the result as a MathArray
-        return MathArray(array)
+        # Return the result
+        return array
 
 
 class SquareMatrices(SquareMatrixSamplingSet):
@@ -688,42 +765,45 @@ class OrthogonalMatrices(SquareMatrixSamplingSet):
 
     Usage:
     ======
+    Note: These doctests can only work in python 3.
+    We can't dynamically skip doctests before pytest 4.4 (we're using 3.6.2),
+    so for the moment, we just skip things that don't work.
+
     By default, we generate 2x2 matrices:
-    >> matrices = OrthogonalMatrices()
-    >> matrices.gen_sample().shape
+    >>> matrices = OrthogonalMatrices()
+    >>> matrices.gen_sample().shape                 # doctest: +SKIP
     (2, 2)
 
     We can generate NxN matrices by specifying the dimension:
-    >> matrices = OrthogonalMatrices(dimension=4)
-    >> matrices.gen_sample().shape
+    >>> matrices = OrthogonalMatrices(dimension=4)
+    >>> matrices.gen_sample().shape                 # doctest: +SKIP
     (4, 4)
 
     If unitdet is specified, the determinant is 1:
-    >> from mitxgraders.helpers.calc import within_tolerance
-    >> matrices = OrthogonalMatrices(unitdet=True)
-    >> within_tolerance(np.linalg.det(matrices.gen_sample(), 1, 1e-14)
+    >>> from mitxgraders.helpers.calc import within_tolerance
+    >>> matrices = OrthogonalMatrices(unitdet=True)
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)  # doctest: +SKIP
     True
 
     Otherwise, it could be +1 or -1.
 
     The resulting samples are orthogonal matrices:
-    >> matrices = OrthogonalMatrices(unitdet=True)
-    >> m = matrices.gen_sample()
-    >> within_tolerance(m * np.transpose(m), np.eye(2))
+    >>> matrices = OrthogonalMatrices(unitdet=True)
+    >>> m = matrices.gen_sample()                                           # doctest: +SKIP
+    >>> within_tolerance(m * np.transpose(m), MathArray(np.eye(2)), 1e-14)  # doctest: +SKIP
     True
 
-    >> matrices = OrthogonalMatrices(unitdet=False)
-    >> m = matrices.gen_sample()
-    >> within_tolerance(m * np.transpose(m), np.eye(2))
+    >>> matrices = OrthogonalMatrices(unitdet=False)
+    >>> m = matrices.gen_sample()                                           # doctest: +SKIP
+    >>> within_tolerance(m * np.transpose(m), MathArray(np.eye(2)), 1e-14)  # doctest: +SKIP
     True
 
-    (Note: These tests are included in unit tests which run only in python3)
     """
     schema_config = SquareMatrixSamplingSet.schema_config.extend({
         Required('unitdet', default=True): bool
     })
 
-    def gen_sample(self):
+    def generate_sample(self):
         """
         Generates an orthogonal matrix
         """
@@ -732,8 +812,8 @@ class OrthogonalMatrices(SquareMatrixSamplingSet):
             array = special_ortho_group.rvs(self.config['dimension'])
         else:
             array = ortho_group.rvs(self.config['dimension'])
-        # Return the result as a MathArray
-        return MathArray(array)
+        # Return the result
+        return array
 
 
 class UnitaryMatrices(SquareMatrixSamplingSet):
@@ -753,45 +833,48 @@ class UnitaryMatrices(SquareMatrixSamplingSet):
 
     Usage:
     ======
+    Note: These doctests can only work in python 3.
+    We can't dynamically skip doctests before pytest 4.4 (we're using 3.6.2),
+    so for the moment, we just skip things that don't work.
+
     By default, we generate 2x2 matrices:
-    >> matrices = UnitaryMatrices()
-    >> matrices.gen_sample().shape
+    >>> matrices = UnitaryMatrices()
+    >>> matrices.gen_sample().shape                 # doctest: +SKIP
     (2, 2)
 
     We can generate NxN matrices by specifying the dimension:
-    >> matrices = UnitaryMatrices(dimension=4)
-    >> matrices.gen_sample().shape
+    >>> matrices = UnitaryMatrices(dimension=4)
+    >>> matrices.gen_sample().shape                 # doctest: +SKIP
     (4, 4)
 
     If unitdet is specified, the determinant is 1:
-    >> from mitxgraders.helpers.calc import within_tolerance
-    >> matrices = UnitaryMatrices(unitdet=True)
-    >> within_tolerance(np.linalg.det(matrices.gen_sample(), 1, 1e-14)
+    >>> from mitxgraders.helpers.calc import within_tolerance
+    >>> matrices = UnitaryMatrices(unitdet=True)
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)  # doctest: +SKIP
     True
 
     Otherwise, it's typically not (though it could randomly be):
-    >> matrices = UnitaryMatrices(unitdet=False)
-    >> within_tolerance(np.linalg.det(matrices.gen_sample(), 1, 1e-14)
+    >>> matrices = UnitaryMatrices(unitdet=False)
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)  # doctest: +SKIP
     False
 
     The resulting samples are unitary matrices:
-    >> matrices = UnitaryMatrices(unitdet=True)
-    >> m = matrices.gen_sample()
-    >> within_tolerance(m * np.conjugate(np.transpose(m)), np.eye(2))
+    >>> matrices = UnitaryMatrices(unitdet=True)
+    >>> m = matrices.gen_sample()                                         # doctest: +SKIP
+    >>> within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)  # doctest: +SKIP
     True
 
-    >> matrices = UnitaryMatrices(unitdet=False)
-    >> m = matrices.gen_sample()
-    >> within_tolerance(m * np.conjugate(np.transpose(m)), np.eye(2))
+    >>> matrices = UnitaryMatrices(unitdet=False)
+    >>> m = matrices.gen_sample()                                         # doctest: +SKIP
+    >>> within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)  # doctest: +SKIP
     True
 
-    (Note: These tests are included in unit tests which run only in python3)
     """
     schema_config = SquareMatrixSamplingSet.schema_config.extend({
         Required('unitdet', default=True): bool
     })
 
-    def gen_sample(self):
+    def generate_sample(self):
         """
         Generates an orthogonal matrix as appropriate
         """
@@ -801,5 +884,5 @@ class UnitaryMatrices(SquareMatrixSamplingSet):
         if self.config['unitdet']:
             det = np.linalg.det(array)
             array /= det**(1/self.config['dimension'])
-        # Return the result as a MathArray
-        return MathArray(array)
+        # Return the result
+        return array
