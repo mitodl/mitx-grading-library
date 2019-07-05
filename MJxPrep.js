@@ -98,6 +98,9 @@ if (window.MJxPrep) {
       return 'delta_{' + args[0] + ',' + args[1] + '}'
     })
 
+    // Do any custom cosmetic replacements (see end of script)
+    eqn = customCosmeticReplacements(eqn)
+
     // Return the preprocessed equation
     return eqn;
   }
@@ -627,8 +630,30 @@ if (window.MJxPrep) {
     funcToPostfix: funcToPostfix
   }
 
-  // A function to allow for custom replacements
   function customReplacements(eqn) {
+    /*
+     * A function to allow for custom replacements.
+     * This function is called *before* wrapping occurs, and should
+     * be used for implementing new functions, but not for doing
+     * cosmetic replacements. The output of this function must still
+     * satisfy the allowed variable/function name structure expected
+     * by the grading library.
+     */
+    var working = eqn;
+
+    // Manipulate working however you like here!
+
+    return working;
+  }
+
+  function customCosmeticReplacements(eqn) {
+    /*
+     * A function to allow for custom replacements.
+     * This function is called *after* wrapping occurs, and is useful
+     * for providing cosmetic changes that do not satisfy the structure
+     * expected by the parser, for example:
+     * working = working.replace(/A_p/g, 'A_{+}');
+     */
     var working = eqn;
 
     // Manipulate working however you like here!
