@@ -749,7 +749,7 @@ class SquareMatrices(SquareMatrixSamplingSet):
             # Temporarily convert the matrix into a hermitian matrix
             # and use the special algorithm
             eigenvalues = np.linalg.eigvalsh(1j * array)
-            eigenvalues *= -1j
+            eigenvalues = -1j * eigenvalues
         else:
             # No relevant symmetry. Use a general algorithm to compute eigenvalues.
             eigenvalues = np.linalg.eigvals(array)
