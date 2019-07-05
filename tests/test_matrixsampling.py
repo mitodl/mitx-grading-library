@@ -21,7 +21,8 @@ from mitxgraders import (
     UnitaryMatrices,
     MathArray,
     RealInterval,
-    ComplexRectangle
+    ComplexRectangle,
+    ConfigError
 )
 from mitxgraders.helpers.calc import within_tolerance
 
@@ -213,6 +214,68 @@ def test_orthogonal():
 
 def test_square_matrices():
     # Test shape, real/complex, norm, symmetry, traceless, det, MathArray
-    # Some combinations are invalid and should expect an error
-    # SquareMatrices
-    pass
+    shapes = tuple(range(2, 5))
+    norms = ([2, 6], [1 - 1e-12, 1 + 1e-12])
+    symmetries = (None, 'diagonal', 'symmetric', 'antisymmetric', 'hermitian', 'antihermitian')
+    traceless_opts = (True, False)
+    dets = (None, 0, 1)
+    complexes = (True, False)
+
+    for det in dets:
+        for traceless in traceless_opts:
+            for symmetry in symmetries:
+                # Handle the cases that don't work
+                if det == 0 and symmetry == 'antisymmetric':
+                    with raises(ConfigError, match='Unable to generate zero determinant antisymmetric matrices'):
+                        SquareMatrices(traceless=traceless,
+                                       symmetry=symmetry,
+                                       determinant=det)
+                    continue
+                if det == 0 and traceless:
+                    with raises(ConfigError, match='Unable to generate zero determinant traceless matrices'):
+                        SquareMatrices(traceless=traceless,
+                                       symmetry=symmetry,
+                                       determinant=det)
+                    continue
+
+                # Continue with further cases
+                for shape in shapes:
+                    for norm in norms:
+                        for comp in complexes:
+                            # Check for matrices that don't exist
+                            if det == 1:
+                                if traceless and shape == 2:
+                                    if symmetry == 'diagonal' and not comp:
+                                        with raises(ConfigError, match='No real, traceless, unit-determinant, diagonal 2x2 matrix exists'):
+                                            SquareMatrices(dimension=shape, norm=norm, traceless=traceless, symmetry=symmetry, determinant=det, complex=comp)
+                                        continue
+                                    elif symmetry == 'symmetric' and not comp:
+                                        with raises(ConfigError, match='No real, traceless, unit-determinant, symmetric 2x2 matrix exists'):
+                                            SquareMatrices(dimension=shape, norm=norm, traceless=traceless, symmetry=symmetry, determinant=det, complex=comp)
+                                        continue
+                                    elif symmetry == 'hermitian':
+                                        with raises(ConfigError, match='No traceless, unit-determinant, Hermitian 2x2 matrix exists'):
+                                            SquareMatrices(dimension=shape, norm=norm, traceless=traceless, symmetry=symmetry, determinant=det, complex=comp)
+                                        continue
+                                elif shape % 2 == 1:  # Odd dimension
+                                    if symmetry == 'antisymmetric':
+                                        with raises(ConfigError, match='No unit-determinant antisymmetric matrix exists in odd dimensions'):
+                                            SquareMatrices(dimension=shape, norm=norm, traceless=traceless, symmetry=symmetry, determinant=det, complex=comp)
+                                        continue
+                                    elif symmetry == 'antihermitian':
+                                        with raises(ConfigError, match='No unit-determinant antihermitian matrix exists in odd dimensions'):
+                                            SquareMatrices(dimension=shape, norm=norm, traceless=traceless, symmetry=symmetry, determinant=det, complex=comp)
+                                        continue
+
+                            # Matrix exists, so let's test
+                            matrices = SquareMatrices(dimension=shape,
+                                                      norm=norm,
+                                                      traceless=traceless,
+                                                      symmetry=symmetry,
+                                                      determinant=det,
+                                                      complex=comp)
+                            if symmetry in ('hermitian', 'antihermitian'):
+                                comp = True
+                            m = matrices.gen_sample()
+                            assert m.shape == (shape, shape)
+                            assert isinstance(m, MathArray)
