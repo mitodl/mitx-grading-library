@@ -41,7 +41,7 @@ def test_expressions_py():
     assert used.suffixes_used == set()
 
     # Test incorrect case variables
-    msg = r"Invalid Input: X not permitted in answer as a variable \(did you mean x\?\)"
+    msg = r"Invalid Input: 'X' not permitted in answer as a variable \(did you mean 'x'\?\)"
     with raises(UndefinedVariable, match=msg):
         evaluator("X", {"x": 1}, {}, {})
 
@@ -179,7 +179,7 @@ def test_inf_overflow():
     # This is ok
     evaluator("f(1)", functions=functions, allow_inf=True)
     # This gives an error
-    msg = "Numerical overflow occurred. Does your expression generate very large numbers\?"
+    msg = r"Numerical overflow occurred. Does your expression generate very large numbers\?"
     with raises(CalcOverflowError, match=msg):
         evaluator("f(1)", functions=functions,)
 
@@ -195,7 +195,7 @@ def test_suffix_capitalization_error():
     variables = {}
     functions = {}
     suffixes = {'M'}
-    match = "Invalid Input: m not permitted directly after a number \(did you mean M\?\)"
+    match = r"Invalid Input: 'm' not permitted directly after a number \(did you mean 'M'\?\)"
     with raises(CalcError, match=match):
         evaluator('5m', variables, functions, suffixes)
 
