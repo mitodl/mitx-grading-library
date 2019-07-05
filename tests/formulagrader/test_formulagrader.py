@@ -933,17 +933,20 @@ def test_instructor_vars():
     grader = FormulaGrader(
         answers='sin(x)/cos(x)',
         variables=['x', 's', 'c'],
+        numbered_vars=['y'],
         sample_from={
             'x': [-3.14159, 3.14159],
             's': DependentSampler(depends=["x"], formula="sin(x)"),
             'c': DependentSampler(depends=["x"], formula="cos(x)")
         },
-        instructor_vars=['x', 'pi', 'nothere']  # nothere will be ignored
+        instructor_vars=['x', 'pi', 'y_{0}', 'nothere']  # nothere will be ignored
     )
 
     assert grader(None, 's/c')['ok']
+    assert not grader(None, 'y_{1}')['ok']
     with raises(UndefinedVariable, match="'x' not permitted in answer as a variable"):
         grader(None, 'tan(x)')
-
     with raises(UndefinedVariable, match="'pi' not permitted in answer as a variable"):
         grader(None, 'pi')
+    with raises(UndefinedVariable, match=r"'y_\{0\}' not permitted in answer as a variable"):
+        grader(None, 'y_{0}')
