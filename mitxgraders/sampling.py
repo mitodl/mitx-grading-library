@@ -227,23 +227,42 @@ class ComplexSector(ScalarSamplingSet):
 
 class DiscreteSet(VariableSamplingSet):  # pylint: disable=too-few-public-methods
     """
-    Represents a discrete set of values from which to sample.
+    Represents a discrete set of values from which to sample, which may consist of numbers
+    and/or MathArrays.
 
-    Initialize with a single value or a non-empty tuple of scalar values. Note that we use
-    a tuple instead of a list so that the range [0,1] isn't confused with (0,1). We would
-    use a set, but unfortunately voluptuous doesn't work with sets.
+    Initialize with a single value or a non-empty tuple of values. Note that we use
+    a tuple instead of a list so that the range [0,1] isn't confused with the set (0, 1).
+    The set of values can include numbers and MathArrays.
+
+    Historical note: When we first implemented this, voluptuous didn't work with sets, and
+    so we used tuples instead. Now we can't change to sets without breaking backwards
+    compatability, alas.
 
     Usage
     =====
-    Specify a single value
+    Specify a single value (note that you would usually use a user_constant for this)
     >>> values = DiscreteSet(3.142)
+    >>> values.gen_sample() == 3.142
+    True
 
     Specify a tuple of values
     >>> values = DiscreteSet((1,3,5,7,9))
+
+    Specify an array
+    >>> ident = MathArray([[1, 0], [0, 1]])
+    >>> values = DiscreteSet(ident)
+
+    Specify a set of arrays
+    >>> myarray = MathArray([[1, 2], [3, 4]])
+    >>> values = DiscreteSet((ident, myarray))
+
+    Specify a mixed set
+    >>> values = DiscreteSet((1, ident))
+
     """
 
-    # Take in an individual or tuple of numbers
-    schema_config = Schema(TupleOfType(Number))
+    # Take in an individual or tuple of numbers/MathArrays
+    schema_config = Schema(TupleOfType((Number, MathArray)))
 
     def gen_sample(self):
         """Return a random entry from the given set"""

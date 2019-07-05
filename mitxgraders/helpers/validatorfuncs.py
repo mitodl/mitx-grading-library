@@ -209,20 +209,26 @@ def is_callable_with_args(num_args):
 
     return _validate
 
-def TupleOfType(given_type, validator=None):
+def TupleOfType(given_types, validator=None):
     """
-    Validator that allows for a single given_type or a tuple of given_type.
+    This is a validator that allows for a single instance or tuple of some given types.
+    The different types can be mixed in the tuple.
+    Single instances are coerced into tuples by the validator.
     Also allows an extra validator to be applied to each item in the resulting tuple.
+    given_types can be a single type, or a tuple of types.
     """
+    if not isinstance(given_types, tuple):
+        given_types = (given_types, )
+
     def func(config_input):
         # Wrap an individual given_type in a tuple
         if not isinstance(config_input, tuple):
             config_input = (config_input,)
         # Apply the schema
         if validator:
-            schema = Schema(All((given_type,), Length(min=1), (validator, )))
+            schema = Schema(All((Any(*given_types),), Length(min=1), (validator, )))
         else:
-            schema = Schema(All((given_type,), Length(min=1)))
+            schema = Schema(All((Any(*given_types),), Length(min=1)))
         return schema(config_input)
     return func
 
