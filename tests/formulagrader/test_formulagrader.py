@@ -17,6 +17,7 @@ from mitxgraders import (
     SpecificFunctions,
     RandomFunction,
     ConfigError,
+    DependentSampler,
 )
 from mitxgraders.helpers.compatibility import UNICODE_PREFIX
 from mitxgraders.exceptions import MissingInput, InvalidInput
@@ -78,29 +79,38 @@ def test_fg_expressions():
 def test_fg_invalid_input():
     grader = FormulaGrader(answers='2', variables=['m'])
 
-    expect = 'Invalid Input: pi not permitted in answer as a function ' + \
-             '\(did you forget to use \* for multiplication\?\)'
+    expect = "Invalid Input: 'pi' not permitted in answer as a function " + \
+             r'\(did you forget to use \* for multiplication\?\)'
     with raises(CalcError, match=expect):
         grader(None, "pi(3)")
 
-    expect = 'Invalid Input: Im, Re not permitted in answer as a function ' + \
-             '\(did you mean im, re\?\)'
+    expect = "Invalid Input: 'Im', 'Re' not permitted in answer as a function " + \
+             r"\(did you mean 'im', 're'\?\)"
     with raises(CalcError, match=expect):
         grader(None, "Im(3) + Re(2)")
 
-    expect = 'Invalid Input: spin not permitted in answer as a function'
+    expect = "Invalid Input: 'spin' not permitted in answer as a function"
     with raises(CalcError, match=expect):
         grader(None, "spin(3)")
 
-    expect = 'Invalid Input: R not permitted in answer as a variable'
+    expect = "Invalid Input: 'R' not permitted in answer as a variable"
     with raises(CalcError, match=expect):
         grader(None, "R")
 
-    expect = "Invalid Input: pp not permitted directly after a number"
+    expect = "Invalid Input: 'Q', 'R' not permitted in answer as a variable"
+    with raises(CalcError, match=expect):
+        grader(None, "R+Q")
+
+    expect = "Invalid Input: 'pp' not permitted directly after a number"
     with raises(CalcError, match=expect):
         grader(None, "5pp")
 
-    expect = "Invalid Input: m not permitted directly after a number \(did you forget to use \* for multiplication\?\)"
+    expect = "Invalid Input: 'mm', 'pp' not permitted directly after a number"
+    with raises(CalcError, match=expect):
+        grader(None, "5pp+6mm")
+
+    expect = ("Invalid Input: 'm' not permitted directly after a number "
+              r"\(did you forget to use \* for multiplication\?\)")
     with raises(CalcError, match=expect):
         grader(None, "5m")
 
@@ -171,7 +181,7 @@ def test_fg_percent():
     )
     assert grader(None, "2%")['ok']
     assert grader(None, "0.02")['ok']
-    with raises(CalcError, match="Invalid Input: m not permitted directly after a number"):
+    with raises(CalcError, match="Invalid Input: 'm' not permitted directly after a number"):
         grader(None, "20m")
 
 def test_fg_metric():
@@ -256,7 +266,7 @@ def test_fg_blacklist_grading():
     expect = r"Invalid Input: function\(s\) 'tan' not permitted in answer"
     with raises(InvalidInput, match=expect):
         grader(None, "tan(0.4)")
-    expect = r"Invalid Input: TAN, Tan not permitted in answer as a function \(did you mean tan\?\)"
+    expect = r"Invalid Input: 'TAN', 'Tan' not permitted in answer as a function \(did you mean 'tan'\?\)"
     with raises(UndefinedFunction, match=expect):
         grader(None, "(TAN(0.4) + Tan(0.4))/2")
 
@@ -268,7 +278,6 @@ def test_fg_whitelist_grading():
     )
     assert grader(None, "hello(0.4)")['ok']
 
-
     assert grader(None, "sin(0.4)/cos(0.4)")['ok']
     # Incorrect answers with forbidden function are marked wrong:
     assert not grader(None, "cos(0.4)/sin(0.4)")['ok']
@@ -276,7 +285,7 @@ def test_fg_whitelist_grading():
     expect = r"Invalid Input: function\(s\) 'tan' not permitted in answer"
     with raises(InvalidInput, match=expect):
         grader(None, "tan(0.4)")
-    expect = r"Invalid Input: TAN not permitted in answer as a function \(did you mean tan\?\)"
+    expect = r"Invalid Input: 'TAN' not permitted in answer as a function \(did you mean 'tan'\?\)"
     with raises(UndefinedFunction, match=expect):
         grader(None, "TAN(0.4)")
 
@@ -461,7 +470,7 @@ def test_fg_config_expect():
 
     # If trying to use comparer, a detailed validation error is raised
     expect = ("to have 3 arguments, instead it has 2 for dictionary value @ "
-              "data\['answers'\]\[0\]\[u?'expect'\]\['comparer'\]")
+              r"data\['answers'\]\[0\]\[u?'expect'\]\['comparer'\]")
     with raises(Error, match=expect):
         FormulaGrader(
             answers={
@@ -891,7 +900,7 @@ def test_numbered_vars():
         }
     )
     assert grader(None, 'a_{0}+a_{1}+a_{-1}')['ok']
-    with raises(UndefinedVariable, match="a not permitted in answer as a variable"):
+    with raises(UndefinedVariable, match="'a' not permitted in answer as a variable"):
         grader(None, 'a')
 
 def test_whitespace_stripping():
@@ -918,3 +927,26 @@ def test_default_comparer():
     grader.config['answers'][0]['expect']['comparer'] is equality_comparer
     assert not grader(None, '1')['ok']
     assert grader(None, '3.141592653')['ok']
+
+def test_instructor_vars():
+    """Ensures that instructor variables are not available to students"""
+    grader = FormulaGrader(
+        answers='sin(x)/cos(x)',
+        variables=['x', 's', 'c'],
+        numbered_vars=['y'],
+        sample_from={
+            'x': [-3.14159, 3.14159],
+            's': DependentSampler(depends=["x"], formula="sin(x)"),
+            'c': DependentSampler(depends=["x"], formula="cos(x)")
+        },
+        instructor_vars=['x', 'pi', 'y_{0}', 'nothere']  # nothere will be ignored
+    )
+
+    assert grader(None, 's/c')['ok']
+    assert not grader(None, 'y_{1}')['ok']
+    with raises(UndefinedVariable, match="'x' not permitted in answer as a variable"):
+        grader(None, 'tan(x)')
+    with raises(UndefinedVariable, match="'pi' not permitted in answer as a variable"):
+        grader(None, 'pi')
+    with raises(UndefinedVariable, match=r"'y_\{0\}' not permitted in answer as a variable"):
+        grader(None, 'y_{0}')

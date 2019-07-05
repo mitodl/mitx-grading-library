@@ -586,8 +586,8 @@ class MathExpression(object):
         """
         bad_vars = set(var for var in self.variables_used if var not in variables)
         if bad_vars:
-            message = "Invalid Input: {} not permitted in answer as a variable"
-            varnames = ", ".join(sorted(bad_vars))
+            message = "Invalid Input: '{}' not permitted in answer as a variable"
+            varnames = "', '".join(sorted(bad_vars))
 
             # Check to see if there is a different case version of the variable
             caselist = set()
@@ -596,15 +596,15 @@ class MathExpression(object):
                     if var1.lower() == var2.lower():
                         caselist.add(var1)
             if len(caselist) > 0:
-                betternames = ', '.join(sorted(caselist))
-                message += " (did you mean " + betternames + "?)"
+                betternames = "', '".join(sorted(caselist))
+                message += " (did you mean '" + betternames + "'?)"
 
             raise UndefinedVariable(message.format(varnames))
 
         bad_funcs = set(func for func in self.functions_used if func not in functions)
         if bad_funcs:
-            funcnames = ', '.join(sorted(bad_funcs))
-            message = "Invalid Input: {} not permitted in answer as a function"
+            funcnames = "', '".join(sorted(bad_funcs))
+            message = "Invalid Input: '{}' not permitted in answer as a function"
 
             # Check to see if there is a corresponding variable name
             if any(func in variables for func in bad_funcs):
@@ -617,15 +617,15 @@ class MathExpression(object):
                     if func2.lower() == func1.lower():
                         caselist.add(func1)
             if len(caselist) > 0:
-                betternames = ', '.join(sorted(caselist))
-                message += " (did you mean " + betternames + "?)"
+                betternames = "', '".join(sorted(caselist))
+                message += " (did you mean '" + betternames + "'?)"
 
             raise UndefinedFunction(message.format(funcnames))
 
         bad_suffixes = set(suff for suff in self.suffixes_used if suff not in suffixes)
         if bad_suffixes:
-            bad_suff_names = ', '.join(sorted(bad_suffixes))
-            message = "Invalid Input: {} not permitted directly after a number"
+            bad_suff_names = "', '".join(sorted(bad_suffixes))
+            message = "Invalid Input: '{}' not permitted directly after a number"
 
             # Check to see if there is a corresponding variable name
             if any(suff in variables for suff in bad_suffixes):
@@ -638,8 +638,8 @@ class MathExpression(object):
                     if suff2.lower() == suff1.lower():
                         caselist.add(suff1)
             if len(caselist) > 0:
-                betternames = ', '.join(sorted(caselist))
-                message += " (did you mean " + betternames + "?)"
+                betternames = "', '".join(sorted(caselist))
+                message += " (did you mean '" + betternames + "'?)"
 
             raise UndefinedFunction(message.format(bad_suff_names))
 

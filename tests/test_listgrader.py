@@ -113,7 +113,7 @@ def test_multiple_graders():
 
     # Test incorrect ordering
     submission = ['1', 'cat']
-    with raises(CalcError, match='Invalid Input: cat not permitted in answer'):
+    with raises(CalcError, match="Invalid Input: 'cat' not permitted in answer as a variable"):
         result = grader(None, submission)
 
     # Test failure

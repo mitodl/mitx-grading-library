@@ -420,6 +420,11 @@ class FormulaGrader(ItemGrader):
                     should return True, False, 'partial', or a dictionary with required key
                     'grade_decimal' and optional key 'msg'. Comparer messages are ignored
                     when comparison succeeds (result['ok'] is True).
+
+        instructor_vars ([str]): A list of variable/constant names that cannot be used by
+            students. This can be useful in constructing DependentSampler expressions or
+            blacklisting constants. Note that this list is not validated against the list
+            of constants/variables.
     """
 
     default_functions = DEFAULT_FUNCTIONS.copy()
@@ -473,6 +478,7 @@ class FormulaGrader(ItemGrader):
             Required('forbidden_strings', default=[]): [text_string],
             Required('forbidden_message', default=forbidden_default): text_string,
             Required('required_functions', default=[]): [text_string],
+            Required('instructor_vars', default=[]): [text_string],
             Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
             Required('metric_suffixes', default=False): bool,
             Required('samples', default=5): Positive(int),
@@ -736,6 +742,12 @@ class FormulaGrader(ItemGrader):
         comparer_params_evals = []
         student_evals = []
 
+        # Create a list of instructor variables to remove from student evaluation
+        var_blacklist = []
+        for var in self.config['instructor_vars']:
+            if var in var_samples[0]:
+                var_blacklist.append(var)
+
         for i in range(self.config['samples']):
             # Update the functions and variables listings with this sample
             funclist.update(func_samples[i])
@@ -760,9 +772,11 @@ class FormulaGrader(ItemGrader):
                 scoped_eval, comparer_params, siblings_eval)
             comparer_params_evals.append(comparer_params_eval)
 
-            # Before performing student evaluation, scrub the siblings
-            # so that students can't use them
+            # Before performing student evaluation, scrub the sibling and instructor
+            # variables so that students can't use them
             for key in siblings_eval:
+                del varlist[key]
+            for key in var_blacklist:
                 del varlist[key]
 
             student_eval, meta = scoped_eval(student_input)
