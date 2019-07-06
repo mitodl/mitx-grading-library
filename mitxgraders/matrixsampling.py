@@ -795,37 +795,37 @@ class OrthogonalMatrices(SquareMatrixSamplingSet):
 
     Usage:
     ======
-    Note: These doctests can only work in python 3.
-    We can't dynamically skip doctests before pytest 4.4 (we're using 3.6.2),
-    so for the moment, we just skip things that don't work.
+    >>> import six, pytest
+    >>> if six.PY2:
+    ...     pytest.skip('These doctests only work in python 3')
 
     By default, we generate 2x2 matrices:
     >>> matrices = OrthogonalMatrices()
-    >>> matrices.gen_sample().shape                 # doctest: +SKIP
+    >>> matrices.gen_sample().shape
     (2, 2)
 
     We can generate NxN matrices by specifying the dimension:
     >>> matrices = OrthogonalMatrices(dimension=4)
-    >>> matrices.gen_sample().shape                 # doctest: +SKIP
+    >>> matrices.gen_sample().shape
     (4, 4)
 
     If unitdet is specified, the determinant is 1:
     >>> from mitxgraders.helpers.calc import within_tolerance
     >>> matrices = OrthogonalMatrices(unitdet=True)
-    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 5e-13)  # doctest: +SKIP
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 5e-13)
     True
 
     Otherwise, it could be +1 or -1.
 
     The resulting samples are orthogonal matrices:
     >>> matrices = OrthogonalMatrices(unitdet=True)
-    >>> m = matrices.gen_sample()                                           # doctest: +SKIP
-    >>> within_tolerance(m * np.transpose(m), MathArray(np.eye(2)), 5e-13)  # doctest: +SKIP
+    >>> m = matrices.gen_sample()
+    >>> within_tolerance(m * np.transpose(m), MathArray(np.eye(2)), 5e-13)
     True
 
     >>> matrices = OrthogonalMatrices(unitdet=False)
-    >>> m = matrices.gen_sample()                                           # doctest: +SKIP
-    >>> within_tolerance(m * np.transpose(m), MathArray(np.eye(2)), 5e-13)  # doctest: +SKIP
+    >>> m = matrices.gen_sample()
+    >>> within_tolerance(m * np.transpose(m), MathArray(np.eye(2)), 5e-13)
     True
 
     """
@@ -863,40 +863,40 @@ class UnitaryMatrices(SquareMatrixSamplingSet):
 
     Usage:
     ======
-    Note: These doctests can only work in python 3.
-    We can't dynamically skip doctests before pytest 4.4 (we're using 3.6.2),
-    so for the moment, we just skip things that don't work.
+    >>> import six, pytest
+    >>> if six.PY2:
+    ...     pytest.skip('These doctests only work in python 3')
 
     By default, we generate 2x2 matrices:
     >>> matrices = UnitaryMatrices()
-    >>> matrices.gen_sample().shape                 # doctest: +SKIP
+    >>> matrices.gen_sample().shape
     (2, 2)
 
     We can generate NxN matrices by specifying the dimension:
     >>> matrices = UnitaryMatrices(dimension=4)
-    >>> matrices.gen_sample().shape                 # doctest: +SKIP
+    >>> matrices.gen_sample().shape
     (4, 4)
 
     If unitdet is specified, the determinant is 1:
     >>> from mitxgraders.helpers.calc import within_tolerance
     >>> matrices = UnitaryMatrices(unitdet=True)
-    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 5e-13)  # doctest: +SKIP
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 5e-13)
     True
 
     Otherwise, it's typically not (though it could randomly be):
     >>> matrices = UnitaryMatrices(unitdet=False)
-    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 5e-13)  # doctest: +SKIP
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 5e-13)
     False
 
     The resulting samples are unitary matrices:
     >>> matrices = UnitaryMatrices(unitdet=True)
-    >>> m = matrices.gen_sample()                                         # doctest: +SKIP
-    >>> within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 5e-13)  # doctest: +SKIP
+    >>> m = matrices.gen_sample()
+    >>> within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 5e-13)
     True
 
     >>> matrices = UnitaryMatrices(unitdet=False)
-    >>> m = matrices.gen_sample()                                         # doctest: +SKIP
-    >>> within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 5e-13)  # doctest: +SKIP
+    >>> m = matrices.gen_sample()
+    >>> within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 5e-13)
     True
 
     """
