@@ -4,8 +4,7 @@ scipy==1.2.2
 pyparsing==2.4.0
 six==1.11.0
 
-# For testing/linting
-pylint
+# For testing
 pytest==3.6.2
 pytest-cov==2.5.1
 
