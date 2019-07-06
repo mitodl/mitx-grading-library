@@ -36,5 +36,5 @@ def test_text_string():
     assert isinstance(validatorfuncs.text_string('Leo'), six.text_type)
     assert isinstance(validatorfuncs.text_string(six.u('Leo')), six.text_type)
 
-    with raises(Invalid, match="expected str \(or unicode\)"):
+    with raises(Invalid, match=r"expected str \(or unicode\)"):
         validatorfuncs.text_string([1, 2, 3])

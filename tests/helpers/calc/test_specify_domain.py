@@ -66,12 +66,12 @@ def test_incorrect_arguments_raise_errors():
     y = np.random.uniform(-10, 10)
     z = random_math_array([2])
 
-    match = ("There was an error evaluating function {0}\(...\)"
-             "\n1st input is ok: received a scalar as expected"
-             "\n2nd input has an error: received a matrix of shape \(rows: 2, cols: 2\), "
-             "expected a matrix of shape \(rows: 2, cols: 3\)"
-             "\n3rd input has an error: received a scalar, expected a vector of length 3"
-             "\n4th input is ok: received a vector of length 2 as expected")
+    match = (r"There was an error evaluating function {0}\(...\)"
+             r"\n1st input is ok: received a scalar as expected"
+             r"\n2nd input has an error: received a matrix of shape \(rows: 2, cols: 2\), "
+             r"expected a matrix of shape \(rows: 2, cols: 3\)"
+             r"\n3rd input has an error: received a scalar, expected a vector of length 3"
+             r"\n4th input is ok: received a vector of length 2 as expected")
     with raises(DomainError, match=match.format('somefunc')):
         f(w, x, y, z)
     with raises(DomainError, match=match.format('somefunc')):
@@ -87,21 +87,21 @@ def test_incorrect_arguments_raise_errors():
 
 def test_incorrect_number_of_inputs_raises_useful_error():
     f = get_somefunc()
-    match = 'Wrong number of arguments passed to somefunc\(...\): Expected 4 inputs, but received 2.'
+    match = r'Wrong number of arguments passed to somefunc\(...\): Expected 4 inputs, but received 2.'
     with raises(DomainError, match=match):
         f(1, 2)
 
 def test_author_facing_decorator_raises_errors_with_invalid_config():
 
-    match = "required key not provided @ data\[u?'input_shapes'\]. Got None"
+    match = r"required key not provided @ data\[u?'input_shapes'\]. Got None"
     with raises(Error, match=match):
         @specify_domain()
         def f():
             pass
 
-    match = ("expected shape specification to be a positive integer, or a "
-            "list/tuple of positive integers \(min length 1, max length None\) @ "
-            "data\['input_shapes'\]\[1\]. Got 0")
+    match = (r"expected shape specification to be a positive integer, or a "
+             r"list/tuple of positive integers \(min length 1, max length None\) @ "
+             r"data\['input_shapes'\]\[1\]. Got 0")
     with raises(Error, match=match):
         @specify_domain(input_shapes=[5, 0, [1, 2]])
         def g():
