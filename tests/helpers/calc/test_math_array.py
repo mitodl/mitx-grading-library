@@ -83,16 +83,16 @@ def test_addition_with_shape_mismath():
     # shape mismatch
     A = MathArray([[5, 2, 1], [-2, 4, -3]])
     B = MathArray([[2, -1], [3, 0]])
-    match = ('Cannot add/subtract a matrix of shape \(rows: 2, cols: 3\) '
-             'with a matrix of shape \(rows: 2, cols: 2\).')
+    match = (r'Cannot add/subtract a matrix of shape \(rows: 2, cols: 3\) '
+             r'with a matrix of shape \(rows: 2, cols: 2\).')
     with raises(ShapeError, match=match):
         A + B
 
     # dimension mismatch
     u = MathArray([1, 2])
     v = MathArray([1, 2, 3])
-    match = ('Cannot add/subtract a vector of length 2 with a matrix of '
-             'shape \(rows: 2, cols: 2\).')
+    match = (r'Cannot add/subtract a vector of length 2 with a matrix of '
+             r'shape \(rows: 2, cols: 2\).')
     with raises(ShapeError, match=match):
         u + B
 
@@ -147,15 +147,15 @@ def test_subtraction_with_shape_mismath():
     # shape mismatch
     A = MathArray([[5,  2, 1], [-2, 4, -3]])
     B = MathArray([[2, -1], [3,  0]])
-    match = ('Cannot add/subtract a matrix of shape \(rows: 2, cols: 3\) '
-             'with a matrix of shape \(rows: 2, cols: 2\).')
+    match = (r'Cannot add/subtract a matrix of shape \(rows: 2, cols: 3\) '
+             r'with a matrix of shape \(rows: 2, cols: 2\).')
     with raises(ShapeError, match=match):
         A - B
 
     # dimension mismatch
     u = MathArray([1, 2])
-    match = ('Cannot add/subtract a vector of length 2 with a matrix of '
-             'shape \(rows: 2, cols: 2\).')
+    match = (r'Cannot add/subtract a vector of length 2 with a matrix of '
+             r'shape \(rows: 2, cols: 2\).')
     with raises(ShapeError, match=match):
         u - B
 
@@ -202,8 +202,8 @@ def test_matrix_times_matrix_multiplication():
     X = random_math_array([3, 5])
     Y = random_math_array([4, 2])
 
-    match = ("Cannot multiply a matrix of shape \(rows: 3, cols: 5\) with a matrix "
-             "of shape \(rows: 4, cols: 2\)")
+    match = (r"Cannot multiply a matrix of shape \(rows: 3, cols: 5\) with a matrix "
+             r"of shape \(rows: 4, cols: 2\)")
     with raises(ShapeError, match=match):
         X*Y
 
@@ -224,8 +224,8 @@ def test_matrix_times_vector_multiplication():
     X = random_math_array([4, 3])
     Y = random_math_array(5)
 
-    match = ("Cannot multiply a matrix of shape \(rows: 4, cols: 3\) with a vector "
-             "of length 5.")
+    match = (r"Cannot multiply a matrix of shape \(rows: 4, cols: 3\) with a vector "
+             r"of length 5.")
     with raises(ShapeError, match=match):
         X*Y
 
@@ -243,8 +243,8 @@ def test_vector_times_matrix_multiplication():
     X = random_math_array(5)
     Y = random_math_array([4, 3])
 
-    match = ("Cannot multiply a vector of length 5 with a matrix of shape "
-             "\(rows: 4, cols: 3\)")
+    match = (r"Cannot multiply a vector of length 5 with a matrix of shape "
+             r"\(rows: 4, cols: 3\)")
     with raises(ShapeError, match=match):
         X*Y
 

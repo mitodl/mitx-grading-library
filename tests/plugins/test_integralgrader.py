@@ -25,8 +25,8 @@ def test_wrong_number_of_inputs_raises_error():
         variables=['a', 'b']
     )
     student_input = ['a', 'b']
-    expected_message = ("Expected 3 student inputs but found 2. "
-                        "Inputs should  appear in order \['integrand', 'lower', 'upper'\].")
+    expected_message = (r"Expected 3 student inputs but found 2. "
+                        r"Inputs should  appear in order \['integrand', 'lower', 'upper'\].")
     with raises(ConfigError, match=expected_message):
         grader(None, student_input)
 
@@ -654,7 +654,7 @@ def test_error_catching():
         variables=['a', 'b']
     )
     student_input = ['1+', '1', '2']
-    expected_message = "Invalid Input: Could not parse '1\+' as a formula"
+    expected_message = r"Invalid Input: Could not parse '1\+' as a formula"
     with raises(CalcError, match=expected_message):
         grader(None, student_input)
 

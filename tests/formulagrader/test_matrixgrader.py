@@ -1,7 +1,7 @@
 from __future__ import print_function, division, absolute_import
 
-from pytest import raises
 import re
+from pytest import raises
 from mitxgraders import (MatrixGrader, RealMatrices, RealVectors, ComplexRectangle)
 from mitxgraders.formulagrader.matrixgrader import InputTypeError
 from mitxgraders.helpers.calc.exceptions import (
@@ -68,7 +68,7 @@ def test_fg_with_arrays():
     assert grader(None, correct_2)['ok']
     assert grader(None, correct_3)['ok']
 
-    match = "Cannot multiply a matrix of shape \(rows: 3, cols: 2\) with a matrix of shape \(rows: 3, cols: 2\)"
+    match = r"Cannot multiply a matrix of shape \(rows: 3, cols: 2\) with a matrix of shape \(rows: 3, cols: 2\)"
     with raises(ShapeError, match=match):
         grader(None, 'B*B')
 
@@ -80,9 +80,9 @@ def test_fg_with_arrays():
     with raises(ShapeError, match=match):
         grader(None, 'B + 5')
 
-    match = ("There was an error evaluating function sin\(...\)<br/>"
-             "1st input has an error: received a matrix of shape "
-             "\(rows: 3, cols: 2\), expected a scalar")
+    match = (r"There was an error evaluating function sin\(...\)<br/>"
+             r"1st input has an error: received a matrix of shape "
+             r"\(rows: 3, cols: 2\), expected a scalar")
     with raises(DomainError, match=match):
         grader(None, 'sin(B)')
 
@@ -153,8 +153,8 @@ def test_wrong_answer_type_error_messages():
             msg_detail='shape'
         )
     )
-    match = ('Expected answer to be a matrix of shape \(rows: 1, cols: 3\), '
-             'but input is a vector of length 3')
+    match = (r'Expected answer to be a matrix of shape \(rows: 1, cols: 3\), '
+             r'but input is a vector of length 3')
     with raises(InputTypeError, match=match):
         grader(None, '[1, 2, 3]')
 

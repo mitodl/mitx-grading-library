@@ -62,16 +62,16 @@ def test_array_functions_preserve_type():
 def test_det_and_tr_raise_error_if_not_square():
 
     det = ARRAY_ONLY_FUNCTIONS['det']
-    match = ("There was an error evaluating function det\(...\)\n"
-             "1st input has an error: received a matrix of shape "
-             "\(rows: 2, cols: 3\), expected a square matrix")
+    match = (r"There was an error evaluating function det\(...\)\n"
+             r"1st input has an error: received a matrix of shape "
+             r"\(rows: 2, cols: 3\), expected a square matrix")
     with raises(DomainError, match=match):
         det(random_math_array((2, 3)))
 
     tr = ARRAY_ONLY_FUNCTIONS['trace']
-    match = ("There was an error evaluating function trace\(...\)\n"
-             "1st input has an error: received a matrix of shape "
-             "\(rows: 2, cols: 3\), expected a square matrix")
+    match = (r"There was an error evaluating function trace\(...\)\n"
+             r"1st input has an error: received a matrix of shape "
+             r"\(rows: 2, cols: 3\), expected a square matrix")
     with raises(DomainError, match=match):
         tr(random_math_array((2, 3)))
 
@@ -84,8 +84,8 @@ def test_array_abs_input_types():
 
     assert array_abs(MathArray([2, -3, 6])) == 7
 
-    match = ("The abs\(...\) function expects a scalar or vector. To take the "
-             "norm of a matrix, try norm\(...\) instead.")
+    match = (r"The abs\(...\) function expects a scalar or vector. To take the "
+             r"norm of a matrix, try norm\(...\) instead.")
     with raises(FunctionEvalError, match=match):
         array_abs(MathArray([[1, 2], [3, 4]]))
 
@@ -99,17 +99,17 @@ def test_cross():
 
     vec_3 = random_math_array((3,))
     vec_4 = random_math_array((4,))
-    match = ("There was an error evaluating function cross\(...\)\n"
-             "1st input is ok: received a vector of length 3 as expected\n"
-             "2nd input has an error: received a vector of length 4, expected "
-             "a vector of length 3")
+    match = (r"There was an error evaluating function cross\(...\)\n"
+             r"1st input is ok: received a vector of length 3 as expected\n"
+             r"2nd input has an error: received a vector of length 4, expected "
+             r"a vector of length 3")
     with raises(DomainError, match=match):
         cross(vec_3, vec_4)
 
-    match = ("There was an error evaluating function cross\(...\)\n"
-             "1st input has an error: received a vector of length 4, expected "
-             "a vector of length 3\n"
-             "2nd input is ok: received a vector of length 3 as expected")
+    match = (r"There was an error evaluating function cross\(...\)\n"
+             r"1st input has an error: received a vector of length 4, expected "
+             r"a vector of length 3\n"
+             r"2nd input is ok: received a vector of length 3 as expected")
     with raises(DomainError, match=match):
         cross(vec_4, vec_3)
 
@@ -124,7 +124,7 @@ def test_arctan2():
         # We reversed the order compared to numpy
         assert np.arctan2(y, x) == arctan2(x, y)
 
-    match = 'arctan2\(0, 0\) is undefined'
+    match = r'arctan2\(0, 0\) is undefined'
     with raises(FunctionEvalError, match=match):
         arctan2(0, 0)
 
