@@ -43,6 +43,9 @@ if (window.MJxPrep) {
     // Strip spaces, which can confuse the regex matching we're about to do
     eqn = eqn.replace(/ /g, '');
 
+    // Do any custom pre-processing replacements (see end of script)
+    eqn = customPreReplacements(eqn)
+
     // Factorial: We want fact(n) -> n!, but fact(2n) -> (2n)!
     // Replace fact(...) -> with {:...!:}, wrap with parens as needed
     eqn = replaceFunctionCalls(eqn, 'fact', funcToPostfix('!') )
@@ -73,9 +76,6 @@ if (window.MJxPrep) {
       eqn = replaceFunctionCalls(eqn, 'conj', funcToPostfix('^**') )
     }
 
-    // Do any custom pre-wrapping replacements (see end of script)
-    eqn = customPreReplacements(eqn)
-
     // This is done last, so that it doesn't mess up subsequent processing
     eqn = wrapVariables(eqn)
     eqn = wrapFuncCalls(eqn)
@@ -98,7 +98,7 @@ if (window.MJxPrep) {
       return 'delta_{' + args[0] + ',' + args[1] + '}'
     })
 
-    // Do any final custom replacements (see end of script)
+    // Do any custom post-processing replacements (see end of script)
     eqn = customPostReplacements(eqn)
 
     // Return the preprocessed equation
@@ -633,11 +633,10 @@ if (window.MJxPrep) {
   function customPreReplacements(eqn) {
     /*
      * A function to allow for custom replacements.
-     * This function is called *before* wrapping occurs, and should
-     * be used for implementing anything that replaces traditional
-     * function calls func(args) with something else.
+     * This function is called *before* any standard changes are
+     * made (other than whitespace cleaning).
      * We suggest trying the Post replacements function (below) first,
-     * and resorting to this function if necessary.
+     * and resorting to the use of this function only if necessary.
      */
     var working = eqn;
 
@@ -649,8 +648,8 @@ if (window.MJxPrep) {
   function customPostReplacements(eqn) {
     /*
      * A function to allow for custom replacements.
-     * This function is called *after* wrapping occurs, and is useful
-     * for providing cosmetic changes, for example:
+     * This function is called *after* all other processing occurs,
+     * and is useful for providing cosmetic changes, for example:
      * working = working.replace(/A_p/g, 'A_{+}');
      */
     var working = eqn;
