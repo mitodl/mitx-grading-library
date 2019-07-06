@@ -16,7 +16,7 @@ from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
 from mitxgraders.exceptions import ConfigError, MITxError, StudentFacingError
-from mitxgraders.helpers.validatorfuncs import text_string
+from mitxgraders.helpers.validatorfuncs import text_string, Positive
 
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""
@@ -75,6 +75,25 @@ class AbstractGrader(ObjectWithSchema):
 
         suppress_warnings (bool): Whether to suppress warnings that the given
             configuration may lead to unintended consequences (default False)
+
+        attempt_based_credit (bool): Whether to award different amounts of credit
+            based on the attempt number. Requires the attempt number to be passed to the
+            grader; see documentation (default False)
+
+        decrease_credit_after (positive int): The last attempt number to award maximum
+            credit to (default 1)
+
+        minimum_credit (float between 0 and 1): The minimum amount of credit to be awarded
+            after using too many attempts (default 0.2)
+
+        decrease_credit_steps (positive int): How many attempts it takes to get to minimum
+            credit. So, if set to 1, after decrease_credit_after attempts, the next attempt
+            will receive minimum_credit. If set to 2, the next attempt will be halfway
+            between 1 and minimum_credit, and the attempt after that will be awarded
+            minimum_credit. (default 4)
+
+        attempt_based_credit_msg (bool): When maximum credit has been decreased due to
+            attempt number, present the student with a message explaining so (default True)
     """
 
     # This is an abstract base class
@@ -88,7 +107,12 @@ class AbstractGrader(ObjectWithSchema):
         """
         return Schema({
             Required('debug', default=False): bool,  # Use to turn on debug output
-            Required('suppress_warnings', default=False): bool
+            Required('suppress_warnings', default=False): bool,
+            Required('attempt_based_credit', default=False): bool,
+            Required('decrease_credit_after', default=1): Positive(int),
+            Required('decrease_credit_steps', default=4): Positive(int),
+            Required('minimum_credit', default=0.2): All(float, Range(0, 1)),
+            Required('attempt_based_credit_msg', default=True): bool
         })
 
     @abc.abstractmethod
@@ -103,14 +127,17 @@ class AbstractGrader(ObjectWithSchema):
                 graders when a grader is used as a subgrader in a ListGrader.
         """
 
-    def __call__(self, expect, student_input):
+    def __call__(self, expect, student_input, **kwargs):
         """
         Used to ask the grading class to grade student_input.
         Used by edX as the check function (cfn).
 
         Arguments:
-            expect: The value of edX customresponse expect attribute (ignored).
+            expect: The value of edX customresponse expect attribute (often ignored)
             student_input: The student's input passed by edX
+            **kwargs: Anything else that edX passes (using the "cfn_extra_args" XML tag)
+
+        The only kwarg that can influence grading at all is 'attempt'.
 
         Notes:
             This function ignores the value of expect. The expect argument is
@@ -169,6 +196,10 @@ class AbstractGrader(ObjectWithSchema):
                     formatted = msg.format(student_input)
                 raise StudentFacingError(formatted)
 
+        # Handle partial credit based on attempt number
+        if self.config['attempt_based_credit']:
+            self.apply_attempt_based_credit(result, kwargs.get('attempt'))
+
         # Append the debug log to the result if requested
         if self.config['debug']:
             if "input_list" in result:
@@ -186,6 +217,53 @@ class AbstractGrader(ObjectWithSchema):
 
         self.format_messages(result)
         return result
+
+    def apply_attempt_based_credit(self, result, attempt_number):
+        """
+        Apply attempt-based credit maximums to grading.
+        Mutates result directly.
+        """
+        if not attempt_number:
+            self.log("Attempt-based credit requested, but attempt number "
+                     "not passed through to grader")
+            return
+        self.log("Attempt number {}".format(attempt_number))
+
+        # How far past the point of decreasing credit are we?
+        steps = attempt_number - self.config['decrease_credit_after']
+        if steps <= 0:
+            return
+
+        # Compute the credit to be awarded
+        min_cred = self.config['minimum_credit']
+        decrease_steps = self.config['decrease_credit_steps']
+        if steps >= decrease_steps:
+            credit = min_cred
+        else:
+            # Linear interpolation
+            credit = 1 + (min_cred - 1) * steps / decrease_steps
+        self.log("Maximum credit is {}".format(credit))
+
+        def reduce_credit(results_dict):
+            """
+            Multiply all grades by credit, updating from 'ok'=True to 'partial'
+            as needed
+            """
+            if results_dict['grade_decimal'] > 0:
+                grade = results_dict['grade_decimal'] * credit
+                results_dict['grade_decimal'] = grade
+                results_dict['ok'] = {0: False, 1: True}.get(grade, 'partial')
+
+        if "input_list" in result:
+            for results_dict in result['input_list']:
+                reduce_credit(results_dict)
+        else:
+            reduce_credit(result)
+
+        # Append the message
+        if self.config['attempt_based_credit_msg']:
+            msg = "\n\nMaximum credit for attempt #{} is {:04.2f}."
+            result['overall_message'] += msg.format(attempt_number, credit)
 
     @staticmethod
     def format_messages(result):
@@ -234,14 +312,14 @@ class AbstractGrader(ObjectWithSchema):
         elif allow_lists and not isinstance(student_input, list):
             msg = ("Expected student_input to be a list of text strings, but "
                    "received {}"
-                  ).format(type(student_input))
+                   ).format(type(student_input))
         elif allow_lists:
             msg = ("Expected a list of text strings for student_input, but "
                    "item at position {pos} has {thetype}"
-                  ).format(pos=pos, thetype=type(student_input[pos]))
+                   ).format(pos=pos, thetype=type(student_input[pos]))
         elif allow_single:
             msg = ("Expected string for student_input, received {}"
-                  ).format(type(student_input))
+                   ).format(type(student_input))
         else:
             raise ValueError('At least one of (allow_lists, allow_single) must be True.')
 
@@ -473,7 +551,7 @@ class ItemGrader(AbstractGrader):
                 graders when a grader is used as a subgrader in a ListGrader.
         """
 
-    def __call__(self, expect, student_input):
+    def __call__(self, expect, student_input, **kwargs):
         """
         The same as AbstractGrader.__call__, except that we try to infer
         answers from expect argument if answers are not specified in the
@@ -482,7 +560,7 @@ class ItemGrader(AbstractGrader):
         if not self.config['answers'] and expect is not None:
             self.config['answers'] = self.schema_answers(expect)
 
-        return super(ItemGrader, self).__call__(expect, student_input)
+        return super(ItemGrader, self).__call__(expect, student_input, **kwargs)
 
     @staticmethod
     def ensure_text_inputs(student_input):
