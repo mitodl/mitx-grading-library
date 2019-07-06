@@ -5,8 +5,8 @@ pyparsing==2.4.0
 six==1.11.0
 
 # For testing
-pytest==3.6.2
-pytest-cov==2.5.1
+pytest==4.6.4
+pytest-cov==2.7.1
 
 # For documentation
 mkdocs==0.17.5
