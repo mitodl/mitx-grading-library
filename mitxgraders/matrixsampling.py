@@ -14,7 +14,7 @@ Contains classes for sampling vector/matrix/tensor values:
 * UnitaryMatrices
 All of these classes perform random sampling. To obtain a sample, use class.gen_sample()
 """
-from __future__ import division
+from __future__ import print_function, division, absolute_import, unicode_literals
 import abc
 import numpy as np
 
@@ -62,7 +62,7 @@ class ArraySamplingSet(VariableSamplingSet):
     """
     Represents a set from which random array variable samples are taken.
 
-    The norm used is standard Euclidean norm: root-sum of all entries in the array.
+    The norm used is standard Euclidean norm: root-square-sum of all entries in the array.
 
     This is the most low-level array sampling set we have, and is subclassed for various
     specific purposes.
@@ -343,9 +343,9 @@ class GeneralMatrices(MatrixSamplingSet):
 
     def apply_symmetry(self, array):
         """Impose the triangular requirement on the array"""
-        if self.config['triangular'] is 'upper':
+        if self.config['triangular'] == 'upper':
             return np.triu(array)
-        elif self.config['triangular'] is 'lower':
+        elif self.config['triangular'] == 'lower':
             return np.tril(array)
         return array
 
@@ -417,7 +417,7 @@ class SquareMatrixSamplingSet(MatrixSamplingSet):
     Config:
     =======
         Same as MatrixSamplingSet, but:
-            - dimension (int, min 2): Dimension of the matrix (minimum 2).
+            - dimension (int): Dimension of the matrix (minimum 2).
 
     The 'shape' property is not used.
     """
@@ -446,7 +446,7 @@ class IdentityMatrixMultiples(SquareMatrixSamplingSet):
     =======
         Same as MatrixSamplingSet, but:
             - sampler: A scalar sampling set for the multiplicative constant
-                (default [1, 5])
+                (default RealInterval([1, 5]))
 
     Note that the 'complex' and 'norm' properties are ignored.
 
@@ -519,8 +519,9 @@ class SquareMatrices(SquareMatrixSamplingSet):
     The determinant step is sometimes problematic. To achieve unit determinant, we attempt
     to rescale the matrix. This can't always be done, and we try a new random generation
     in such cases. To achieve zero determinant, we attempt to subtract lambda*I from the
-    matrix. This can't be done for antisymmetric or traceless matrices while preserving
-    those properties.
+    matrix. This can't be done for traceless matrices while preserving those properties,
+    and we also can't handle zero determinant antisymmetric matrices that are complex, or
+    real in even dimensions.
 
     Some special cases that don't exist:
         * Real, diagonal, traceless, unit determinant, 2x2 matrix
@@ -628,12 +629,17 @@ class SquareMatrices(SquareMatrixSamplingSet):
         if self.config['symmetry'] in ['hermitian', 'antihermitian']:
             self.config['complex'] = True
 
-        # A couple of cases that we can't handle:
+        # A couple of cases that are possible but we can't handle:
         if self.config['determinant'] == 0:
-            if self.config['symmetry'] == 'antisymmetric':
-                raise ConfigError("Unable to generate zero determinant antisymmetric matrices")
             if self.config['traceless']:
                 raise ConfigError("Unable to generate zero determinant traceless matrices")
+            if self.config['symmetry'] == 'antisymmetric':
+                # Real antisymmetric matrices in odd dimension automatically have zero determinant
+                if self.config['complex']:
+                    raise ConfigError("Unable to generate complex zero determinant antisymmetric matrices")
+                if self.config['dimension'] % 2 == 0:
+                    raise ConfigError("Unable to generate real zero determinant antisymmetric matrices in even dimensions")
+        # And a handful of cases that don't exist
         if self.config['determinant'] == 1:
             if self.config['dimension'] == 2 and self.config['traceless']:
                 if self.config['symmetry'] == 'diagonal' and not self.config['complex']:
@@ -688,33 +694,21 @@ class SquareMatrices(SquareMatrixSamplingSet):
         return super(SquareMatrices, self).normalize(array)
 
     def make_det_one(self, array):
-        """Scale an array to have unit determinant, or raise Retry if not possible"""
-        det = np.linalg.det(array)
-        # Have to treat different configuration cases separately
-        if not self.config['complex']:
-            if det > 0:
-                # This is the easy case: Just scale the determinant
-                return array / np.power(det, 1/self.config['dimension'])
-            elif self.config['dimension'] % 2 == 1 and det < 0:
-                # Odd-dimension matrices can also have their determinant scaled
-                return - array / np.power(-det, 1/self.config['dimension'])
-            else:
-                # Even-dimension, real matrix: we can't rescale this to
-                # set the determinant to unity. Also possible: zero determinant
-                # (should basically never happen though, due to floating pointness!)
-                raise Retry()
-        else:
-            # Complex matrices are generally easier
-            # But certain symmetries can be problematic
-            if self.config['symmetry'] in [None, 'diagonal',
-                                           'symmetric', 'antisymmetric']:
-                # Check to ensure that det isn't 0 before we get a division by zero
-                if np.abs(det) < 1e-13:
-                    raise Retry()  # pragma: no cover
-                # We can just rescale the matrix
-                return array / np.power(det + 0.0j, 1/self.config['dimension'])
+        """
+        Scale an array to have unit determinant, or raise Retry if not possible.
 
-            # If we get to here, det is real
+        Note that odd-dimensional antisymmetric and antihermitian symmetries should
+        not be able to make it to here, as their determinants are always purely imaginary.
+        """
+        assert not (self.config['symmetry'] in ['antisymmetric', 'antihermitian']
+                    and self.config['dimension'] % 2 == 1)
+
+        # Compute the determinant
+        det = np.linalg.det(array)
+
+        # Is the determinant guaranteed to be real?
+        if (not self.config['complex']
+                or self.config['symmetry'] in ['hermitian', 'antihermitian']):
             det = np.real(det)  # Get rid of numerical error
             if det > 0:
                 # This is the easy case: Just scale the determinant
@@ -723,15 +717,26 @@ class SquareMatrices(SquareMatrixSamplingSet):
                 # Odd-dimension matrices can also have their determinant scaled
                 return - array / np.power(-det, 1/self.config['dimension'])
             else:
-                # Can't rescale our way out of this one while maintaining the
-                # desired symmetry
+                # Can't rescale our way out of this one
                 raise Retry()
+
+        elif (self.config['symmetry'] in [None, 'diagonal', 'symmetric', 'antisymmetric']
+                and self.config['complex']):
+            # Check to ensure that det isn't 0 before we get a division by zero
+            if np.abs(det) < 1e-13:
+                raise Retry()  # pragma: no cover
+            # Complex matrices are easy: we can just rescale the matrix
+            return array / np.power(det + 0.0j, 1/self.config['dimension'])
+
+        # We should never get here
+        raise ValueError('Unknown class configuration')  # pragma: no cover
 
     def make_det_zero(self, array):
         """Modify an array to have zero determinant, or raise Retry if not possible"""
-        if np.linalg.det(array) == 0:
-            # This should never happen due to floating pointness. But just in case...
-            return array  # pragma: no cover
+        if np.abs(np.linalg.det(array)) < 1e-13:
+            # This is close enough to zero for our purposes!
+            # This occurs for real, antisymmetric matrices in odd dimensions, for example.
+            return array
 
         # Pick a random number!
         index = np.random.randint(self.config['dimension'])
@@ -741,15 +746,17 @@ class SquareMatrices(SquareMatrixSamplingSet):
             # Choose a random diagonal entry to be zero
             array[index, index] = 0
             return array
-        elif self.config['symmetry'] in ['symmetric', 'hermitian']:
+        elif ((self.config['symmetry'] == 'symmetric' and not self.config['complex'])
+              or self.config['symmetry'] == 'hermitian'):
             # Eigenvalues are all real - use special algorithm to compute eigenvalues
             eigenvalues = np.linalg.eigvalsh(array)
+            eigenvalue = np.real(eigenvalues[index])
         elif self.config['symmetry'] == 'antihermitian':
             # Eigenvalues are all imaginary
             # Temporarily convert the matrix into a hermitian matrix
             # and use the special algorithm
             eigenvalues = np.linalg.eigvalsh(1j * array)
-            eigenvalues = -1j * eigenvalues
+            eigenvalue = -1j * np.real(eigenvalues[index])
         else:
             # No relevant symmetry. Use a general algorithm to compute eigenvalues.
             eigenvalues = np.linalg.eigvals(array)
@@ -763,9 +770,12 @@ class SquareMatrices(SquareMatrixSamplingSet):
                 # np.random.choice was introduced in 1.7.0; edX has 1.6.0
                 take = np.random.randint(len(idxs))
                 index = idxs[take]
+                eigenvalue = np.real(eigenvalues[index])
+            else:
+                eigenvalue = eigenvalues[index]
 
-        # Subtract an eigenvalue from the array
-        return array - np.eye(self.config['dimension']) * eigenvalues[index]
+        # Subtract the eigenvalue from the array
+        return array - np.eye(self.config['dimension']) * eigenvalue
 
 
 class OrthogonalMatrices(SquareMatrixSamplingSet):
