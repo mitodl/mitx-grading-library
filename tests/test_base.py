@@ -333,6 +333,6 @@ def test_ensure_text_inputs_errors():
     with raises(ConfigError,  match=msg):
         ensure_text_inputs(5, allow_lists=False)
 
-    msg = "At least one of \(allow\_lists, allow\_single\) must be True."
+    msg = r"At least one of \(allow\_lists, allow\_single\) must be True."
     with raises(ValueError,  match=msg):
         ensure_text_inputs('cat', allow_lists=False, allow_single=False)

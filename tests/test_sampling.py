@@ -48,7 +48,7 @@ def test_real_interval():
         assert 1 <= ri.gen_sample() <= 5
 
     # Rejects tuples
-    with raises(Error, match="expected a dictionary. Got \(1, 3\)"):
+    with raises(Error, match=r"expected a dictionary. Got \(1, 3\)"):
         RealInterval((1, 3))
 
 def test_int_range():
@@ -166,7 +166,7 @@ def test_discrete_set():
     assert ds.gen_sample() == val
 
     # Rejects lists
-    with raises(Error, match="expected Number @ data\[0\]. Got 1"):
+    with raises(Error, match=r"expected Number @ data\[0\]. Got 1"):
         DiscreteSet([1, 2])
 
 def test_specific_functions():

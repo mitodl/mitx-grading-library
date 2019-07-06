@@ -1,4 +1,4 @@
-"""
+r"""
 expressions.py
 
 Defines classes to parse and evaluate mathematical expressions. Implements
@@ -847,7 +847,7 @@ class MathExpression(object):
             msg = ("There was an error evaluating {name}(...). "
                    "(Numerical overflow).").format(name=name)
             raise CalcOverflowError(msg)
-        except Exception as err:  # pylint: disable=W0703
+        except Exception: # pylint: disable=W0703
             # Don't know what this is, or how you want to deal with it
             # Call it a domain issue.
             msg = ("There was an error evaluating {name}(...). "

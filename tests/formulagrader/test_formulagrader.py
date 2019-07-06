@@ -44,8 +44,8 @@ def test_half_power_of_negative_number():
 
 def test_factorial():
     grader = FormulaGrader(answers='0')
-    expect = "Error evaluating factorial\(\) or fact\(\) in input. " + \
-             "These functions cannot be used at negative integer values."
+    expect = (r"Error evaluating factorial\(\) or fact\(\) in input. "
+              r"These functions cannot be used at negative integer values.")
 
     grader(None, 'fact(0.5) - sqrt(pi)/2')
     grader(None, 'fact(-0.5) + sqrt(pi)')
@@ -109,22 +109,22 @@ def test_fg_invalid_input():
     with raises(CalcError, match=expect):
         grader(None, "5pp+6mm")
 
-    expect = ("Invalid Input: 'm' not permitted directly after a number "
+    expect = (r"Invalid Input: 'm' not permitted directly after a number "
               r"\(did you forget to use \* for multiplication\?\)")
     with raises(CalcError, match=expect):
         grader(None, "5m")
 
-    expect = ("There was an error evaluating csc\(...\). "
-              "Its input does not seem to be in its domain.")
+    expect = (r"There was an error evaluating csc\(...\). "
+              r"Its input does not seem to be in its domain.")
     with raises(CalcError, match=expect):
         grader(None, 'csc(0)')
 
-    expect = "There was an error evaluating sinh\(...\). \(Numerical overflow\)."
+    expect = r"There was an error evaluating sinh\(...\). \(Numerical overflow\)."
     with raises(CalcError, match=expect):
         grader(None, 'sinh(10000)')
 
-    expect = ("There was an error evaluating arccosh\(...\). "
-              "Its input does not seem to be in its domain.")
+    expect = (r"There was an error evaluating arccosh\(...\). "
+              r"Its input does not seem to be in its domain.")
     with raises(CalcError, match=expect):
         grader(None, 'arccosh(0)')
 
@@ -160,8 +160,8 @@ def test_fg_tolerance():
     assert grader(None, '10')['ok']
     assert not grader(None, '10.000001')['ok']
 
-    expect = "Cannot have a negative percentage for dictionary value @ " + \
-             "data\['tolerance'\]. Got '-1%'"
+    expect = (r"Cannot have a negative percentage for dictionary value @ "
+              r"data\['tolerance'\]. Got '-1%'")
     with raises(Error, match=expect):
         FormulaGrader(answers="10", tolerance="-1%")
 
@@ -218,7 +218,7 @@ def test_fg_userfunction():
     assert grader(None, "function2name_2go''''''(0.4)")['ok']
 
     # Primes aren't allowed in the middle
-    expect = "Invalid Input: Could not parse 'that'sbad\(1\)' as a formula"
+    expect = r"Invalid Input: Could not parse 'that'sbad\(1\)' as a formula"
     with raises(CalcError, match=expect):
         grader = FormulaGrader(
             answers="1",
@@ -226,8 +226,8 @@ def test_fg_userfunction():
         )
         grader(None, "that'sbad(1)")
 
-    expect = ("1 is not a valid key, must be of type string for dictionary "
-              "value @ data\['user_functions'\]. Got {{1: <ufunc 'tan'>}}").format(
+    expect = (r"1 is not a valid key, must be of type string for dictionary "
+              r"value @ data\['user_functions'\]. Got {{1: <ufunc 'tan'>}}").format(
               str_type=str)
     with raises(Error, match=expect):
         FormulaGrader(
@@ -243,8 +243,8 @@ def test_fg_userconstants():
     )
     assert grader(None, "hello")['ok']
 
-    expect = ("1 is not a valid key, must be of type string for dictionary "
-              "value @ data\['user_constants'\]. Got {1: 5}")
+    expect = (r"1 is not a valid key, must be of type string for dictionary "
+              r"value @ data\['user_constants'\]. Got {1: 5}")
     with raises(Error, match=expect):
         FormulaGrader(
             answers="1",
@@ -374,7 +374,7 @@ def test_fg_sampling():
     assert isinstance(grader.config["sample_from"]['z'], RealInterval)
     assert isinstance(grader.config["sample_from"]['w'], RealInterval)
 
-    with raises(MultipleInvalid, match="extra keys not allowed @ data\['w'\]"):
+    with raises(MultipleInvalid, match=r"extra keys not allowed @ data\['w'\]"):
         grader = FormulaGrader(variables=['x'], sample_from={'w': 2})
 
     grader = FormulaGrader(
@@ -656,45 +656,46 @@ def test_fg_evals_numbered_variables_in_siblings():
 
 def test_ng_config():
     """Test that the NumericalGrader config bars unwanted entries"""
-    expect = "not a valid value for dictionary value @ data\['failable_evals'\]. Got 1"
+    expect = r"not a valid value for dictionary value @ data\['failable_evals'\]. Got 1"
     with raises(Error, match=expect):
         NumericalGrader(
             answers="1",
             failable_evals=1
         )
 
-    expect = "not a valid value for dictionary value @ data\['samples'\]. Got 2"
+    expect = r"not a valid value for dictionary value @ data\['samples'\]. Got 2"
     with raises(Error, match=expect):
         NumericalGrader(
             answers="1",
             samples=2
         )
 
-    expect = "length of value must be at most 0 for dictionary value @ data\['variables'\]. Got \['x'\]"
+    expect = (r"length of value must be at most 0 for dictionary value "
+              r"@ data\['variables'\]. Got \['x'\]")
     with raises(Error, match=expect):
         NumericalGrader(
             answers="1",
             variables=["x"]
         )
 
-    expect = ("extra keys not allowed @ data\['sample_from'\]\['x'\]. Got "
-              "RealInterval\({u?'start': 1, u?'stop': 5}\)")
+    expect = (r"extra keys not allowed @ data\['sample_from'\]\['x'\]. Got "
+              r"RealInterval\({u?'start': 1, u?'stop': 5}\)")
     with raises(Error, match=expect):
         NumericalGrader(
             answers="1",
             sample_from={"x": RealInterval()}
         )
 
-    expect = "not a valid value for dictionary value @ data\['user_functions'\]\[u?'f'\]. " + \
-             "Got RandomFunction"
+    expect = (r"not a valid value for dictionary value @ data\['user_functions'\]\[u?'f'\]. "
+              r"Got RandomFunction")
     with raises(Error, match=expect):
         NumericalGrader(
             answers="1",
             user_functions={"f": RandomFunction()}
         )
 
-    expect = "not a valid value for dictionary value @ data\['user_functions'\]\[u?'f'\]. " + \
-             "Got \[<ufunc 'sin'>, <ufunc 'cos'>\]"
+    expect = (r"not a valid value for dictionary value @ data\['user_functions'\]\[u?'f'\]. " + \
+              r"Got \[<ufunc 'sin'>, <ufunc 'cos'>\]")
     with raises(Error, match=expect):
         NumericalGrader(
             answers="1",
