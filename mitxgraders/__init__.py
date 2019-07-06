@@ -27,6 +27,7 @@ from mitxgraders.stringgrader import *
 from mitxgraders.listgrader import *
 from mitxgraders.formulagrader import *
 from mitxgraders.sampling import *
+from mitxgraders.matrixsampling import *
 from mitxgraders.exceptions import ConfigError, StudentFacingError, InvalidInput, MissingInput
 from mitxgraders.helpers.calc import *
 from mitxgraders.comparers import *

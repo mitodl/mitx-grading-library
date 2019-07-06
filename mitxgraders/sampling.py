@@ -8,11 +8,8 @@ Contains classes for sampling numerical values:
 * ComplexRectangle
 * ComplexSector
 * DependentSampler
-for sampling vectors/matrices/tensors:
-* RealMatrices
-* RealVectors
-* IdentityMatrixMultiples
-for specifying functions:
+
+and for specifying functions:
 * SpecificFunctions
 * RandomFunction
 
@@ -36,7 +33,7 @@ from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
-    has_keys_of_type, is_shape_specification, text_string)
+    has_keys_of_type, text_string)
 from mitxgraders.helpers.compatibility import coerce_string_keys_to_text_type
 from mitxgraders.helpers.calc import (
     METRIC_SUFFIXES, CalcError, evaluator, MathArray)
@@ -48,9 +45,6 @@ __all__ = [
     "DiscreteSet",
     "ComplexRectangle",
     "ComplexSector",
-    "RealVectors",
-    "RealMatrices",
-    "IdentityMatrixMultiples",
     "SpecificFunctions",
     "RandomFunction",
     "DependentSampler"
@@ -267,184 +261,6 @@ class DiscreteSet(VariableSamplingSet):  # pylint: disable=too-few-public-method
     def gen_sample(self):
         """Return a random entry from the given set"""
         return random.choice(self.config)
-
-
-class RealMathArrays(VariableSamplingSet):
-    """
-    Represents a collection of real arrays with specified norm from which to
-    draw random samples.
-
-    The norm used is standard Euclidean norm: root-sum of all entries in the array.
-
-    Config:
-    =======
-        shape (int|(int)|[int]): the array shape
-        norm ([start, stop]): Real interval from which to sample the array's norm
-            defaults to [1, 5]
-
-    Usage
-    ========
-    Sample tensors with shape [4, 2, 5]:
-    >>> real_tensors = RealMathArrays(shape=[4, 2, 5])
-    >>> sample = real_tensors.gen_sample()
-    >>> sample.shape
-    (4, 2, 5)
-
-    Samples are of class MathArray:
-    >>> isinstance(sample, MathArray)
-    True
-
-    Specify a range for the tensor's norm:
-    >>> real_tensors = RealMathArrays(shape=[4, 2, 5], norm=[10, 20])
-    >>> sample = real_tensors.gen_sample()
-    >>> 10 < np.linalg.norm(sample) < 20
-    True
-    """
-
-    schema_config = Schema({
-        Required('shape'): is_shape_specification(min_dim=1),
-        Required('norm', default=[1, 5]): NumberRange()
-    })
-
-    def __init__(self, config=None, **kwargs):
-        """
-        Configure the class as normal, then set up norm as a RealInterval
-        """
-        super(RealMathArrays, self).__init__(config, **kwargs)
-        self.norm = RealInterval(self.config['norm'])
-
-    def gen_sample(self):
-        """
-        Generates a random matrix of shape and norm determined by config.
-        """
-        desired_norm = self.norm.gen_sample()
-        # construct an array with entries in [-0.5, 0.5)
-        array = np.random.random_sample(self.config['shape']) - 0.5
-        actual_norm = np.linalg.norm(array)
-        # convert the array to a matrix with desired norm
-        return MathArray(array) * desired_norm/actual_norm
-
-
-class RealVectors(RealMathArrays):
-    """
-    Represents a collection of real vectors.
-
-    Config:
-    =======
-        Same as RealMathArrays, but:
-            - shape can be a plain integer indicating number of components
-            - if shape is tuple/list, must have length 1
-
-    Usage:
-    ======
-
-    By default, vectors have 3 components:
-    >>> vectors = RealVectors()
-    >>> vectors.gen_sample().shape
-    (3,)
-    """
-
-    schema_config = RealMathArrays.schema_config.extend({
-        Required('shape', default=(3,)): is_shape_specification(min_dim=1, max_dim=1)
-    })
-
-
-class RealMatrices(RealMathArrays):
-    """
-    Represents a collection of real matrices.
-
-    Config:
-    =======
-        Same as RealMathArrays, but shape must have length 2.
-
-    Usage:
-    ======
-
-    By default, matrices have two rows and two columns:
-    >>> matrices = RealMatrices()
-    >>> matrices.gen_sample().shape
-    (2, 2)
-    """
-
-    schema_config = RealMathArrays.schema_config.extend({
-        Required('shape', default=(2, 2)): is_shape_specification(min_dim=2, max_dim=2)
-    })
-
-
-class AbstractSquareMatrices(VariableSamplingSet):  # pylint: disable=abstract-method
-    """
-    Abstract class representing a collection of square matrices
-
-    Config:
-    =======
-        dimension: Positive integer that specifies the dimension of the matrix (default 2)
-    """
-
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
-
-    # Store the dimension of the square matrix
-    schema_config = Schema({
-        Required('dimension', default=2): Positive(int)
-    })
-
-
-class IdentityMatrixMultiples(AbstractSquareMatrices):
-    """
-    Class representing a collection of multiples of the identity matrix
-    of a given dimension
-
-    Config:
-    =======
-        dimension: Positive integer that specifies the dimension of the matrix (default 2)
-        sampler: A scalar sampling set for the multiplicative constant (default [1, 5])
-
-    Usage:
-    ======
-
-    By default, we generate 2x2 matrices:
-    >>> matrices = IdentityMatrixMultiples()
-    >>> matrices.gen_sample().shape
-    (2, 2)
-
-    We can generate NxN matrices by specifying the dimension:
-    >>> matrices = IdentityMatrixMultiples(dimension=4)
-    >>> matrices.gen_sample().shape
-    (4, 4)
-
-    The scalar multiple can be generated in a number of ways:
-    >>> matrices = IdentityMatrixMultiples(sampler=[1,3])
-    >>> sect = ComplexSector(modulus=[0,1], argument=[-np.pi,np.pi])
-    >>> matrices = IdentityMatrixMultiples(sampler=sect)
-
-    The resulting samples are simply a scalar times the identity matrix:
-    >>> matrices = IdentityMatrixMultiples()
-    >>> m = matrices.gen_sample()
-    >>> m == m[0, 0] * np.eye(2)                # doctest: +NORMALIZE_WHITESPACE
-    MathArray([[ True,  True],
-           [ True,  True]], dtype=bool)
-    """
-
-    # Sampling set for the multiplicative constant
-    # Accept anything that FormulaGrader would accept for a sampling set, restricted to
-    # scalar sampling sets. Hence, ScalarSamplingSets and ranges are allowed.
-    # Note: Does not support DependentSampler or DiscreteSet, as they are not guaranteed
-    # to return a scalar value.
-    schema_config = AbstractSquareMatrices.schema_config.extend({
-        Required('sampler', default=RealInterval()): Any(ScalarSamplingSet,
-                                                         All(list, Coerce(RealInterval)))
-    })
-
-    def gen_sample(self):
-        """
-        Generates an identity matrix of specified dimension multiplied by a random scalar
-        """
-        # Sample the multiplicative constant
-        scaling = self.config['sampler'].gen_sample()
-        # Create the numpy matrix
-        array = scaling * np.eye(self.config['dimension'])
-        # Return the result as a MathArray
-        return MathArray(array)
 
 
 class RandomFunction(FunctionSamplingSet):  # pylint: disable=too-few-public-methods
