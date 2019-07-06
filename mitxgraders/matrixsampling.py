@@ -567,9 +567,9 @@ class SquareMatrices(SquareMatrixSamplingSet):
     True
     >>> np.array_equal(mat, np.conj(mat))               # Complex
     False
-    >>> within_tolerance(mat.trace(), 0, 1e-14)         # Traceless
+    >>> within_tolerance(mat.trace(), 0, 5e-13)         # Traceless
     True
-    >>> within_tolerance(np.linalg.det(mat), 1, 1e-14)  # Unit determinant
+    >>> within_tolerance(np.linalg.det(mat), 1, 5e-13)  # Unit determinant
     True
 
     More combinations: symmetric, real, zero determinant and norm in [6, 10]
@@ -579,7 +579,7 @@ class SquareMatrices(SquareMatrixSamplingSet):
     True
     >>> np.array_equal(mat, np.conj(mat))               # Real
     True
-    >>> within_tolerance(np.linalg.det(mat), 0, 1e-13)  # Zero determinant
+    >>> within_tolerance(np.linalg.det(mat), 0, 5e-13)  # Zero determinant
     True
     >>> 6 <= np.linalg.norm(mat) <= 10                  # Norm in [6, 10]
     True
@@ -597,7 +597,7 @@ class SquareMatrices(SquareMatrixSamplingSet):
     >>> mat = matrices.gen_sample()
     >>> np.array_equal(mat, np.conj(mat.T))             # Hermitian
     True
-    >>> within_tolerance(np.linalg.det(mat), 0, 1e-13)  # Zero determinant
+    >>> within_tolerance(np.linalg.det(mat), 0, 5e-13)  # Zero determinant
     True
     >>> 6 <= np.linalg.norm(mat) <= 10                  # Norm in [6, 10]
     True
@@ -607,9 +607,9 @@ class SquareMatrices(SquareMatrixSamplingSet):
     >>> mat = matrices.gen_sample()
     >>> np.array_equal(mat, -np.conj(mat.T))            # Antihermitian
     True
-    >>> within_tolerance(np.linalg.det(mat), 1, 1e-13)  # Unit determinant
+    >>> within_tolerance(np.linalg.det(mat), 1, 5e-13)  # Unit determinant
     True
-    >>> within_tolerance(mat.trace(), 0, 1e-14)         # Traceless
+    >>> within_tolerance(mat.trace(), 0, 5e-13)         # Traceless
     True
 
     """
@@ -723,7 +723,7 @@ class SquareMatrices(SquareMatrixSamplingSet):
         elif (self.config['symmetry'] in [None, 'diagonal', 'symmetric', 'antisymmetric']
                 and self.config['complex']):
             # Check to ensure that det isn't 0 before we get a division by zero
-            if np.abs(det) < 1e-13:
+            if np.abs(det) < 5e-13:
                 raise Retry()  # pragma: no cover
             # Complex matrices are easy: we can just rescale the matrix
             return array / np.power(det + 0.0j, 1/self.config['dimension'])
@@ -733,7 +733,7 @@ class SquareMatrices(SquareMatrixSamplingSet):
 
     def make_det_zero(self, array):
         """Modify an array to have zero determinant, or raise Retry if not possible"""
-        if np.abs(np.linalg.det(array)) < 1e-13:
+        if np.abs(np.linalg.det(array)) < 5e-13:
             # This is close enough to zero for our purposes!
             # This occurs for real, antisymmetric matrices in odd dimensions, for example.
             return array
@@ -762,7 +762,7 @@ class SquareMatrices(SquareMatrixSamplingSet):
             eigenvalues = np.linalg.eigvals(array)
             if not self.config['complex']:
                 # We need to select a real eigenvalue.
-                idxs = np.where(np.abs(np.imag(eigenvalues)) < 1e-14)[0]
+                idxs = np.where(np.abs(np.imag(eigenvalues)) < 5e-13)[0]
                 # idxs now stores any indices that have real eigenvalues
                 if len(idxs) == 0:
                     # No real eigenvalues. Try again.
@@ -812,7 +812,7 @@ class OrthogonalMatrices(SquareMatrixSamplingSet):
     If unitdet is specified, the determinant is 1:
     >>> from mitxgraders.helpers.calc import within_tolerance
     >>> matrices = OrthogonalMatrices(unitdet=True)
-    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)  # doctest: +SKIP
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 5e-13)  # doctest: +SKIP
     True
 
     Otherwise, it could be +1 or -1.
@@ -820,12 +820,12 @@ class OrthogonalMatrices(SquareMatrixSamplingSet):
     The resulting samples are orthogonal matrices:
     >>> matrices = OrthogonalMatrices(unitdet=True)
     >>> m = matrices.gen_sample()                                           # doctest: +SKIP
-    >>> within_tolerance(m * np.transpose(m), MathArray(np.eye(2)), 1e-14)  # doctest: +SKIP
+    >>> within_tolerance(m * np.transpose(m), MathArray(np.eye(2)), 5e-13)  # doctest: +SKIP
     True
 
     >>> matrices = OrthogonalMatrices(unitdet=False)
     >>> m = matrices.gen_sample()                                           # doctest: +SKIP
-    >>> within_tolerance(m * np.transpose(m), MathArray(np.eye(2)), 1e-14)  # doctest: +SKIP
+    >>> within_tolerance(m * np.transpose(m), MathArray(np.eye(2)), 5e-13)  # doctest: +SKIP
     True
 
     """
@@ -880,23 +880,23 @@ class UnitaryMatrices(SquareMatrixSamplingSet):
     If unitdet is specified, the determinant is 1:
     >>> from mitxgraders.helpers.calc import within_tolerance
     >>> matrices = UnitaryMatrices(unitdet=True)
-    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)  # doctest: +SKIP
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 5e-13)  # doctest: +SKIP
     True
 
     Otherwise, it's typically not (though it could randomly be):
     >>> matrices = UnitaryMatrices(unitdet=False)
-    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)  # doctest: +SKIP
+    >>> within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 5e-13)  # doctest: +SKIP
     False
 
     The resulting samples are unitary matrices:
     >>> matrices = UnitaryMatrices(unitdet=True)
     >>> m = matrices.gen_sample()                                         # doctest: +SKIP
-    >>> within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)  # doctest: +SKIP
+    >>> within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 5e-13)  # doctest: +SKIP
     True
 
     >>> matrices = UnitaryMatrices(unitdet=False)
     >>> m = matrices.gen_sample()                                         # doctest: +SKIP
-    >>> within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)  # doctest: +SKIP
+    >>> within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 5e-13)  # doctest: +SKIP
     True
 
     """

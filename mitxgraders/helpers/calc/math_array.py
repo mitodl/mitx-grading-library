@@ -18,7 +18,7 @@ def is_number_zero(value):
 
     >>> is_number_zero(0), is_number_zero(0.0), is_number_zero(0j)
     (True, True, True)
-    >>> is_number_zero(np.matrix([0, 0, 0]))
+    >>> is_number_zero(np.array([0, 0, 0]))
     False
     """
     return isinstance(value, Number) and value == 0

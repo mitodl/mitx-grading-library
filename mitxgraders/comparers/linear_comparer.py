@@ -23,7 +23,7 @@ def get_linear_fit_error(x, y):
     """
     A = np.vstack([x, np.ones(len(x))]).T
     _, residuals, _, _ = np.linalg.lstsq(A, y, rcond=-1)
-    return np.sqrt(np.asscalar(residuals))
+    return np.sqrt(residuals.item())
 
 def get_proportional_fit_error(x, y):
     """
@@ -48,7 +48,7 @@ def get_proportional_fit_error(x, y):
     """
     A = np.vstack(x)
     _, residuals, _, _ = np.linalg.lstsq(A, y, rcond=-1)
-    return np.sqrt(np.asscalar(residuals))
+    return np.sqrt(residuals.item())
 
 def get_offset_fit_error(x, y):
     """

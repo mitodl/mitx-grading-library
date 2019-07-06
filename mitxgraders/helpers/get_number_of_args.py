@@ -161,9 +161,6 @@ def get_number_of_args(callable_obj):
     raise an error; in Python 3, the number of arguments of __init__ is returned.
 
     Works on built-in functions (assuming their docstring is correct)
-    >>> import math
-    >>> get_number_of_args(math.sin)
-    1
     >>> get_number_of_args(pow)
     2
 

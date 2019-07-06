@@ -288,9 +288,9 @@ def cast_np_numeric_as_builtin(obj, map_across_lists=False):
 
     """
     if isinstance(obj, np.number):
-        return np.asscalar(obj)
+        return obj.item()
     if map_across_lists and isinstance(obj, list):
-        return [np.asscalar(item) if isinstance(item, np.number) else item
+        return [item.item() if isinstance(item, np.number) else item
                 for item in obj]
     return obj
 
@@ -782,8 +782,8 @@ class MathExpression(object):
         Usage
         =====
         Instantiate a parser and some functions:
-        >>> import math
-        >>> functions = {"sin": math.sin, "cos": math.cos}
+        >>> import numpy as np
+        >>> functions = {"sin": np.sin, "cos": np.cos}
 
         Single variable functions work:
         >>> MathExpression.eval_function(['sin', [0]], functions)

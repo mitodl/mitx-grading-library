@@ -406,8 +406,8 @@ def within_tolerance(x, y, tolerance):
     False
 
     Works for vectors and matrices:
-    >>> A = np.matrix([[1,2],[-3,1]])
-    >>> B = np.matrix([[1.1, 2], [-2.8, 1]])
+    >>> A = np.array([[1,2],[-3,1]])
+    >>> B = np.array([[1.1, 2], [-2.8, 1]])
     >>> diff = round(np.linalg.norm(A-B), 6)
     >>> diff
     0.223607

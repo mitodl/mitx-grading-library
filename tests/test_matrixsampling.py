@@ -293,13 +293,13 @@ def test_square_matrices():
 
             # Trace
             if traceless:
-                assert within_tolerance(m.trace(), 0, 1e-14)
+                assert within_tolerance(m.trace(), 0, 5e-13)
 
             # Determinant
             if det == 0:
-                assert within_tolerance(np.abs(np.linalg.det(m)), 0, 1e-13)
+                assert within_tolerance(np.abs(np.linalg.det(m)), 0, 5e-13)
             elif det == 1:
-                assert within_tolerance(np.abs(np.linalg.det(m)), 1, 1e-13)
+                assert within_tolerance(np.abs(np.linalg.det(m)), 1, 5e-13)
 
             # Symmetries
             if symmetry == 'diagonal':
