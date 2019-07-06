@@ -288,9 +288,9 @@ def cast_np_numeric_as_builtin(obj, map_across_lists=False):
 
     """
     if isinstance(obj, np.number):
-        return np.asscalar(obj)
+        return obj.item()
     if map_across_lists and isinstance(obj, list):
-        return [np.asscalar(item) if isinstance(item, np.number) else item
+        return [item.item() if isinstance(item, np.number) else item
                 for item in obj]
     return obj
 
