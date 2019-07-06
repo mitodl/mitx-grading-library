@@ -782,8 +782,8 @@ class MathExpression(object):
         Usage
         =====
         Instantiate a parser and some functions:
-        >>> import math
-        >>> functions = {"sin": math.sin, "cos": math.cos}
+        >>> import numpy as np
+        >>> functions = {"sin": np.sin, "cos": np.cos}
 
         Single variable functions work:
         >>> MathExpression.eval_function(['sin', [0]], functions)
