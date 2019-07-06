@@ -43,11 +43,6 @@ if (window.MJxPrep) {
     // Strip spaces, which can confuse the regex matching we're about to do
     eqn = eqn.replace(/ /g, '');
 
-    // log10(x) -> log_10(x)
-    eqn = eqn.replace(/log10\(/g, "log_10(");
-    // log2(x) -> log_2(x)
-    eqn = eqn.replace(/log2\(/g, "log_2(");
-
     // Factorial: We want fact(n) -> n!, but fact(2n) -> (2n)!
     // Replace fact(...) -> with {:...!:}, wrap with parens as needed
     eqn = replaceFunctionCalls(eqn, 'fact', funcToPostfix('!') )
@@ -78,17 +73,22 @@ if (window.MJxPrep) {
       eqn = replaceFunctionCalls(eqn, 'conj', funcToPostfix('^**') )
     }
 
-    // Display vectors as columns, if the option is turned on
-    if (window.MJxPrepOptions.vectors_as_columns) {
-      eqn = columnizeVectors(eqn)
-    }
-
-    // Do any custom replacements (see end of script)
-    eqn = customReplacements(eqn)
+    // Do any custom pre-wrapping replacements (see end of script)
+    eqn = customPreReplacements(eqn)
 
     // This is done last, so that it doesn't mess up subsequent processing
     eqn = wrapVariables(eqn)
     eqn = wrapFuncCalls(eqn)
+
+    // log10(x) -> log_10(x)
+    eqn = eqn.replace(/log10\(/g, "log_10(");
+    // log2(x) -> log_2(x)
+    eqn = eqn.replace(/log2\(/g, "log_2(");
+
+    // Display vectors as columns, if the option is turned on
+    if (window.MJxPrepOptions.vectors_as_columns) {
+      eqn = columnizeVectors(eqn)
+    }
 
     // Fix Kronecker deltas now: kronecker(a, b) -> kronecker_{a, b}
     // The wrapping interferes with parsing of delta_{complexthings},
@@ -98,8 +98,8 @@ if (window.MJxPrep) {
       return 'delta_{' + args[0] + ',' + args[1] + '}'
     })
 
-    // Do any custom cosmetic replacements (see end of script)
-    eqn = customCosmeticReplacements(eqn)
+    // Do any final custom replacements (see end of script)
+    eqn = customPostReplacements(eqn)
 
     // Return the preprocessed equation
     return eqn;
@@ -630,14 +630,14 @@ if (window.MJxPrep) {
     funcToPostfix: funcToPostfix
   }
 
-  function customReplacements(eqn) {
+  function customPreReplacements(eqn) {
     /*
      * A function to allow for custom replacements.
      * This function is called *before* wrapping occurs, and should
-     * be used for implementing new functions, but not for doing
-     * cosmetic replacements. The output of this function must still
-     * satisfy the allowed variable/function name structure expected
-     * by the grading library.
+     * be used for implementing anything that replaces traditional
+     * function calls func(args) with something else.
+     * We suggest trying the Post replacements function (below) first,
+     * and resorting to this function if necessary.
      */
     var working = eqn;
 
@@ -646,12 +646,11 @@ if (window.MJxPrep) {
     return working;
   }
 
-  function customCosmeticReplacements(eqn) {
+  function customPostReplacements(eqn) {
     /*
      * A function to allow for custom replacements.
      * This function is called *after* wrapping occurs, and is useful
-     * for providing cosmetic changes that do not satisfy the structure
-     * expected by the parser, for example:
+     * for providing cosmetic changes, for example:
      * working = working.replace(/A_p/g, 'A_{+}');
      */
     var working = eqn;
