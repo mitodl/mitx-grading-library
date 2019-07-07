@@ -10,7 +10,7 @@ from pytest import raises, approx
 from voluptuous import Error
 import mitxgraders
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, __version__
-from mitxgraders.baseclasses import AbstractGrader
+from mitxgraders.baseclasses import AbstractGrader, ItemGrader
 from mitxgraders.exceptions import MITxError, StudentFacingError
 from tests.helpers import mock
 
@@ -530,3 +530,45 @@ def test_attempt_based_grading_list():
         ]
     }
     assert grader(None, ['cat', 'unicorn'], attempt=5) == expected_result
+
+def test_registered_defaults():
+    # Test that each class has it's own default_variables parameter
+    AbstractGrader.register_defaults({'test': False})
+    assert StringGrader.default_values is None
+    AbstractGrader.clear_registered_defaults()
+
+    # Test that registered defaults are used in instantiation
+    StringGrader.register_defaults({'case_sensitive': False})
+    assert StringGrader.default_values == {'case_sensitive': False}
+    grader = StringGrader()
+    assert grader.config['case_sensitive'] is False
+
+    # Test that registered defaults clear correctly
+    StringGrader.clear_registered_defaults()
+    assert StringGrader.default_values is None
+
+    # Check that registered defaults propagate to subclasses
+    AbstractGrader.register_defaults({'debug': True})
+    grader = StringGrader()
+    assert grader.config['debug']
+    assert StringGrader.default_values is None
+    AbstractGrader.clear_registered_defaults()
+
+    # Check that registered defaults layer up through a subclass chain
+    AbstractGrader.register_defaults({'debug': True})
+    ItemGrader.register_defaults({'wrong_msg': 'haha!'})
+    StringGrader.register_defaults({'case_sensitive': False})
+    grader = StringGrader()
+    assert grader.config['debug']
+    assert grader.config['wrong_msg'] == 'haha!'
+    assert not grader.config['case_sensitive']
+    AbstractGrader.clear_registered_defaults()
+    ItemGrader.clear_registered_defaults()
+    StringGrader.clear_registered_defaults()
+
+    # Check that registered defaults can be higher level than where they're defined
+    StringGrader.register_defaults({'debug': True})
+    assert AbstractGrader.default_values is None
+    grader = StringGrader()
+    assert grader.config['debug']
+    StringGrader.clear_registered_defaults()

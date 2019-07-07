@@ -15,7 +15,6 @@ Contains classes for sampling vector/matrix/tensor values:
 All of these classes perform random sampling. To obtain a sample, use class.gen_sample()
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
-import abc
 import numpy as np
 
 class Unavailable(object):
@@ -65,7 +64,8 @@ class ArraySamplingSet(VariableSamplingSet):
     The norm used is standard Euclidean norm: root-square-sum of all entries in the array.
 
     This is the most low-level array sampling set we have, and is subclassed for various
-    specific purposes.
+    specific purposes. While we cannot make this class abstract, we strongly discourage
+    its use.
 
     Config:
     =======
@@ -77,8 +77,6 @@ class ArraySamplingSet(VariableSamplingSet):
             (default [1, 5])
         - complex (bool): Whether or not the matrix is complex (default False)
     """
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
 
     schema_config = Schema({
         Required('shape'): is_shape_specification(min_dim=1),
@@ -162,8 +160,8 @@ class ArraySamplingSet(VariableSamplingSet):
 
 class VectorSamplingSet(ArraySamplingSet):
     """
-    Sampling set of vectors. This is an abstract class; you should use RealVectors or
-    ComplexVectors instead.
+    Sampling set of vectors. While we cannot make this class abstract, you should use
+    RealVectors or ComplexVectors instead.
 
     Config:
     =======
@@ -172,8 +170,6 @@ class VectorSamplingSet(ArraySamplingSet):
             - if shape is tuple/list, must have length 1
             - default shape is (3, ), for a 3D vector
     """
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
 
     schema_config = ArraySamplingSet.schema_config.extend({
         Required('shape', default=(3,)): is_shape_specification(min_dim=1, max_dim=1)
@@ -227,16 +223,14 @@ class ComplexVectors(VectorSamplingSet):
 
 class TensorSamplingSet(ArraySamplingSet):
     """
-    Sampling set of tensors. This is an abstract class; you should use RealTensors or
-    ComplexTensors instead.
+    Sampling set of tensors. While we cannot make this class abstract, you should use
+    RealTensors or ComplexTensors instead.
 
     Config:
     =======
         Same as ArraySamplingSet, but:
             - shape must be a tuple with at least 3 dimensions
     """
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
 
     schema_config = ArraySamplingSet.schema_config.extend({
         Required('shape'): is_shape_specification(min_dim=3)
@@ -305,7 +299,7 @@ class ComplexTensors(TensorSamplingSet):
 
 class MatrixSamplingSet(ArraySamplingSet):
     """
-    Base sampling set of matrices. This is an abstract base class; you should
+    Base sampling set of matrices. While we cannot make this class abstract, you should
     use a more specific subclass instead.
 
     Config:
@@ -315,8 +309,6 @@ class MatrixSamplingSet(ArraySamplingSet):
             - default shape is (2, 2), for a 2x2 matrix
 
     """
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
 
     schema_config = ArraySamplingSet.schema_config.extend({
         Required('shape', default=(2, 2)): is_shape_specification(min_dim=2, max_dim=2)
@@ -325,7 +317,7 @@ class MatrixSamplingSet(ArraySamplingSet):
 
 class GeneralMatrices(MatrixSamplingSet):
     """
-    Base sampling set of general matrices. This is an abstract base class; you
+    Base sampling set of general matrices. While we cannot make this class abstract, you
     should use RealMatrices or ComplexMatrices instead.
 
     Config:
@@ -334,8 +326,6 @@ class GeneralMatrices(MatrixSamplingSet):
             - triangular (None, 'upper', 'lower'): Specify if you want a triangular
                 matrix (default None)
     """
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
 
     schema_config = MatrixSamplingSet.schema_config.extend({
         Required('triangular', default=None): Any(None, 'upper', 'lower')
@@ -411,8 +401,8 @@ class ComplexMatrices(GeneralMatrices):
 
 class SquareMatrixSamplingSet(MatrixSamplingSet):
     """
-    Base sampling set of square matrices. This is an abstract base class. You want to use
-    a subclass instead (likely SquareMatrices).
+    Base sampling set of square matrices. While we cannot make this class abstract, you
+    want to use a subclass instead (likely SquareMatrices).
 
     Config:
     =======
@@ -421,8 +411,6 @@ class SquareMatrixSamplingSet(MatrixSamplingSet):
 
     The 'shape' property is not used.
     """
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
 
     schema_config = MatrixSamplingSet.schema_config.extend({
         Required('shape', default=None): None,
