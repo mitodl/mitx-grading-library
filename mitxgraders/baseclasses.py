@@ -78,7 +78,8 @@ class AbstractGrader(ObjectWithSchema):
 
         attempt_based_credit (bool): Whether to award different amounts of credit
             based on the attempt number. Requires the attempt number to be passed to the
-            grader; see documentation (default False)
+            grader; see documentation. When using lists, only applies to the grader
+            that is passed through to edX. (default False)
 
         decrease_credit_after (positive int): The last attempt number to award maximum
             credit to (default 1)
@@ -111,7 +112,7 @@ class AbstractGrader(ObjectWithSchema):
             Required('attempt_based_credit', default=False): bool,
             Required('decrease_credit_after', default=1): Positive(int),
             Required('decrease_credit_steps', default=4): Positive(int),
-            Required('minimum_credit', default=0.2): All(float, Range(0, 1)),
+            Required('minimum_credit', default=0.2): Any(All(float, Range(0, 1)), 0, 1),
             Required('attempt_based_credit_msg', default=True): bool
         })
 
@@ -223,13 +224,15 @@ class AbstractGrader(ObjectWithSchema):
         Apply attempt-based credit maximums to grading.
         Mutates result directly.
         """
-        if not attempt_number:
+        if attempt_number is None:
             self.log("Attempt-based credit requested, but attempt number "
                      "not passed through to grader")
             return
         self.log("Attempt number {}".format(attempt_number))
 
         # How far past the point of decreasing credit are we?
+        if attempt_number < 1:  # Just in case edX has issues
+            attempt_number = 1
         steps = attempt_number - self.config['decrease_credit_after']
         if steps <= 0:
             return
@@ -244,26 +247,32 @@ class AbstractGrader(ObjectWithSchema):
             credit = 1 + (min_cred - 1) * steps / decrease_steps
         self.log("Maximum credit is {}".format(credit))
 
-        def reduce_credit(results_dict):
-            """
-            Multiply all grades by credit, updating from 'ok'=True to 'partial'
-            as needed
-            """
-            if results_dict['grade_decimal'] > 0:
-                grade = results_dict['grade_decimal'] * credit
-                results_dict['grade_decimal'] = grade
-                results_dict['ok'] = {0: False, 1: True}.get(grade, 'partial')
-
+        # Multiply all grades by credit, updating from 'ok'=True to 'partial' as needed
+        changed_result = False
         if "input_list" in result:
             for results_dict in result['input_list']:
-                reduce_credit(results_dict)
+                if results_dict['grade_decimal'] > 0:
+                    grade = results_dict['grade_decimal'] * credit
+                    results_dict['grade_decimal'] = grade
+                    results_dict['ok'] = {0: False, 1: True}.get(grade, 'partial')
+                    changed_result = True
         else:
-            reduce_credit(result)
+            if result['grade_decimal'] > 0:
+                grade = result['grade_decimal'] * credit
+                result['grade_decimal'] = grade
+                result['ok'] = {0: False, 1: True}.get(grade, 'partial')
+                changed_result = True
 
-        # Append the message
-        if self.config['attempt_based_credit_msg']:
-            msg = "\n\nMaximum credit for attempt #{} is {:04.2f}."
-            result['overall_message'] += msg.format(attempt_number, credit)
+        # Append the message if credit was reduced
+        if self.config['attempt_based_credit_msg'] and changed_result:
+            msg = "Maximum credit for attempt #{} is {:04.2f}."
+            if "input_list" in result:
+                key = 'overall_message'
+            else:
+                key = 'msg'
+            if result[key]:
+                result[key] += '\n\n'
+            result[key] += msg.format(attempt_number, credit)
 
     @staticmethod
     def format_messages(result):
