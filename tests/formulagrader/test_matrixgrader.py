@@ -264,3 +264,63 @@ def test_suppress_matrix_messages():
     # Note that we haven't suppressed all errors:
     with raises(ArgumentError):
         grader(None, 'sin(1, 2)')
+
+def test_default_grader_instance_override():
+    grader_0 = MatrixGrader()
+    grader_1 = MatrixGrader(entry_partial_credit='proportional')
+    grader_2 = MatrixGrader()
+
+    # not the same grader...
+    assert grader_0 is not grader_2
+    # but should use the exact same comparer function, class default
+    assert grader_0.default_comparer is grader_2.default_comparer
+    # but grader_1 should use an instance-specific default_comparer
+    assert grader_0.default_comparer is not grader_1.default_comparer
+
+def test_entry_partial_proportional_credit_grading():
+    grader = MatrixGrader(
+        max_array_dim=2,
+        answers='[[0, 1, 2], [x, y, z]]',
+        variables=['x', 'y', 'z'],
+        entry_partial_credit='proportional'
+    )
+    expected = {
+        'ok': 'partial',
+        'msg': 'Matrix entries at [row column] locations [1 2], [1 3], [2 1], [2 2] are incorrect.',
+        'grade_decimal': 2/6
+    }
+    assert grader(None, '[[0, 10, 20*z], [x/2, y^2, z]]') == expected
+    assert grader(None, '[[0, 1, 2], [x, y, z]]') == {
+        'ok': True,
+        'msg': '',
+        'grade_decimal': 1
+    }
+    assert grader(None, '[[10, 20, 30], [40, 50, 60]]') == {
+        'ok': False,
+        'msg': '',
+        'grade_decimal': 0
+    }
+
+def test_entry_partial_flat_rate_credit_grading():
+    grader = MatrixGrader(
+        max_array_dim=2,
+        answers='[[0, 1, 2], [x, y, z]]',
+        variables=['x', 'y', 'z'],
+        entry_partial_credit=0.123
+    )
+    expected = {
+        'ok': 'partial',
+        'msg': 'Matrix entries at [row column] locations [1 2], [1 3], [2 1], [2 2] are incorrect.',
+        'grade_decimal': 0.123
+    }
+    assert grader(None, '[[0, 10, 20*z], [x/2, y^2, z]]') == expected
+    assert grader(None, '[[0, 1, 2], [x, y, z]]') == {
+        'ok': True,
+        'msg': '',
+        'grade_decimal': 1
+    }
+    assert grader(None, '[[10, 20, 30], [40, 50, 60]]') == {
+        'ok': False,
+        'msg': '',
+        'grade_decimal': 0
+    }

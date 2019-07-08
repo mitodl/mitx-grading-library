@@ -52,10 +52,11 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from numbers import Number
 import numpy as np
 
-from voluptuous import Schema, Required
+import six
+from voluptuous import Schema, Required, Any, Range, All
 
 from mitxgraders.exceptions import InputTypeError, StudentFacingError
-from mitxgraders.helpers.validatorfuncs import is_callable, Nullable
+from mitxgraders.helpers.validatorfuncs import is_callable, Nullable, text_string
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 from mitxgraders.helpers.calc.math_array import are_same_length_vectors, is_vector
 from mitxgraders.comparers.baseclasses import Comparer
@@ -102,7 +103,7 @@ class EqualityComparer(Comparer):
 
     The following example takes the norm of the expected answer and student input
     before comparison. Note the different method of changing the comparer.
-    >>> FormulaGrader.set_default_comparer(EqualityComparer(transform=np.linalg.norm))
+    >>> MatrixGrader.set_default_comparer(EqualityComparer(transform=np.linalg.norm))
     >>> grader = MatrixGrader(
     ...     answers='[1, 0, 0]'
     ... )
@@ -112,29 +113,107 @@ class EqualityComparer(Comparer):
     True
     >>> grader(None, '[1/sqrt(2), 0, 1/sqrt(2)]')['ok']
     True
-    >>> FormulaGrader.reset_default_comparer()
+    >>> MatrixGrader.reset_default_comparer()
+
+    FormulaGrader and MatrixGrader both have set_default_comparer() and
+    reset_default_comparer() methods.
 
     """
     schema_config = Schema({
         Required('transform', default=None): Nullable(is_callable)
     })
 
-    def __call__(self, comparer_params_eval, student_eval, utils):
-        expected_input = comparer_params_eval[0]
-
+    @staticmethod
+    def validate(expected_eval, student_eval, utils):
         if hasattr(utils, 'validate_shape'):
             # in numpy, scalars have empty tuples as their shapes
-            shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
+            shape = tuple() if isinstance(expected_eval, Number) else expected_eval.shape
             utils.validate_shape(student_eval, shape)
 
-        # If provided, apply the transform function
-        if self.config['transform'] is not None:
-            expected_input = self.config['transform'](expected_input)
-            student_eval = self.config['transform'](student_eval)
+    def transform(self, evaluation):
+        f = self.config['transform']
+        return evaluation if f is None else f(evaluation)
 
-        return utils.within_tolerance(expected_input, student_eval)
+
+    def __call__(self, comparer_params_eval, student_eval, utils):
+        expected_eval = comparer_params_eval[0]
+        self.validate(expected_eval, student_eval, utils)
+
+        expected_eval = self.transform(expected_eval)
+        student_eval = self.transform(student_eval)
+
+        return utils.within_tolerance(expected_eval, student_eval)
 
 equality_comparer = EqualityComparer()
+
+class MatrixEntryComparer(EqualityComparer):
+    """
+    Default comparer for MatrixGrader. Compares student and instructor matirx
+    evaluations entry-by-entry for equality.
+
+    Configuration
+    =============
+
+        transform (None | function): same as EqualityComparer, defaults to None
+        entry_partial_credit ('proportional'|number): Determines how partial credit
+            is awarded. If set to 'proportional', then credit is proportional to
+            the number of correct matrix entries. If a numeric value is provided,
+            this flat rate of partial credit is provided as long as some but
+            not all entries are correct.
+
+            Default is the numeric value 0 (no partial credit).
+        entry_partial_msg (str): A text string message shown when partial credit
+            is awarded. The string may optionally contain the formatting key {error_indices},
+            which will be replaced with the indices of the incorrect matrix entries.
+    """
+
+    default_msg = "Matrix entries at [row column] locations {error_indices} are incorrect."
+    schema_config = EqualityComparer.schema_config.extend({
+        Required('entry_partial_credit', default=0): Any(All(Number, Range(0, 1)), 'proportional'),
+        Required('entry_partial_msg', default=default_msg): text_string
+    })
+
+    @staticmethod
+    def format_message_with_locations(format_string, locs):
+        """
+        Returns format_string with {error_indices} replaced by 1-indexed error
+        locations.
+
+        Arguments:
+            format_string: a string that may contain {error_indices} formatting key.
+            locs: a 0-indexed numpy array of error locations
+        """
+        locs_as_str = ", ".join(map(six.text_type, locs+1))
+        return format_string.format(error_indices=locs_as_str)
+
+    def __call__(self, comparer_params_eval, student_eval, utils):
+        expected_eval = comparer_params_eval[0]
+        self.validate(expected_eval, student_eval, utils)
+
+        num_entries = expected_eval.size
+
+        expected_eval = self.transform(expected_eval)
+        student_eval = self.transform(student_eval)
+
+        vec_within_tol = np.vectorize(utils.within_tolerance)
+        # compared_items is a boolean array of entry-by-entry comparisons
+        compared_items = vec_within_tol(expected_eval, student_eval)
+        percent_correct = np.sum(compared_items).item()/num_entries
+        wrong_locs = np.argwhere(np.logical_not(compared_items))
+        msg = self.format_message_with_locations(self.config['entry_partial_msg'], wrong_locs)
+        partial_credit = self.config['entry_partial_credit']
+
+        if partial_credit == 0:
+            return percent_correct == 1
+
+        if percent_correct == 0:
+            return False
+        elif percent_correct == 1:
+            return True
+        elif partial_credit == 'proportional':
+            return {'ok': 'partial', 'grade_decimal': percent_correct, 'msg': msg}
+        else:
+            return {'ok': 'partial', 'grade_decimal': partial_credit, 'msg': msg}
 
 def between_comparer(comparer_params_eval, student_eval, utils):
     """

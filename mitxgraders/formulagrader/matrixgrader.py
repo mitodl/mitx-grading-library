@@ -8,10 +8,11 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from numbers import Number
 from collections import namedtuple
 import six
-from voluptuous import Required, Any
+from voluptuous import Required, Any, Range, All
 from mitxgraders.exceptions import InputTypeError
+from mitxgraders.comparers import MatrixEntryComparer
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
-from mitxgraders.helpers.validatorfuncs import NonNegative, Nullable
+from mitxgraders.helpers.validatorfuncs import NonNegative, Nullable, text_string
 from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
 from mitxgraders.helpers.calc.exceptions import (
     MathArrayShapeError as ShapeError, MathArrayError, DomainError, ArgumentShapeError)
@@ -59,8 +60,23 @@ class MatrixGrader(FormulaGrader):
                         received objects is revealed.
 
         suppress_matrix_messages (bool): If True, suppresses all matrix-related
-            error messages from being displayed. Overrides shape_errors=True and
+            erro2r messages from being displayed. Overrides shape_errors=True and
             is_raised=True. Defaults to False.
+
+        Additionally, the following three configuration keys will be passed to
+        the default comparer and be used to specify partial credit options.
+
+        entry_partial_credit ('proportional'|number): Determines how partial credit
+            is awarded. If set to 'proportional', then credit is proportional to
+            the number of correct matrix entries. If a numeric value is provided,
+            this flat rate of partial credit is provided as long as some but
+            not all entries are correct.
+
+            Default is the numeric value 0 (no partial credit).
+        entry_partial_msg (str): A text string message shown when partial credit
+            is awarded. The string may optionally contain the formatting key {error_indices},
+            which will be replaced with the indices of the incorrect matrix entries.
+        transform (None | function): same as EqualityComparer, defaults to None
     """
 
     # merge_dicts does not mutate the originals
@@ -82,11 +98,31 @@ class MatrixGrader(FormulaGrader):
             }): {
                 Required('is_raised', default=True): bool,
                 Required('msg_detail', default='type'): Any(None, 'type', 'shape')
-            }
+            },
+            Required('entry_partial_credit', default=0): Any(All(Number, Range(0, 1)), 'proportional'),
+            Required('entry_partial_msg', default=MatrixEntryComparer.default_msg): text_string
         })
 
+    default_comparer = staticmethod(MatrixEntryComparer())
+
+    @classmethod
+    def get_default_comparer(cls, unvalidated_config):
+        keys = ['entry_partial_credit', 'entry_partial_msg']
+        comparer_config = {key: unvalidated_config[key]
+                           for key in keys if key in unvalidated_config}
+        if comparer_config:
+            return MatrixEntryComparer(comparer_config)
+        return cls.default_comparer
+
     def __init__(self, config=None, **kwargs):
+        # Set default_comparer on as an instance property
+        # This will be used by schema_config during validation to set defaults
+        unvalidated_config = config if config is not None else kwargs
+
+        self.default_comparer = self.get_default_comparer(unvalidated_config)
+
         super(MatrixGrader, self).__init__(config, **kwargs)
+
         if self.config['identity_dim'] and not self.constants.get('I', None):
             self.constants['I'] = identity(self.config['identity_dim'])
 

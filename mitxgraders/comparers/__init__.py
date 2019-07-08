@@ -2,6 +2,7 @@ from __future__ import print_function, division, absolute_import
 
 from mitxgraders.comparers.comparers import (
     EqualityComparer,
+    MatrixEntryComparer,
     equality_comparer,
     congruence_comparer,
     eigenvector_comparer,
@@ -15,6 +16,7 @@ from mitxgraders.comparers.linear_comparer import LinearComparer
 
 __all__ = [
     'EqualityComparer',
+    'MatrixEntryComparer',
     'equality_comparer',
     'congruence_comparer',
     'eigenvector_comparer',
