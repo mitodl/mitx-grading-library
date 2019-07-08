@@ -16,9 +16,6 @@ class Comparer(ObjectWithSchema):
     This class is abstract. Comparers should inherit from it.
     """
 
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
-
     @abc.abstractmethod
     def __call__(self, comparer_params_eval, student_eval, utils):
         """
@@ -47,9 +44,6 @@ class CorrelatedComparer(Comparer):
 
     This class is abstract. Correlated Comparers should inherit from it.
     """
-
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def __call__(self, comparer_params_evals, student_evals, utils):

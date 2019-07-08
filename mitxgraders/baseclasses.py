@@ -18,11 +18,18 @@ from mitxgraders.version import __version__
 from mitxgraders.exceptions import ConfigError, MITxError, StudentFacingError
 from mitxgraders.helpers.validatorfuncs import text_string, Positive
 
+class DefaultValuesMeta(abc.ABCMeta):
+    """
+    Metaclass that mixes ABCMeta behaviour and also provides a default_values parameter
+    to every subclass that is NOT shared with superclasses/subclasses.
+    """
+    def __init__(self, name, bases, attrs):
+        self.default_values = None
+        super(DefaultValuesMeta, self).__init__(name, bases, attrs)
+
+@six.add_metaclass(DefaultValuesMeta)  # This is an abstract base class with default_values
 class ObjectWithSchema(object):
     """Represents an author-facing object whose configuration needs validation."""
-
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractproperty
     def schema_config(self):
@@ -40,15 +47,76 @@ class ObjectWithSchema(object):
         """
         return voluptuous_validate(config, self.schema_config)
 
+    @classmethod
+    def register_defaults(cls, values_dict):
+        """Saves a dictionary of values to override the defaults"""
+        if cls.default_values is None:
+            cls.default_values = {}
+        cls.default_values.update(values_dict)
+
+    @classmethod
+    def clear_registered_defaults(cls):
+        """Clears all registered defaults"""
+        cls.default_values = None
+
     def __init__(self, config=None, **kwargs):
         """
         Validate the supplied config for the object, using either a config dict or kwargs,
-        but not both.
+        but not both. Also loads any registered defaults.
         """
+        # Select the appropriate source for configuration
         if config is None:
-            self.config = self.validate_config(kwargs)
+            use_config = kwargs
         else:
-            self.config = self.validate_config(config)
+            use_config = config
+
+        # Apply any registered defaults before overriding with the given configuration
+        if isinstance(use_config, dict):
+            use_config = self.apply_registered_defaults(use_config)
+
+        # Validate the configuration
+        self.config = self.validate_config(use_config)
+
+    def apply_registered_defaults(self, config):
+        """
+        Apply the registered defaults of this class and all superclasses to the
+        configuration, then return the resulting configuration.
+        """
+        # Initialize a storage list
+        config_dicts = []
+        config_dicts.append(self.default_values)
+
+        # Traverse the super classes to obtain default_values from all super classes
+        current_class = self.__class__
+        while True:
+            # We never use multiple inheritance, so just follow the chain
+            current_class = current_class.__bases__[0]
+            config_dicts.append(current_class.default_values)
+            if current_class == ObjectWithSchema:
+                break
+
+        # Go and apply all the default_values in reverse order
+        base = {}
+        config_dicts.reverse()
+        for entry in config_dicts:
+            if entry is not None:
+                base.update(entry)
+
+        # Report that modified defaults are being used
+        self.save_modified_defaults(base)
+
+        # Apply the provided configuration
+        base.update(config)
+
+        # Return the resulting configuration
+        return base
+
+    def save_modified_defaults(self, config):
+        """
+        Allows an ObjectWithSchema to save any modified defaults for later use.
+        This function is intended to be shadowed as necessary.
+        """
+        pass
 
     def __repr__(self):
         """Printable representation of the object"""
@@ -96,9 +164,6 @@ class AbstractGrader(ObjectWithSchema):
         attempt_based_credit_msg (bool): When maximum credit has been decreased due to
             attempt number, present the student with a message explaining so (default True)
     """
-
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractproperty
     def schema_config(self):
@@ -300,6 +365,12 @@ class AbstractGrader(ObjectWithSchema):
         content = "\n".join(self.debuglog)
         return "<pre>{content}</pre>".format(content=content)
 
+    def save_modified_defaults(self, config):
+        """
+        Make a copy of the modified defaults for future logging purposes.
+        """
+        self.modified_defaults = config.copy()
+
     @staticmethod
     def ensure_text_inputs(student_input, allow_lists=True, allow_single=True):
         """
@@ -374,9 +445,6 @@ class ItemGrader(AbstractGrader):
         wrong_msg (str): A generic message to give the students upon submission of an
             answer that received a grade of 0 (default "")
     """
-
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
 
     @property
     def schema_config(self):

@@ -55,10 +55,11 @@ def set_seed(seed=None):
     np.random.seed(seed)
 
 class AbstractSamplingSet(ObjectWithSchema):  # pylint: disable=abstract-method
-    """Represents a set from which random samples are taken."""
+    """
+    Represents a set from which random samples are taken.
 
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
+    Note that this is an abstract class.
+    """
 
     @abc.abstractmethod
     def gen_sample(self):
@@ -66,24 +67,27 @@ class AbstractSamplingSet(ObjectWithSchema):  # pylint: disable=abstract-method
 
 
 class VariableSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-method
-    """Represents a set from which random variable samples are taken."""
+    """
+    Represents a set from which random variable samples are taken.
 
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
+    Note that this is an abstract class.
+    """
 
 
 class ScalarSamplingSet(VariableSamplingSet):  # pylint: disable=abstract-method
-    """Represents a set from which random scalar variable samples are taken."""
+    """
+    Represents a set from which random scalar variable samples are taken.
 
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
+    Note that this is an abstract class.
+    """
 
 
 class FunctionSamplingSet(AbstractSamplingSet):  # pylint: disable=abstract-method
-    """Represents a set from which random function samples are taken."""
+    """
+    Represents a set from which random function samples are taken.
 
-    # This is an abstract base class
-    __metaclass__ = abc.ABCMeta
+    Note that this is an abstract class.
+    """
 
 
 class RealInterval(ScalarSamplingSet):
