@@ -167,7 +167,7 @@ class MatrixEntryComparer(EqualityComparer):
             which will be replaced with the indices of the incorrect matrix entries.
     """
 
-    default_msg = "Matrix entries at [row column] locations {error_indices} are incorrect."
+    default_msg = "Matrix entries at indices {error_indices} are incorrect."
     schema_config = EqualityComparer.schema_config.extend({
         Required('entry_partial_credit', default=0): Any(All(Number, Range(0, 1)), 'proportional'),
         Required('entry_partial_msg', default=default_msg): text_string

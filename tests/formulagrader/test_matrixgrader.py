@@ -286,7 +286,7 @@ def test_entry_partial_proportional_credit_grading():
     )
     expected = {
         'ok': 'partial',
-        'msg': 'Matrix entries at [row column] locations [1 2], [1 3], [2 1], [2 2] are incorrect.',
+        'msg': 'Matrix entries at indices [1 2], [1 3], [2 1], [2 2] are incorrect.',
         'grade_decimal': 2/6
     }
     assert grader(None, '[[0, 10, 20*z], [x/2, y^2, z]]') == expected
@@ -310,7 +310,7 @@ def test_entry_partial_flat_rate_credit_grading():
     )
     expected = {
         'ok': 'partial',
-        'msg': 'Matrix entries at [row column] locations [1 2], [1 3], [2 1], [2 2] are incorrect.',
+        'msg': 'Matrix entries at indices [1 2], [1 3], [2 1], [2 2] are incorrect.',
         'grade_decimal': 0.123
     }
     assert grader(None, '[[0, 10, 20*z], [x/2, y^2, z]]') == expected
