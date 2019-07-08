@@ -325,6 +325,14 @@ def test_entry_partial_flat_rate_credit_grading():
         'grade_decimal': 0
     }
 
+def test_entry_partial_credit_with_no_partial_credit():
+    grader = MatrixGrader(
+        answers='[1, 2, 3]',
+        entry_partial_credit=0
+    )
+    assert grader(None, '[1, 2, 4]')['grade_decimal'] == 0
+    assert grader(None, '[1, 2, 3]')['grade_decimal'] == 1
+
 def test_entry_partial_custom_message():
     grader = MatrixGrader(
         max_array_dim=2,
