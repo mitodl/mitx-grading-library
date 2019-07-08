@@ -60,23 +60,16 @@ class MatrixGrader(FormulaGrader):
                         received objects is revealed.
 
         suppress_matrix_messages (bool): If True, suppresses all matrix-related
-            erro2r messages from being displayed. Overrides shape_errors=True and
+            error messages from being displayed. Overrides shape_errors=True and
             is_raised=True. Defaults to False.
 
-        Additionally, the following three configuration keys will be passed to
-        the default comparer and be used to specify partial credit options.
-
-        entry_partial_credit ('proportional'|number): Determines how partial credit
-            is awarded. If set to 'proportional', then credit is proportional to
-            the number of correct matrix entries. If a numeric value is provided,
-            this flat rate of partial credit is provided as long as some but
-            not all entries are correct.
-
-            Default is the numeric value 0 (no partial credit).
-        entry_partial_msg (str): A text string message shown when partial credit
-            is awarded. The string may optionally contain the formatting key {error_indices},
-            which will be replaced with the indices of the incorrect matrix entries.
-        transform (None | function): same as EqualityComparer, defaults to None
+        Additionally, the configuration options
+            entry_partial_credit
+            entry_partial_msg
+        of MatrixEntryComparer can be passed directly to MatrixGrader to facilitate
+        partial credit without the explicit use of comparers. If either key
+        is provided a non-default value, MatrixEntryComparer is used as the default
+        comparer for that MatrixGrader instance with the given key values.
     """
 
     # merge_dicts does not mutate the originals
@@ -116,7 +109,6 @@ class MatrixGrader(FormulaGrader):
         # Set default_comparer on as an instance property
         # This will be used by schema_config during validation to set defaults
         unvalidated_config = config if config is not None else kwargs
-
         self.default_comparer = self.get_default_comparer(unvalidated_config)
 
         super(MatrixGrader, self).__init__(config, **kwargs)

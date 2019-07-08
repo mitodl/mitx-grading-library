@@ -148,20 +148,20 @@ equality_comparer = EqualityComparer()
 
 class MatrixEntryComparer(EqualityComparer):
     """
-    Default comparer for MatrixGrader. Compares student and instructor matirx
+    Default comparer for MatrixGrader. Compares student and instructor matrix
     evaluations entry-by-entry for equality.
 
     Configuration
     =============
 
-        transform (None | function): same as EqualityComparer, defaults to None
-        entry_partial_credit ('proportional'|number): Determines how partial credit
+        transform (None | function): same as EqualityComparer (default None)
+        entry_partial_credit ('proportional' | number): Determines how partial credit
             is awarded. If set to 'proportional', then credit is proportional to
-            the number of correct matrix entries. If a numeric value is provided,
-            this flat rate of partial credit is provided as long as some but
-            not all entries are correct.
+            the number of correct matrix entries. If a numeric value betweem 0 and 1
+            is provided, this flat rate of partial credit is provided as long as
+            some but not all entries are correct. Default is the numeric value 0
+            (no partial credit).
 
-            Default is the numeric value 0 (no partial credit).
         entry_partial_msg (str): A text string message shown when partial credit
             is awarded. The string may optionally contain the formatting key {error_indices},
             which will be replaced with the indices of the incorrect matrix entries.
@@ -202,9 +202,6 @@ class MatrixEntryComparer(EqualityComparer):
         wrong_locs = np.argwhere(np.logical_not(compared_items))
         msg = self.format_message_with_locations(self.config['entry_partial_msg'], wrong_locs)
         partial_credit = self.config['entry_partial_credit']
-
-        if partial_credit == 0:
-            return percent_correct == 1
 
         if percent_correct == 0:
             return False
