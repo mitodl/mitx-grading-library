@@ -225,10 +225,25 @@ def test_nesting_with_same_delimiter_raises_config_error():
     with raises(ConfigError, match="Nested SingleListGraders must use different delimiters."):
         # Both delimiters have same default value
         SingleListGrader(
-            answers=[['a', 'b'], ['c', 'd']],
             subgrader=SingleListGrader(
                 subgrader=StringGrader()
             )
+        )
+
+    # Why you would do this is beyond me, but hey, we can test it!
+    with raises(ConfigError, match="Nested SingleListGraders must use different delimiters."):
+        SingleListGrader(
+            subgrader=SingleListGrader(
+                subgrader=SingleListGrader(
+                    subgrader=SingleListGrader(
+                        subgrader=StringGrader(),
+                        delimiter=','
+                    ),
+                    delimiter='-'
+                ),
+                delimiter=';'
+            ),
+            delimiter=','
         )
 
 def test_order_matters():
@@ -363,3 +378,40 @@ def test_errors():
     grader(None, '1,2,3,')['grade_decimal'] = 0.75
     grader(None, '1,,2,3')['grade_decimal'] = 0.75
     grader(None, ',1,2,3,')['grade_decimal'] = 0.6
+
+def test_infer_expect():
+    grader = SingleListGrader(
+        subgrader=SingleListGrader(
+            subgrader=StringGrader(),
+            delimiter=','
+        ),
+        delimiter=';',
+        debug=True
+    )
+    assert grader.infer_answers('a,b;c,d') == [['a', 'b'], ['c', 'd']]
+    assert grader.infer_answers('a,b,c;d,e,f;g,h,i') == [['a', 'b', 'c'],
+                                                         ['d', 'e', 'f'],
+                                                         ['g', 'h', 'i']]
+    # Test that the grading process works
+    assert grader('a,b;c,d', 'd,c;b,a')['ok']
+    # Test that inferred answers show up in the debug log as expected
+    msg = grader('a,b;c,d', 'a')['msg']
+    assert 'Answer inferred to be [["a", "b"], ["c", "d"]]' in msg
+    msg = grader('a,b', 'a')['msg']
+    assert 'Answer inferred to be [["a", "b"]]' in msg
+    msg = grader('a;b', 'a')['msg']
+    assert 'Answer inferred to be [["a"], ["b"]]' in msg
+
+    # Test heavy nesting
+    grader = SingleListGrader(
+        subgrader=SingleListGrader(
+            subgrader=SingleListGrader(
+                subgrader=StringGrader(),
+                delimiter='-'
+            ),
+            delimiter=','
+        ),
+        delimiter=';'
+    )
+    assert grader.infer_answers('a-1-@,b-2;c-3,d-4') == [[['a', '1', '@'], ['b', '2']],
+                                                         [['c', '3'], ['d', '4']]]

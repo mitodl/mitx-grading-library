@@ -12,6 +12,7 @@ import numbers
 import abc
 import pprint
 import six
+import json
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
@@ -193,6 +194,32 @@ class AbstractGrader(ObjectWithSchema):
                 graders when a grader is used as a subgrader in a ListGrader.
         """
 
+    log_created = False
+
+    def create_debuglog(self, student_input):
+        """
+        Instantiates the debug log for the grader
+
+        The debug log always exists and is written to, so that it can be accessed
+        programmatically. It is only output with the grading when config["debug"] is True
+        When subgraders are used, they need to be given access to this debuglog.
+        Note that debug=True must be set on parents to obtain debug output from children
+        when nested graders (lists) are used.
+        """
+        if self.log_created:
+            # Get out if we've already initialized
+            return
+
+        self.debuglog = []
+        # Add the version to the debug log
+        self.log("MITx Grading Library Version " + __version__)
+        # Add the student inputs to the debug log
+        if isinstance(student_input, list):
+            self.log("Student Responses:\n" + "\n".join(map(six.text_type, student_input)))
+        else:
+            self.log("Student Response:\n" + six.text_type(student_input))
+        self.log_created = True
+
     def __call__(self, expect, student_input, **kwargs):
         """
         Used to ask the grading class to grade student_input.
@@ -228,19 +255,9 @@ class AbstractGrader(ObjectWithSchema):
         student_input = self.ensure_text_inputs(student_input)
 
         # Initialize the debug log
-        # The debug log always exists and is written to, so that it can be accessed
-        # programmatically. It is only output with the grading when config["debug"] is True
-        # When subgraders are used, they need to be given access to this debuglog.
-        # Note that debug=True must be set on parents to obtain debug output from children
-        # when nested graders (lists) are used.
-        self.debuglog = []
-        # Add the version to the debug log
-        self.log("MITx Grading Library Version " + __version__)
-        # Add the student inputs to the debug log
-        if isinstance(student_input, list):
-            self.log("Student Responses:\n" + "\n".join(map(six.text_type, student_input)))
-        else:
-            self.log("Student Response:\n" + six.text_type(student_input))
+        self.create_debuglog(student_input)
+        # Clear the log_created flag so that a new log will be created when called again
+        self.log_created = False
 
         # Compute the result of the check
         try:
@@ -629,16 +646,47 @@ class ItemGrader(AbstractGrader):
                 graders when a grader is used as a subgrader in a ListGrader.
         """
 
+    inferring_answers = False
+
     def __call__(self, expect, student_input, **kwargs):
         """
         The same as AbstractGrader.__call__, except that we try to infer
         answers from expect argument if answers are not specified in the
-        grader configuration.
+        grader configuration. The actual inference is done by infer_answers,
+        which can be shadowed.
         """
-        if not self.config['answers'] and expect is not None:
-            self.config['answers'] = self.schema_answers(expect)
+        # If expect is provided, infer an answer if we either don't have an answer or
+        # are always inferring answers
+        if expect is not None and (self.inferring_answers or not self.config['answers']):
+            self.config['answers'] = self.infer_answers(expect)
 
+            # Create the debug log...
+            self.create_debuglog(student_input)
+            # ... so that we can add the inferred answers to it before
+            # calling AbstractGrader.__call__
+            output = json.dumps(self.config['answers'])  # How to avoid unicode 'u' showing up!
+            self.log("Answer inferred to be {}".format(output))
+
+            # Validate the answers
+            self.config['answers'] = self.schema_answers(self.config['answers'])
+            # Note that this answer is now stored for future calls, but
+            # will be overridden if a new expect value is provided.
+
+            # Mark that we are using inferred answers
+            self.inferring_answers = True
+
+        # And punt the actual __call__ function to the superclass
         return super(ItemGrader, self).__call__(expect, student_input, **kwargs)
+
+    def infer_answers(self, expect):
+        """
+        Infer answer from the expect parameter and return it. For most purposes,
+        the answer is just the expect parameter. However, this can be shadowed if need be.
+
+        If you create a grader that cannot infer answers, shadow this function, and simply
+        raise ConfigError('Answer cannot be inferred for this grader')
+        """
+        return expect
 
     @staticmethod
     def ensure_text_inputs(student_input):

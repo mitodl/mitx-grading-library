@@ -644,6 +644,17 @@ class SingleListGrader(ItemGrader):
         # Step 2: Validate the answers
         self.config['answers'] = self.schema_answers(self.config['answers'])
 
+        # Step 3: Ensure that nested SingleListGraders all use different delimiters
+        # Required here as schema_answers does not run when embedded in a ListGrader
+        if isinstance(self.config['subgrader'], SingleListGrader):
+            delimiters = [self.config['delimiter']]
+            subgrader = self.config['subgrader']
+            while isinstance(subgrader, SingleListGrader):
+                if subgrader.config['delimiter'] in delimiters:
+                    raise ConfigError("Nested SingleListGraders must use different delimiters.")
+                delimiters.append(subgrader.config['delimiter'])
+                subgrader = subgrader.config['subgrader']
+
     def schema_answers(self, answer_tuple):
         """
         Defines the schema to validate an answer tuple against.
@@ -662,8 +673,9 @@ class SingleListGrader(ItemGrader):
         # Turn answers_tuple into a tuple if it isn't already
         if isinstance(answers_tuple, list):
             if not answers_tuple:  # empty list
-                # Nothing further to check here. This must be a nested grader, which will
-                # be called upon to check answers again a bit later.
+                # Nothing further to check here. This must be a nested grader or inferring
+                # the answer from expect. In both cases, we'll be called upon again later
+                # to check the answers once we have them.
                 return tuple()
             answers_tuple = (answers_tuple,)
         elif not isinstance(answers_tuple, tuple):  # pragma: no cover
@@ -674,13 +686,6 @@ class SingleListGrader(ItemGrader):
         for answer_list in answers_tuple:
             if len(answer_list) != len(answers_tuple[0]):
                 raise ConfigError("All possible list answers must have the same length")
-
-        # If subgrader is a SingleListGrader, check that it uses a different delimiter
-        # TODO This does not check past the first level of nesting.
-        if isinstance(self.config['subgrader'], SingleListGrader):
-            subgrader = self.config['subgrader']
-            if self.config['delimiter'] == subgrader.config['delimiter']:
-                raise ConfigError("Nested SingleListGraders must use different delimiters.")
 
         # Validate answer_list using the subgrader
         for answer_list in answers_tuple:
@@ -734,3 +739,25 @@ class SingleListGrader(ItemGrader):
                                         partial_credit=self.config['partial_credit'])
 
         return result
+
+    def infer_answers(self, expect):
+        """
+        Infer answers from the expect parameter, following nested SingleListGrader
+        chains through recursion. Returns the resulting answers key.
+
+        Shadows the ItemGrader infer_answers function.
+
+        For example, we want to turn
+        'a, b; c, d' -> [['a', 'b'], ['c', 'd']]
+        where the outermost delimiter is ';'' and the inner most is ','.
+        """
+        # Split the expect string using the delimiter
+        answers = expect.split(self.config['delimiter'])
+
+        # If the subgrader is also a SingleListGrader, recurse on each element of answers
+        if isinstance(self.config['subgrader'], SingleListGrader):
+            for idx, entry in enumerate(answers):
+                answers[idx] = self.config['subgrader'].infer_answers(entry)
+
+        # Return the result
+        return answers
