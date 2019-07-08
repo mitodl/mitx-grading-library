@@ -783,7 +783,8 @@ class FormulaGrader(ItemGrader):
             student_evals.append(student_eval)
 
             if self.config['debug']:
-                # Put the siblings back in for the debug output
+                # Put the siblings and instructor variables back in for the debug output
+                varlist.update(var_samples[i])
                 varlist.update(siblings_eval)
                 self.log_eval_info(i, varlist, funclist, comparer_params_eval, student_eval)
 
