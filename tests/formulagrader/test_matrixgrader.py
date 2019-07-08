@@ -324,3 +324,22 @@ def test_entry_partial_flat_rate_credit_grading():
         'msg': '',
         'grade_decimal': 0
     }
+
+def test_entry_partial_custom_message():
+    grader = MatrixGrader(
+        max_array_dim=2,
+        answers='[[1, 2], [3, 4]]',
+        entry_partial_credit='proportional',
+        entry_partial_msg='Partly correct'
+    )
+    grader_with_indices = MatrixGrader(
+        max_array_dim=2,
+        answers='[[1, 2], [3, 4]]',
+        entry_partial_credit='proportional',
+        entry_partial_msg='Partly correct, errors at {error_indices}'
+    )
+
+    assert grader(None, '[[1, 20], [30, 4]]')['msg'] == 'Partly correct'
+
+    formatted_msg = 'Partly correct, errors at [1 2], [2 1]'
+    assert grader_with_indices(None, '[[1, 20], [30, 4]]')['msg'] == formatted_msg
