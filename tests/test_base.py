@@ -6,7 +6,7 @@ from __future__ import print_function, division, absolute_import
 import sys
 import six
 from imp import reload
-from pytest import raises
+from pytest import raises, approx
 from voluptuous import Error
 import mitxgraders
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, __version__
@@ -336,3 +336,197 @@ def test_ensure_text_inputs_errors():
     msg = r"At least one of \(allow\_lists, allow\_single\) must be True."
     with raises(ValueError,  match=msg):
         ensure_text_inputs('cat', allow_lists=False, allow_single=False)
+
+def test_attempt_based_grading_single():
+    # Test basic usage
+    grader = StringGrader(
+        answers='cat',
+        attempt_based_credit=True,
+        decrease_credit_after=3,
+        decrease_credit_steps=3,
+        minimum_credit=0.1,
+        attempt_based_credit_msg=False
+    )
+
+    expected_result = {'msg': '', 'grade_decimal': 1, 'ok': True}
+    for i in range(0, 4):  # Includes edX error case: attempt = 0
+        assert grader(None, 'cat', attempt=i) == expected_result
+
+    grade = 1
+    for i in range(4, 7):
+        grade -= 0.3
+        expected_result = {'msg': '', 'grade_decimal': None, 'ok': 'partial'}
+        result = grader(None, 'cat', attempt=i)
+        assert result['msg'] == expected_result['msg']
+        assert result['ok'] == expected_result['ok']
+        assert result['grade_decimal'] == approx(grade)
+
+    for i in range(7, 10):
+        expected_result = {'msg': '', 'grade_decimal': 0.1, 'ok': 'partial'}
+        result = grader(None, 'cat', attempt=i)
+        assert result['msg'] == expected_result['msg']
+        assert result['ok'] == expected_result['ok']
+        assert result['grade_decimal'] == approx(0.1)
+
+    # Test individual flags
+    # Ensure it turns off properly
+    grader = StringGrader(
+        answers='cat',
+        attempt_based_credit=False
+    )
+
+    expected_result = {'msg': '', 'grade_decimal': 1, 'ok': True}
+    for i in range(1, 10):
+        assert grader(None, 'cat', attempt=i) == expected_result
+
+    # Ensure that wrong answers are always zeros
+    grader = StringGrader(
+        answers='cat',
+        attempt_based_credit=True
+    )
+
+    expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
+    for i in range(1, 10):
+        assert grader(None, 'dog', attempt=i) == expected_result
+
+    # Ensure that zero credit is graded as false appropriately
+    grader = StringGrader(
+        answers='cat',
+        attempt_based_credit=True,
+        minimum_credit=0,
+        attempt_based_credit_msg=False
+    )
+
+    expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
+    for i in range(10, 20):
+        assert grader(None, 'cat', attempt=i) == expected_result
+
+    # Ensure that messages are included as appropriate
+    grader = StringGrader(
+        answers='cat',
+        attempt_based_credit=True,
+        minimum_credit=0,
+        decrease_credit_after=1,
+        decrease_credit_steps=2,
+        attempt_based_credit_msg=True
+    )
+
+    expected_result = {'msg': '', 'grade_decimal': 1, 'ok': True}
+    assert grader(None, 'cat', attempt=1) == expected_result
+    expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'dog', attempt=1) == expected_result
+
+    expected_result = {'msg': 'Maximum credit for attempt #2 is 0.50.', 'grade_decimal': 0.5, 'ok': 'partial'}
+    assert grader(None, 'cat', attempt=2) == expected_result
+    expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'dog', attempt=2) == expected_result
+
+    expected_result = {'msg': 'Maximum credit for attempt #3 is 0.00.', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'cat', attempt=3) == expected_result
+    expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'dog', attempt=3) == expected_result
+
+    # Ensure that messages are appended as appropriate
+    # Also test that reduced-value entries are affected by partial credit as expected
+    grader = StringGrader(
+        answers={'expect': 'cat', 'msg': 'Meow!', 'grade_decimal': 0.5},
+        attempt_based_credit=True,
+        minimum_credit=0,
+        decrease_credit_after=1,
+        decrease_credit_steps=2,
+        attempt_based_credit_msg=True,
+        wrong_msg='too bad'
+    )
+
+    expected_result = {'msg': 'Meow!', 'grade_decimal': 0.5, 'ok': 'partial'}
+    assert grader(None, 'cat', attempt=1) == expected_result
+    expected_result = {'msg': 'too bad', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'dog', attempt=1) == expected_result
+
+    expected_result = {'msg': 'Meow!<br/>\n<br/>\nMaximum credit for attempt #2 is 0.50.', 'grade_decimal': 0.25, 'ok': 'partial'}
+    assert grader(None, 'cat', attempt=2) == expected_result
+    expected_result = {'msg': 'too bad', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'dog', attempt=2) == expected_result
+
+    expected_result = {'msg': 'Meow!<br/>\n<br/>\nMaximum credit for attempt #3 is 0.00.', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'cat', attempt=3) == expected_result
+    expected_result = {'msg': 'too bad', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'dog', attempt=3) == expected_result
+
+    # Ensure that things behave when an attempt number is not passed in
+    grader = StringGrader(
+        answers='cat',
+        attempt_based_credit=True
+    )
+
+    msg = ("Attempt number not passed to grader as keyword argument 'attempt'. "
+           'The attribute <code>cfn_extra_args="attempt"</code> may need to be '
+           "set in the <code>customresponse</code> tag.")
+    with raises(ConfigError, match=msg):
+        assert grader(None, 'cat') == expected_result
+
+    # Ensure that debug info is passed along
+    grader = StringGrader(
+        answers='cat',
+        attempt_based_credit=True,
+        debug=True
+    )
+
+    template = ("<pre>"
+                "MITx Grading Library Version {version}\n"
+                "{debug_content}\n"
+                "{attempt_msg}"
+                "</pre>")
+    debug_content = "Student Response:\ncat"
+    attempt_msg = 'Attempt number 1'
+    msg = template.format(version=__version__,
+                          debug_content=debug_content,
+                          attempt_msg=attempt_msg).replace("\n", "<br/>\n")
+    expected_result = {'msg': msg, 'grade_decimal': 1, 'ok': True}
+    assert grader(None, 'cat', attempt=1) == expected_result
+
+    template = ("Maximum credit for attempt #3 is 0.60.\n\n<pre>"
+                "MITx Grading Library Version {version}\n"
+                "{debug_content}\n"
+                "{attempt_msg}"
+                "</pre>")
+    attempt_msg = 'Attempt number 3\nMaximum credit is 0.6'
+    msg = template.format(version=__version__,
+                          debug_content=debug_content,
+                          attempt_msg=attempt_msg).replace("\n", "<br/>\n")
+    expected_result = {'msg': msg, 'grade_decimal': 0.6, 'ok': 'partial'}
+    assert grader(None, 'cat', attempt=3) == expected_result
+
+def test_attempt_based_grading_list():
+    grader = ListGrader(
+        answers=['cat', 'dog'],
+        subgraders=StringGrader(),
+        attempt_based_credit=True,
+    )
+
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''}
+        ]
+    }
+    assert grader(None, ['cat', 'dog'], attempt=1) == expected_result
+
+    expected_result = {
+        'overall_message': 'Maximum credit for attempt #5 is 0.20.',
+        'input_list': [
+            {'ok': 'partial', 'grade_decimal': 0.2, 'msg': ''},
+            {'ok': 'partial', 'grade_decimal': 0.2, 'msg': ''}
+        ]
+    }
+    assert grader(None, ['cat', 'dog'], attempt=5) == expected_result
+
+    expected_result = {
+        'overall_message': 'Maximum credit for attempt #5 is 0.20.',
+        'input_list': [
+            {'ok': 'partial', 'grade_decimal': 0.2, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''}
+        ]
+    }
+    assert grader(None, ['cat', 'unicorn'], attempt=5) == expected_result

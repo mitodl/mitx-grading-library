@@ -200,7 +200,7 @@ class StringGrader(ItemGrader):
             'msg': answer['msg']
         }
 
-    def __call__(self, expect, student_input):
+    def __call__(self, expect, student_input, **kwargs):
         """
         The same as ItemGrader.__call__, except that we accept a None
         entry for expect if accept_any or accept_nonempty are set.
@@ -208,4 +208,4 @@ class StringGrader(ItemGrader):
         if expect is None and (self.config['accept_any'] or self.config['accept_nonempty']):
             expect = ""
 
-        return super(StringGrader, self).__call__(expect, student_input)
+        return super(StringGrader, self).__call__(expect, student_input, **kwargs)
