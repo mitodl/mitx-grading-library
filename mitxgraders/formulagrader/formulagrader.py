@@ -789,17 +789,17 @@ class FormulaGrader(ItemGrader):
 
         return comparer_params_evals, student_evals, meta.functions_used
 
-    def compare_evaluations(self, compare_parms_evals, student_evals, comparer, utils):
+    def compare_evaluations(self, compare_params_evals, student_evals, comparer, utils):
         """
         Compare the student evaluations to the expected results.
         """
         results = []
         if isinstance(comparer, CorrelatedComparer):
-            result = comparer(compare_parms_evals, student_evals, utils)
+            result = comparer(compare_params_evals, student_evals, utils)
             results.append(ItemGrader.standardize_cfn_return(result))
         else:
-            for compare_parms_eval, student_eval in zip(compare_parms_evals, student_evals):
-                result = comparer(compare_parms_eval, student_eval, utils)
+            for compare_params_eval, student_eval in zip(compare_params_evals, student_evals):
+                result = comparer(compare_params_eval, student_eval, utils)
                 results.append(ItemGrader.standardize_cfn_return(result))
 
         if self.config['debug']:
