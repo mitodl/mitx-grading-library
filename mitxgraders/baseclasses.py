@@ -103,7 +103,7 @@ class ObjectWithSchema(object):
                 base.update(entry)
 
         # Report that modified defaults are being used
-        self.save_modified_defaults(config_dicts)
+        self.save_modified_defaults(base)
 
         # Apply the provided configuration
         base.update(config)
