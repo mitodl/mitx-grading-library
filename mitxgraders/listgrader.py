@@ -9,6 +9,7 @@ Both work by farming out the individual objects to other graders.
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
+import six
 import numpy as np
 from voluptuous import Required, Any
 from mitxgraders.helpers import munkres
@@ -704,6 +705,12 @@ class SingleListGrader(ItemGrader):
             if len(answer_list) != len(answers_tuple[0]):
                 raise ConfigError("All possible list answers must have the same length")
 
+        # Check for empty entries anywhere in answers_tuple (which can be a nested mess!)
+        # We do this before validating answer_list, as strings may be coerced into other
+        # objects by schema validation (e.g., FormulaGrader coerces expect into a dict)
+        if self.config['missing_error']:
+            demand_no_empty(answers_tuple)
+
         # Validate answer_list using the subgrader
         for answer_list in answers_tuple:
             for index, answer in enumerate(answer_list):
@@ -778,3 +785,32 @@ class SingleListGrader(ItemGrader):
 
         # Return the result
         return answers
+
+def demand_no_empty(obj):
+    """
+    Recursively search through all lists and tuples in obj.
+    Make sure that all strings are non-empty.
+    If we find a dictionary, if it has an 'expect' key that is a string, make sure
+    it is non-empty also.
+    """
+    if isinstance(obj, list) or isinstance(obj, tuple):
+        for item in obj:
+            demand_no_empty(item)
+    else:
+        test = obj
+        if isinstance(test, dict):
+            if 'expect' in test:
+                test = test['expect']
+            else:
+                return
+        if isinstance(test, six.string_types):
+            demand_nonempty_string(test)
+
+def demand_nonempty_string(text):
+    """Raise an error if text is empty"""
+    msg = ("There is a problem with the author's problem configuration: "
+           "Empty entry detected in answer list. Students receive an error "
+           "when supplying an empty entry. Set 'missing_error' to False in "
+           "order to allow such entries.")
+    if text.strip() == '':
+        raise ConfigError(msg)
