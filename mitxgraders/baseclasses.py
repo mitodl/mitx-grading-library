@@ -225,9 +225,10 @@ class AbstractGrader(ObjectWithSchema):
         Mutates result directly.
         """
         if attempt_number is None:
-            self.log("Attempt-based credit requested, but attempt number "
-                     "not passed through to grader")
-            return
+            msg = ("Attempt number not passed to grader as keyword argument 'attempt'. "
+                   'The attribute <code>cfn_extra_args="attempt"</code> may need to be '
+                   "set in the <code>customresponse</code> tag.")
+            raise ConfigError(msg)
         self.log("Attempt number {}".format(attempt_number))
 
         # How far past the point of decreasing credit are we?
@@ -254,13 +255,13 @@ class AbstractGrader(ObjectWithSchema):
                 if results_dict['grade_decimal'] > 0:
                     grade = results_dict['grade_decimal'] * credit
                     results_dict['grade_decimal'] = grade
-                    results_dict['ok'] = {0: False, 1: True}.get(grade, 'partial')
+                    results_dict['ok'] = self.grade_decimal_to_ok(grade)
                     changed_result = True
         else:
             if result['grade_decimal'] > 0:
                 grade = result['grade_decimal'] * credit
                 result['grade_decimal'] = grade
-                result['ok'] = {0: False, 1: True}.get(grade, 'partial')
+                result['ok'] = self.grade_decimal_to_ok(grade)
                 changed_result = True
 
         # Append the message if credit was reduced
@@ -273,6 +274,11 @@ class AbstractGrader(ObjectWithSchema):
             if result[key]:
                 result[key] += '\n\n'
             result[key] += msg.format(attempt_number, credit)
+
+    @staticmethod
+    def grade_decimal_to_ok(grade):
+        """Converts a grade decimal into an 'ok' value: True, False or 'partial'"""
+        return {0: False, 1: True}.get(grade, 'partial')
 
     @staticmethod
     def format_messages(result):
@@ -447,11 +453,6 @@ class ItemGrader(AbstractGrader):
         Usually this is a just a string.
         """
         return Schema(text_string)(expect)
-
-    @staticmethod
-    def grade_decimal_to_ok(grade):
-        """Converts a grade decimal into an 'ok' value: True, False or 'partial'"""
-        return {0: False, 1: True}.get(grade, 'partial')
 
     @staticmethod
     def standardize_cfn_return(value):

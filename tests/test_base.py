@@ -427,8 +427,9 @@ def test_attempt_based_grading_single():
     assert grader(None, 'dog', attempt=3) == expected_result
 
     # Ensure that messages are appended as appropriate
+    # Also test that reduced-value entries are affected by partial credit as expected
     grader = StringGrader(
-        answers={'expect': 'cat', 'msg': 'Meow!'},
+        answers={'expect': 'cat', 'msg': 'Meow!', 'grade_decimal': 0.5},
         attempt_based_credit=True,
         minimum_credit=0,
         decrease_credit_after=1,
@@ -437,12 +438,12 @@ def test_attempt_based_grading_single():
         wrong_msg='too bad'
     )
 
-    expected_result = {'msg': 'Meow!', 'grade_decimal': 1, 'ok': True}
+    expected_result = {'msg': 'Meow!', 'grade_decimal': 0.5, 'ok': 'partial'}
     assert grader(None, 'cat', attempt=1) == expected_result
     expected_result = {'msg': 'too bad', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'dog', attempt=1) == expected_result
 
-    expected_result = {'msg': 'Meow!<br/>\n<br/>\nMaximum credit for attempt #2 is 0.50.', 'grade_decimal': 0.5, 'ok': 'partial'}
+    expected_result = {'msg': 'Meow!<br/>\n<br/>\nMaximum credit for attempt #2 is 0.50.', 'grade_decimal': 0.25, 'ok': 'partial'}
     assert grader(None, 'cat', attempt=2) == expected_result
     expected_result = {'msg': 'too bad', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'dog', attempt=2) == expected_result
@@ -458,26 +459,11 @@ def test_attempt_based_grading_single():
         attempt_based_credit=True
     )
 
-    expected_result = {'msg': '', 'grade_decimal': 1, 'ok': True}
-    assert grader(None, 'cat') == expected_result
-
-    grader = StringGrader(
-        answers='cat',
-        attempt_based_credit=True,
-        debug=True
-    )
-
-    template = ("<pre>"
-                "MITx Grading Library Version {version}\n"
-                "{debug_content}\n"
-                "Attempt-based credit requested, but attempt number not passed through to grader"
-                "</pre>")
-    debug_content = "Student Response:\ncat"
-    msg = template.format(version=__version__,
-                          debug_content=debug_content
-                          ).replace("\n", "<br/>\n")
-    expected_result = {'msg': msg, 'grade_decimal': 1, 'ok': True}
-    assert grader(None, 'cat') == expected_result
+    msg = ("Attempt number not passed to grader as keyword argument 'attempt'. "
+           'The attribute <code>cfn_extra_args="attempt"</code> may need to be '
+           "set in the <code>customresponse</code> tag.")
+    with raises(ConfigError, match=msg):
+        assert grader(None, 'cat') == expected_result
 
     # Ensure that debug info is passed along
     grader = StringGrader(
