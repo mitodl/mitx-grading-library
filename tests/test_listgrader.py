@@ -878,3 +878,117 @@ def test_nested_debug():
     result = grader(None, ["1", "2"])['overall_message']
 
     assert result.count("FormulaGrader Debug Info<br/>") == 4
+
+def test_partial_credit():
+    # Or rather, lack thereof
+    grader = ListGrader(
+        answers=['cat', 'dog', 'unicorn'],
+        subgraders=StringGrader(),
+        partial_credit=False
+    )
+    submission = ['cat', 'fish', 'dog']
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': False, 'grade_decimal': 0, 'msg': ''}
+        ]
+    }
+    assert grader(None, submission) == expected_result
+
+def test_nested_partial_credit():
+    # Base case
+    grader = ListGrader(
+        answers=[
+            ['cat', 'dog'],
+            ['eagle', 'sparrow']
+        ],
+        grouping=[1, 1, 2, 2],
+        subgraders=ListGrader(
+            subgraders=StringGrader()
+        )
+    )
+    student_input = [
+        'eagle', 'bear',
+        'cat', 'dog'
+    ]
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'msg': '', 'grade_decimal': 1},
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+            {'ok': True, 'msg': '', 'grade_decimal': 1},
+            {'ok': True, 'msg': '', 'grade_decimal': 1},
+        ]
+    }
+    assert grader(None, student_input) == expected_result
+
+    # Partial credit off - innermost
+    grader = ListGrader(
+        answers=[
+            ['cat', 'dog'],
+            ['eagle', 'sparrow']
+        ],
+        grouping=[1, 1, 2, 2],
+        subgraders=ListGrader(
+            subgraders=StringGrader(),
+            partial_credit=False
+        )
+    )
+    student_input = [
+        'eagle', 'bear',
+        'cat', 'dog'
+    ]
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+            {'ok': True, 'msg': '', 'grade_decimal': 1},
+            {'ok': True, 'msg': '', 'grade_decimal': 1},
+        ]
+    }
+    assert grader(None, student_input) == expected_result
+
+    student_input = [
+        'eagle', 'dog',
+        'cat', 'sparrow'
+    ]
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+        ]
+    }
+    assert grader(None, student_input) == expected_result
+
+    # Partial credit off - outermost
+    grader = ListGrader(
+        answers=[
+            ['cat', 'dog'],
+            ['eagle', 'sparrow']
+        ],
+        grouping=[1, 1, 2, 2],
+        subgraders=ListGrader(
+            subgraders=StringGrader()
+        ),
+        partial_credit=False
+    )
+    student_input = [
+        'eagle', 'bear',
+        'cat', 'dog'
+    ]
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+            {'ok': False, 'msg': '', 'grade_decimal': 0},
+        ]
+    }
+    assert grader(None, student_input) == expected_result
