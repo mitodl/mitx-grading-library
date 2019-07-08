@@ -103,8 +103,6 @@ class MatrixGrader(FormulaGrader):
             Required('entry_partial_msg', default=MatrixEntryComparer.default_msg): text_string
         })
 
-    default_comparer = staticmethod(MatrixEntryComparer())
-
     @classmethod
     def get_default_comparer(cls, unvalidated_config):
         keys = ['entry_partial_credit', 'entry_partial_msg']
