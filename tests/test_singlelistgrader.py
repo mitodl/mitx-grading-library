@@ -388,19 +388,19 @@ def test_infer_expect():
         delimiter=';',
         debug=True
     )
-    assert grader.infer_answers('a,b;c,d') == [['a', 'b'], ['c', 'd']]
-    assert grader.infer_answers('a,b,c;d,e,f;g,h,i') == [['a', 'b', 'c'],
-                                                         ['d', 'e', 'f'],
-                                                         ['g', 'h', 'i']]
+    assert grader.infer_from_expect('a,b;c,d') == [['a', 'b'], ['c', 'd']]
+    assert grader.infer_from_expect('a,b,c;d,e,f;g,h,i') == [['a', 'b', 'c'],
+                                                             ['d', 'e', 'f'],
+                                                             ['g', 'h', 'i']]
     # Test that the grading process works
     assert grader('a,b;c,d', 'd,c;b,a')['ok']
     # Test that inferred answers show up in the debug log as expected
     msg = grader('a,b;c,d', 'a')['msg']
-    assert 'Answer inferred to be [["a", "b"], ["c", "d"]]' in msg
+    assert 'Expect value inferred to be [["a", "b"], ["c", "d"]]' in msg
     msg = grader('a,b', 'a')['msg']
-    assert 'Answer inferred to be [["a", "b"]]' in msg
+    assert 'Expect value inferred to be [["a", "b"]]' in msg
     msg = grader('a;b', 'a')['msg']
-    assert 'Answer inferred to be [["a"], ["b"]]' in msg
+    assert 'Expect value inferred to be [["a"], ["b"]]' in msg
 
     # Test heavy nesting
     grader = SingleListGrader(
@@ -413,5 +413,5 @@ def test_infer_expect():
         ),
         delimiter=';'
     )
-    assert grader.infer_answers('a-1-@,b-2;c-3,d-4') == [[['a', '1', '@'], ['b', '2']],
-                                                         [['c', '3'], ['d', '4']]]
+    assert grader.infer_from_expect('a-1-@,b-2;c-3,d-4') == [[['a', '1', '@'], ['b', '2']],
+                                                             [['c', '3'], ['d', '4']]]

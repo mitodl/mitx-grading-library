@@ -66,7 +66,7 @@ def test_debug_with_input_list():
     debug_content = "Student Responses:\ncat\nfish\ndog"
     msg = template.format(version=__version__,
                           debug_content=debug_content
-                         ).replace("\n", "<br/>\n")
+                          ).replace("\n", "<br/>\n")
     expected_result = {
         'overall_message': msg,
         'input_list': [
@@ -135,15 +135,15 @@ def test_itemgrader_infers_answers_from_expect():
     # answer, and that newly provided answers override the old ones.
     result = grader('cat', 'cat')
     assert result['ok']
-    assert 'Answer inferred to be "cat"' in result['msg']
+    assert 'Expect value inferred to be "cat"' in result['msg']
 
     result = grader(None, 'cat')
     assert result['ok']
-    assert 'Answer inferred to be "cat"' not in result['msg']
+    assert 'Expect value inferred to be "cat"' not in result['msg']
 
     result = grader('dog', 'dog')
     assert result['ok']
-    assert 'Answer inferred to be "dog"' in result['msg']
+    assert 'Expect value inferred to be "dog"' in result['msg']
 
 def test_single_expect_value_in_config():
     grader = StringGrader(

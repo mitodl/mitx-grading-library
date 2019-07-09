@@ -652,23 +652,23 @@ class ItemGrader(AbstractGrader):
         """
         The same as AbstractGrader.__call__, except that we try to infer
         answers from expect argument if answers are not specified in the
-        grader configuration. The actual inference is done by infer_answers,
+        grader configuration. The actual inference is done by infer_from_expect,
         which can be shadowed.
         """
         # If expect is provided, infer an answer if we either don't have an answer or
         # are always inferring answers
         if expect is not None and (self.inferring_answers or not self.config['answers']):
-            self.config['answers'] = self.infer_answers(expect)
+            inferred = self.infer_from_expect(expect)
 
             # Create the debug log...
             self.create_debuglog(student_input)
             # ... so that we can add the inferred answers to it before
             # calling AbstractGrader.__call__
-            output = json.dumps(self.config['answers'])  # How to avoid unicode 'u' showing up!
-            self.log("Answer inferred to be {}".format(output))
+            output = json.dumps(inferred)  # How to avoid unicode 'u' showing up!
+            self.log("Expect value inferred to be {}".format(output))
 
             # Validate the answers
-            self.config['answers'] = self.schema_answers(self.config['answers'])
+            self.config['answers'] = self.schema_answers(inferred)
             # Note that this answer is now stored for future calls, but
             # will be overridden if a new expect value is provided.
 
@@ -678,13 +678,13 @@ class ItemGrader(AbstractGrader):
         # And punt the actual __call__ function to the superclass
         return super(ItemGrader, self).__call__(expect, student_input, **kwargs)
 
-    def infer_answers(self, expect):
+    def infer_from_expect(self, expect):
         """
-        Infer answer from the expect parameter and return it. For most purposes,
+        Infer the answer from the expect parameter and return it. For most purposes,
         the answer is just the expect parameter. However, this can be shadowed if need be.
 
-        If you create a grader that cannot infer answers, shadow this function, and simply
-        raise ConfigError('Answer cannot be inferred for this grader')
+        If you create a grader that cannot infer from expect, shadow this function, and
+        simply raise ConfigError('Answer cannot be inferred for this grader')
         """
         return expect
 

@@ -740,12 +740,12 @@ class SingleListGrader(ItemGrader):
 
         return result
 
-    def infer_answers(self, expect):
+    def infer_from_expect(self, expect):
         """
         Infer answers from the expect parameter, following nested SingleListGrader
         chains through recursion. Returns the resulting answers key.
 
-        Shadows the ItemGrader infer_answers function.
+        Shadows the ItemGrader infer_from_expect function.
 
         For example, we want to turn
         'a, b; c, d' -> [['a', 'b'], ['c', 'd']]
@@ -757,7 +757,7 @@ class SingleListGrader(ItemGrader):
         # If the subgrader is also a SingleListGrader, recurse on each element of answers
         if isinstance(self.config['subgrader'], SingleListGrader):
             for idx, entry in enumerate(answers):
-                answers[idx] = self.config['subgrader'].infer_answers(entry)
+                answers[idx] = self.config['subgrader'].infer_from_expect(entry)
 
         # Return the result
         return answers
