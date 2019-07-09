@@ -467,6 +467,13 @@ class ItemGrader(AbstractGrader):
             answer that received a grade of 0 (default "")
     """
 
+    def __init__(self, config=None, **kwargs):
+        """
+        Validate the ItemGrader's configuration, then call post-schema validation.
+        """
+        super(ItemGrader, self).__init__(config, **kwargs)
+        self.config['answers'] = self.post_schema_validation(self.config['answers'])
+
     @property
     def schema_config(self):
         """
@@ -494,6 +501,21 @@ class ItemGrader(AbstractGrader):
             answer_tuple = (answer_tuple,)
         schema = Schema((self.validate_single_answer,))
         return schema(answer_tuple)
+
+    def post_schema_validation(self, answer_tuple):
+        """
+        Perform any post-schema validation on the answer tuple. This function should be
+        idempotent, as it may be called on a configuration multiple times.
+
+        Any post-schema validation that doesn't work with the answer tuple should be
+        handled in a shadowed __init__ function. The reason this function is invoked
+        separately is so that it can also be called on inferred answers.
+
+        Returns the validated answer_tuple.
+
+        This function exists to be shadowed.
+        """
+        return answer_tuple
 
     def validate_single_answer(self, answer):
         """
@@ -675,6 +697,9 @@ class ItemGrader(AbstractGrader):
             self.config['answers'] = self.schema_answers(inferred)
             # Note that this answer is now stored for future calls, but
             # will be overridden if a new expect value is provided.
+
+            # Perform post-schema validation
+            self.config['answers'] = self.post_schema_validation(self.config['answers'])
 
             # Mark that we are using inferred answers
             self.inferring_answers = True
