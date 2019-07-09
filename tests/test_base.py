@@ -595,7 +595,7 @@ def test_registered_defaults():
 Student Response:<br/>
 cat<br/>
 Using modified defaults: {{"debug": true}}<br/>
-Answer inferred to be "cat"</pre>""".format(__version__)
+Expect value inferred to be "cat"</pre>""".format(__version__)
     assert result['msg'] == expect
     StringGrader.clear_registered_defaults()
 
