@@ -3,7 +3,7 @@ from __future__ import print_function, division, absolute_import
 from pytest import raises
 from mitxgraders.version import __version__
 from mitxgraders import CalcError
-from mitxgraders.plugins.integralgrader import IntegralGrader, IntegrationError
+from mitxgraders.formulagrader.integralgrader import IntegralGrader, IntegrationError
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.helpers.compatibility import UNICODE_PREFIX
 from tests.helpers import round_decimals_in_string
