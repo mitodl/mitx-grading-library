@@ -15,7 +15,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from mitxgraders.stringgrader import StringGrader
 from mitxgraders.baseclasses import AbstractGrader, ItemGrader
 from mitxgraders.listgrader import ListGrader, SingleListGrader
-from mitxgraders.plugins.integralgrader import IntegralGrader
+from mitxgraders.formulagrader.integralgrader import IntegralGrader
 from mitxgraders.formulagrader.formulagrader import FormulaGrader, NumericalGrader
 from mitxgraders.formulagrader.matrixgrader import MatrixGrader
 

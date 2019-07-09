@@ -24,9 +24,14 @@ from mitxgraders.formulagrader.matrixgrader import (
     MatrixGrader,
 )
 
+from mitxgraders.formulagrader.integralgrader import (
+    IntegralGrader,
+)
+
 # Set the objects to be *-imported from package
 __all__ = [
     "NumericalGrader",
     "FormulaGrader",
-    "MatrixGrader"
+    "MatrixGrader",
+    "IntegralGrader"
 ]
