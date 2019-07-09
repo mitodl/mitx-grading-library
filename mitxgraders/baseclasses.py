@@ -218,6 +218,10 @@ class AbstractGrader(ObjectWithSchema):
             self.log("Student Responses:\n" + "\n".join(map(six.text_type, student_input)))
         else:
             self.log("Student Response:\n" + six.text_type(student_input))
+        # Add in the modified defaults
+        if self.modified_defaults:
+            output = json.dumps(self.modified_defaults)
+            self.log("Using modified defaults: {}".format(output))
         self.log_created = True
 
     def __call__(self, expect, student_input, **kwargs):

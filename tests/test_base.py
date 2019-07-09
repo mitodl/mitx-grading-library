@@ -587,6 +587,18 @@ def test_registered_defaults():
     assert grader.config['debug']
     StringGrader.clear_registered_defaults()
 
+    # Check that registered defaults are logged in the debug log
+    StringGrader.register_defaults({'debug': True})
+    grader = StringGrader()
+    result = grader('cat', 'cat')
+    expect = """<pre>MITx Grading Library Version {}<br/>
+Student Response:<br/>
+cat<br/>
+Using modified defaults: {{"debug": true}}<br/>
+Expect value inferred to be "cat"</pre>""".format(__version__)
+    assert result['msg'] == expect
+    StringGrader.clear_registered_defaults()
+
 def test_debuglog_persistence():
     # Or rather, lack thereof
     grader = StringGrader(debug=True)
