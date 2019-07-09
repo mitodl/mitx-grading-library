@@ -280,26 +280,27 @@ class ListGrader(AbstractGrader):
 
             # Validate answer_list using the subgraders
             for answer_list in answers_tuple:
-                for index, answer in enumerate(answer_list):
+                for idx, answer in enumerate(answer_list):
                     # Run the answers through the subgrader schema and the post-schema validation
-                    answer_list[index] = subgraders[index].schema_answers(answer)
-                    answer_list[index] = subgraders[index].post_schema_validation(answer_list[index])
+                    answer_list[idx] = subgraders[idx].schema_answers(answer)
+                    answer_list[idx] = subgraders[idx].post_schema_validation(answer_list[idx])
         else:
             # We have a single subgrader
             subgrader = self.config['subgraders']
 
             # Validate answer_list using the subgraders
             for answer_list in answers_tuple:
-                for index, answer in enumerate(answer_list):
+                for idx, answer in enumerate(answer_list):
                     # Run the answers through the subgrader schema and the post-schema validation
-                    answer_list[index] = subgrader.schema_answers(answer)
-                    answer_list[index] = subgrader.post_schema_validation(answer_list[index])
+                    answer_list[idx] = subgrader.schema_answers(answer)
+                    answer_list[idx] = subgrader.post_schema_validation(answer_list[idx])
 
         return answers_tuple
 
     def post_schema_validation(self, answer_tuple):
         """
-        Included because ListGrader is not an ItemGrader
+        This function is used by ItemGraders for answer validation.
+        It's included here because it may be called for nested ListGraders.
         """
         return answer_tuple
 

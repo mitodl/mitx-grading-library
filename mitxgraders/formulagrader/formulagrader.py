@@ -575,7 +575,7 @@ class FormulaGrader(ItemGrader):
         """
         super(FormulaGrader, self).__init__(config, **kwargs)
 
-        # Finish validating
+        # finish validating
         validate_blacklist_whitelist_config(self.default_functions,
                                             self.config['blacklist'],
                                             self.config['whitelist'])
@@ -590,7 +590,7 @@ class FormulaGrader(ItemGrader):
                                                            self.config['blacklist'],
                                                            self.config['user_functions'])
 
-        # Store the comparer utils
+        # store the comparer utils
         self.comparer_utils = self.get_comparer_utils()
 
         # Set up the various lists we use

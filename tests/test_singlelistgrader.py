@@ -478,3 +478,41 @@ def test_empty_entry_in_answers():
         missing_error=False
     )
     grader('a,,b', 'a, b, c')
+
+def test_answer_validation():
+    grader = SingleListGrader(
+        subgrader=StringGrader(),
+        answers=['a', 'b']
+    )
+    assert grader.config['answers'] == (
+        {
+            'expect': [
+                ({'expect': 'a', 'msg': '', 'grade_decimal': 1, 'ok': True}, ),
+                ({'expect': 'b', 'msg': '', 'grade_decimal': 1, 'ok': True}, )
+            ],
+            'grade_decimal': 1,
+            'msg': '',
+            'ok': True
+        },
+    )
+
+def test_overall_grade_msg():
+    grader = SingleListGrader(
+        subgrader=StringGrader(),
+        answers={'expect': ['a', 'b'], 'msg': 'Yay', 'grade_decimal': 0.5}
+    )
+    assert grader(None, 'a, b')['grade_decimal'] == 0.5
+    assert grader(None, 'a, b')['msg'] == 'Yay'
+    assert grader(None, 'a, c')['grade_decimal'] == 0.25
+    assert grader(None, 'a, c')['msg'] == ''
+
+    grader = SingleListGrader(
+        subgrader=StringGrader(),
+        answers={'expect': [{'expect': 'a', 'msg': 'a msg'},
+                            {'expect': 'b', 'msg': 'b msg'}],
+                 'msg': 'Yay', 'grade_decimal': 0.5}
+    )
+    assert grader(None, 'a, b')['grade_decimal'] == 0.5
+    assert grader(None, 'a, b')['msg'] == 'a msg<br/>\nb msg<br/>\nYay'
+    assert grader(None, 'a, c')['grade_decimal'] == 0.25
+    assert grader(None, 'a, c')['msg'] == 'a msg'
