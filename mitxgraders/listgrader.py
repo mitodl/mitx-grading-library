@@ -44,7 +44,6 @@ def find_optimal_order(check, answers, student_list):
     """
     result_matrix = [[check(a, i) for a in answers] for i in student_list]
 
-
     def calculate_cost(result):
         """
         The result matrix could contain short-form or long-form result dictionaries.
@@ -195,6 +194,11 @@ class ListGrader(AbstractGrader):
             if multiple "correct lists" are available. Each individual answer must conform
             to the appropriate answer schema for the subgrader. The default is [], as an
             empty list is allowable if SingleListGrader is being used as a subgrader.
+
+        partial_credit (bool): Whether to assign partial credit when not all list entries
+            are correct. If setting to False, we strongly recommend informing students of
+            this choice, so that they are not confused when all input boxes are graded
+            incorrect even though x/y of them are correct. (default True)
     """
 
     @property
@@ -205,6 +209,7 @@ class ListGrader(AbstractGrader):
         # Append options
         return schema.extend({
             Required('ordered', default=False): bool,
+            Required('partial_credit', default=True): bool,
             Required('subgraders'): Any(AbstractGrader, [AbstractGrader]),
             Required('grouping', default=[]): [Positive(int)],
             Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
@@ -372,8 +377,20 @@ class ListGrader(AbstractGrader):
         else:
             self.config['subgraders'].debuglog = self.debuglog
 
+        # Perform the check against each possible list of answers and select the best
+        # result for the student
         results = [self.perform_check(answer_list, student_input) for answer_list in answers]
-        return self.get_best_result(results)
+        best_result = self.get_best_result(results)
+
+        # If no partial credit is to be awarded, zero out all scores if not perfect
+        if not self.config['partial_credit']:
+            perfect = all(entry['ok'] is True for entry in best_result['input_list'])
+            if not perfect:
+                for entry in best_result['input_list']:
+                    entry['ok'] = False
+                    entry['grade_decimal'] = 0
+
+        return best_result
 
     @staticmethod
     def groupify_list(grouping, thelist):
