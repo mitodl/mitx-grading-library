@@ -48,7 +48,7 @@ def test_debug_without_author_message():
     debug_content = "Student Response:\nhorse"
     msg = template.format(version=__version__,
                           debug_content=debug_content
-                         ).replace("\n", "<br/>\n")
+                          ).replace("\n", "<br/>\n")
     expected_result = {'msg': msg, 'grade_decimal': 0, 'ok': False}
     assert grader(None, student_response) == expected_result
 
@@ -66,7 +66,7 @@ def test_debug_with_input_list():
     debug_content = "Student Responses:\ncat\nfish\ndog"
     msg = template.format(version=__version__,
                           debug_content=debug_content
-                         ).replace("\n", "<br/>\n")
+                          ).replace("\n", "<br/>\n")
     expected_result = {
         'overall_message': msg,
         'input_list': [
@@ -124,12 +124,26 @@ def test_itemgrader():
     assert not grader(None, "3")['ok']
 
 def test_itemgrader_infers_answers_from_expect():
-    grader = StringGrader()
+    grader = StringGrader(debug=True)
     expect = 'cat'
     student_input_1 = 'cat'
     student_input_2 = 'dog'
     assert grader(expect, student_input_1)['ok']
     assert not grader(expect, student_input_2)['ok']
+
+    # Test that once an answer is inferred, subsequent calls to the grader remember that
+    # answer, and that newly provided answers override the old ones.
+    result = grader('cat', 'cat')
+    assert result['ok']
+    assert 'Expect value inferred to be "cat"' in result['msg']
+
+    result = grader(None, 'cat')
+    assert result['ok']
+    assert 'Expect value inferred to be "cat"' not in result['msg']
+
+    result = grader('dog', 'dog')
+    assert result['ok']
+    assert 'Expect value inferred to be "dog"' in result['msg']
 
 def test_single_expect_value_in_config():
     grader = StringGrader(
@@ -572,3 +586,12 @@ def test_registered_defaults():
     grader = StringGrader()
     assert grader.config['debug']
     StringGrader.clear_registered_defaults()
+
+def test_debuglog_persistence():
+    # Or rather, lack thereof
+    grader = StringGrader(debug=True)
+    grader('cat', 'cat')
+    log1 = grader.debuglog
+    grader('cat', 'cat')
+    # Demand that the debug logs are different objects
+    assert log1 is not grader.debuglog
