@@ -5,7 +5,7 @@ from __future__ import print_function, division, absolute_import
 
 import pprint
 from pytest import approx, raises
-from mitxgraders import ConfigError, StringGrader, SingleListGrader
+from mitxgraders import ConfigError, StringGrader, SingleListGrader, FormulaGrader, congruence_comparer
 from mitxgraders.exceptions import MissingInput
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -415,3 +415,66 @@ def test_infer_expect():
     )
     assert grader.infer_from_expect('a-1-@,b-2;c-3,d-4') == [[['a', '1', '@'], ['b', '2']],
                                                              [['c', '3'], ['d', '4']]]
+
+def test_empty_entry_in_answers():
+    msg = ("There is a problem with the author's problem configuration: "
+           "Empty entry detected in answer list. Students receive an error "
+           "when supplying an empty entry. Set 'missing_error' to False in "
+           "order to allow such entries.")
+    # Test base case
+    with raises(ConfigError, match=msg):
+        grader = SingleListGrader(
+            answers=['a', 'b', ' ', 'c'],
+            subgrader=StringGrader()
+        )
+
+    # Test case with dictionary
+    with raises(ConfigError, match=msg):
+        grader = SingleListGrader(
+            answers=['a', 'b', {'expect': ' '}, 'c'],
+            subgrader=StringGrader()
+        )
+
+    # Test case with unusual expect values
+    with raises(ConfigError, match=msg):
+        grader = SingleListGrader(
+            answers=['a',
+                     'b',
+                     {'comparer': congruence_comparer, 'comparer_params': ['b^2/a', '2*pi']},
+                     ''],
+            subgrader=FormulaGrader()
+        )
+
+    # Test case with really unusual expect values
+    with raises(ConfigError, match=msg):
+        grader = SingleListGrader(
+            answers=['a',
+                     'b',
+                     {
+                         'expect': {
+                             'comparer': congruence_comparer,
+                             'comparer_params': ['b^2/a', '2*pi']
+                         },
+                         'msg': 'Well done!'
+                     },
+                     ''],
+            subgrader=FormulaGrader()
+        )
+
+    # Test nested case
+    with raises(ConfigError, match=msg):
+        grader = SingleListGrader(
+            answers=[['a', 'b'], ['c', '']],
+            subgrader=SingleListGrader(
+                subgrader=StringGrader(),
+                delimiter=';'
+            )
+        )
+
+    # Test case with no error
+    grader = SingleListGrader(
+        answers=['a', 'b', ' ', 'c'],
+        subgrader=StringGrader(),
+        missing_error=False
+    )
+    grader('a,,b', 'a, b, c')
