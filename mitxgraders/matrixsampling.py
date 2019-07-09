@@ -17,6 +17,13 @@ All of these classes perform random sampling. To obtain a sample, use class.gen_
 from __future__ import print_function, division, absolute_import, unicode_literals
 import numpy as np
 
+from voluptuous import Schema, Required, All, Coerce, Any, Range
+
+from mitxgraders.exceptions import ConfigError
+from mitxgraders.sampling import VariableSamplingSet, RealInterval, ScalarSamplingSet
+from mitxgraders.helpers.validatorfuncs import NumberRange, is_shape_specification
+from mitxgraders.helpers.calc import MathArray
+
 class Unavailable(object):
     def rvs(self, dimension):
         raise NotImplementedError('This feature requires newer versions of numpy '
@@ -28,13 +35,6 @@ except ImportError:
     ortho_group = Unavailable()
     special_ortho_group = Unavailable()
     unitary_group = Unavailable()
-
-from voluptuous import Schema, Required, All, Coerce, Any, Range
-
-from mitxgraders.exceptions import ConfigError
-from mitxgraders.sampling import VariableSamplingSet, RealInterval, ScalarSamplingSet
-from mitxgraders.helpers.validatorfuncs import NumberRange, is_shape_specification
-from mitxgraders.helpers.calc import MathArray
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -557,7 +557,7 @@ class SquareMatrices(SquareMatrixSamplingSet):
     False
     >>> within_tolerance(mat.trace(), 0, 5e-13)         # Traceless
     True
-    >>> within_tolerance(np.linalg.det(mat), 1, 5e-13)  # Unit determinant
+    >>> within_tolerance(np.linalg.det(mat), 1, 1e-12)  # Unit determinant
     True
 
     More combinations: symmetric, real, zero determinant and norm in [6, 10]
@@ -567,7 +567,7 @@ class SquareMatrices(SquareMatrixSamplingSet):
     True
     >>> np.array_equal(mat, np.conj(mat))               # Real
     True
-    >>> within_tolerance(np.linalg.det(mat), 0, 5e-13)  # Zero determinant
+    >>> within_tolerance(np.linalg.det(mat), 0, 1e-12)  # Zero determinant
     True
     >>> 6 <= np.linalg.norm(mat) <= 10                  # Norm in [6, 10]
     True
@@ -585,7 +585,7 @@ class SquareMatrices(SquareMatrixSamplingSet):
     >>> mat = matrices.gen_sample()
     >>> np.array_equal(mat, np.conj(mat.T))             # Hermitian
     True
-    >>> within_tolerance(np.linalg.det(mat), 0, 5e-13)  # Zero determinant
+    >>> within_tolerance(np.linalg.det(mat), 0, 1e-12)  # Zero determinant
     True
     >>> 6 <= np.linalg.norm(mat) <= 10                  # Norm in [6, 10]
     True
@@ -595,7 +595,7 @@ class SquareMatrices(SquareMatrixSamplingSet):
     >>> mat = matrices.gen_sample()
     >>> np.array_equal(mat, -np.conj(mat.T))            # Antihermitian
     True
-    >>> within_tolerance(np.linalg.det(mat), 1, 5e-13)  # Unit determinant
+    >>> within_tolerance(np.linalg.det(mat), 1, 1e-12)  # Unit determinant
     True
     >>> within_tolerance(mat.trace(), 0, 5e-13)         # Traceless
     True

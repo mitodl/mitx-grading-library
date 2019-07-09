@@ -285,7 +285,9 @@ def test_square_matrices():
 
             # Norm
             if det != 1:
-                assert norm[0] <= np.linalg.norm(m) <= norm[1]
+                computed_norm = np.linalg.norm(m)
+                assert norm[0] <= computed_norm or abs(computed_norm - norm[0]) < 1e-12
+                assert computed_norm <= norm[1] or abs(computed_norm - norm[1]) < 1e-12
 
             # Complex
             if not comp:
@@ -297,9 +299,9 @@ def test_square_matrices():
 
             # Determinant
             if det == 0:
-                assert within_tolerance(np.abs(np.linalg.det(m)), 0, 5e-13)
+                assert within_tolerance(np.abs(np.linalg.det(m)), 0, 1e-12)
             elif det == 1:
-                assert within_tolerance(np.abs(np.linalg.det(m)), 1, 5e-13)
+                assert within_tolerance(np.abs(np.linalg.det(m)), 1, 1e-12)
 
             # Symmetries
             if symmetry == 'diagonal':
