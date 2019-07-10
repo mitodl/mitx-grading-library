@@ -59,7 +59,15 @@ from mitxgraders.exceptions import InputTypeError, StudentFacingError
 from mitxgraders.helpers.validatorfuncs import is_callable, Nullable, text_string
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 from mitxgraders.helpers.calc.math_array import are_same_length_vectors, is_vector
-from mitxgraders.comparers.baseclasses import Comparer
+from mitxgraders.comparers.baseclasses import Comparer, CorrelatedComparer
+
+def identity_transform(x):
+    """
+    Returns the input.
+
+    Note: used instead of lambdas because it prints a nice name.
+    """
+    return x
 
 class EqualityComparer(Comparer):
     """
@@ -120,7 +128,11 @@ class EqualityComparer(Comparer):
 
     """
     schema_config = Schema({
-        Required('transform', default=None): Nullable(is_callable)
+        Required('transform', default=None): All(
+            Nullable(is_callable),
+            # if f is None, coerce to identity function
+            lambda f: identity_transform if f is None else f
+        )
     })
 
     @staticmethod
@@ -130,23 +142,19 @@ class EqualityComparer(Comparer):
             shape = tuple() if isinstance(expected_eval, Number) else expected_eval.shape
             utils.validate_shape(student_eval, shape)
 
-    def transform(self, evaluation):
-        f = self.config['transform']
-        return evaluation if f is None else f(evaluation)
-
-
     def __call__(self, comparer_params_eval, student_eval, utils):
         expected_eval = comparer_params_eval[0]
         self.validate(expected_eval, student_eval, utils)
 
-        expected_eval = self.transform(expected_eval)
-        student_eval = self.transform(student_eval)
+        transform = self.config['transform']
+        expected_eval = transform(expected_eval)
+        student_eval = transform(student_eval)
 
         return utils.within_tolerance(expected_eval, student_eval)
 
 equality_comparer = EqualityComparer()
 
-class MatrixEntryComparer(EqualityComparer):
+class MatrixEntryComparer(CorrelatedComparer):
     """
     Default comparer for MatrixGrader. Compares student and instructor matrix
     evaluations entry-by-entry for equality.
@@ -186,20 +194,27 @@ class MatrixEntryComparer(EqualityComparer):
         locs_as_str = ", ".join(map(six.text_type, locs+1))
         return format_string.format(error_indices=locs_as_str)
 
-    def __call__(self, comparer_params_eval, student_eval, utils):
-        expected_eval = comparer_params_eval[0]
-        self.validate(expected_eval, student_eval, utils)
+    @staticmethod
+    def validate(expected_evals, student_evals, utils):
+        for x, y in zip(expected_evals, student_evals):
+            EqualityComparer.validate(x, y, utils)
 
-        num_entries = expected_eval.size
+    def __call__(self, comparer_params_evals, student_evals, utils):
+        expected_evals = [params[0] for params in comparer_params_evals]
+        self.validate(expected_evals, student_evals, utils)
 
-        expected_eval = self.transform(expected_eval)
-        student_eval = self.transform(student_eval)
-
+        transform = self.config['transform']
+        expected_evals = [transform(x) for x in expected_evals]
+        student_evals = [transform(x) for x in student_evals]
         vec_within_tol = np.vectorize(utils.within_tolerance)
-        # compared_items is a boolean array of entry-by-entry comparisons
-        compared_items = vec_within_tol(expected_eval, student_eval)
-        percent_correct = np.sum(compared_items).item()/num_entries
-        wrong_locs = np.argwhere(np.logical_not(compared_items))
+        # comparisons_by_eval is a boolean array of entry-by-entry comparisons,
+        # one for each comparison. Its numpy shape is (n_evals, *eval_shape)
+        comparisons_by_eval = vec_within_tol(expected_evals, student_evals)
+        comparisons_summary = np.all(comparisons_by_eval, axis=0)
+
+        num_entries = comparisons_summary.size
+        percent_correct = np.sum(comparisons_summary).item()/num_entries
+        wrong_locs = np.argwhere(np.logical_not(comparisons_summary))
         msg = self.format_message_with_locations(self.config['entry_partial_msg'], wrong_locs)
         partial_credit = self.config['entry_partial_credit']
 
