@@ -96,20 +96,20 @@ class MatrixGrader(FormulaGrader):
             Required('entry_partial_msg', default=MatrixEntryComparer.default_msg): text_string
         })
 
-    @classmethod
-    def get_default_comparer(cls, unvalidated_config):
-        keys = ['entry_partial_credit', 'entry_partial_msg']
+    @staticmethod
+    def get_entry_comparer_config(unvalidated_config):
+        keys = ('entry_partial_credit', 'entry_partial_msg')
         comparer_config = {key: unvalidated_config[key]
                            for key in keys if key in unvalidated_config}
-        if comparer_config:
-            return MatrixEntryComparer(comparer_config)
-        return cls.default_comparer
+        return comparer_config
 
     def __init__(self, config=None, **kwargs):
-        # Set default_comparer on as an instance property
-        # This will be used by schema_config during validation to set defaults
+        # Set default_comparer on as an instance property if entry_parial keys
+        # are provided
         unvalidated_config = config if config is not None else kwargs
-        self.default_comparer = self.get_default_comparer(unvalidated_config)
+        entry_comparer_config = self.get_entry_comparer_config(unvalidated_config)
+        if entry_comparer_config:
+            self.default_comparer = MatrixEntryComparer(entry_comparer_config)
 
         super(MatrixGrader, self).__init__(config, **kwargs)
 
