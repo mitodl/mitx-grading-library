@@ -175,7 +175,7 @@ class MatrixEntryComparer(CorrelatedComparer):
             which will be replaced with the indices of the incorrect matrix entries.
     """
 
-    default_msg = "Some matrix entries are incorrect, marked below: \n {error_locations}"
+    default_msg = "Some matrix entries are incorrect, marked below:\n{error_locations}"
     schema_config = EqualityComparer.schema_config.extend({
         Required('entry_partial_credit', default=0): Any(All(Number, Range(0, 1)), 'proportional'),
         Required('entry_partial_msg', default=default_msg): text_string
@@ -191,11 +191,13 @@ class MatrixEntryComparer(CorrelatedComparer):
             format_string: a string that may contain {error_locations} formatting key.
             locs: a boolean error with False values indicating errors
         """
+        # Not the most elegant way to do these replacements, but this was what
+        # I came up with the minimize the amount of extra u prefixes in Python 2
         bad_str = '\u2717'
         good_str = '\u2713'
-        entries_to_strings = np.vectorize(lambda entry: good_str if entry else bad_str)
-        locs_as_str = six.text_type(entries_to_strings(locs)).replace("'",'')
-        return format_string.format(error_locations=locs_as_str)
+        matrix_as_text = six.text_type(locs).replace("  ", " ").replace("[ ", "[")
+        matrix_as_text = matrix_as_text.replace("True", good_str).replace("False", bad_str)
+        return format_string.format(error_locations=matrix_as_text)
 
     @staticmethod
     def validate(expected_evals, student_evals, utils):
@@ -220,10 +222,10 @@ class MatrixEntryComparer(CorrelatedComparer):
         msg = self.format_message_with_locations(self.config['entry_partial_msg'], comparisons_summary)
         partial_credit = self.config['entry_partial_credit']
 
-        if percent_correct == 0:
-            return False
-        elif percent_correct == 1:
+        if percent_correct == 1:
             return True
+        elif percent_correct == 0:
+            return {'ok': False, 'grade_decimal': 0, 'msg': msg}
         elif partial_credit == 'proportional':
             return {'ok': 'partial', 'grade_decimal': percent_correct, 'msg': msg}
         else:
