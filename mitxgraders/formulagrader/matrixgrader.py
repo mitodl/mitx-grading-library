@@ -8,7 +8,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from numbers import Number
 from collections import namedtuple
 import six
-from voluptuous import Required, Any, Range, All
+from voluptuous import Required, Any, Range, All, Optional
 from mitxgraders.exceptions import InputTypeError
 from mitxgraders.comparers import MatrixEntryComparer
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
@@ -68,8 +68,8 @@ class MatrixGrader(FormulaGrader):
             entry_partial_msg
         of MatrixEntryComparer can be passed directly to MatrixGrader to facilitate
         partial credit without the explicit use of comparers. If either key
-        is provided a non-default value, MatrixEntryComparer is used as the default
-        comparer for that MatrixGrader instance with the given key values.
+        is included, MatrixEntryComparer is used as the default comparer for
+        that MatrixGrader instance with the given key values.
     """
 
     # merge_dicts does not mutate the originals
@@ -92,8 +92,8 @@ class MatrixGrader(FormulaGrader):
                 Required('is_raised', default=True): bool,
                 Required('msg_detail', default='type'): Any(None, 'type', 'shape')
             },
-            Required('entry_partial_credit', default=0): Any(All(Number, Range(0, 1)), 'proportional'),
-            Required('entry_partial_msg', default=MatrixEntryComparer.default_msg): text_string
+            Optional('entry_partial_credit'): Any(All(Number, Range(0, 1)), 'proportional'),
+            Optional('entry_partial_msg'): text_string
         })
 
     @staticmethod
