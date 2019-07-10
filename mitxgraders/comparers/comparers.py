@@ -175,7 +175,7 @@ class MatrixEntryComparer(CorrelatedComparer):
             which will be replaced with the indices of the incorrect matrix entries.
     """
 
-    default_msg = "Matrix entries at indices {error_indices} are incorrect."
+    default_msg = "Some matrix entries are incorrect, marked below: \n {error_locations}"
     schema_config = EqualityComparer.schema_config.extend({
         Required('entry_partial_credit', default=0): Any(All(Number, Range(0, 1)), 'proportional'),
         Required('entry_partial_msg', default=default_msg): text_string
@@ -184,15 +184,18 @@ class MatrixEntryComparer(CorrelatedComparer):
     @staticmethod
     def format_message_with_locations(format_string, locs):
         """
-        Returns format_string with {error_indices} replaced by 1-indexed error
+        Returns format_string with {error_locations} replaced by 1-indexed error
         locations.
 
         Arguments:
-            format_string: a string that may contain {error_indices} formatting key.
-            locs: a 0-indexed numpy array of error locations
+            format_string: a string that may contain {error_locations} formatting key.
+            locs: a boolean error with False values indicating errors
         """
-        locs_as_str = ", ".join(map(six.text_type, locs+1))
-        return format_string.format(error_indices=locs_as_str)
+        bad_str = '\u2717'
+        good_str = '\u2713'
+        entries_to_strings = np.vectorize(lambda entry: good_str if entry else bad_str)
+        locs_as_str = six.text_type(entries_to_strings(locs)).replace("'",'')
+        return format_string.format(error_locations=locs_as_str)
 
     @staticmethod
     def validate(expected_evals, student_evals, utils):
@@ -214,8 +217,7 @@ class MatrixEntryComparer(CorrelatedComparer):
 
         num_entries = comparisons_summary.size
         percent_correct = np.sum(comparisons_summary).item()/num_entries
-        wrong_locs = np.argwhere(np.logical_not(comparisons_summary))
-        msg = self.format_message_with_locations(self.config['entry_partial_msg'], wrong_locs)
+        msg = self.format_message_with_locations(self.config['entry_partial_msg'], comparisons_summary)
         partial_credit = self.config['entry_partial_credit']
 
         if percent_correct == 0:
