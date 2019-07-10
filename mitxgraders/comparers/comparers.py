@@ -173,6 +173,8 @@ class MatrixEntryComparer(CorrelatedComparer):
         entry_partial_msg (str): A text string message shown when partial credit
             is awarded. The string may optionally contain the formatting key {error_indices},
             which will be replaced with the indices of the incorrect matrix entries.
+            Default value is:
+            "Some matrix entries are incorrect, marked below:\n{error_locations}"
     """
 
     default_msg = "Some matrix entries are incorrect, marked below:\n{error_locations}"
