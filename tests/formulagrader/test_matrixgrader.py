@@ -1,6 +1,7 @@
 from __future__ import print_function, division, absolute_import
 
 import re
+import six
 from pytest import raises
 from mitxgraders import (MatrixGrader, RealMatrices, RealVectors, ComplexRectangle)
 from mitxgraders.formulagrader.matrixgrader import InputTypeError
@@ -264,3 +265,159 @@ def test_suppress_matrix_messages():
     # Note that we haven't suppressed all errors:
     with raises(ArgumentError):
         grader(None, 'sin(1, 2)')
+
+def test_default_grader_instance_override():
+    grader_0 = MatrixGrader()
+    grader_1 = MatrixGrader(entry_partial_credit='proportional')
+    grader_2 = MatrixGrader()
+
+    # not the same grader...
+    assert grader_0 is not grader_2
+    # but should use the exact same comparer function, class default
+    assert grader_0.default_comparer is grader_2.default_comparer
+    # but grader_1 should use an instance-specific default_comparer
+    assert grader_0.default_comparer is not grader_1.default_comparer
+
+BAD = six.u('<span style="color:#b20610">\u2717</span>')
+GOOD = six.u('<span style="color:#008100">\u2713</span>')
+
+def test_entry_partial_proportional_credit_grading():
+    grader = MatrixGrader(
+        max_array_dim=2,
+        answers='[[0, 1, 2], [x, y, z]]',
+        variables=['x', 'y', 'z'],
+        entry_partial_credit='proportional'
+    )
+    expected = {
+        'ok': 'partial',
+        'msg': six.u(
+            'Some matrix entries are incorrect, marked below:<br/>\n'
+            '<pre>'
+            '[[{g} {b} {b}]<br/>'
+            ' [{b} {b} {g}]]'
+            '</pre>'
+        ).format(g=GOOD, b=BAD),
+        'grade_decimal': 2/6
+    }
+    assert grader(None, '[[0, 10, 20*z], [x/2, y^2, z]]') == expected
+    assert grader(None, '[[0, 1, 2], [x, y, z]]') == {
+        'ok': True,
+        'msg': '',
+        'grade_decimal': 1
+    }
+    assert grader(None, '[[10, 20, 30], [40, 50, 60]]') == {
+        'ok': False,
+        'msg': six.u(
+            'Some matrix entries are incorrect, marked below:<br/>\n'
+            '<pre>'
+            '[[{b} {b} {b}]<br/>'
+            ' [{b} {b} {b}]]'
+            '</pre>'
+        ).format(g=GOOD, b=BAD),
+        'grade_decimal': 0
+    }
+
+def test_entry_partial_flat_rate_credit_grading():
+    grader = MatrixGrader(
+        max_array_dim=2,
+        answers='[[0, 1, 2], [x, y, z]]',
+        variables=['x', 'y', 'z'],
+        entry_partial_credit=0.123
+    )
+    expected = {
+        'ok': 'partial',
+        'msg': six.u(
+            'Some matrix entries are incorrect, marked below:<br/>\n'
+            '<pre>'
+            '[[{g} {b} {b}]<br/>'
+            ' [{b} {b} {g}]]'
+            '</pre>'
+        ).format(g=GOOD, b=BAD),
+        'grade_decimal': 0.123
+    }
+    assert grader(None, '[[0, 10, 20*z], [x/2, y^2, z]]') == expected
+    assert grader(None, '[[0, 1, 2], [x, y, z]]') == {
+        'ok': True,
+        'msg': '',
+        'grade_decimal': 1
+    }
+    assert grader(None, '[[10, 20, 30], [40, 50, 60]]') == {
+        'ok': False,
+        'msg': six.u(
+            'Some matrix entries are incorrect, marked below:<br/>\n'
+            '<pre>'
+            '[[{b} {b} {b}]<br/>'
+            ' [{b} {b} {b}]]'
+            '</pre>'
+        ).format(g=GOOD, b=BAD),
+        'grade_decimal': 0
+    }
+
+def test_entry_partial_custom_message():
+    grader = MatrixGrader(
+        max_array_dim=2,
+        answers='[[1, 2], [3, 4]]',
+        entry_partial_credit='proportional',
+        entry_partial_msg='Partly correct'
+    )
+    grader_with_locs = MatrixGrader(
+        max_array_dim=2,
+        answers='[[1, 2], [3, 4]]',
+        entry_partial_credit='proportional',
+        entry_partial_msg=six.u('Partly correct, errors at\n{error_locations}')
+    )
+
+    assert grader(None, '[[1, 20], [30, 4]]')['msg'] == 'Partly correct'
+
+    formatted_msg = six.u(
+        'Partly correct, errors at<br/>\n'
+        '<pre>'
+        '[[{g} {b}]<br/>'
+        ' [{b} {g}]]'
+        '</pre>'
+    ).format(g=GOOD, b=BAD)
+    result_msg = grader_with_locs(None, '[[1, 20], [30, 4]]')['msg']
+    assert result_msg == formatted_msg
+
+def test_entry_partial_message_with_vectors():
+    grader = MatrixGrader(
+        answers='[0, 1, 2, 3, 4]',
+        entry_partial_credit='proportional'
+    )
+
+    expected = {
+        'ok': 'partial',
+        'grade_decimal': 0.6,
+        'msg': six.u(
+            'Some matrix entries are incorrect, marked below:<br/>\n'
+            '<pre>'
+            '[{g} {b} {g} {g} {b}]'
+            '</pre>'
+        ).format(g=GOOD, b=BAD)
+    }
+    result = grader(None, '[0, 10, 2, 3, 40]')
+    assert expected == result
+
+def test_entry_partial_message_with_tensors():
+    grader = MatrixGrader(
+        max_array_dim=3,
+        answers='[ [[0, 1], [2, 3]], [[4, 5], [6, 7]] ]',
+        entry_partial_credit='proportional'
+    )
+
+    expected = {
+        'ok': 'partial',
+        'grade_decimal': 7/8,
+        'msg': six.u(
+            'Some matrix entries are incorrect, marked below:<br/>\n'
+            '<pre>'
+            '[[[{g} {g}]<br/>'
+            ' [{g} {b}]]<br/>'
+            '<br/>'
+            ' [[{g} {g}]<br/>'
+            ' [{g} {g}]]]'
+            '</pre>'
+        ).format(g=GOOD, b=BAD)
+    }
+    result = grader(None, '[ [[0, 1], [2, 10]], [[4, 5], [6, 7]] ]')
+    assert expected == result

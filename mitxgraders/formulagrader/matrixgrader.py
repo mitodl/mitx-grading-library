@@ -8,10 +8,11 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from numbers import Number
 from collections import namedtuple
 import six
-from voluptuous import Required, Any
+from voluptuous import Required, Any, Range, All, Optional
 from mitxgraders.exceptions import InputTypeError
+from mitxgraders.comparers import MatrixEntryComparer
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
-from mitxgraders.helpers.validatorfuncs import NonNegative, Nullable
+from mitxgraders.helpers.validatorfuncs import NonNegative, Nullable, text_string
 from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
 from mitxgraders.helpers.calc.exceptions import (
     MathArrayShapeError as ShapeError, MathArrayError, DomainError, ArgumentShapeError)
@@ -61,6 +62,15 @@ class MatrixGrader(FormulaGrader):
         suppress_matrix_messages (bool): If True, suppresses all matrix-related
             error messages from being displayed. Overrides shape_errors=True and
             is_raised=True. Defaults to False.
+
+        Additionally, the configuration options
+            entry_partial_credit
+            entry_partial_msg
+        of MatrixEntryComparer can be passed directly to MatrixGrader to facilitate
+        partial credit without the explicit use of comparers. If either key
+        is included, MatrixEntryComparer is used as the default comparer for
+        that MatrixGrader instance with the given key values. If neither key is
+        provided, equality_comparer is used.
     """
 
     # merge_dicts does not mutate the originals
@@ -82,11 +92,23 @@ class MatrixGrader(FormulaGrader):
             }): {
                 Required('is_raised', default=True): bool,
                 Required('msg_detail', default='type'): Any(None, 'type', 'shape')
-            }
+            },
+            Optional('entry_partial_credit'): Any(All(Number, Range(0, 1)), 'proportional'),
+            Optional('entry_partial_msg'): text_string
         })
 
     def __init__(self, config=None, **kwargs):
+        # Set default_comparer as an instance property if entry_partial keys
+        # are provided
+        unvalidated_config = config if config is not None else kwargs
+        entry_comparer_config = {key: unvalidated_config[key]
+                                 for key in ('entry_partial_credit', 'entry_partial_msg')
+                                 if key in unvalidated_config}
+        if entry_comparer_config:
+            self.default_comparer = MatrixEntryComparer(entry_comparer_config)
+
         super(MatrixGrader, self).__init__(config, **kwargs)
+
         if self.config['identity_dim'] and not self.constants.get('I', None):
             self.constants['I'] = identity(self.config['identity_dim'])
 

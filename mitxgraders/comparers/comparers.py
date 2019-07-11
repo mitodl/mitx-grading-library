@@ -52,13 +52,22 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from numbers import Number
 import numpy as np
 
-from voluptuous import Schema, Required
+import six
+from voluptuous import Schema, Required, Any, Range, All
 
 from mitxgraders.exceptions import InputTypeError, StudentFacingError
-from mitxgraders.helpers.validatorfuncs import is_callable, Nullable
+from mitxgraders.helpers.validatorfuncs import is_callable, Nullable, text_string
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 from mitxgraders.helpers.calc.math_array import are_same_length_vectors, is_vector
-from mitxgraders.comparers.baseclasses import Comparer
+from mitxgraders.comparers.baseclasses import Comparer, CorrelatedComparer
+
+def identity_transform(x):
+    """
+    Returns the input.
+
+    Note: used instead of lambdas because it prints a nice name.
+    """
+    return x
 
 class EqualityComparer(Comparer):
     """
@@ -102,7 +111,7 @@ class EqualityComparer(Comparer):
 
     The following example takes the norm of the expected answer and student input
     before comparison. Note the different method of changing the comparer.
-    >>> FormulaGrader.set_default_comparer(EqualityComparer(transform=np.linalg.norm))
+    >>> MatrixGrader.set_default_comparer(EqualityComparer(transform=np.linalg.norm))
     >>> grader = MatrixGrader(
     ...     answers='[1, 0, 0]'
     ... )
@@ -112,29 +121,121 @@ class EqualityComparer(Comparer):
     True
     >>> grader(None, '[1/sqrt(2), 0, 1/sqrt(2)]')['ok']
     True
-    >>> FormulaGrader.reset_default_comparer()
+    >>> MatrixGrader.reset_default_comparer()
+
+    FormulaGrader and MatrixGrader both have set_default_comparer() and
+    reset_default_comparer() methods.
 
     """
     schema_config = Schema({
-        Required('transform', default=None): Nullable(is_callable)
+        Required('transform', default=None): All(
+            Nullable(is_callable),
+            # if f is None, coerce to identity function
+            lambda f: identity_transform if f is None else f
+        )
     })
 
-    def __call__(self, comparer_params_eval, student_eval, utils):
-        expected_input = comparer_params_eval[0]
-
+    @staticmethod
+    def validate(expected_eval, student_eval, utils):
         if hasattr(utils, 'validate_shape'):
             # in numpy, scalars have empty tuples as their shapes
-            shape = tuple() if isinstance(expected_input, Number) else expected_input.shape
+            shape = tuple() if isinstance(expected_eval, Number) else expected_eval.shape
             utils.validate_shape(student_eval, shape)
 
-        # If provided, apply the transform function
-        if self.config['transform'] is not None:
-            expected_input = self.config['transform'](expected_input)
-            student_eval = self.config['transform'](student_eval)
+    def __call__(self, comparer_params_eval, student_eval, utils):
+        expected_eval = comparer_params_eval[0]
+        self.validate(expected_eval, student_eval, utils)
 
-        return utils.within_tolerance(expected_input, student_eval)
+        transform = self.config['transform']
+        expected_eval = transform(expected_eval)
+        student_eval = transform(student_eval)
+
+        return utils.within_tolerance(expected_eval, student_eval)
 
 equality_comparer = EqualityComparer()
+
+class MatrixEntryComparer(CorrelatedComparer):
+    """
+    Default comparer for MatrixGrader. Compares student and instructor matrix
+    evaluations entry-by-entry for equality.
+
+    Configuration
+    =============
+        transform (None | function): same as EqualityComparer (default None)
+        entry_partial_credit ('proportional' | number): Determines how partial credit
+            is awarded. If set to 'proportional', then credit is proportional to
+            the number of correct matrix entries. If a numeric value betweem 0 and 1
+            is provided, this flat rate of partial credit is provided as long as
+            some but not all entries are correct. Default is the numeric value 0
+            (no partial credit).
+
+        entry_partial_msg (str): A text string message shown when partial credit
+            is awarded. The string may optionally contain the formatting key {error_indices},
+            which will be replaced with the indices of the incorrect matrix entries.
+            To show no message, use the the empty string.
+            Default value is:
+            "Some matrix entries are incorrect, marked below:\n{error_locations}"
+    """
+
+    default_msg = "Some matrix entries are incorrect, marked below:\n{error_locations}"
+    schema_config = EqualityComparer.schema_config.extend({
+        Required('entry_partial_credit', default=0): Any(All(Number, Range(0, 1)), 'proportional'),
+        Required('entry_partial_msg', default=default_msg): text_string
+    })
+
+    @staticmethod
+    def format_message_with_locations(format_string, locs):
+        """
+        Returns format_string with {error_locations} replaced by 1-indexed error
+        locations.
+
+        Arguments:
+            format_string: a string that may contain {error_locations} formatting key.
+            locs: a boolean array with False values indicating incorrect entries
+        """
+        # Not the most elegant way to do these replacements, but this was what
+        # I came up with to minimize the amount of extra u prefixes in Python 2
+
+        # These are the edX colors, at least as of July 2019
+        bad_str = '<span style="color:#b20610">\u2717</span>'
+        good_str = '<span style="color:#008100">\u2713</span>'
+        matrix_as_text = six.text_type(locs).replace("  ", " ").replace("[ ", "[")
+        matrix_as_text = matrix_as_text.replace("True", good_str).replace("False", bad_str)
+        matrix_as_text = matrix_as_text.replace('\n', '<br/>')
+        formatted_locs = '<pre>{mat}</pre>'.format(mat=matrix_as_text)
+        return format_string.format(error_locations=formatted_locs)
+
+    @staticmethod
+    def validate(expected_evals, student_evals, utils):
+        for x, y in zip(expected_evals, student_evals):
+            EqualityComparer.validate(x, y, utils)
+
+    def __call__(self, comparer_params_evals, student_evals, utils):
+        expected_evals = [params[0] for params in comparer_params_evals]
+        self.validate(expected_evals, student_evals, utils)
+
+        transform = self.config['transform']
+        expected_evals = [transform(x) for x in expected_evals]
+        student_evals = [transform(x) for x in student_evals]
+        vec_within_tol = np.vectorize(utils.within_tolerance)
+        # comparisons_by_eval is a boolean array of entry-by-entry comparisons,
+        # one for each comparison. Its numpy shape is (n_evals, *eval_shape)
+        comparisons_by_eval = vec_within_tol(expected_evals, student_evals)
+        comparisons_summary = np.all(comparisons_by_eval, axis=0)
+
+        num_entries = comparisons_summary.size
+        percent_correct = np.sum(comparisons_summary).item()/num_entries
+        msg = self.format_message_with_locations(self.config['entry_partial_msg'], comparisons_summary)
+        partial_credit = self.config['entry_partial_credit']
+
+        if percent_correct == 1:
+            return True
+        elif percent_correct == 0:
+            return {'ok': False, 'grade_decimal': 0, 'msg': msg}
+        elif partial_credit == 'proportional':
+            return {'ok': 'partial', 'grade_decimal': percent_correct, 'msg': msg}
+        else:
+            return {'ok': 'partial', 'grade_decimal': partial_credit, 'msg': msg}
 
 def between_comparer(comparer_params_eval, student_eval, utils):
     """
