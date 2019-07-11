@@ -97,13 +97,6 @@ class MatrixGrader(FormulaGrader):
             Optional('entry_partial_msg'): text_string
         })
 
-    @staticmethod
-    def get_entry_comparer_config(unvalidated_config):
-        keys = ('entry_partial_credit', 'entry_partial_msg')
-        comparer_config = {key: unvalidated_config[key]
-                           for key in keys if key in unvalidated_config}
-        return comparer_config
-
     def __init__(self, config=None, **kwargs):
         # Set default_comparer as an instance property if entry_partial keys
         # are provided

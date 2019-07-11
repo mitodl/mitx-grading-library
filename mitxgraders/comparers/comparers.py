@@ -195,6 +195,8 @@ class MatrixEntryComparer(CorrelatedComparer):
         """
         # Not the most elegant way to do these replacements, but this was what
         # I came up with to minimize the amount of extra u prefixes in Python 2
+
+        # These are the edX colors, at least as of July 2019
         bad_str = '<span style="color:#b20610">\u2717</span>'
         good_str = '<span style="color:#008100">\u2713</span>'
         matrix_as_text = six.text_type(locs).replace("  ", " ").replace("[ ", "[")
