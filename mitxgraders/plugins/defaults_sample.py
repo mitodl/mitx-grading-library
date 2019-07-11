@@ -49,3 +49,8 @@ from mitxgraders.formulagrader.matrixgrader import MatrixGrader
 # Precedence is given to the registered defaults of higher level classes. If
 # register_defaults is called twice on the same class, the options stack on top of
 # each other, overwriting earlier options as necessary.
+
+# In this example, we make all MatrixGrader problems award partial credit by default.
+# MatrixGrader.register_defaults({
+#     'entry_partial_credit': 'partial'
+# })
