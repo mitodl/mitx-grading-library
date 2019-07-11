@@ -156,28 +156,30 @@ equality_comparer = EqualityComparer()
 
 class MatrixEntryComparer(CorrelatedComparer):
     """
-    Default comparer for MatrixGrader. Compares student and instructor matrix
-    evaluations entry-by-entry for equality.
+    Default comparer for MatrixGrader. Compares student and instructor array
+    evaluations entry-by-entry for equality. Note that despite the name, this comparer
+    works equally well on vectors/matrices/tensors.
 
     Configuration
     =============
         transform (None | function): same as EqualityComparer (default None)
+
         entry_partial_credit ('proportional' | number): Determines how partial credit
             is awarded. If set to 'proportional', then credit is proportional to
-            the number of correct matrix entries. If a numeric value betweem 0 and 1
+            the number of correct array entries. If a numeric value betweem 0 and 1
             is provided, this flat rate of partial credit is provided as long as
             some but not all entries are correct. Default is the numeric value 0
             (no partial credit).
 
         entry_partial_msg (str): A text string message shown when partial credit
             is awarded. The string may optionally contain the formatting key {error_indices},
-            which will be replaced with the indices of the incorrect matrix entries.
+            which will be replaced with a diagram showing the correct/incorrect entries.
             To show no message, use the the empty string.
             Default value is:
-            "Some matrix entries are incorrect, marked below:\n{error_locations}"
+            "Some array entries are incorrect, marked below:\n{error_locations}"
     """
 
-    default_msg = "Some matrix entries are incorrect, marked below:\n{error_locations}"
+    default_msg = "Some array entries are incorrect, marked below:\n{error_locations}"
     schema_config = EqualityComparer.schema_config.extend({
         Required('entry_partial_credit', default=0): Any(All(Number, Range(0, 1)), 'proportional'),
         Required('entry_partial_msg', default=default_msg): text_string
@@ -186,8 +188,8 @@ class MatrixEntryComparer(CorrelatedComparer):
     @staticmethod
     def format_message_with_locations(format_string, locs):
         """
-        Returns format_string with {error_locations} replaced by 1-indexed error
-        locations.
+        Returns format_string with {error_locations} replaced by a diagram showing
+        correct/incorrect entries.
 
         Arguments:
             format_string: a string that may contain {error_locations} formatting key.
