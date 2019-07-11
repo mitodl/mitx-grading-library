@@ -1,5 +1,52 @@
 # Change Log
 
+# Version 2
+
+This is a major new version with many new features added. We have been very careful to preserve backwards compatability of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2.0. However, we do warn that we broke internal backwards compatability in a number of locations in order to accomodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.0.
+
+## Version 2.0
+
+### Version 2.0.0
+
+Feature updates:
+
+* Graders can now be constructed in-line in a customresponse, rather than in a python code block.
+* Credit awarded can now be dependent upon the attempt number.
+* Introduced a new plug-in to set course-wide defaults that differ from library defaults.
+* `StringGrader` received a major overhaul, and can now require minimum character or word lengths, and also pattern match to regular expressions. Further options to treat whitespace were introduced.
+* The structure of `SingleListGrader` answers now uses and extends that used by `ItemGrader` answers, leading to more general ways of expressing answers and providing feedback to students.
+* Answers to `SingleListGrader` problems can now be inferred from the `expect` keyword.
+* `SingleListGrader` can now warn students that they have missing entries.
+* Partial credit can now be turned off in `ListGrader` problems.
+* Partial credit can now be awarded in matrix entry problems, with messages explaining which entries are correct.
+* Implemented `LinearComparer`, which can assign partial/full credit to formula responses that are linearly related to answers.
+* Comparers for math problems can now be set much more straightforwardly.
+* `floor`, `ceil`, `min` and `max` functions were added to the math library.
+* In math problems, introduced an option to apply a transforming function to the answer and student input before comparing.
+* Completely overhauled matrix sampling to allow most typical matrix types to be sampled.
+* Introduced instructor variables for math problems, which authors can use in constructing the problem, but students may not use in their responses.
+* `DependentSampler` now has access to constants.
+* `DiscreteSet` will now work with arrays.
+* All comparers are now imported when using `from mitxgraders import *`.
+
+Under the hood:
+
+* Ensured that the entire library (including tests) is compatible with python 2.7 and python 3.6/3.7, in preparation for edX's upcoming transition to python 3. (The change to having internal unicode literals is the biggest internal backward-compatability-breaking issue from version 1.2.)
+* Introduced `CorrelatedComparer`s, which compare multiple samples at once.
+* `IntegralGrader` has been promoted from a plug-in to a core component of the library.
+* `SpecifyDomain` has been expanded to allow for functions with any number of arguments.
+* Javascript preprocessor was tidied up, and further options for customization were included.
+* All documentation examples are now run as doctests.
+* Upgraded voluptuous to version 0.11.5.
+* Upgraded testing infrastructure.
+
+Bug fixes:
+
+* Fixed a bug in assigning partial credit in `ListGrader`s when multiple lists of answers were included.
+
+
+# Version 1
+
 ## Version 1.2
 
 ### Version 1.2.3
@@ -36,13 +83,12 @@ This version includes a number of new features and documentation updates.
     * eigenvector_comparer
 
 
-## Version 1.1.x
+## Version 1.1
 
 ### Version 1.1.2
 * This version includes an internal change to the way that errors are handled during check.
   * If you only use builtin graders (FormulaGrader, ListGrader...) or public plugins (IntegralGrader) you should not notice any difference.
   * If you have previously written your own grading class, this change could affect what errors messages are displayed to students. In particular, only exceptions inheriting from `MITxError` will display their messages to students; other errors will be replaced with a generic error message.
-
 
 ### Version 1.1.1
 * Added AsciiMath renderer definitions
@@ -64,8 +110,7 @@ This version includes a number of new features and documentation updates.
         - Removing case-insensitive comparison fixes a number of ambiguous situations.
 
 
-
-## Version 1.0.x
+## Version 1.0
 
 ### Version 1.0.5
 * Improved debugging information for FormulaGrader
@@ -95,3 +140,7 @@ This version includes a number of new features and documentation updates.
 * Fixed issue with zip file tests
 * Added doctests to test suite
 * Fixed bug in FormulaGrader when given an empty string
+
+### Version 1.0.0
+
+* First release!
