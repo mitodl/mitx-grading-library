@@ -291,7 +291,7 @@ def test_entry_partial_proportional_credit_grading():
     expected = {
         'ok': 'partial',
         'msg': six.u(
-            'Some matrix entries are incorrect, marked below:<br/>\n'
+            'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[[{g} {b} {b}]<br/>'
             ' [{b} {b} {g}]]'
@@ -308,7 +308,7 @@ def test_entry_partial_proportional_credit_grading():
     assert grader(None, '[[10, 20, 30], [40, 50, 60]]') == {
         'ok': False,
         'msg': six.u(
-            'Some matrix entries are incorrect, marked below:<br/>\n'
+            'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[[{b} {b} {b}]<br/>'
             ' [{b} {b} {b}]]'
@@ -327,7 +327,7 @@ def test_entry_partial_flat_rate_credit_grading():
     expected = {
         'ok': 'partial',
         'msg': six.u(
-            'Some matrix entries are incorrect, marked below:<br/>\n'
+            'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[[{g} {b} {b}]<br/>'
             ' [{b} {b} {g}]]'
@@ -344,7 +344,7 @@ def test_entry_partial_flat_rate_credit_grading():
     assert grader(None, '[[10, 20, 30], [40, 50, 60]]') == {
         'ok': False,
         'msg': six.u(
-            'Some matrix entries are incorrect, marked below:<br/>\n'
+            'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[[{b} {b} {b}]<br/>'
             ' [{b} {b} {b}]]'
@@ -389,7 +389,7 @@ def test_entry_partial_message_with_vectors():
         'ok': 'partial',
         'grade_decimal': 0.6,
         'msg': six.u(
-            'Some matrix entries are incorrect, marked below:<br/>\n'
+            'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[{g} {b} {g} {g} {b}]'
             '</pre>'
@@ -409,7 +409,7 @@ def test_entry_partial_message_with_tensors():
         'ok': 'partial',
         'grade_decimal': 7/8,
         'msg': six.u(
-            'Some matrix entries are incorrect, marked below:<br/>\n'
+            'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[[[{g} {g}]<br/>'
             ' [{g} {b}]]<br/>'
