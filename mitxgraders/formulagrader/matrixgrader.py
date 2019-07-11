@@ -69,7 +69,8 @@ class MatrixGrader(FormulaGrader):
         of MatrixEntryComparer can be passed directly to MatrixGrader to facilitate
         partial credit without the explicit use of comparers. If either key
         is included, MatrixEntryComparer is used as the default comparer for
-        that MatrixGrader instance with the given key values.
+        that MatrixGrader instance with the given key values. If neither key is
+        provided, equality_comparer is used.
     """
 
     # merge_dicts does not mutate the originals
@@ -104,10 +105,12 @@ class MatrixGrader(FormulaGrader):
         return comparer_config
 
     def __init__(self, config=None, **kwargs):
-        # Set default_comparer on as an instance property if entry_parial keys
+        # Set default_comparer as an instance property if entry_partial keys
         # are provided
         unvalidated_config = config if config is not None else kwargs
-        entry_comparer_config = self.get_entry_comparer_config(unvalidated_config)
+        entry_comparer_config = {key: unvalidated_config[key]
+                                 for key in ('entry_partial_credit', 'entry_partial_msg')
+                                 if key in unvalidated_config}
         if entry_comparer_config:
             self.default_comparer = MatrixEntryComparer(entry_comparer_config)
 

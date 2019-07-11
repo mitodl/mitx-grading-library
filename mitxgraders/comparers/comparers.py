@@ -161,7 +161,6 @@ class MatrixEntryComparer(CorrelatedComparer):
 
     Configuration
     =============
-
         transform (None | function): same as EqualityComparer (default None)
         entry_partial_credit ('proportional' | number): Determines how partial credit
             is awarded. If set to 'proportional', then credit is proportional to
@@ -173,6 +172,7 @@ class MatrixEntryComparer(CorrelatedComparer):
         entry_partial_msg (str): A text string message shown when partial credit
             is awarded. The string may optionally contain the formatting key {error_indices},
             which will be replaced with the indices of the incorrect matrix entries.
+            To show no message, use the the empty string.
             Default value is:
             "Some matrix entries are incorrect, marked below:\n{error_locations}"
     """
@@ -191,15 +191,17 @@ class MatrixEntryComparer(CorrelatedComparer):
 
         Arguments:
             format_string: a string that may contain {error_locations} formatting key.
-            locs: a boolean error with False values indicating errors
+            locs: a boolean array with False values indicating incorrect entries
         """
         # Not the most elegant way to do these replacements, but this was what
-        # I came up with the minimize the amount of extra u prefixes in Python 2
-        bad_str = '\u2717'
-        good_str = '\u2713'
+        # I came up with to minimize the amount of extra u prefixes in Python 2
+        bad_str = '<span style="color:#b20610">\u2717</span>'
+        good_str = '<span style="color:#008100">\u2713</span>'
         matrix_as_text = six.text_type(locs).replace("  ", " ").replace("[ ", "[")
         matrix_as_text = matrix_as_text.replace("True", good_str).replace("False", bad_str)
-        return format_string.format(error_locations=matrix_as_text)
+        matrix_as_text = matrix_as_text.replace('\n', '<br/>')
+        formatted_locs = '<pre>{mat}</pre>'.format(mat=matrix_as_text)
+        return format_string.format(error_locations=formatted_locs)
 
     @staticmethod
     def validate(expected_evals, student_evals, utils):
