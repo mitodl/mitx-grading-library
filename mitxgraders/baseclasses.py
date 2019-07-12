@@ -710,7 +710,7 @@ class ItemGrader(AbstractGrader):
             # Note that this answer is now stored for future calls, but
             # will be overridden if a new expect value is provided.
 
-            # Perform post-schema validation
+            # Perform post-schema answer validation
             self.config['answers'] = self.post_schema_ans_val(self.config['answers'])
 
             # Mark that we are using inferred answers
