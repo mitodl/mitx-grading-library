@@ -6,9 +6,10 @@ theme:
 pages:
   - Getting Started:
     - Overview: 'index.md'
+    - edX Syntax: 'edx.md'
+    - Introduction to Graders: 'graders.md'
     - ItemGrader: 'item_grader.md'
     - StringGrader: 'string_grader.md'
-    - edX Syntax: 'edx.md'
   - Grading Math:
     - FormulaGrader: 'grading_math/formula_grader.md'
     - NumericalGrader: 'grading_math/numerical_grader.md'
@@ -21,6 +22,8 @@ pages:
   - Grading Lists:
     - ListGrader: 'grading_lists/list_grader.md'
     - SingleListGrader: 'grading_lists/single_list_grader.md'
+  - Plugins: 'plugins.md'
+  - Frequently Asked Questions: 'faq.md'
   - Changelog: 'changelog.md'
 markdown_extensions:
     - toc:

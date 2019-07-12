@@ -30,7 +30,7 @@ grader = FormulaGrader(variables=["x"])
 </problem>
 ```
 
-Note that the `customresponse` tag contains the answer that is passed to the grader. You can also use `expect="2*x"` instead of `answer="2*x"`; edX treats these parameters indistinguishably (although we strongly suggest not using both!). Also note that a grader can be reused if desired.
+Note that the `customresponse` tag contains the answer that is passed to the grader. You can also use `expect="2*x"` instead of `answer="2*x"`; edX treats these parameters indistinguishably (although we strongly suggest not using both!). Also note that a grader can be used multiple times if desired.
 
 
 ## Using an answers key to a grader
@@ -42,40 +42,41 @@ If you provide an `answers` key to the grader, it will ignore whatever is specif
 
 <script type="loncapa/python">
 from mitxgraders import *
-grader = FormulaGrader(
-    answers={'expect': '2*x', 'ok': True, 'grade_decimal': 1, 'msg': 'Good job!'},
+mygrader = FormulaGrader(
+    answers={'expect': '2*x', 'msg': 'Good job!'},
     variables=['x']
 )
 </script>
 
   <p>Enter the derivative of \(x^2\).</p>
 
-  <customresponse cfn="grader" answer="2*x">
+  <customresponse cfn="mygrader" answer="2*x">
     <textline math="true" />
   </customresponse>
 
 </problem>
 ```
 
-Even though the `answers` key is provided to the grader explicitly, the `answer` parameter in the `customresponse` tag is still important, as it is what the students see when they click on "Show Answer".
+The `answers` key is provided to the grader explicitly, and so it ignores whatever is in the `customresponse` tag. However, the `answer` key in the `customresponse` tag is still important, because it is what the students see when they click on "Show Answer".
+
+Also worth noting is that the grader is stored in a python variable, which in this example, we've called `mygrader` (the previous example just called it `grader`). The `cfn` key in the `customresponse` tag needs to tell edX which variable stores the grader you want to use for that problem. If you have multiple `customresponse` tags, you can provide a different grader to each one.
 
 
 ## Using `correct_answer` for multiple inputs
 
-If you are using multiple inputs (such as when using a `ListGrader`) or a `SingleListGrader`, you must provide the `answers` key to the grader explicitly, as the `expect` or `answer` parameters in the `customresponse` tag are ignored. When using multiple inputs, it's recommended to provide a `correct_answer` parameter on the `textline` tags, which is what is used to show students the correct answer. Here is an example.
+If you are using multiple inputs (such as when using a `ListGrader`) or a `SingleListGrader`, you must provide the `answers` key to the grader explicitly, as the `expect` or `answer` parameters in the `customresponse` tag are ignored by both edX and the grader. When using multiple inputs, it's recommended to provide a `correct_answer` parameter on the `textline` tags, which is what is used to show students the correct answer. Here is an example.
 
 ```XML
 <problem>
 <script type="loncapa/python">
 from mitxgraders import *
-grader = FormulaGrader(
+grader = ListGrader(
     answers=['x-2', 'x+2'],
-    ordered=False,
     subgraders=FormulaGrader(variables=['x'])
 )
 </script>
 
-  <p>What are the linear factors of \((x^2 - 4)\)?</p>
+  <p>What are the linear factors of \((x^2 - 4)\)? Enter your answers in any order.</p>
 
   <!-- Note there is no 'expect' or 'answer' parameter in the customresponse tag -->
   <customresponse cfn="grader">
@@ -90,12 +91,12 @@ grader = FormulaGrader(
 
 Note that the `correct_answer` parameters are never sent to the grader, which is why you must provide them independently.
 
-When using sublists, such as a `ListGrader` or a `SingleListGrader` inside a `ListGrader`, you only need to provide an `answers` key to the top-level grader.
+When using lists, such as with a `ListGrader` or a `SingleListGrader`, you only need to provide an `answers` key to the top-level grader (the one that is specified in the `cfn` key).
 
 
 ## Passing a grader directly
 
-Because the `cfn` parameter of the `customresponse` tag is executed as python code, it is possible to skip the definition of the grader altogether, as the following example shows.
+Because the `cfn` parameter of the `customresponse` tag is executed as python code, it is possible to provide the definition of the grader in-line, as the following example shows.
 
 ```XML
 <problem>
@@ -114,4 +115,4 @@ from mitxgraders import *
 </problem>
 ```
 
-One must be careful to make sure that quotation marks are properly escaped if using this method.
+We want to stress the simplicity of this example compared to implementing the same problem using standard edX problem types! This method of defining a grader is very handy for simple grader constructions such as this one. For more complex graders, we recommend the previous style. One must be careful to make sure that quotation marks `'` and `"` do not conflict if using the in-line method.
