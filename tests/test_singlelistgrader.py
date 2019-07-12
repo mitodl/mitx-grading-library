@@ -516,3 +516,52 @@ def test_overall_grade_msg():
     assert grader(None, 'a, b')['msg'] == 'a msg<br/>\nb msg<br/>\nYay'
     assert grader(None, 'a, c')['grade_decimal'] == 0.25
     assert grader(None, 'a, c')['msg'] == 'a msg'
+
+    grader = SingleListGrader(
+        answers=(
+            {
+                'expect': [('X', {'expect': 'x', 'grade_decimal': 0.5}),
+                           ('Y', {'expect': 'y', 'grade_decimal': 0.5})],
+                'msg': 'Good pairing!'
+            },
+            {
+                'expect': [('W', {'expect': 'w', 'grade_decimal': 0.5}),
+                           ('Z', {'expect': 'z', 'grade_decimal': 0.5})],
+                'msg': 'Good pairing!'
+            }
+        ),
+        subgrader=StringGrader()
+    )
+    result = grader(None, 'X, Y')
+    assert result['grade_decimal'] == 1
+    assert result['msg'] == 'Good pairing!'
+    result = grader(None, 'X, y')
+    assert result['grade_decimal'] == 0.75
+    assert result['msg'] == 'Good pairing!'
+    result = grader(None, 'w, z')
+    assert result['grade_decimal'] == 0.5
+    assert result['msg'] == 'Good pairing!'
+    result = grader(None, 'X, z')
+    assert result['grade_decimal'] == 0.5
+    assert result['msg'] == ''
+    result = grader(None, 'y, z')
+    assert result['grade_decimal'] == 0.25
+    assert result['msg'] == ''
+
+def test_overall_msg_nested():
+    grader = SingleListGrader(
+        answers={
+            'expect': [['a', 'b'], ['c', {'expect': 'd', 'grade_decimal': 0.5}]],
+            'msg': 'Good job!'
+        },
+        subgrader=SingleListGrader(
+            subgrader=StringGrader()
+        ),
+        delimiter=';'
+    )
+    result = grader(None, 'a,b;c,d')
+    assert result['grade_decimal'] == 0.875
+    assert result['msg'] == 'Good job!'
+    result = grader(None, 'a,b;c,e')
+    assert result['grade_decimal'] == 0.75
+    assert result['msg'] == ''

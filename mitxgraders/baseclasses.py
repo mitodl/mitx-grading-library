@@ -283,6 +283,18 @@ class AbstractGrader(ObjectWithSchema):
                     formatted = msg.format(student_input)
                 raise StudentFacingError(formatted)
 
+        # Make sure we're only returning the relevant keys in the result.
+        # List graders may use other keys to track information between nesting levels.
+        keys = ['ok', 'grade_decimal', 'msg']
+        if 'input_list' in result:
+            # Multiple inputs
+            for idx, entry in enumerate(result['input_list']):
+                cleaned = {key: val for key, val in entry.iteritems() if key in keys}
+                result['input_list'][idx] = cleaned
+        else:
+            # Single input
+            result = {key: val for key, val in result.iteritems() if key in keys}
+
         # Handle partial credit based on attempt number
         if self.config['attempt_based_credit']:
             self.apply_attempt_based_credit(result, kwargs.get('attempt'))
@@ -472,7 +484,7 @@ class ItemGrader(AbstractGrader):
         Validate the ItemGrader's configuration, then call post-schema validation.
         """
         super(ItemGrader, self).__init__(config, **kwargs)
-        self.config['answers'] = self.post_schema_validation(self.config['answers'])
+        self.config['answers'] = self.post_schema_ans_val(self.config['answers'])
 
     @property
     def schema_config(self):
@@ -502,7 +514,7 @@ class ItemGrader(AbstractGrader):
         schema = Schema((self.validate_single_answer,))
         return schema(answer_tuple)
 
-    def post_schema_validation(self, answer_tuple):
+    def post_schema_ans_val(self, answer_tuple):
         """
         Perform any post-schema validation on the answer tuple. This function should be
         idempotent, as it may be called on a configuration multiple times.
@@ -699,7 +711,7 @@ class ItemGrader(AbstractGrader):
             # will be overridden if a new expect value is provided.
 
             # Perform post-schema validation
-            self.config['answers'] = self.post_schema_validation(self.config['answers'])
+            self.config['answers'] = self.post_schema_ans_val(self.config['answers'])
 
             # Mark that we are using inferred answers
             self.inferring_answers = True

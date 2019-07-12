@@ -76,7 +76,7 @@ def padded_check(check):
     """Wraps a check function to reject _AutomaticFailure"""
     def _check(ans, inp):
         if isinstance(ans, _AutomaticFailure) or isinstance(inp, _AutomaticFailure):
-            return {'ok': False, 'msg': '', 'grade_decimal': 0}
+            return {'ok': False, 'msg': '', 'grade_decimal': 0, 'all_awarded': False}
         return check(ans, inp)
     return _check
 
@@ -283,7 +283,7 @@ class ListGrader(AbstractGrader):
                 for idx, answer in enumerate(answer_list):
                     # Run the answers through the subgrader schema and the post-schema validation
                     answer_list[idx] = subgraders[idx].schema_answers(answer)
-                    answer_list[idx] = subgraders[idx].post_schema_validation(answer_list[idx])
+                    answer_list[idx] = subgraders[idx].post_schema_ans_val(answer_list[idx])
         else:
             # We have a single subgrader
             subgrader = self.config['subgraders']
@@ -293,11 +293,11 @@ class ListGrader(AbstractGrader):
                 for idx, answer in enumerate(answer_list):
                     # Run the answers through the subgrader schema and the post-schema validation
                     answer_list[idx] = subgrader.schema_answers(answer)
-                    answer_list[idx] = subgrader.post_schema_validation(answer_list[idx])
+                    answer_list[idx] = subgrader.post_schema_ans_val(answer_list[idx])
 
         return answers_tuple
 
-    def post_schema_validation(self, answer_tuple):
+    def post_schema_ans_val(self, answer_tuple):
         """
         This function is used by ItemGraders for answer validation.
         It's included here because it may be called for nested ListGraders.
@@ -650,10 +650,7 @@ class SingleListGrader(ItemGrader):
             Required('subgrader'): ItemGrader
         })
         # Note that we use the ItemGrader definitions for 'answers', although
-        # validate_expect is shadowed, and we do post-processing in post_schema_validation
-
-    # Make sure that the ItemGrader validate_expect isn't used
-    validate_expect = None
+        # validate_expect is shadowed, and we do post-processing in post_schema_ans_val
 
     def __init__(self, config=None, **kwargs):
         """
@@ -672,7 +669,7 @@ class SingleListGrader(ItemGrader):
                 delimiters.append(subgrader.config['delimiter'])
                 subgrader = subgrader.config['subgrader']
 
-    def post_schema_validation(self, answer_tuple):
+    def post_schema_ans_val(self, answer_tuple):
         """
         Used to validate the individual 'expect' lists in the 'answers' key.
         This must be done after the schema has finished validation, as we need access
@@ -699,7 +696,7 @@ class SingleListGrader(ItemGrader):
             for index, answer in enumerate(expect):
                 # Run the answers through the subgrader schema and the post-schema validation
                 expect[index] = self.config['subgrader'].schema_answers(answer)
-                expect[index] = self.config['subgrader'].post_schema_validation(expect[index])
+                expect[index] = self.config['subgrader'].post_schema_ans_val(expect[index])
             if not expect:
                 raise ConfigError("Cannot have an empty list of answers")
 
@@ -761,9 +758,25 @@ class SingleListGrader(ItemGrader):
                                            n_expect=len(answers),
                                            partial_credit=self.config['partial_credit'])
 
-        # If the result is ok, display the message for this answer
-        if result['ok'] is True and msg != '':
-            result['msg'] = msg if result['msg'] == '' else result['msg'] + '\n' + msg
+        # Check if all inputs were awarded credit
+        all_awarded = False
+        if not isinstance(self.config['subgrader'], SingleListGrader):
+            # Check to see if all items were awarded credit
+            if all(item['grade_decimal'] > 0 for item in input_list):
+                all_awarded = True
+        else:
+            # Check to see if the all_awarded key was set by all of the
+            # child SingleListGraders
+            if all(item['all_awarded'] for item in input_list):
+                all_awarded = True
+
+        # Mark if all inputs were awarded in the result, so that any higher
+        # level graders can use this information.
+        result['all_awarded'] = all_awarded
+
+        # Append the message if there is one (and it's deserved)
+        if all_awarded and msg != '':
+                result['msg'] = msg if result['msg'] == '' else result['msg'] + '\n' + msg
 
         # Apply the overall grade_decimal for this answer
         result['grade_decimal'] *= grade_decimal
