@@ -3,10 +3,12 @@
 When an individual input needs to be graded, it is graded by an `ItemGrader`. All `ItemGrader`s work by specifying answers and their corresponding points/messages, as well as an optional message for wrong answers. In these examples, we use `StringGrader` as an example of how to use a generic `ItemGrader`. You cannot use a generic `ItemGrader` by itself.
 
 ```pycon
+>>> from mitxgraders import *
 >>> grader = StringGrader(
 ...     answers='cat',
 ...     wrong_msg='Try again!'
 ... )
+
 ```
 
 The grader is set up to grade an answer of `cat` as correct, and includes a message that is presented to students if they get the answer wrong. One could pass `grader` in as the `cfn` key for a `customresponse` tag. The following code demonstrates what happens when the grader is called using python (for example, inside a python console). Note that this is only for demonstrating the behavior of the grader, and is not required in order to use the library in edX.
@@ -16,6 +18,7 @@ The grader is set up to grade an answer of `cat` as correct, and includes a mess
 True
 >>> grader(None, 'dog') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
 True
+
 ```
 
 You will often see this type of demonstration in this documentation. It serves both to demonstrate how the grader works and to ensure that our examples are always syntactically correct, as these code blocks form part of our documentation testing.
@@ -40,6 +43,7 @@ For all `ItemGrader`s, the `answers` key can be used to specify correct answers,
 True
 >>> grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
 True
+
 ```
 
 - A single `'expect'` value: can be used to specify the correct answer. For example,
@@ -51,10 +55,11 @@ True
 ...     # answers={'expect': 'zebra', 'msg': '', 'grade_decimal': 1}
 ...     wrong_msg='Try again!'
 ... )
->>> grader(None, 'zebra') == {'grade_decimal': 1, 'msg': 'Yay!', 'ok': True}
+>>> grader(None, 'zebra') == {'grade_decimal': 1, 'msg': '', 'ok': True}
 True
 >>> grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
 True
+
 ```
 
   Again, most `ItemGrader`s use strings to store `'expect'` values.
@@ -85,6 +90,7 @@ True
 True
 >>> grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
 True
+
 ```
 
 Internally, the `ItemGrader` converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.
