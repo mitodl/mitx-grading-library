@@ -759,16 +759,12 @@ class SingleListGrader(ItemGrader):
                                            partial_credit=self.config['partial_credit'])
 
         # Check if all inputs were awarded credit
-        all_awarded = False
         if not isinstance(self.config['subgrader'], SingleListGrader):
             # Check to see if all items were awarded credit
-            if all(item['grade_decimal'] > 0 for item in input_list):
-                all_awarded = True
+            all_awarded = all(item['grade_decimal'] > 0 for item in input_list)
         else:
-            # Check to see if the all_awarded key was set by all of the
-            # child SingleListGraders
-            if all(item['all_awarded'] for item in input_list):
-                all_awarded = True
+            # Check to see if all_awarded was True for all of the child SingleListGraders
+            all_awarded = all(item['all_awarded'] for item in input_list)
 
         # Mark if all inputs were awarded in the result, so that any higher
         # level graders can use this information.
