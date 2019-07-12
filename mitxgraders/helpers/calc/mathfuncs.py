@@ -275,11 +275,19 @@ ELEMENTWISE_FUNCTIONS = {
 def has_one_scalar_input(display_name):
     return SpecifyDomain.make_decorator((1,), display_name=display_name)
 
+def has_at_least_2_scalar_inputs(display_name):
+    return SpecifyDomain.make_decorator((1,), display_name=display_name, min_length=2)
+
 SCALAR_FUNCTIONS = {key: has_one_scalar_input(key)(ELEMENTWISE_FUNCTIONS[key])
                     for key in ELEMENTWISE_FUNCTIONS}
 
 SCALAR_FUNCTIONS['arctan2'] = arctan2
 SCALAR_FUNCTIONS['kronecker'] = kronecker
+
+MULTI_SCALAR_FUNCTIONS = {
+    'min': has_at_least_2_scalar_inputs('min')(min),
+    'max': has_at_least_2_scalar_inputs('max')(max)
+}
 
 ARRAY_FUNCTIONS = {
     're': real,
@@ -323,7 +331,7 @@ def merge_dicts(*source_dicts):
         target.update(source)
     return target
 
-DEFAULT_FUNCTIONS = merge_dicts(SCALAR_FUNCTIONS, ARRAY_FUNCTIONS)
+DEFAULT_FUNCTIONS = merge_dicts(SCALAR_FUNCTIONS, MULTI_SCALAR_FUNCTIONS, ARRAY_FUNCTIONS)
 
 DEFAULT_SUFFIXES = {
     '%': 0.01

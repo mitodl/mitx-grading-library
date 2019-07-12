@@ -4,8 +4,9 @@ from pytest import raises
 import numpy as np
 from voluptuous import Error
 from mitxgraders.helpers.calc import specify_domain
-from mitxgraders.helpers.calc.exceptions import DomainError
+from mitxgraders.helpers.calc.exceptions import DomainError, ArgumentError
 from mitxgraders.helpers.calc.math_array import equal_as_arrays, random_math_array
+from mitxgraders.exceptions import ConfigError
 
 def get_somefunc(display_name=None):
 
@@ -77,7 +78,7 @@ def test_incorrect_arguments_raise_errors():
     with raises(DomainError, match=match.format('somefunc')):
         F(w, x, y, z)
 
-    # Test dispaly name
+    # Test display name
     g = get_somefunc('puppy')
     G = get_somefunc_from_static_method('puppy')
     with raises(DomainError, match=match.format('puppy')):
@@ -90,6 +91,15 @@ def test_incorrect_number_of_inputs_raises_useful_error():
     match = r'Wrong number of arguments passed to somefunc\(...\): Expected 4 inputs, but received 2.'
     with raises(DomainError, match=match):
         f(1, 2)
+
+    # Test min_length length argument error
+    @specify_domain(input_shapes=[1], min_length=2)
+    def testfunc(*args):
+        return min(args)
+
+    with raises(ArgumentError, match=r"Wrong number of arguments passed to testfunc\(...\): "
+                                     r"Expected at least 2 inputs, but received 0."):
+        testfunc()
 
 def test_author_facing_decorator_raises_errors_with_invalid_config():
 
@@ -105,4 +115,12 @@ def test_author_facing_decorator_raises_errors_with_invalid_config():
     with raises(Error, match=match):
         @specify_domain(input_shapes=[5, 0, [1, 2]])
         def g():
+            pass
+
+    match = ("SpecifyDomain was called with a specified min_length, which "
+             "requires input_shapes to specify only a single shape. "
+             "However, 2 shapes were provided.")
+    with raises(ConfigError, match=match):
+        @specify_domain(input_shapes=[5, 1], min_length=2)
+        def h(*args):
             pass

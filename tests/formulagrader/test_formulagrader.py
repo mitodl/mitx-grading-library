@@ -543,6 +543,8 @@ def test_fg_debug_log():
     " {u}'ln': <function log at 0x...>,<br/>\n"
     " {u}'log10': <function log10 at 0x...>,<br/>\n"
     " {u}'log2': <function log2 at 0x...>,<br/>\n"
+    " {u}'max': <function max at 0x...>,<br/>\n"
+    " {u}'min': <function min at 0x...>,<br/>\n"
     " {u}'re': <function real at 0x...>,<br/>\n"
     " {u}'sec': <function sec at 0x...>,<br/>\n"
     " {u}'sech': <function sech at 0x...>,<br/>\n"
