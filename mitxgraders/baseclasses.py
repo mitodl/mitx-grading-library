@@ -283,6 +283,18 @@ class AbstractGrader(ObjectWithSchema):
                     formatted = msg.format(student_input)
                 raise StudentFacingError(formatted)
 
+        # Make sure we're only returning the relevant keys in the result.
+        # List graders may use other keys to track information between nesting levels.
+        keys = ['ok', 'grade_decimal', 'msg']
+        if 'input_list' in result:
+            # Multiple inputs
+            for idx, entry in enumerate(result['input_list']):
+                cleaned = {key: val for key, val in entry.items() if key in keys}
+                result['input_list'][idx] = cleaned
+        else:
+            # Single input
+            result = {key: val for key, val in result.items() if key in keys}
+
         # Handle partial credit based on attempt number
         if self.config['attempt_based_credit']:
             self.apply_attempt_based_credit(result, kwargs.get('attempt'))
@@ -467,6 +479,13 @@ class ItemGrader(AbstractGrader):
             answer that received a grade of 0 (default "")
     """
 
+    def __init__(self, config=None, **kwargs):
+        """
+        Validate the ItemGrader's configuration, then call post-schema validation.
+        """
+        super(ItemGrader, self).__init__(config, **kwargs)
+        self.config['answers'] = self.post_schema_ans_val(self.config['answers'])
+
     @property
     def schema_config(self):
         """
@@ -494,6 +513,21 @@ class ItemGrader(AbstractGrader):
             answer_tuple = (answer_tuple,)
         schema = Schema((self.validate_single_answer,))
         return schema(answer_tuple)
+
+    def post_schema_ans_val(self, answer_tuple):
+        """
+        Perform any post-schema validation on the answer tuple. This function should be
+        idempotent, as it may be called on a configuration multiple times.
+
+        Any post-schema validation that doesn't work with the answer tuple should be
+        handled in a shadowed __init__ function. The reason this function is invoked
+        separately is so that it can also be called on inferred answers.
+
+        Returns the validated answer_tuple.
+
+        This function exists to be shadowed.
+        """
+        return answer_tuple
 
     def validate_single_answer(self, answer):
         """
@@ -675,6 +709,9 @@ class ItemGrader(AbstractGrader):
             self.config['answers'] = self.schema_answers(inferred)
             # Note that this answer is now stored for future calls, but
             # will be overridden if a new expect value is provided.
+
+            # Perform post-schema answer validation
+            self.config['answers'] = self.post_schema_ans_val(self.config['answers'])
 
             # Mark that we are using inferred answers
             self.inferring_answers = True

@@ -11,7 +11,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 
 import six
 import numpy as np
-from voluptuous import Required, Any
+from voluptuous import Required, Any, Schema
 from mitxgraders.helpers import munkres
 from mitxgraders.baseclasses import AbstractGrader, ItemGrader
 from mitxgraders.exceptions import ConfigError, MissingInput
@@ -76,7 +76,7 @@ def padded_check(check):
     """Wraps a check function to reject _AutomaticFailure"""
     def _check(ans, inp):
         if isinstance(ans, _AutomaticFailure) or isinstance(inp, _AutomaticFailure):
-            return {'ok': False, 'msg': '', 'grade_decimal': 0}
+            return {'ok': False, 'msg': '', 'grade_decimal': 0, 'all_awarded': False}
         return check(ans, inp)
     return _check
 
@@ -115,14 +115,13 @@ def consolidate_grades(grade_decimals, n_expect=None):
 
     return max(0, avg)
 
-def consolidate_cfn_return(input_list, overall_message="", n_expect=None, partial_credit=True):
-    """
-    Consolidates a long-form customresponse return dictionary.
+def consolidate_single_return(input_list, n_expect=None, partial_credit=True):
+    r"""
+    Consolidates a long-form customresponse return dictionary into a single dictionary.
 
     Arguments:
         input_list (list): a list of customresponse single-answer dictionaries
             each has keys 'ok', 'grade_decimal', 'msg'
-        overall_message (str): an overall message
         n_expect: The expected number of answers, defaults to len(input_list).
             Used in assigning partial credit.
 
@@ -137,11 +136,9 @@ def consolidate_cfn_return(input_list, overall_message="", n_expect=None, partia
     >>> expect = {
     ...     'ok':'partial',
     ...     'grade_decimal': (1 + 0.5 + 0 + 0.1)/4,
-    ...     'msg': 'summary\\nmsg_0\\nmsg_1\\nmsg_2\\nmsg_3' # escape newlines in docstring
+    ...     'msg': 'msg_0\nmsg_1\nmsg_2\nmsg_3'
     ... }
-    >>> result = consolidate_cfn_return(input_list,
-    ...     overall_message = "summary"
-    ... )
+    >>> result = consolidate_single_return(input_list)
     >>> expect == result
     True
     """
@@ -153,10 +150,9 @@ def consolidate_cfn_return(input_list, overall_message="", n_expect=None, partia
     if not partial_credit:
         if grade_decimal < 1:
             grade_decimal = 0
-    ok_status = ItemGrader.grade_decimal_to_ok(grade_decimal)
+    ok_status = AbstractGrader.grade_decimal_to_ok(grade_decimal)
 
-    # TODO Discuss: Do we want the overall_message to go first or last?
-    messages = [overall_message] + [result['msg'] for result in input_list]
+    messages = [result['msg'] for result in input_list]
 
     result = {
         'grade_decimal': grade_decimal,
@@ -284,18 +280,29 @@ class ListGrader(AbstractGrader):
 
             # Validate answer_list using the subgraders
             for answer_list in answers_tuple:
-                for index, answer in enumerate(answer_list):
-                    answer_list[index] = subgraders[index].schema_answers(answer)
+                for idx, answer in enumerate(answer_list):
+                    # Run the answers through the subgrader schema and the post-schema validation
+                    answer_list[idx] = subgraders[idx].schema_answers(answer)
+                    answer_list[idx] = subgraders[idx].post_schema_ans_val(answer_list[idx])
         else:
             # We have a single subgrader
             subgrader = self.config['subgraders']
 
             # Validate answer_list using the subgraders
             for answer_list in answers_tuple:
-                for index, answer in enumerate(answer_list):
-                    answer_list[index] = subgrader.schema_answers(answer)
+                for idx, answer in enumerate(answer_list):
+                    # Run the answers through the subgrader schema and the post-schema validation
+                    answer_list[idx] = subgrader.schema_answers(answer)
+                    answer_list[idx] = subgrader.post_schema_ans_val(answer_list[idx])
 
         return answers_tuple
+
+    def post_schema_ans_val(self, answer_tuple):
+        """
+        This function is used by ItemGraders for answer validation.
+        It's included here because it may be called for nested ListGraders.
+        """
+        return answer_tuple
 
     @staticmethod
     def create_grouping_map(grouping):
@@ -633,37 +640,26 @@ class SingleListGrader(ItemGrader):
         """Define the configuration options for SingleListGrader"""
         # Construct the default ItemGrader schema
         schema = super(SingleListGrader, self).schema_config
-        # Append options, replacing the ItemGrader 'answers' key
+        # Append options
         return schema.extend({
             Required('ordered', default=False): bool,
             Required('length_error', default=False): bool,
             Required('missing_error', default=True): bool,
             Required('delimiter', default=','): text_string,
             Required('partial_credit', default=True): bool,
-            Required('subgrader'): ItemGrader,
-            Required('answers', default=[]): Any(list, (list,))  # Allow for a tuple of lists
+            Required('subgrader'): ItemGrader
         })
-
-    # Make sure that the ItemGrader validate_expect isn't used
-    validate_expect = None
+        # Note that we use the ItemGrader definitions for 'answers', although
+        # validate_expect is shadowed, and we do post-processing in post_schema_ans_val
 
     def __init__(self, config=None, **kwargs):
         """
         Validate the SingleListGrader's configuration.
-        This is a bit different from other graders, because the validation of the answers
-        depends on the subgrader item in the config. Hence, we validate in three steps:
-        0. Subgrader class is initialized and checked before this class is initialized
-        1. Validate the config for this class, checking that answers is a list
-        2. Validate the answers by using the subgrader class
         """
         # Step 1: Validate the configuration of this list using the usual routines
         super(SingleListGrader, self).__init__(config, **kwargs)
 
-        # Step 2: Validate the answers
-        self.config['answers'] = self.schema_answers(self.config['answers'])
-
-        # Step 3: Ensure that nested SingleListGraders all use different delimiters
-        # Required here as schema_answers does not run when embedded in a ListGrader
+        # Step 2: Ensure that nested SingleListGraders all use different delimiters
         if isinstance(self.config['subgrader'], SingleListGrader):
             delimiters = [self.config['delimiter']]
             subgrader = self.config['subgrader']
@@ -673,56 +669,54 @@ class SingleListGrader(ItemGrader):
                 delimiters.append(subgrader.config['delimiter'])
                 subgrader = subgrader.config['subgrader']
 
-    def schema_answers(self, answer_tuple):
+    def post_schema_ans_val(self, answer_tuple):
         """
-        Defines the schema to validate an answer tuple against.
-
-        This will transform the input to a tuple as necessary, and then attempt to
-        validate the answer_tuple using the defined subgraders.
-
-        Two forms for the answer tuple are acceptable:
-
-        1. A list of answers
-        2. A tuple of lists of answers
+        Used to validate the individual 'expect' lists in the 'answers' key.
+        This must be done after the schema has finished validation, as we need access
+        to the 'subgraders' configuration key to perform this validation.
         """
-        # Rename from the ItemGrader argument
-        answers_tuple = answer_tuple
-
-        # Turn answers_tuple into a tuple if it isn't already
-        if isinstance(answers_tuple, list):
-            if not answers_tuple:  # empty list
-                # Nothing further to check here. This must be a nested grader or inferring
-                # the answer from expect. In both cases, we'll be called upon again later
-                # to check the answers once we have them.
-                return tuple()
-            answers_tuple = (answers_tuple,)
-        elif not isinstance(answers_tuple, tuple):  # pragma: no cover
-            # Should not get here; voluptuous should catch this beforehand
-            raise ConfigError("Answer list must be a list or a tuple of lists")
+        # The structure of answer_tuple at this stage is:
+        # tuple(dict('expect', 'grade_decimal', 'ok', 'msg'))
+        # where 'expect' is a list that needs validation.
 
         # Check that all lists in the tuple have the same length
-        for answer_list in answers_tuple:
-            if len(answer_list) != len(answers_tuple[0]):
+        for answer_list in answer_tuple:
+            if len(answer_list['expect']) != len(answer_tuple[0]['expect']):
                 raise ConfigError("All possible list answers must have the same length")
 
         # Check for empty entries anywhere in answers_tuple (which can be a nested mess!)
-        # We do this before validating answer_list, as strings may be coerced into other
+        # We do this before validating individual entries, as strings may be coerced into other
         # objects by schema validation (e.g., FormulaGrader coerces expect into a dict)
         if self.config['missing_error']:
-            demand_no_empty(answers_tuple)
+            demand_no_empty(answer_tuple)
 
-        # Validate answer_list using the subgrader
-        for answer_list in answers_tuple:
-            for index, answer in enumerate(answer_list):
-                answer_list[index] = self.config['subgrader'].schema_answers(answer)
-            if not answer_list:
+        # Validate each entry in 'expect' lists using the subgrader
+        for answer_list in answer_tuple:
+            expect = answer_list['expect']
+            for index, answer in enumerate(expect):
+                # Run the answers through the subgrader schema and the post-schema validation
+                expect[index] = self.config['subgrader'].schema_answers(answer)
+                expect[index] = self.config['subgrader'].post_schema_ans_val(expect[index])
+            if not expect:
                 raise ConfigError("Cannot have an empty list of answers")
 
-        return answers_tuple
+        return answer_tuple
+
+    @staticmethod
+    def validate_expect(expect):
+        """
+        Defines the schema that answers should satisfy. For SingleListGrader, this is a list.
+        """
+        return Schema(list)(expect)
 
     def check_response(self, answer, student_input, **kwargs):
         """Check student_input against a given answer list"""
-        answers = answer  # Rename from the ItemGrader name
+        # Unpack the given answer
+        answers = answer['expect']  # The list of answers
+        msg = answer['msg']
+        grade_decimal = answer['grade_decimal']
+
+        # Split the student response
         student_list = student_input.split(self.config['delimiter'])
 
         # Check for empty entries in the list
@@ -737,6 +731,7 @@ class SingleListGrader(ItemGrader):
                 msg += ', '.join(map(str, bad_items))
                 raise MissingInput(msg)
 
+        # Check for the wrong number of entries
         if self.config['length_error'] and len(answers) != len(student_list):
             msg = 'List length error: Expected {} terms in the list, but received {}. ' + \
                   'Separate items with character "{}"'
@@ -758,9 +753,30 @@ class SingleListGrader(ItemGrader):
         else:
             input_list = find_optimal_order(checker, pad_ans, pad_stud)
 
-        result = consolidate_cfn_return(input_list,
-                                        n_expect=len(answers),
-                                        partial_credit=self.config['partial_credit'])
+        # Consolidate the separate results into a single result
+        result = consolidate_single_return(input_list,
+                                           n_expect=len(answers),
+                                           partial_credit=self.config['partial_credit'])
+
+        # Check if all inputs were awarded credit
+        if not isinstance(self.config['subgrader'], SingleListGrader):
+            # Check to see if all items were awarded credit
+            all_awarded = all(item['grade_decimal'] > 0 for item in input_list)
+        else:
+            # Check to see if all_awarded was True for all of the child SingleListGraders
+            all_awarded = all(item['all_awarded'] for item in input_list)
+
+        # Mark if all inputs were awarded in the result, so that any higher
+        # level graders can use this information.
+        result['all_awarded'] = all_awarded
+
+        # Append the message if there is one (and it's deserved)
+        if all_awarded and msg != '':
+                result['msg'] = msg if result['msg'] == '' else result['msg'] + '\n' + msg
+
+        # Apply the overall grade_decimal for this answer
+        result['grade_decimal'] *= grade_decimal
+        result['ok'] = AbstractGrader.grade_decimal_to_ok(result['grade_decimal'])
 
         return result
 
@@ -788,29 +804,18 @@ class SingleListGrader(ItemGrader):
 
 def demand_no_empty(obj):
     """
-    Recursively search through all lists and tuples in obj.
-    Make sure that all strings are non-empty.
-    If we find a dictionary, if it has an 'expect' key that is a string, make sure
-    it is non-empty also.
+    Recursively search through all tuples, lists and dictionaries in obj,
+    ensuring that all expect strings are non-empty.
     """
     if isinstance(obj, list) or isinstance(obj, tuple):
         for item in obj:
             demand_no_empty(item)
-    else:
-        test = obj
-        if isinstance(test, dict):
-            if 'expect' in test:
-                test = test['expect']
-            else:
-                return
-        if isinstance(test, six.string_types):
-            demand_nonempty_string(test)
-
-def demand_nonempty_string(text):
-    """Raise an error if text is empty"""
-    msg = ("There is a problem with the author's problem configuration: "
-           "Empty entry detected in answer list. Students receive an error "
-           "when supplying an empty entry. Set 'missing_error' to False in "
-           "order to allow such entries.")
-    if text.strip() == '':
-        raise ConfigError(msg)
+    elif isinstance(obj, dict) and 'expect' in obj:
+        demand_no_empty(obj['expect'])
+    elif isinstance(obj, six.string_types):
+        msg = ("There is a problem with the author's problem configuration: "
+               "Empty entry detected in answer list. Students receive an error "
+               "when supplying an empty entry. Set 'missing_error' to False in "
+               "order to allow such entries.")
+        if obj.strip() == '':
+            raise ConfigError(msg)
