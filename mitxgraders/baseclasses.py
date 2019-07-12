@@ -289,11 +289,11 @@ class AbstractGrader(ObjectWithSchema):
         if 'input_list' in result:
             # Multiple inputs
             for idx, entry in enumerate(result['input_list']):
-                cleaned = {key: val for key, val in entry.iteritems() if key in keys}
+                cleaned = {key: val for key, val in entry.items() if key in keys}
                 result['input_list'][idx] = cleaned
         else:
             # Single input
-            result = {key: val for key, val in result.iteritems() if key in keys}
+            result = {key: val for key, val in result.items() if key in keys}
 
         # Handle partial credit based on attempt number
         if self.config['attempt_based_credit']:
