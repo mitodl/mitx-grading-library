@@ -180,13 +180,13 @@
                         
                             
 <li >
-    <a href="../grading_lists/list_grader/">ListGrader</a>
+    <a href="../grading_lists/single_list_grader/">SingleListGrader</a>
 </li>
 
                         
                             
 <li >
-    <a href="../grading_lists/single_list_grader/">SingleListGrader</a>
+    <a href="../grading_lists/list_grader/">ListGrader</a>
 </li>
 
                         
@@ -268,6 +268,7 @@ True</code></pre>
 
 
 <p>You will often see this type of demonstration in this documentation. It serves both to demonstrate how the grader works and to ensure that our examples are always syntactically correct, as these code blocks form part of our documentation testing.</p>
+<p>Note that <code>grader</code> accepts two arguments. This is because edX passes two arguments to all graders. The first argument is the <code>expect</code> or <code>answer</code> value associated with the <code>customresponse</code> tag. Here, we supply <code>None</code>, as the grader already has its answer specified. The second argument is the student input. If the <code>customresponse</code> problem has multiple inputs, the second argument is a list of the student inputs.</p>
 <h2 id="specifying-answers">Specifying Answers<a class="headerlink" href="#specifying-answers" title="Permanent link"> # </a></h2>
 <p>For all <code>ItemGrader</code>s, the <code>answers</code> key can be used to specify correct answers, specific feedback messages, and to assign partial credit. It accepts a few formats:</p>
 <ul>

@@ -180,13 +180,13 @@
                         
                             
 <li >
-    <a href="grading_lists/list_grader/">ListGrader</a>
+    <a href="grading_lists/single_list_grader/">SingleListGrader</a>
 </li>
 
                         
                             
 <li >
-    <a href="grading_lists/single_list_grader/">SingleListGrader</a>
+    <a href="grading_lists/list_grader/">ListGrader</a>
 </li>
 
                         
@@ -286,8 +286,7 @@
 </ul>
 <h2 id="two-typical-examples">Two Typical Examples<a class="headerlink" href="#two-typical-examples" title="Permanent link"> # </a></h2>
 <p>Typical usage in an edX course looks like:</p>
-<pre class="codehilite"><code class="language-XML">&lt;!-- First Example --&gt;
-&lt;problem&gt;
+<pre class="codehilite"><code class="language-XML">&lt;problem&gt;
 &lt;script type=&quot;loncapa/python&quot;&gt;
 from mitxgraders import *
 grader = FormulaGrader(
@@ -344,7 +343,7 @@ grader = ListGrader(
 </ul>
 </li>
 </ul>
-<p><strong>Multi-input graders</strong> are for grading multiple input boxes at once. They are composed of single-input graders working in concert, handled by the general <code>ListGrader</code> class. At this stage, <code>ListGrader</code> is the only multi-input grader included in the library, although plugins can be used to construct further examples.</p>
+<p><strong>Multi-input graders</strong> are for grading multiple input boxes at once. They are composed of single-input graders working in concert, handled by the general <code>ListGrader</code> class. <code>ListGrader</code> is the only multi-input grader included in the library, but is incredibly general.</p>
 <ul>
 <li><a href="grading_lists/list_grader/">ListGrader</a> for grading a list of inputs. Examples:<ul>
 <li>grade an ordered list of text inputs</li>
@@ -353,7 +352,7 @@ grader = ListGrader(
 </ul>
 </li>
 </ul>
-<p><strong>Specialized graders</strong> are used to grade very specific situations. The only specialized grader we presently have is <code>IntegralGrader</code>.</p>
+<p><strong>Specialized graders</strong> are used to grade very specific situations. The only specialized grader we presently have is <code>IntegralGrader</code>, although plugins can be used to construct further examples.</p>
 <ul>
 <li><a href="grading_math/integral_grader/">IntegralGrader</a> for grading the construction of integrals.</li>
 </ul>
@@ -421,5 +420,5 @@ grader = ListGrader(
 
 <!--
 MkDocs version : 0.17.5
-Build Date UTC : 2019-07-12 13:59:45
+Build Date UTC : 2019-07-12 22:12:50
 -->
