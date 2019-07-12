@@ -28,7 +28,6 @@ Use MITxGraders because it:
 
 Typical usage in an edX course looks like:
 ```XML
-<!-- First Example -->
 <problem>
 <script type="loncapa/python">
 from mitxgraders import *
@@ -92,14 +91,14 @@ Grading classes generally fall into two categories: single-input graders and mul
     - [MatrixGrader](grading_math/matrix_grader/matrix_grader.md) for grading formulas with vectors and matrices
     - [SingleListGrader](grading_lists/single_list_grader.md) for grading a delimited (default: comma-separated) list of inputs in a single response box
 
-**Multi-input graders** are for grading multiple input boxes at once. They are composed of single-input graders working in concert, handled by the general `ListGrader` class. At this stage, `ListGrader` is the only multi-input grader included in the library, although plugins can be used to construct further examples.
+**Multi-input graders** are for grading multiple input boxes at once. They are composed of single-input graders working in concert, handled by the general `ListGrader` class. `ListGrader` is the only multi-input grader included in the library, but is incredibly general.
 
 - [ListGrader](grading_lists/list_grader.md) for grading a list of inputs. Examples:
     - grade an ordered list of text inputs
     - grade an unordered list of mathematical expressions
     - grade a list of eigenvalue-eigenvector pairs
 
-**Specialized graders** are used to grade very specific situations. The only specialized grader we presently have is `IntegralGrader`.
+**Specialized graders** are used to grade very specific situations. The only specialized grader we presently have is `IntegralGrader`, although plugins can be used to construct further examples.
 
 - [IntegralGrader](grading_math/integral_grader.md) for grading the construction of integrals.
 
