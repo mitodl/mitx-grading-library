@@ -10,7 +10,7 @@ from collections import namedtuple
 import six
 from voluptuous import Required, Any, Range, All, Optional
 from mitxgraders.exceptions import InputTypeError
-from mitxgraders.comparers import MatrixEntryComparer
+from mitxgraders.comparers import MatrixEntryComparer, equality_comparer
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from mitxgraders.helpers.validatorfuncs import NonNegative, Nullable, text_string
 from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
@@ -72,6 +72,9 @@ class MatrixGrader(FormulaGrader):
         that MatrixGrader instance with the given key values. If neither key is
         provided, equality_comparer is used.
     """
+
+    # Default comparer for MatrixGrader (independent of FormulaGrader)
+    default_comparer = staticmethod(equality_comparer)
 
     # merge_dicts does not mutate the originals
     default_functions = merge_dicts(FormulaGrader.default_functions,

@@ -5,6 +5,7 @@ from voluptuous import Schema, Required, Any, Range
 from mitxgraders.comparers.baseclasses import CorrelatedComparer
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 from mitxgraders.helpers.validatorfuncs import text_string
+from mitxgraders.exceptions import ConfigError
 
 def get_linear_fit_error(x, y):
     """
@@ -183,6 +184,11 @@ class LinearComparer(CorrelatedComparer):
             scalar_expected = isinstance(expected_0, Number)
             shape = tuple() if scalar_expected else expected_0.shape
             utils.validate_shape(student_evals[0], shape)
+
+        # Raise an error if there is less than 3 samples
+        if len(student_evals) < 3:
+            msg = 'Cannot perform linear comparison with less than 3 samples'
+            raise ConfigError(msg)
 
         is_comparing_zero = self.check_comparing_zero(comparer_params_evals,
                                                       student_evals, utils.tolerance)

@@ -1,5 +1,7 @@
-from mitxgraders import FormulaGrader, MatrixGrader, RealMatrices
+from pytest import raises
+from mitxgraders import FormulaGrader, MatrixGrader, RealMatrices, NumericalGrader
 from mitxgraders.comparers import LinearComparer
+from mitxgraders.exceptions import ConfigError
 
 def test_linear_comparer_default_modes():
     grader = FormulaGrader(
@@ -107,3 +109,15 @@ def test_works_with_matrixgrader():
     assert grader(None, '3*x*A*B^2 + 5*[[1, 1], [1, 1]]')['grade_decimal'] == 0.2
     assert grader(None, 'x*A*B^2 + x*[[1, 1], [1, 1]]')['grade_decimal'] == 0
     assert grader(None, '0*A')['grade_decimal'] == 0
+
+def test_linear_too_few_comparisons():
+    FormulaGrader.set_default_comparer(LinearComparer())
+    grader = FormulaGrader(samples=2)
+    with raises(ConfigError, match='Cannot perform linear comparison with less than 3 samples'):
+        grader('1.5', '1.5')
+
+    # Ensure that NumericalGrader does not use the same default comparer as FormulaGrader
+    grader = NumericalGrader()
+    assert grader('1.5', '1.5')['ok']
+
+    FormulaGrader.reset_default_comparer()
