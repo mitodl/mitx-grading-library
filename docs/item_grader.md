@@ -23,6 +23,8 @@ True
 
 You will often see this type of demonstration in this documentation. It serves both to demonstrate how the grader works and to ensure that our examples are always syntactically correct, as these code blocks form part of our documentation testing.
 
+Note that `grader` accepts two arguments. This is because edX passes two arguments to all graders. The first argument is the `expect` or `answer` value associated with the `customresponse` tag. Here, we supply `None`, as the grader already has its answer specified. The second argument is the student input. If the `customresponse` problem has multiple inputs, the second argument is a list of the student inputs.
+
 
 ## Specifying Answers
 
