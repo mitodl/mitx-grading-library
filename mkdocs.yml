@@ -21,8 +21,8 @@ pages:
     - AsciiMath Renderer Definitions: 'grading_math/renderer.md'
     - IntegralGrader: 'grading_math/integral_grader.md'
   - Grading Lists:
-    - ListGrader: 'grading_lists/list_grader.md'
     - SingleListGrader: 'grading_lists/single_list_grader.md'
+    - ListGrader: 'grading_lists/list_grader.md'
   - Plugins: 'plugins.md'
   - FAQs: 'faq.md'
   - Changelog: 'changelog.md'
