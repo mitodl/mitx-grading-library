@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
-    <title>Functions and Constants List - MITxGraders</title>
+    <title>IntegralGrader - MITxGraders</title>
 
     <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -146,8 +146,8 @@
 
                         
                             
-<li class="active">
-    <a href="./">Functions and Constants List</a>
+<li >
+    <a href="../functions_and_constants/">Functions and Constants List</a>
 </li>
 
                         
@@ -164,8 +164,8 @@
 
                         
                             
-<li >
-    <a href="../integral_grader/">IntegralGrader</a>
+<li class="active">
+    <a href="./">IntegralGrader</a>
 </li>
 
                         
@@ -221,12 +221,12 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../sampling/">
+                        <a rel="next" href="../renderer/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../comparer_functions/">
+                        <a rel="prev" href="../../grading_lists/list_grader/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -242,104 +242,12 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#mathematical-functions-and-constants">Mathematical Functions and Constants</a></li>
-            <li class="second-level"><a href="#formulagrader-and-numericalgrader-default-functions">FormulaGrader and NumericalGrader Default Functions</a></li>
-                
-            <li class="second-level"><a href="#matrixgrader-default-functions">MatrixGrader Default Functions</a></li>
-                
-            <li class="second-level"><a href="#default-constants">Default Constants</a></li>
-                
-            <li class="second-level"><a href="#optional-constant-collections">Optional Constant Collections</a></li>
-                
+        <li class="first-level active"><a href="#integralgrader">IntegralGrader</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="mathematical-functions-and-constants">Mathematical Functions and Constants<a class="headerlink" href="#mathematical-functions-and-constants" title="Permanent link"> # </a></h1>
-<h2 id="formulagrader-and-numericalgrader-default-functions">FormulaGrader and NumericalGrader Default Functions<a class="headerlink" href="#formulagrader-and-numericalgrader-default-functions" title="Permanent link"> # </a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Below, expressions marked with a * may require our <a href="../renderer/">AsciiMath renderer definitions</a> to display properly in edX.</p>
-</div>
-<p>By default, all of the following functions are made available to students in <code>FormulaGrader</code> problems.</p>
-<ul>
-<li><code>sin(x)</code> Sine</li>
-<li><code>cos(x)</code> Cosine</li>
-<li><code>tan(x)</code> Tangent</li>
-<li><code>sec(x)</code> Secant</li>
-<li><code>csc(x)</code> Cosecant</li>
-<li><code>cot(x)</code> Cotangent</li>
-<li><code>sqrt(x)</code> Square Root</li>
-<li><code>log10(x)</code> Log (base 10)*</li>
-<li><code>log2(x)</code> Log (base 2)*</li>
-<li><code>ln(x)</code> Natural logarithm</li>
-<li><code>exp(x)</code> Exponential</li>
-<li><code>arccos(x)</code> Inverse Cosine</li>
-<li><code>arcsin(x)</code> Inverse Sine</li>
-<li><code>arctan(x)</code> Inverse Tangent</li>
-<li><code>arctan2(x, y)</code> Four-quadrant Inverse Tangent*</li>
-<li><code>arcsec(x)</code> Inverse Secant*</li>
-<li><code>arccsc(x)</code> Inverse Cosecant*</li>
-<li><code>arccot(x)</code> Inverse Cotangent*</li>
-<li><code>abs(x)</code> Absolute value (real) or modulus (complex)</li>
-<li><code>factorial(x)</code> and <code>fact(x)</code> Factorial*<ul>
-<li>domain: all complex numbers except negative integers. Large outputs may raise <code>OverflowError</code>s.</li>
-</ul>
-</li>
-<li><code>sinh(x)</code> Hyperbolic Sine</li>
-<li><code>cosh(x)</code> Hyperbolic Cosine</li>
-<li><code>tanh(x)</code> Hyperbolic Tangent</li>
-<li><code>sech(x)</code> Hyperbolic Secant</li>
-<li><code>csch(x)</code> Hyperbolic Cosecant</li>
-<li><code>coth(x)</code> Hyperbolic Cotangent</li>
-<li><code>arcsinh(x)</code> Inverse Hyperbolic Sine*</li>
-<li><code>arccosh(x)</code> Inverse Hyperbolic Cosine*</li>
-<li><code>arctanh(x)</code> Inverse Hyperbolic Tangent*</li>
-<li><code>arcsech(x)</code> Inverse Hyperbolic Secant*</li>
-<li><code>arccsch(x)</code> Inverse Hyperbolic Cosecant*</li>
-<li><code>arccoth(x)</code> Inverse Hyperbolic Cotangent*</li>
-<li><code>floor(x)</code> Floor function (applies only to real numbers)</li>
-<li><code>ceil(x)</code> Ceiling function (applies only to real numbers)</li>
-<li><code>re(x)</code> Real part of a complex expression*</li>
-<li><code>im(x)</code> Imaginary part of a complex expression*</li>
-<li><code>conj(x)</code> Complex conjugate of a complex expression*</li>
-<li><code>kronecker(x, y)</code> Kronecker delta* (Note that we highly recommend integer sampling over a short range (eg, 1 to 4) when kronecker deltas appear in an answer, and using many samples (eg, 30) so that most permutations appear in the sampling.)</li>
-</ul>
-<h2 id="matrixgrader-default-functions">MatrixGrader Default Functions<a class="headerlink" href="#matrixgrader-default-functions" title="Permanent link"> # </a></h2>
-<p>In <code>MatrixGrader</code> problems, all <code>FormulaGrader</code> functions are available by default, as are the following extra functions:</p>
-<ul>
-<li><code>abs(x)</code>: absolute value of a scalar or magnitude of a vector</li>
-<li><code>adj(x)</code>: Hermitian adjoint, same as <code>ctrans(x)</code></li>
-<li><code>cross(x, y)</code>: cross product, inputs must be 3-component vectors</li>
-<li><code>ctrans(x)</code>: conjugate transpose, same as <code>adj(x)</code></li>
-<li><code>det(x)</code>: determinant, input must be square matrix</li>
-<li><code>norm(x)</code>: Frobenius norm, works for scalars, vectors, and matrices</li>
-<li><code>trans(x)</code>: transpose</li>
-<li><code>trace(x)</code>: trace</li>
-</ul>
-<h2 id="default-constants">Default Constants<a class="headerlink" href="#default-constants" title="Permanent link"> # </a></h2>
-<p>Available in <code>FormulaGrader</code>, <code>NumericalGrader</code>, and <code>MatrixGrader</code> by default:</p>
-<ul>
-<li><code>i</code>: imaginary unit</li>
-<li><code>j</code>: imaginary unit</li>
-<li><code>e</code>: approximately 2.718281828</li>
-<li><code>pi</code>: approximately 3.141592654</li>
-</ul>
-<h2 id="optional-constant-collections">Optional Constant Collections<a class="headerlink" href="#optional-constant-collections" title="Permanent link"> # </a></h2>
-<p>The <code>mitxgraders.helpers.calc</code> module provides a few collections of constants that can be imported for convenience and reuse. For example, <code>pauli</code> is a dictionary with keys <code>sigma_x</code>, <code>sigma_y</code>, and <code>sigma_z</code> that are <a href="../matrix_grader/matrix_grader/#matrix-operations-and-matharrays"><code>MathArray</code></a> representations of the 2 by 2 Pauli matrices.</p>
-<p>The collections of mathematical constants provided by <code>mitxgraders.helpers.calc</code> are:</p>
-<ul>
-<li><code>pauli</code>: MathArray representations of the 2 by 2 Pauli matrices, <code>sigma_x</code>, <code>sigma_y</code>, and <code>sigma_z</code></li>
-<li><code>cartesian_xyz</code>: MathArray representations of the three-dimensional Cartesian unit vectors, named <code>hatx</code>, <code>haty</code>, <code>hatz</code></li>
-<li><code>cartesian_ijk</code>: MathArray representations of the three-dimensional Cartesian unit vectors, named <code>hati</code>, <code>hatj</code>, <code>hatk</code></li>
-</ul>
-<p>Each collection is a dictionary that can be provided as a value of <code>user_constants</code>:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import MatrixGrader
-&gt;&gt;&gt; from mitxgraders.helpers.calc import pauli
-&gt;&gt;&gt; grader = MatrixGrader(
-...   answers='sigma_x + sigma_z',
-...   user_constants=pauli
-... )</code></pre></div>
+<h1 id="integralgrader">IntegralGrader<a class="headerlink" href="#integralgrader" title="Permanent link"> # </a></h1></div>
         
     </div>
 

@@ -66,6 +66,11 @@
      <changefreq>daily</changefreq>
     </url>
     <url>
+     <loc>/grading_math/integral_grader/</loc>
+     <lastmod>2019-07-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
      <loc>/grading_lists/list_grader/</loc>
      <lastmod>2019-07-12</lastmod>
      <changefreq>daily</changefreq>
