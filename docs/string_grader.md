@@ -1,6 +1,6 @@
 # StringGrader
 
-The `StringGrader` class grades text inputs. It can perform comparisons to expected answers or patterns, and can also accept arbitrary input. It is the simplest grading class, both in code and in usage.
+The `StringGrader` class is an `ItemGrader` that grades text inputs. It can perform comparisons to expected answers or patterns, and can also accept arbitrary input. It is the simplest grading class, both in code and in usage.
 
 To use a `StringGrader` in its simplest form, simply pass in the set of answers you want to grade, as described in the [ItemGrader documentation](item_grader.md).
 
@@ -18,7 +18,7 @@ True
 
 ```
 
-This will accept the answer of `cat`, but not `CAT` or `Cat`, as grading is case-sensitive by default.
+This example will accept the answer of `cat`, but not `CAT` or `Cat`, as grading is case-sensitive by default.
 
 
 ## Cleaning Input
@@ -53,7 +53,7 @@ True
 
 ```
 
-Here, the answer is `two  spaces`, complete with two spaces. A students' answer of `two spaces` (with a single space) would be graded incorrect.
+Here, the answer is `two  spaces`, complete with two spaces (which may not render on a webpage). A student's answer of `two spaces` (with a single space) would be graded incorrect.
 
 Finally, you may have a situation where spaces are completely irrelevant (e.g., when grading a mathematical expression). To instruct the grader to completely ignore all spaces, set `strip_all=True`.
 
@@ -91,9 +91,9 @@ True
 This will accept `Cat`, `cat` and `CAT`. By default, `case_sensitive=True`.
 
 
-## Accepting anything (within reason!)
+## Accepting Anything
 
-Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). This can be useful, for example, when asking for a free response to a prompt, and can be used in conjunction with validation (see below) to accept a variety of answers that satisfy a given pattern. To do this, set the `accept_any` flag, which will literally accept anything that is entered into the textbox.
+Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). This can be useful, for example, when asking for a free response to a prompt, and can be used in conjunction with validation (see below) to accept a variety of answers that satisfy a given pattern. To do this, set the `accept_any` flag, which will cause the grader to literally accept anything that is entered into the textbox.
 
 ```pycon
 >>> grader = StringGrader(
@@ -146,35 +146,39 @@ True
 ...                               'msg': 'Your response is too short (2/3 words)',
 ...                               'ok': False}
 True
+>>> grader(None, '  a  b  c  d  ') == {'grade_decimal': 0,
+...                                    'msg': 'Your response is too short (7/10 characters)',
+...                                    'ok': False}
+True
 
 ```
 
-Note that punctuation doesn't break a word for the purpose of word counting, so `isn't word-counting fun?` will only count as three words. If `accept_nonempty` and `min_length` are both used, the more stringent requirement is the one that is used.
+Note that punctuation doesn't break a word for the purpose of word counting, so `isn't word-counting fun?` will only count as three words. If `accept_nonempty` and `min_length` are both used, the longer requirement is the one that is used.
 
 When a student's answer is rejected because it doesn't meet the minimum requirements, there are three types of feedback that you can provide, controlled by the `explain_minimums` flag:
 
-* The student receives an error message describing how many words/characters they have, compared to how many are required. This does not consume an attempt (`explain_minimums='err'`, default)
-* The student is graded incorrect, but a message is provided describing how many words/characters they have, compared to how many are required. This does consume an attempt (`explain_minimums='msg'`)
-* The student is graded incorrect, and no explanation is given. This does consume an attempt (`explain_minimums=None`)
+* The student receives an error message describing how many words/characters they have, compared to how many are required. This does not consume an attempt (`explain_minimums='err'`, default).
+* The student is graded incorrect, but a message is provided describing how many words/characters they have, compared to how many are required. This consumes an attempt (`explain_minimums='msg'`).
+* The student is graded incorrect, and no explanation is given. This consumes an attempt (`explain_minimums=None`).
 
-The flags `min_length`, `min_words` and `explain_minimums` are all ignored if not using `accept_any` or `accept_nonempty`.
+The settings `min_length`, `min_words` and `explain_minimums` are all ignored if not using `accept_any` or `accept_nonempty`.
 
 
 ## Validating Input
 
 Sometimes, you may want to validate student input against a pattern. This can be useful if the student response simply needs to follow a given pattern, or if you want to reject student responses that don't conform to the required format. Validation can be used both when comparing against an expected response, or when using `accept_any` (and variants).
 
-Validation is performed by constructing a python regular expressions (regex) pattern, stored in the `validation_pattern` flag (if you are unfamiliar with regular expressions, there are many excellent tutorials available online to get you started!). After input cleaning, the student input is checked against the pattern for a match. If no match is found, the desired response is returned. Expected answers are also checked against the pattern; if a possible answer does not conform to the pattern, then a `ConfigError` is raised.
+Validation is performed by constructing a python regular expressions (regex) pattern, stored in the `validation_pattern` flag (if you are unfamiliar with regular expressions, there are many excellent tutorials available online to get you started!). After input cleaning, the student input is checked against the pattern for a match. If no match is found, the desired response is returned. Expected answers are also checked against the pattern; if a possible answer does not conform to the pattern, then a configuration error results.
 
 When a response doesn't satisfy the given pattern, there are three types of feedback that you can provide, controlled by the `explain_validation` flag:
 
-* The student receives an error message. This does not consume an attempt (`explain_validation='err'`, default)
-* The student is graded incorrect, but receives a message. This does consume an attempt (`explain_validation='msg'`)
-* The student is graded incorrect, and no explanation is given. This does consume an attempt (`explain_validation=None`)
+* The student receives an error message. This does not consume an attempt (`explain_validation='err'`, default).
+* The student is graded incorrect, but receives a message. This consumes an attempt (`explain_validation='msg'`).
+* The student is graded incorrect, and no explanation is given. This consumes an attempt (`explain_validation=None`).
 
-In the first two cases, the message provided is given by the `invalid_msg` flag, which defaults to `Your input is not in the expected format`.
+In the first two cases, the message provided is given by the `invalid_msg` setting, which defaults to `Your input is not in the expected format`.
 
-Here is an example of using a validation pattern to accept inputs that look like chemical formulae for organic molecules. Note that anything that matches the pattern will be accepted.
+Here is an example of using a validation pattern to accept inputs that look like chemical formulae for organic molecules. Note that anything that matches the pattern will be graded correct.
 
 ```pycon
 >>> grader = StringGrader(
@@ -195,7 +199,7 @@ True
 
 ```
 
-Here, we use validation to ensure that the student input matches the desired format before comparing to the answer, and give the student an error message if their input doesn't match the specification.
+Below, we use validation to ensure that the student input matches the desired format before comparing to the answer, and give the student an error message if their input doesn't match the specification.
 
 ```pycon
 >>> grader = StringGrader(
@@ -210,6 +214,11 @@ True
 True
 >>> try:
 ...     grader(None, '(a)(2)')
+... except InvalidInput as error:
+...     print(error)
+Your input is not in the expected format
+>>> try:
+...     grader(None, '[1)(2)')
 ... except InvalidInput as error:
 ...     print(error)
 Your input is not in the expected format

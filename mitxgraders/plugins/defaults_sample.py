@@ -54,3 +54,10 @@ from mitxgraders.formulagrader.matrixgrader import MatrixGrader
 # MatrixGrader.register_defaults({
 #     'entry_partial_credit': 'partial'
 # })
+
+# You can also use this plug-in to make pre-built graders and functions available to
+# all your problems. You just need to include them in the __all__ list. For example:
+# my_grader = FormulaGrader(variables=['x', 'y'])
+# __all__ = ['my_grader']
+# Now, "from mitxgraders import *"" will make my_grader available to you in a problem
+# You can similarly define custom functions etc, in the same way.
