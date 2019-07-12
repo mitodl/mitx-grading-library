@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <link rel="shortcut icon" href="../img/favicon.ico">
 
-    <title>ItemGrader - MITxGraders</title>
+    <title>Frequently Asked Questions - MITxGraders</title>
 
     <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -72,7 +72,7 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -95,8 +95,8 @@
 
                         
                             
-<li class="active">
-    <a href="./">ItemGrader</a>
+<li >
+    <a href="../item_grader/">ItemGrader</a>
 </li>
 
                         
@@ -195,8 +195,8 @@
                 
                 
                 
-                    <li >
-                        <a href="../faq/">Frequently Asked Questions</a>
+                    <li class="active">
+                        <a href="./">Frequently Asked Questions</a>
                     </li>
                 
                 
@@ -215,12 +215,12 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../graders/">
+                        <a rel="next" href="../plugins/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../string_grader/">
+                        <a rel="prev" href="../changelog/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -236,107 +236,16 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#itemgrader">ItemGrader</a></li>
-            <li class="second-level"><a href="#specifying-answers">Specifying Answers</a></li>
-                
-            <li class="second-level"><a href="#option-listing">Option Listing</a></li>
-                
+        <li class="first-level active"><a href="#frequently-asked-questions-faqs">Frequently Asked Questions (FAQs)</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="itemgrader">ItemGrader<a class="headerlink" href="#itemgrader" title="Permanent link"> # </a></h1>
-<p>When an individual input needs to be graded, it is graded by an <code>ItemGrader</code>. All <code>ItemGrader</code>s work by specifying answers and their corresponding points/messages, as well as an optional message for wrong answers. In these examples, we use <code>StringGrader</code> as an example of how to use a generic <code>ItemGrader</code>. You cannot use a generic <code>ItemGrader</code> by itself.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = StringGrader(
-...     answers='cat',
-...     wrong_msg='Try again!'
-... )</code></pre>
-
-
-<p>The grader is set up to grade an answer of <code>cat</code> as correct, and includes a message that is presented to students if they get the answer wrong. One could pass <code>grader</code> in as the <code>cfn</code> key for a <code>customresponse</code> tag. The following code demonstrates what happens when the grader is called using python (for example, inside a python console). Note that this is only for demonstrating the behavior of the grader, and is not required in order to use the library in edX.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<p>You will often see this type of demonstration in this documentation. It serves both to demonstrate how the grader works and to ensure that our examples are always syntactically correct, as these code blocks form part of our documentation testing.</p>
-<h2 id="specifying-answers">Specifying Answers<a class="headerlink" href="#specifying-answers" title="Permanent link"> # </a></h2>
-<p>For all <code>ItemGrader</code>s, the <code>answers</code> key can be used to specify correct answers, specific feedback messages, and to assign partial credit. It accepts a few formats:</p>
+<h1 id="frequently-asked-questions-faqs">Frequently Asked Questions (FAQs)<a class="headerlink" href="#frequently-asked-questions-faqs" title="Permanent link"> # </a></h1>
 <ul>
-<li>
-<p>A single dictionary can be used to specify an answer, feedback, correctness, and partial credit. The dictionary keys are:</p>
-<ul>
-<li><code>'expect'</code> (required): compared against student answer. Most <code>ItemGrader</code>s use strings to specify the <code>'expect'</code> value.</li>
-<li><code>'grade_decimal'</code> (optional, a number between <code>0</code> and <code>1</code> inclusive): The credit associated with this answer (default <code>1</code>).</li>
-<li><code>'msg'</code> (optional, string): An optional feedback message associated with this answer (default <code>''</code>).</li>
+<li>Does the grading library work with multiple choice/checkbox/dropdown lists?</li>
 </ul>
-</li>
-</ul>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers={'expect': 'zebra', 'grade_decimal': 1, 'msg': 'Yay!'},
-...     wrong_msg='Try again!'
-... )
-&gt;&gt;&gt; grader(None, 'zebra') == {'grade_decimal': 1, 'msg': 'Yay!', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<ul>
-<li>A single <code>'expect'</code> value: can be used to specify the correct answer. For example,</li>
-</ul>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers='zebra',
-...     # Equivalent to:
-...     # answers={'expect': 'zebra', 'msg': '', 'grade_decimal': 1}
-...     wrong_msg='Try again!'
-... )
-&gt;&gt;&gt; grader(None, 'zebra') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<p>Again, most <code>ItemGrader</code>s use strings to store <code>'expect'</code> values.</p>
-<ul>
-<li>A tuple of the afore-mentioned dictionaries/strings, which specifies multiple possible answers:</li>
-</ul>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers=(
-...         # the correct answer
-...         'wolf',
-...         # an alternative correct answer
-...         'canis lupus',
-...         # a partially correct answer
-...         {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
-...         # a wrong answer with specific feedback
-...         {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
-...     ),
-...     wrong_msg='Try again!'
-... )
-&gt;&gt;&gt; grader(None, 'wolf') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'canis lupus') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 0.5, 'msg': 'No, not dog!', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader(None, 'unicorn') == {'grade_decimal': 0, 'msg': 'No, not unicorn!', 'ok': False}
-True
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<p>Internally, the <code>ItemGrader</code> converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.</p>
-<p>The <code>wrong_msg</code> is only displayed if the score is zero and there are no other messages.</p>
-<p>If no <code>answers</code> key is provided, the grader reads from the <code>expect</code> or <code>answer</code> parameter of the <code>customresponse</code> tag (see <a href="../edx/">edX Syntax</a>). Note that when using a <code>ListGrader</code>, the <code>answers</code> key is required.</p>
-<h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
-<p>Here is the full list of options specific to <code>ItemGrader</code>s.</p>
-<pre class="codehilite"><code class="language-python">grader = ItemGrader(
-    answers=(str, dict, (str, dict)),
-    wrong_msg=str,  # default ''
-)</code></pre></div>
+<p>Unfortunately, no. Those problem types cannot be used in a <code>customresponse</code> problem, so we can't grade them with a python grader.</p></div>
         
     </div>
 

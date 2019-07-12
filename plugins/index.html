@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <link rel="shortcut icon" href="../img/favicon.ico">
 
-    <title>ItemGrader - MITxGraders</title>
+    <title>Plugins - MITxGraders</title>
 
     <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -72,7 +72,7 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -95,8 +95,8 @@
 
                         
                             
-<li class="active">
-    <a href="./">ItemGrader</a>
+<li >
+    <a href="../item_grader/">ItemGrader</a>
 </li>
 
                         
@@ -189,8 +189,8 @@
                 
                 
                 
-                    <li >
-                        <a href="../plugins/">Plugins</a>
+                    <li class="active">
+                        <a href="./">Plugins</a>
                     </li>
                 
                 
@@ -215,12 +215,12 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../graders/">
+                        <a rel="next" href="../grading_lists/single_list_grader/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../string_grader/">
+                        <a rel="prev" href="../faq/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -236,107 +236,27 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#itemgrader">ItemGrader</a></li>
-            <li class="second-level"><a href="#specifying-answers">Specifying Answers</a></li>
-                
-            <li class="second-level"><a href="#option-listing">Option Listing</a></li>
+        <li class="first-level active"><a href="#plugins">Plugins</a></li>
+            <li class="second-level"><a href="#overriding-library-defaults">Overriding Library Defaults</a></li>
                 
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="itemgrader">ItemGrader<a class="headerlink" href="#itemgrader" title="Permanent link"> # </a></h1>
-<p>When an individual input needs to be graded, it is graded by an <code>ItemGrader</code>. All <code>ItemGrader</code>s work by specifying answers and their corresponding points/messages, as well as an optional message for wrong answers. In these examples, we use <code>StringGrader</code> as an example of how to use a generic <code>ItemGrader</code>. You cannot use a generic <code>ItemGrader</code> by itself.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = StringGrader(
-...     answers='cat',
-...     wrong_msg='Try again!'
-... )</code></pre>
+<h1 id="plugins">Plugins<a class="headerlink" href="#plugins" title="Permanent link"> # </a></h1>
+<p>Plugins are an advanced feature of the library that allows users to construct their own custom-built graders, built on top of the infrastructure of the library. They can also be used to allow for straightforward code re-use, and to override library defaults on a course-wide basis.</p>
+<p>Any <code>.py</code> file stored in the <code>mitxgraders/plugins</code> folder will be automatically loaded. All variables in the <code>__all__</code> list will be made available when doing <code>from mitxgraders import *</code>. See <code>template.py</code> for an example.</p>
+<p>You can define custom grading classes in your plugin. To learn how this works, we recommend copying the code from <code>stringgrader.py</code>, renaming the class, and building a simple plugin based on <code>StringGrader</code>.</p>
+<p>We are happy to include user-contributed plugins in the repository for this library. If you have built a plugin that you would like to see combined into this library, please contact the authors through <a href="https://github.com/mitodl/mitx-grading-library">github</a>. We are also willing to consider incorporating good plugins into the library itself.</p>
+<h2 id="overriding-library-defaults">Overriding Library Defaults<a class="headerlink" href="#overriding-library-defaults" title="Permanent link"> # </a></h2>
+<p>Library defaults for any grading class can be specified by constructing the desired dictionary of defaults, and calling <code>register_defaults(dict)</code> on the class. For example, to specify that all <code>StringGrader</code>s should be case-insensitive by default, you can do the following.</p>
+<pre class="codehilite"><code class="language-pycon">StringGrader.register_defaults({
+    'case_sensitive': False
+})</code></pre>
 
 
-<p>The grader is set up to grade an answer of <code>cat</code> as correct, and includes a message that is presented to students if they get the answer wrong. One could pass <code>grader</code> in as the <code>cfn</code> key for a <code>customresponse</code> tag. The following code demonstrates what happens when the grader is called using python (for example, inside a python console). Note that this is only for demonstrating the behavior of the grader, and is not required in order to use the library in edX.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<p>You will often see this type of demonstration in this documentation. It serves both to demonstrate how the grader works and to ensure that our examples are always syntactically correct, as these code blocks form part of our documentation testing.</p>
-<h2 id="specifying-answers">Specifying Answers<a class="headerlink" href="#specifying-answers" title="Permanent link"> # </a></h2>
-<p>For all <code>ItemGrader</code>s, the <code>answers</code> key can be used to specify correct answers, specific feedback messages, and to assign partial credit. It accepts a few formats:</p>
-<ul>
-<li>
-<p>A single dictionary can be used to specify an answer, feedback, correctness, and partial credit. The dictionary keys are:</p>
-<ul>
-<li><code>'expect'</code> (required): compared against student answer. Most <code>ItemGrader</code>s use strings to specify the <code>'expect'</code> value.</li>
-<li><code>'grade_decimal'</code> (optional, a number between <code>0</code> and <code>1</code> inclusive): The credit associated with this answer (default <code>1</code>).</li>
-<li><code>'msg'</code> (optional, string): An optional feedback message associated with this answer (default <code>''</code>).</li>
-</ul>
-</li>
-</ul>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers={'expect': 'zebra', 'grade_decimal': 1, 'msg': 'Yay!'},
-...     wrong_msg='Try again!'
-... )
-&gt;&gt;&gt; grader(None, 'zebra') == {'grade_decimal': 1, 'msg': 'Yay!', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<ul>
-<li>A single <code>'expect'</code> value: can be used to specify the correct answer. For example,</li>
-</ul>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers='zebra',
-...     # Equivalent to:
-...     # answers={'expect': 'zebra', 'msg': '', 'grade_decimal': 1}
-...     wrong_msg='Try again!'
-... )
-&gt;&gt;&gt; grader(None, 'zebra') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<p>Again, most <code>ItemGrader</code>s use strings to store <code>'expect'</code> values.</p>
-<ul>
-<li>A tuple of the afore-mentioned dictionaries/strings, which specifies multiple possible answers:</li>
-</ul>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers=(
-...         # the correct answer
-...         'wolf',
-...         # an alternative correct answer
-...         'canis lupus',
-...         # a partially correct answer
-...         {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
-...         # a wrong answer with specific feedback
-...         {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
-...     ),
-...     wrong_msg='Try again!'
-... )
-&gt;&gt;&gt; grader(None, 'wolf') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'canis lupus') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 0.5, 'msg': 'No, not dog!', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader(None, 'unicorn') == {'grade_decimal': 0, 'msg': 'No, not unicorn!', 'ok': False}
-True
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<p>Internally, the <code>ItemGrader</code> converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.</p>
-<p>The <code>wrong_msg</code> is only displayed if the score is zero and there are no other messages.</p>
-<p>If no <code>answers</code> key is provided, the grader reads from the <code>expect</code> or <code>answer</code> parameter of the <code>customresponse</code> tag (see <a href="../edx/">edX Syntax</a>). Note that when using a <code>ListGrader</code>, the <code>answers</code> key is required.</p>
-<h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
-<p>Here is the full list of options specific to <code>ItemGrader</code>s.</p>
-<pre class="codehilite"><code class="language-python">grader = ItemGrader(
-    answers=(str, dict, (str, dict)),
-    wrong_msg=str,  # default ''
-)</code></pre></div>
+<p>When this code is included in a file in the plugins folder, it automatically runs every time the library is loaded, leading to course-wide defaults. If for some reason you need to reset to the library defaults for a specific problem, you can call <code>clear_registered_defaults()</code> on the class in that problem.</p>
+<p>An example plugin has been provided for you in <code>defaults_sample.py</code>. The code in this plugin is commented out so that it doesn't change anything by default. If you are interested in overriding library defaults on a course-wide basis, we recommend copying this file to <code>defaults.py</code> and setting the desired defaults using the code templates provided. This is particularly useful if you wish to use attempt-based partial credit throughout your course.</p></div>
         
     </div>
 

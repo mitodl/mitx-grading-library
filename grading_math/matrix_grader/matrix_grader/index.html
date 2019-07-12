@@ -84,6 +84,18 @@
                         
                             
 <li >
+    <a href="../../../edx/">edX Syntax</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../../graders/">Introduction to Graders</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../../../item_grader/">ItemGrader</a>
 </li>
 
@@ -91,12 +103,6 @@
                             
 <li >
     <a href="../../../string_grader/">StringGrader</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../../../edx/">edX Syntax</a>
 </li>
 
                         
@@ -179,6 +185,18 @@
 
                         
                         </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../../plugins/">Plugins</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../../faq/">Frequently Asked Questions</a>
                     </li>
                 
                 
@@ -534,9 +552,11 @@ MathArray([30, 63])</code></pre>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; vec = MathArray([1, 2, 3])
 &gt;&gt;&gt; row = MathArray([[1, 2, 3]])
 &gt;&gt;&gt; col = MathArray([[1], [2], [3]])
-&gt;&gt;&gt; vec + row # raises error
-Traceback (most recent call last):
-MathArrayShapeError: Cannot add/subtract a vector of length 3 with a matrix of shape (rows: 1, cols: 3).
+&gt;&gt;&gt; try:
+...     vec + row # raises error
+... except StudentFacingError as error:
+...     print(error)
+Cannot add/subtract a vector of length 3 with a matrix of shape (rows: 1, cols: 3).
 
 &gt;&gt;&gt; A = MathArray([[1, 2, 3], [4, 5, 6]])
 &gt;&gt;&gt; A * vec # matrix * vector
@@ -591,20 +611,27 @@ MathArray([ 9, 12, 15])</code></pre>
 </tr>
 </tbody>
 </table>
-<!-- Test the messages -->
+<!-- Test the messages (internal verification, not shown in docs) -->
 
 <!-- ```pycon
->>> A + B
-Traceback (most recent call last):
-MathArrayShapeError: Cannot add/subtract a matrix of shape (rows: 3, cols: 2) with a matrix of shape (rows: 2, cols: 2).
+>>> from mitxgraders.helpers.calc.exceptions import MathArrayShapeError
+>>> try:
+...     A + B
+... except MathArrayShapeError as error:
+...     print(error)
+Cannot add/subtract a matrix of shape (rows: 3, cols: 2) with a matrix of shape (rows: 2, cols: 2).
 
->>> v*A
-Traceback (most recent call last):
-MathArrayShapeError: Cannot multiply a vector of length 2 with a matrix of shape (rows: 3, cols: 2).
+>>> try:
+...     v*A
+... except MathArrayShapeError as error:
+...     print(error)
+Cannot multiply a vector of length 2 with a matrix of shape (rows: 3, cols: 2).
 
->>> A**2
-Traceback (most recent call last):
-MathArrayShapeError: Cannot raise a non-square matrix to powers.
+>>> try:
+...     A**2
+... except MathArrayShapeError as error:
+...     print(error)
+Cannot raise a non-square matrix to powers.
 
 ``` -->
 

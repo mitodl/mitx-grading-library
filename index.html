@@ -84,6 +84,18 @@
                         
                             
 <li >
+    <a href="edx/">edX Syntax</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="graders/">Introduction to Graders</a>
+</li>
+
+                        
+                            
+<li >
     <a href="item_grader/">ItemGrader</a>
 </li>
 
@@ -91,12 +103,6 @@
                             
 <li >
     <a href="string_grader/">StringGrader</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="edx/">edX Syntax</a>
 </li>
 
                         
@@ -184,6 +190,18 @@
                 
                 
                     <li >
+                        <a href="plugins/">Plugins</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="faq/">Frequently Asked Questions</a>
+                    </li>
+                
+                
+                
+                    <li >
                         <a href="changelog/">Changelog</a>
                     </li>
                 
@@ -202,7 +220,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="item_grader/">
+                        <a rel="prev" href="edx/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -229,11 +247,9 @@
                 
             <li class="second-level"><a href="#grading-classes">Grading Classes</a></li>
                 
-            <li class="second-level"><a href="#using-grading-classes">Using Grading Classes</a></li>
+            <li class="second-level"><a href="#questions-bugs-issues-suggestions">Questions? Bugs? Issues? Suggestions?</a></li>
                 
-                <li class="third-level"><a href="#debugging">Debugging</a></li>
-                <li class="third-level"><a href="#validation">Validation</a></li>
-            <li class="second-level"><a href="#plugins">Plugins</a></li>
+            <li class="second-level"><a href="#what-should-i-read-next">What should I read next?</a></li>
                 
     </ul>
 </div></div>
@@ -250,7 +266,7 @@
 <p>Use MITxGraders because it:</p>
 <ul>
 <li>has many capabilities beyond the standard edX options</li>
-<li>is highly configuration but with <em>sensible defaults</em></li>
+<li>is highly configurable but with <em>sensible defaults</em></li>
 <li>provides useful error messages<ul>
 <li>to students (when submitting answers &mdash; for example, formula parsing errors)</li>
 <li>to problem authors (when configuring a grader)</li>
@@ -259,17 +275,19 @@
 <li>is reliable (extensively tested)</li>
 <li>is open source (BSD-3 license, <a href="https://github.com/mitodl/mitx-grading-library">our Github repo</a>)</li>
 <li>has an <a href="https://edge.edx.org/courses/course-v1:MITx+grading-library+examples/">excellent example edX course</a></li>
+<li>is ready for the future of edX by being compatible with python 2 and 3</li>
+<li>is actively maintained</li>
 </ul>
 <h2 id="two-typical-examples">Two Typical Examples<a class="headerlink" href="#two-typical-examples" title="Permanent link"> # </a></h2>
 <p>Typical usage in an edX course looks like:</p>
 <pre class="codehilite"><code class="language-XML">&lt;!-- First Example --&gt;
 &lt;problem&gt;
 &lt;script type=&quot;loncapa/python&quot;&gt;
-from mitxgraders import FormulaGrader, RandomFunction
+from mitxgraders import *
 grader = FormulaGrader(
     variables=[&quot;x&quot;],
     # allows students to use generic functions f and f' in their input
-    user_functions={ &quot;f&quot;: RandomFunction(), &quot;f'&quot;:RandomFunction() }
+    user_functions={&quot;f&quot;: RandomFunction(), &quot;f'&quot;: RandomFunction()}
 )
 &lt;/script&gt;
 
@@ -286,15 +304,14 @@ grader = FormulaGrader(
 <p>The next example grader would grade an unordered list of mathematical expressions.</p>
 <pre class="codehilite"><code class="language-XML">&lt;problem&gt;
 &lt;script type=&quot;loncapa/python&quot;&gt;
-from mitxgraders import FormulaGrader, ListGrader
-grader = FormulaGrader(
+from mitxgraders import *
+grader = ListGrader(
     answers=['x-2', 'x+2'],
-    ordered=False,
     subgraders=FormulaGrader(variables=['x'])
 )
 &lt;/script&gt;
 
-  &lt;p&gt;What are the linear factors of \((x^2 - 4)\)?&lt;/p&gt;
+  &lt;p&gt;What are the linear factors of \((x^2 - 4)\)? Enter your answers in any order.&lt;/p&gt;
   &lt;customresponse cfn=&quot;grader&quot;&gt;
     &lt;!-- correct_answer is shown to student when they press [Show Answer].
          Its value is not used for grading purposes --&gt;
@@ -306,64 +323,44 @@ grader = FormulaGrader(
 
 
 <h2 id="loading-in-edx">Loading in edX<a class="headerlink" href="#loading-in-edx" title="Permanent link"> # </a></h2>
-<p>Download <a href="./python_lib.zip">python_lib.zip</a> and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip. If you want to use our AsciiMath renderer definitions, place the <a href="./MjxPrep.js">MjxPrep.js</a> file in your static folder (XML) or upload the file to your course assets (Studio).</p>
+<p>Download <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a> and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip. If you want to use our AsciiMath renderer definitions (if you have math problems, you'll really want this!), place the <a href="https://raw.githubusercontent.com/mitodl/mitx-grading-library/master/MJxPrep.js">MJxPrep.js</a> file in your static folder (XML) or upload the file to your course assets (Studio).</p>
 <p>The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.</p>
 <h2 id="grading-classes">Grading Classes<a class="headerlink" href="#grading-classes" title="Permanent link"> # </a></h2>
 <p>Grading classes generally fall into two categories: single-input graders and multi-input graders.</p>
 <p><strong>Single-input graders</strong> grade a single input. All single-input graders are built on a framework we call an <code>ItemGrader</code>. We recommend understanding how <code>ItemGrader</code>s work before diving into more specifics.</p>
 <ul>
 <li><a href="item_grader/">ItemGrader</a><ul>
-<li><a href="string_grader/">StringGrader</a> for grading simple strings of text</li>
-<li><a href="grading_math/formula_grader/">FormulaGrader</a> for grading scalar formulas</li>
+<li><a href="string_grader/">StringGrader</a> for grading text input (includes pattern matching)</li>
+<li><a href="grading_math/formula_grader/">FormulaGrader</a> for grading general formulas</li>
 <li><a href="grading_math/numerical_grader/">NumericalGrader</a> for grading numbers</li>
 <li><a href="grading_math/matrix_grader/matrix_grader/">MatrixGrader</a> for grading formulas with vectors and matrices</li>
-<li><a href="grading_lists/single_list_grader/">SingleListGrader</a> for grading a delimiter-separated (default: comma-separated) list of inputs in a single response box</li>
+<li><a href="grading_lists/single_list_grader/">SingleListGrader</a> for grading a delimited (default: comma-separated) list of inputs in a single response box</li>
 </ul>
 </li>
 </ul>
 <p><strong>Multi-input graders</strong> are for grading multiple input boxes at once. They are composed of single-input graders working in concert, handled by the general <code>ListGrader</code> class. At this stage, <code>ListGrader</code> is the only multi-input grader included in the library, although plugins can be used to construct further examples.</p>
 <ul>
 <li><a href="grading_lists/list_grader/">ListGrader</a> for grading a list of inputs. Examples:<ul>
-<li>grade an ordered list of strings</li>
+<li>grade an ordered list of text inputs</li>
 <li>grade an unordered list of mathematical expressions</li>
 <li>grade a list of eigenvalue-eigenvector pairs</li>
 </ul>
 </li>
 </ul>
-<h2 id="using-grading-classes">Using Grading Classes<a class="headerlink" href="#using-grading-classes" title="Permanent link"> # </a></h2>
-<p>All grading classes are instantiated by calling them. Options can be provided using keyword arguments as</p>
-<pre class="codehilite"><code class="language-python">grader = FakeGradingClass(option_1=value_1, option_2=value2)
-# FakeGradingClass is not real! It's just a placeholder</code></pre>
-
-
-<p>or with a configuration dictionary:</p>
-<pre class="codehilite"><code class="language-python">config = {'option_1': value_1, 'option_2': value_2}
-grader = FakeGradingClass(config)</code></pre>
-
-
-<p>Passing the configuration as a dictionary can be useful if you are using the same configuration for multiple problems. However, you cannot 'mix and match' these two options: if a configuration dictionary is supplied, any keyword arguments are ignored.</p>
-<p>Most configuration options are specific to their grading classes. For example, <code>FormulaGrader</code> has a <code>variables</code> configuration key, but <code>NumericalGrader</code> does not.</p>
-<p>A few configuration options are accessible to all grading classes.</p>
-<h3 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Permanent link"> # </a></h3>
-<p>Every grading class has a debug option. By default, <code>debug=False</code>. To receive debug information from a given grader, specify <code>debug=True</code>. Some graders will provide more debug information than others. Debug information can be used by authors to check to make sure that the graders are behaving as expected, but shouldn't be made available to students.</p>
-<pre class="codehilite"><code class="language-python">grader = GradingClass(debug=True)</code></pre>
-
-
-<h3 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link"> # </a></h3>
-<p>Every grading class has a <code>suppress_warnings</code> key.</p>
-<p>The options passed to a grading class undergo extensive validation and graders will throw errors if instantiated with invalid options.</p>
-<p>A few error messages serve only as warnings. For example, if you attempt to configure a <code>FormulaGrader</code> with <code>pi</code> as a variable, you will receive a warning:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import FormulaGrader
-&gt;&gt;&gt; grader = FormulaGrader(variables=['pi'])
-Traceback (most recent call last):
-ConfigError: Warning: 'variables' contains entries 'pi' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</code></pre>
-
-
-<p>As the warning message says, if you really want to override the default value of <code>'pi'</code> (not recommended!) then you can suppress this warning by setting <code>suppress_warnings=True</code>.</p>
-<h2 id="plugins">Plugins<a class="headerlink" href="#plugins" title="Permanent link"> # </a></h2>
-<p>Any <code>.py</code> file stored in the <code>plugins</code> folder will be automatically loaded. All variables in the <code>__all__</code> list will be made available when doing <code>from mitxgraders import *</code>. See <code>template.py</code> for an example.</p>
-<p>You can define custom grading classes in your plugin. To learn how this works, we recommend copying the code from <code>stringgrader.py</code>, renaming the class, and building a simple plugin based on <code>StringGrader</code>.</p>
-<p>We are happy to include user-contributed plugins in the repository for this library. If you have built a plugin that you would like to see combined into this library, please contact the authors through <a href="https://github.com/mitodl/mitx-grading-library">github</a>. We are also willing to consider incorporating good plugins into the library itself.</p></div>
+<p><strong>Specialized graders</strong> are used to grade very specific situations. The only specialized grader we presently have is <code>IntegralGrader</code>.</p>
+<ul>
+<li><a href="grading_math/integral_grader.md">IntegralGrader</a> for grading the construction of integrals.</li>
+</ul>
+<h2 id="questions-bugs-issues-suggestions">Questions? Bugs? Issues? Suggestions?<a class="headerlink" href="#questions-bugs-issues-suggestions" title="Permanent link"> # </a></h2>
+<p>Please contact us by making an issue on <a href="https://github.com/mitodl/mitx-grading-library">github</a>.</p>
+<h2 id="what-should-i-read-next">What should I read next?<a class="headerlink" href="#what-should-i-read-next" title="Permanent link"> # </a></h2>
+<ul>
+<li>If you haven't already done so, we recommend looking at our <a href="https://edge.edx.org/courses/course-v1:MITx+grading-library+examples/">example course</a> to get an idea of the type of things that the library is capable of.</li>
+<li>It's probably a good idea to start by looking at how to <a href="edx/">invoke the grading library in edX</a>.</li>
+<li>Next, we recommend looking at the <a href="graders/">Introduction to Graders</a> and the overview of <a href="item_grader/">ItemGraders</a>.</li>
+<li>After that, choose a grader that you're interested in, look at <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem">source code for examples for that grader</a>, and read up on the relevant documentation.</li>
+</ul>
+<p>Enjoy!</p></div>
         
     </div>
 
@@ -418,5 +415,5 @@ ConfigError: Warning: 'variables' contains entries 'pi' which will override defa
 
 <!--
 MkDocs version : 0.17.5
-Build Date UTC : 2019-07-02 18:56:06
+Build Date UTC : 2019-07-12 13:54:21
 -->

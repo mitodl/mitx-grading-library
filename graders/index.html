@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <link rel="shortcut icon" href="../img/favicon.ico">
 
-    <title>ItemGrader - MITxGraders</title>
+    <title>Introduction to Graders - MITxGraders</title>
 
     <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -89,14 +89,14 @@
 
                         
                             
-<li >
-    <a href="../graders/">Introduction to Graders</a>
+<li class="active">
+    <a href="./">Introduction to Graders</a>
 </li>
 
                         
                             
-<li class="active">
-    <a href="./">ItemGrader</a>
+<li >
+    <a href="../item_grader/">ItemGrader</a>
 </li>
 
                         
@@ -215,12 +215,12 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../graders/">
+                        <a rel="next" href="../edx/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../string_grader/">
+                        <a rel="prev" href="../item_grader/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -236,8 +236,12 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#itemgrader">ItemGrader</a></li>
-            <li class="second-level"><a href="#specifying-answers">Specifying Answers</a></li>
+        <li class="first-level active"><a href="#introduction-to-graders">Introduction to Graders</a></li>
+            <li class="second-level"><a href="#debugging">Debugging</a></li>
+                
+            <li class="second-level"><a href="#validation">Validation</a></li>
+                
+            <li class="second-level"><a href="#attempt-based-partial-credit">Attempt-Based Partial Credit</a></li>
                 
             <li class="second-level"><a href="#option-listing">Option Listing</a></li>
                 
@@ -245,97 +249,84 @@
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="itemgrader">ItemGrader<a class="headerlink" href="#itemgrader" title="Permanent link"> # </a></h1>
-<p>When an individual input needs to be graded, it is graded by an <code>ItemGrader</code>. All <code>ItemGrader</code>s work by specifying answers and their corresponding points/messages, as well as an optional message for wrong answers. In these examples, we use <code>StringGrader</code> as an example of how to use a generic <code>ItemGrader</code>. You cannot use a generic <code>ItemGrader</code> by itself.</p>
+<h1 id="introduction-to-graders">Introduction to Graders<a class="headerlink" href="#introduction-to-graders" title="Permanent link"> # </a></h1>
+<p>Graders are implemented as python classes. All grading classes are instantiated by calling them. Options can be provided using keyword arguments as</p>
+<pre class="codehilite"><code class="language-python">grader = FakeGradingClass(option_1=value_1, option_2=value2)
+# FakeGradingClass is not real! It's just a placeholder.</code></pre>
+
+
+<p>or with a configuration dictionary:</p>
+<pre class="codehilite"><code class="language-python">config = {'option_1': value_1, 'option_2': value_2}
+grader = FakeGradingClass(config)</code></pre>
+
+
+<p>Passing the configuration as a dictionary can be useful if you are using the same configuration for multiple problems. However, you cannot 'mix and match' these two options: if a configuration dictionary is supplied, any keyword arguments are ignored.</p>
+<p>Most configuration options are specific to their grading classes. For example, <code>FormulaGrader</code> has a <code>variables</code> configuration key, but <code>NumericalGrader</code> does not.</p>
+<p>A few configuration options are available to all grading classes.</p>
+<h2 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Permanent link"> # </a></h2>
+<p>Every grading class has a debug option. By default, <code>debug=False</code>. To receive debug information from a given grader, specify <code>debug=True</code>. Some graders will provide more debug information than others. Debug information can be used by authors to check to make sure that the graders are behaving as expected, but shouldn't be made available to students.</p>
+<pre class="codehilite"><code class="language-python">grader = FakeGradingClass(debug=True)</code></pre>
+
+
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link"> # </a></h2>
+<p>Every grading class has a <code>suppress_warnings</code> key.</p>
+<p>The options passed to a grading class undergo extensive validation and graders will giver error messages if instantiated with invalid options.</p>
+<p>A few error messages serve only as warnings. For example, if you attempt to configure a <code>FormulaGrader</code> with <code>pi</code> as a variable, you will receive a warning:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = StringGrader(
-...     answers='cat',
-...     wrong_msg='Try again!'
-... )</code></pre>
+&gt;&gt;&gt; try:
+...     grader = FormulaGrader(variables=['pi'])
+... except ConfigError as error:
+...     print(error)
+Warning: 'variables' contains entries 'pi' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</code></pre>
 
 
-<p>The grader is set up to grade an answer of <code>cat</code> as correct, and includes a message that is presented to students if they get the answer wrong. One could pass <code>grader</code> in as the <code>cfn</code> key for a <code>customresponse</code> tag. The following code demonstrates what happens when the grader is called using python (for example, inside a python console). Note that this is only for demonstrating the behavior of the grader, and is not required in order to use the library in edX.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
+<p>As the warning message says, if you really want to override the default value of <code>pi</code> (not recommended!) then you can suppress this warning by setting <code>suppress_warnings=True</code>.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
+&gt;&gt;&gt; grader = FormulaGrader(variables=['pi'], suppress_warnings=True)</code></pre>
 
 
-<p>You will often see this type of demonstration in this documentation. It serves both to demonstrate how the grader works and to ensure that our examples are always syntactically correct, as these code blocks form part of our documentation testing.</p>
-<h2 id="specifying-answers">Specifying Answers<a class="headerlink" href="#specifying-answers" title="Permanent link"> # </a></h2>
-<p>For all <code>ItemGrader</code>s, the <code>answers</code> key can be used to specify correct answers, specific feedback messages, and to assign partial credit. It accepts a few formats:</p>
+<h2 id="attempt-based-partial-credit">Attempt-Based Partial Credit<a class="headerlink" href="#attempt-based-partial-credit" title="Permanent link"> # </a></h2>
+<p>It is possible to pass a student's attempt number to a grader by explicitly requesting that edX do so in a <code>customresponse</code> tag as follows.</p>
+<pre class="codehilite"><code class="language-XML">&lt;customresponse cfn=&quot;grader&quot; expect=&quot;answer&quot; cfn_extra_args=&quot;attempt&quot;&gt;</code></pre>
+
+
+<p>Once this is done, you can enable attempt-based partial credit for your graders. The syntax is as follows.</p>
+<pre class="codehilite"><code class="language-python">grader = FakeGradingClass(
+    attempt_based_credit=True,     # default False
+    decrease_credit_after=1,       # default 1
+    minimum_credit=0.2,            # default 0.2
+    decrease_credit_steps=4,       # default 4
+    attempt_based_credit_msg=True  # default True
+)</code></pre>
+
+
+<p>Attempt-based partial credit is turned on by setting <code>attempt_based_credit=True</code>. When it is turned on, the first attempt a student makes will be eligible for full credit, while subsequent attempts may have a decreasing maximum score.</p>
 <ul>
 <li>
-<p>A single dictionary can be used to specify an answer, feedback, correctness, and partial credit. The dictionary keys are:</p>
-<ul>
-<li><code>'expect'</code> (required): compared against student answer. Most <code>ItemGrader</code>s use strings to specify the <code>'expect'</code> value.</li>
-<li><code>'grade_decimal'</code> (optional, a number between <code>0</code> and <code>1</code> inclusive): The credit associated with this answer (default <code>1</code>).</li>
-<li><code>'msg'</code> (optional, string): An optional feedback message associated with this answer (default <code>''</code>).</li>
-</ul>
+<p>The maximum score begins to decrease after the attempt specified in <code>decrease_credit_after</code>. By default, all attempts after the first will have decreasing credit.</p>
+</li>
+<li>
+<p>The credit decreases linearly to <code>minimum_credit</code>.</p>
+</li>
+<li>
+<p>The number of attempts the credit decreases for is specified in <code>decrease_credit_steps</code>. So, using the defaults, attempts 1, 2, 3, 4, 5, and 6 are eligible for maximum credits of 1, 0.8, 0.6, 0.4, 0.2 and 0.2, respectively.</p>
+</li>
+<li>
+<p>If a student's credit has been decreased from the maximum by attempt-based partial credit, the student can be provided with a message informing them of the maximum possible credit at that attempt number. This is controlled by the <code>attempt_based_credit_msg</code> setting. We recommend that this setting be left on, as it will likely lead to confusion otherwise.</p>
 </li>
 </ul>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers={'expect': 'zebra', 'grade_decimal': 1, 'msg': 'Yay!'},
-...     wrong_msg='Try again!'
-... )
-&gt;&gt;&gt; grader(None, 'zebra') == {'grade_decimal': 1, 'msg': 'Yay!', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<ul>
-<li>A single <code>'expect'</code> value: can be used to specify the correct answer. For example,</li>
-</ul>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers='zebra',
-...     # Equivalent to:
-...     # answers={'expect': 'zebra', 'msg': '', 'grade_decimal': 1}
-...     wrong_msg='Try again!'
-... )
-&gt;&gt;&gt; grader(None, 'zebra') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<p>Again, most <code>ItemGrader</code>s use strings to store <code>'expect'</code> values.</p>
-<ul>
-<li>A tuple of the afore-mentioned dictionaries/strings, which specifies multiple possible answers:</li>
-</ul>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers=(
-...         # the correct answer
-...         'wolf',
-...         # an alternative correct answer
-...         'canis lupus',
-...         # a partially correct answer
-...         {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
-...         # a wrong answer with specific feedback
-...         {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
-...     ),
-...     wrong_msg='Try again!'
-... )
-&gt;&gt;&gt; grader(None, 'wolf') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'canis lupus') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 0.5, 'msg': 'No, not dog!', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader(None, 'unicorn') == {'grade_decimal': 0, 'msg': 'No, not unicorn!', 'ok': False}
-True
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
-
-<p>Internally, the <code>ItemGrader</code> converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.</p>
-<p>The <code>wrong_msg</code> is only displayed if the score is zero and there are no other messages.</p>
-<p>If no <code>answers</code> key is provided, the grader reads from the <code>expect</code> or <code>answer</code> parameter of the <code>customresponse</code> tag (see <a href="../edx/">edX Syntax</a>). Note that when using a <code>ListGrader</code>, the <code>answers</code> key is required.</p>
+<p>When using nested graders, these settings need only be applied to the grader that is provided to edX in the <code>cfn</code> key. These settings can be set on a course-wide basis through the use of <a href="../plugins/">plugins</a>.</p>
+<p>Note that if attempt-based partial credit is turned on but the <code>cfn_extra_args="attempt"</code> entry is missing from the <code>customresponse</code> tag, an error message results.</p>
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
-<p>Here is the full list of options specific to <code>ItemGrader</code>s.</p>
-<pre class="codehilite"><code class="language-python">grader = ItemGrader(
-    answers=(str, dict, (str, dict)),
+<p>Here is the full list of options specific to all graders.</p>
+<pre class="codehilite"><code class="language-python">grader = AbstractGrader(
+    debug=bool,  # default False
     wrong_msg=str,  # default ''
+    attempt_based_credit=bool,  # default False
+    decrease_credit_after=int,  # default 1
+    minimum_credit=float,  # default 0.2
+    decrease_credit_steps=int,  # default 4
+    attempt_based_credit_msg=bool,  # default True
 )</code></pre></div>
         
     </div>

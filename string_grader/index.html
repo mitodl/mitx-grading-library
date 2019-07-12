@@ -84,6 +84,18 @@
                         
                             
 <li >
+    <a href="../edx/">edX Syntax</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../graders/">Introduction to Graders</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../item_grader/">ItemGrader</a>
 </li>
 
@@ -91,12 +103,6 @@
                             
 <li class="active">
     <a href="./">StringGrader</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../edx/">edX Syntax</a>
 </li>
 
                         
@@ -184,6 +190,18 @@
                 
                 
                     <li >
+                        <a href="../plugins/">Plugins</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../faq/">Frequently Asked Questions</a>
+                    </li>
+                
+                
+                
+                    <li >
                         <a href="../changelog/">Changelog</a>
                     </li>
                 
@@ -202,7 +220,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../edx/">
+                        <a rel="prev" href="../grading_math/formula_grader/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -223,7 +241,7 @@
                 
             <li class="second-level"><a href="#case-sensitive">Case Sensitive</a></li>
                 
-            <li class="second-level"><a href="#accepting-anything-within-reason">Accepting anything (within reason!)</a></li>
+            <li class="second-level"><a href="#accepting-anything">Accepting Anything</a></li>
                 
             <li class="second-level"><a href="#validating-input">Validating Input</a></li>
                 
@@ -234,7 +252,7 @@
         <div class="col-md-9" role="main">
 
 <h1 id="stringgrader">StringGrader<a class="headerlink" href="#stringgrader" title="Permanent link"> # </a></h1>
-<p>The <code>StringGrader</code> class grades text inputs. It can perform comparisons to expected answers or patterns, and can also accept arbitrary input. It is the simplest grading class, both in code and in usage.</p>
+<p>The <code>StringGrader</code> class is an <code>ItemGrader</code> that grades text inputs. It can perform comparisons to expected answers or patterns, and can also accept arbitrary input. It is the simplest grading class, both in code and in usage.</p>
 <p>To use a <code>StringGrader</code> in its simplest form, simply pass in the set of answers you want to grade, as described in the <a href="../item_grader/">ItemGrader documentation</a>.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
 &gt;&gt;&gt; grader = StringGrader(
@@ -248,7 +266,7 @@ True
 True</code></pre>
 
 
-<p>This will accept the answer of <code>cat</code>, but not <code>CAT</code> or <code>Cat</code>, as grading is case-sensitive by default.</p>
+<p>This example will accept the answer of <code>cat</code>, but not <code>CAT</code> or <code>Cat</code>, as grading is case-sensitive by default.</p>
 <h2 id="cleaning-input">Cleaning Input<a class="headerlink" href="#cleaning-input" title="Permanent link"> # </a></h2>
 <p>Leading or trailing spaces in an answer rarely change the meaning of the answer. Hence, by default, we strip all leading and trailing spaces from the student input and author-specified answers before comparison. If you want to keep those spaces around for the comparison, you need to disable strip.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
@@ -273,7 +291,7 @@ True
 True</code></pre>
 
 
-<p>Here, the answer is <code>two  spaces</code>, complete with two spaces. A students' answer of <code>two spaces</code> (with a single space) would be graded incorrect.</p>
+<p>Here, the answer is <code>two  spaces</code>, complete with two spaces (which may not render on a webpage). A student's answer of <code>two spaces</code> (with a single space) would be graded incorrect.</p>
 <p>Finally, you may have a situation where spaces are completely irrelevant (e.g., when grading a mathematical expression). To instruct the grader to completely ignore all spaces, set <code>strip_all=True</code>.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
 ...     answers='(12)(34)',
@@ -299,8 +317,8 @@ True</code></pre>
 
 
 <p>This will accept <code>Cat</code>, <code>cat</code> and <code>CAT</code>. By default, <code>case_sensitive=True</code>.</p>
-<h2 id="accepting-anything-within-reason">Accepting anything (within reason!)<a class="headerlink" href="#accepting-anything-within-reason" title="Permanent link"> # </a></h2>
-<p>Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). This can be useful, for example, when asking for a free response to a prompt, and can be used in conjunction with validation (see below) to accept a variety of answers that satisfy a given pattern. To do this, set the <code>accept_any</code> flag, which will literally accept anything that is entered into the textbox.</p>
+<h2 id="accepting-anything">Accepting Anything<a class="headerlink" href="#accepting-anything" title="Permanent link"> # </a></h2>
+<p>Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). This can be useful, for example, when asking for a free response to a prompt, and can be used in conjunction with validation (see below) to accept a variety of answers that satisfy a given pattern. To do this, set the <code>accept_any</code> flag, which will cause the grader to literally accept anything that is entered into the textbox.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
 ...     answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
 ...     accept_any=True
@@ -343,28 +361,32 @@ True
 &gt;&gt;&gt; grader(None, 'too short') == {'grade_decimal': 0,
 ...                               'msg': 'Your response is too short (2/3 words)',
 ...                               'ok': False}
+True
+&gt;&gt;&gt; grader(None, '  a  b  c  d  ') == {'grade_decimal': 0,
+...                                    'msg': 'Your response is too short (7/10 characters)',
+...                                    'ok': False}
 True</code></pre>
 
 
-<p>Note that punctuation doesn't break a word for the purpose of word counting, so <code>isn't word-counting fun?</code> will only count as three words. If <code>accept_nonempty</code> and <code>min_length</code> are both used, the more stringent requirement is the one that is used.</p>
+<p>Note that punctuation doesn't break a word for the purpose of word counting, so <code>isn't word-counting fun?</code> will only count as three words. If <code>accept_nonempty</code> and <code>min_length</code> are both used, the longer requirement is the one that is used.</p>
 <p>When a student's answer is rejected because it doesn't meet the minimum requirements, there are three types of feedback that you can provide, controlled by the <code>explain_minimums</code> flag:</p>
 <ul>
-<li>The student receives an error message describing how many words/characters they have, compared to how many are required. This does not consume an attempt (<code>explain_minimums='err'</code>, default)</li>
-<li>The student is graded incorrect, but a message is provided describing how many words/characters they have, compared to how many are required. This does consume an attempt (<code>explain_minimums='msg'</code>)</li>
-<li>The student is graded incorrect, and no explanation is given. This does consume an attempt (<code>explain_minimums=None</code>)</li>
+<li>The student receives an error message describing how many words/characters they have, compared to how many are required. This does not consume an attempt (<code>explain_minimums='err'</code>, default).</li>
+<li>The student is graded incorrect, but a message is provided describing how many words/characters they have, compared to how many are required. This consumes an attempt (<code>explain_minimums='msg'</code>).</li>
+<li>The student is graded incorrect, and no explanation is given. This consumes an attempt (<code>explain_minimums=None</code>).</li>
 </ul>
-<p>The flags <code>min_length</code>, <code>min_words</code> and <code>explain_minimums</code> are all ignored if not using <code>accept_any</code> or <code>accept_nonempty</code>.</p>
+<p>The settings <code>min_length</code>, <code>min_words</code> and <code>explain_minimums</code> are all ignored if not using <code>accept_any</code> or <code>accept_nonempty</code>.</p>
 <h2 id="validating-input">Validating Input<a class="headerlink" href="#validating-input" title="Permanent link"> # </a></h2>
 <p>Sometimes, you may want to validate student input against a pattern. This can be useful if the student response simply needs to follow a given pattern, or if you want to reject student responses that don't conform to the required format. Validation can be used both when comparing against an expected response, or when using <code>accept_any</code> (and variants).</p>
-<p>Validation is performed by constructing a python regular expressions (regex) pattern, stored in the <code>validation_pattern</code> flag (if you are unfamiliar with regular expressions, there are many excellent tutorials available online to get you started!). After input cleaning, the student input is checked against the pattern for a match. If no match is found, the desired response is returned. Expected answers are also checked against the pattern; if a possible answer does not conform to the pattern, then a <code>ConfigError</code> is raised.</p>
+<p>Validation is performed by constructing a python regular expressions (regex) pattern, stored in the <code>validation_pattern</code> flag (if you are unfamiliar with regular expressions, there are many excellent tutorials available online to get you started!). After input cleaning, the student input is checked against the pattern for a match. If no match is found, the desired response is returned. Expected answers are also checked against the pattern; if a possible answer does not conform to the pattern, then a configuration error results.</p>
 <p>When a response doesn't satisfy the given pattern, there are three types of feedback that you can provide, controlled by the <code>explain_validation</code> flag:</p>
 <ul>
-<li>The student receives an error message. This does not consume an attempt (<code>explain_validation='err'</code>, default)</li>
-<li>The student is graded incorrect, but receives a message. This does consume an attempt (<code>explain_validation='msg'</code>)</li>
-<li>The student is graded incorrect, and no explanation is given. This does consume an attempt (<code>explain_validation=None</code>)</li>
+<li>The student receives an error message. This does not consume an attempt (<code>explain_validation='err'</code>, default).</li>
+<li>The student is graded incorrect, but receives a message. This consumes an attempt (<code>explain_validation='msg'</code>).</li>
+<li>The student is graded incorrect, and no explanation is given. This consumes an attempt (<code>explain_validation=None</code>).</li>
 </ul>
-<p>In the first two cases, the message provided is given by the <code>invalid_msg</code> flag, which defaults to <code>Your input is not in the expected format</code>.</p>
-<p>Here is an example of using a validation pattern to accept inputs that look like chemical formulae for organic molecules. Note that anything that matches the pattern will be accepted.</p>
+<p>In the first two cases, the message provided is given by the <code>invalid_msg</code> setting, which defaults to <code>Your input is not in the expected format</code>.</p>
+<p>Here is an example of using a validation pattern to accept inputs that look like chemical formulae for organic molecules. Note that anything that matches the pattern will be graded correct.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
 ...     validation_pattern=r'([CNOH](_[0-9])?)+',
 ...     explain_validation='msg',
@@ -382,7 +404,7 @@ True
 True</code></pre>
 
 
-<p>Here, we use validation to ensure that the student input matches the desired format before comparing to the answer, and give the student an error message if their input doesn't match the specification.</p>
+<p>Below, we use validation to ensure that the student input matches the desired format before comparing to the answer, and give the student an error message if their input doesn't match the specification.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
 ...     answers='(1)(2)',
 ...     validation_pattern=r'\([0-9]\)\([0-9]\)',
@@ -395,6 +417,11 @@ True
 True
 &gt;&gt;&gt; try:
 ...     grader(None, '(a)(2)')
+... except InvalidInput as error:
+...     print(error)
+Your input is not in the expected format
+&gt;&gt;&gt; try:
+...     grader(None, '[1)(2)')
 ... except InvalidInput as error:
 ...     print(error)
 Your input is not in the expected format</code></pre>
