@@ -278,8 +278,27 @@
 True</code></pre>
 
 
-<p>Each element of answers is set as an answer that is passed as the answers key into the subgrader. This should be set up as two input boxes that the student types in. Note that the <code>answers</code> key is provided as a python list of individual answers for a <code>ListGrader</code>.</p>
-<p>In the above example, the item grader just sees single strings as the answer. You can do more complicated things though, like the following.</p>
+<p>Answers are provided as a python list of individual <code>ItemGrader</code> answers. For <code>ListGrader</code>s, they must be provided as a list; all the <code>ItemGrader</code> flexibility is allowed only in the individual answers. Each element of answers is set as an answer that is passed as the answers key into the subgrader. This particular example should be set up as two input boxes that the student types in, as follows.</p>
+<pre class="codehilite"><code class="language-xml">&lt;problem&gt;
+&lt;p&gt;What are the most common pets?&lt;/p&gt;
+
+&lt;script type=&quot;text/python&quot; system_path=&quot;python_lib&quot;&gt;
+from mitxgraders import *
+grader = ListGrader(
+    answers=['cat', 'dog'],
+    subgraders=StringGrader()
+)
+&lt;/script&gt;
+
+&lt;customresponse cfn=&quot;grader&quot; inline=&quot;1&quot;&gt;
+  &lt;p style=&quot;display:inline&quot;&gt;First answer: &lt;/p&gt;&lt;textline math=&quot;1&quot; inline=&quot;1&quot; correct_answer=&quot;cat&quot;/&gt;
+  &lt;br/&gt;
+  &lt;p style=&quot;display:inline&quot;&gt;Second answer: &lt;/p&gt;&lt;textline math=&quot;1&quot; inline=&quot;1&quot; correct_answer=&quot;dog&quot;/&gt;
+&lt;/customresponse&gt;
+&lt;/problem&gt;</code></pre>
+
+
+<p>In the above example, the item grader just sees single strings as the answer. The full versatility of the <code>ItemGrader</code> answer scheme is available though, such as in the following.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; answer1 = (
 ...     {'expect': 'zebra', 'grade_decimal': 1},
 ...     {'expect': 'horse', 'grade_decimal': 0.45},

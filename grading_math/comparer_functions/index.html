@@ -243,8 +243,17 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#comparer-functions">Comparer Functions</a></li>
+            <li class="second-level"><a href="#employing-comparer-functions">Employing Comparer Functions</a></li>
+                
+            <li class="second-level"><a href="#changing-defaults">Changing Defaults</a></li>
+                
             <li class="second-level"><a href="#available-comparers">Available Comparers</a></li>
                 
+            <li class="second-level"><a href="#special-comparers">Special Comparers</a></li>
+                
+                <li class="third-level"><a href="#equalitycomparer">EqualityComparer</a></li>
+                <li class="third-level"><a href="#linearcomparer">LinearComparer</a></li>
+                <li class="third-level"><a href="#matrixentrycomparer">MatrixEntryComparer</a></li>
             <li class="second-level"><a href="#custom-comparer-functions">Custom comparer functions</a></li>
                 
     </ul>
@@ -252,20 +261,39 @@
         <div class="col-md-9" role="main">
 
 <h1 id="comparer-functions">Comparer Functions<a class="headerlink" href="#comparer-functions" title="Permanent link"> # </a></h1>
-<p>By default, <code>FormulaGrader</code>, <code>NumericalGrader</code>, and <code>MatrixGrader</code> compare the numerically-sampled author formula and student formula for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. To use an alternate comparer, specify the <code>answers</code> key as a dictionary with keys <code>comparer</code> and <code>comparer_params</code> rather than a single string.</p>
-<p>For example, if grading angles in degrees, it may be useful to compare formulas modulo 2&#960;. You can write your own comparer functions, but for this we can use the <code>congruent_modulo</code> comparer from <code>mitxgraders.comparers</code>. This grader will accept any input congruent to <code>'b^2/a'</code> modulo <code>2*pi</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import FormulaGrader
-&gt;&gt;&gt; from mitxgraders.comparers import congruence_comparer
-&gt;&gt;&gt; grader = FormulaGrader(
+<p>By default, <code>FormulaGrader</code>, <code>NumericalGrader</code>, and <code>MatrixGrader</code> compare the numerically-sampled author formula and student formula for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. Functions that perform the actual comparison are called "comparers", and there are a few ways to invoke them.</p>
+<h2 id="employing-comparer-functions">Employing Comparer Functions<a class="headerlink" href="#employing-comparer-functions" title="Permanent link"> # </a></h2>
+<p>When an answer is passed into <code>FormulaGrader</code>, <code>NumericalGrader</code> or <code>MatrixGrader</code>, it is automatically paired up with a comparer. For example, the default comparer is <code>equality_comparer</code>. When you construct a grader like the following,</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
+&gt;&gt;&gt; grader1 = FormulaGrader(
+...     answers='a+b'
+...     variables=['a', 'b']
+... )</code></pre>
+
+
+<p><code>FormulaGrader</code> automatically converts the <code>answers</code> key to the following:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader2 = FormulaGrader(
+...     answers={
+...         'expect': {'comparer': equality_comparer, 'comparer_params': ['a+b']},
+...         'grade_decimal': 1,
+...         'msg': ''
+...     }
+...     variables=['a', 'b']
+... )
+&gt;&gt;&gt; grader1 == grader2
+True</code></pre>
+
+
+<p>To specify an alternate comparer, you can simply change the relevant answer to a dictionary <code>{'comparer': comparer_func, 'comparer_params': [list, of, params]}</code>. Different comparers use <code>comparer_params</code> in different ways.</p>
+<p>For example, if grading angles in degrees, it may be useful to compare formulas modulo 2&#960;. You can write your own comparer functions, but for this we can use the pre-built <code>congruent_modulo</code> comparer. This grader will accept any input congruent to <code>'b^2/a'</code> modulo <code>2*pi</code>.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
 ...     answers={
 ...         'comparer': congruence_comparer,
 ...         # first parameter is expected value, second is the modulus
 ...         'comparer_params': ['b^2/a', '2*pi']
 ...     },
-...     variables=['a', 'b'],
-...     tolerance='1%'
+...     variables=['a', 'b']
 ... )
-
 &gt;&gt;&gt; grader(None, 'b^2/a + 6*pi')['ok']
 True
 &gt;&gt;&gt; grader(None, 'b^2/a + 5.5*pi')['ok']
@@ -273,8 +301,19 @@ False</code></pre>
 
 
 <p>Here, the <code>comparer_params</code> (<code>['b^2/a', '2*pi']</code>) are evaluated just like the student input, and used by the comparer function during grading.</p>
+<h2 id="changing-defaults">Changing Defaults<a class="headerlink" href="#changing-defaults" title="Permanent link"> # </a></h2>
+<p>The default comparer function for each of <code>FormulaGrader</code>, <code>NumericalGrader</code> and <code>MatrixGrader</code> can be set by calling <code>set_default_comparer</code> as follows:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; FormulaGrader.set_default_comparer(LinearComparer())</code></pre>
+
+
+<p>This sets the default comparer to <code>LinearComparer()</code> (see below) for all <code>FormulaGrader</code>s in the given problem. Comparers set in this manner must only take a single comparer parameter. Using this default set approach is typically simpler than setting comparers explicitly, and allows answers to be inferred from <code>expect</code> values. However, comparers that require two or more <code>comparer_params</code> cannot use this method.</p>
+<p>If for some reason you need to reset the default comparer, you can use</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; FormulaGrader.reset_default_comparer()</code></pre>
+
+
+<p>which is equivalent to setting the default comparer to <code>equality_comparer</code>.</p>
 <h2 id="available-comparers">Available Comparers<a class="headerlink" href="#available-comparers" title="Permanent link"> # </a></h2>
-<p>The table below lists the comparers are exported by <code>mitxgraders.comparers</code> along with the expected comparer parameters. Note that <code>comparer_params</code> is <strong>always</strong> a list of strings, and can use any variables available to the student. When using an ordered <code>ListGrader</code>, they can also use sibling values.</p>
+<p>The table below lists the pre-built comparers along with the expected comparer parameters. Note that <code>comparer_params</code> is <strong>always</strong> a list of strings, and can use any variables available to the student. When using an ordered <code>ListGrader</code>, they can also use sibling values.</p>
 <table>
 <thead>
 <tr>
@@ -323,20 +362,55 @@ False</code></pre>
 </tr>
 </tbody>
 </table>
-<p>FormulaGrader (and its subclasses) use <code>equality_comparer</code> as the default. That is, specifying <code>FormulaGrader(answers='x*y', variables=['x', 'y'])</code> is equivalent to</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders.comparers import equality_comparer
-&gt;&gt;&gt; grader = FormulaGrader(
-...     answers={
-...         'comparer': equality_comparer,
-...         'comparer_params': ['x*y']
-...     },
-...     variables=['x', 'y']
-... )</code></pre>
+<p>All of these comparers (as well as the ones below) are available when using <code>from mitxgraders import *</code>.</p>
+<h2 id="special-comparers">Special Comparers<a class="headerlink" href="#special-comparers" title="Permanent link"> # </a></h2>
+<p>There are three special built-in comparer classes that can be used as comparers that take in a single input.</p>
+<h3 id="equalitycomparer">EqualityComparer<a class="headerlink" href="#equalitycomparer" title="Permanent link"> # </a></h3>
+<p>The <code>EqualityComparer</code> class simply checks for equality up to tolerance. In fact, <code>equality_comparer = EqualityComparer()</code>. The reason this class exists, however, is to allow for an extra option to be used when desired.</p>
+<p>The <code>transform</code> option allows the author to specify a transforming function to be called on both the answer and the student input prior to comparison. Here is an example:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; comparer = EqualityComparer(transform=np.real)</code></pre>
 
 
+<p>This comparer will take the real part of the answer and the student input before comparing the results.</p>
+<h3 id="linearcomparer">LinearComparer<a class="headerlink" href="#linearcomparer" title="Permanent link"> # </a></h3>
+<p>The <code>LinearComparer</code> checks if the student's answer is linearly related to the problem's answer, and can provide partial credit as appropriate. Here are all of the options:</p>
+<pre class="codehilite"><code class="language-python">comparer = LinearComparer(
+    equals=float,  # default 1
+    proportional=(None | float),  # default 0.5
+    offset=(None | float),  # default None
+    linear=(None | float),  # default None
+    equals_msg=(None | str),  # default None
+    proportional_msg=(None | str),  # default 'The submitted answer differs from an expected answer by a constant factor.'
+    offset_msg=(None | str),  # default None
+    linear_msg=(None | str),  # default None
+)</code></pre>
+
+
+<p>The first four settings specify how much credit to award the different situations, while the next four describe a message to display when that credit is awarded. Note that setting credit to <code>None</code> means that that type of credit will never be awarded, while setting credit to <code>0</code> means that it can be awarded (usually to display the relevant message).</p>
+<p>Here is an example of a <code>LinearComparer</code> that can be used to award partial credit if students are off from the answer by a constant multiple.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; comparer = LinearComparer()</code></pre>
+
+
+<p>Easy, isn't it? You can combine this with <code>set_default_comparer</code> to enable partial credit of this sort with one line in each problem!</p>
+<p>Here is an example of setting up a <code>LinearComparer</code> that doesn't care about shift offsets (useful when describing indefinite integration).</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; comparer = LinearComparer(proportional=None, linear=1)</code></pre>
+
+
+<h3 id="matrixentrycomparer">MatrixEntryComparer<a class="headerlink" href="#matrixentrycomparer" title="Permanent link"> # </a></h3>
+<p>This comparer is used only for <code>MatrixGrader</code>s. It has a <code>transform</code> option that is exactly equivalent to <code>EqualityComparer</code>, but it also has two options related to partial credit.</p>
+<pre class="codehilite"><code class="language-python">comparer = MatrixEntryComparer(
+    transform=(None | func),  # default None
+    entry_partial_credit=('proportional' | float),  # default 0
+    entry_partial_msg=str,  # default &quot;Some array entries are incorrect, marked below:\n{error_locations}&quot;
+)</code></pre>
+
+
+<p>When <code>entry_partial_credit</code> is set to a number, if at least one entry in the array is correct (but not all of them), that amount of credit is assigned. When partial credit is assigned, the message <code>entry_partial_msg</code> is displayed to the student, with the text <code>{error_locations}</code> replaced by a graphic displaying which entries are correct/incorrect. To turn off the message, simply set <code>entry_partial_msg=''</code>. Setting <code>entry_partial_msg=''</code> and <code>entry_partial_credit=0</code> makes this grader equivalent to <code>EqualityComparer</code>.</p>
+<p>Because this ability to assign partial credit to array input is so useful, the comparer for <code>MatrixGrader</code> can be set to <code>MatrixEntryComparer</code> using configuration options for <code>MatrixGrader</code>.</p>
 <h2 id="custom-comparer-functions">Custom comparer functions<a class="headerlink" href="#custom-comparer-functions" title="Permanent link"> # </a></h2>
-<p>In addition to using the comparers provided by <code>mitxgraders.comparers</code>, you can write your own.</p>
-<p>See <a href="https://github.com/mitodl/mitx-grading-library/tree/master/mitxgraders/comparers/comparers.py">comparers.py</a> for examples</p></div>
+<p>In addition to using the built-in comparers, you can write your own.</p>
+<p>See <a href="https://github.com/mitodl/mitx-grading-library/tree/master/mitxgraders/comparers/comparers.py">comparers.py</a> for documentation and examples.</p></div>
         
     </div>
 
