@@ -1,6 +1,7 @@
-# User-Defined Matrix Functions
+# User-Defined Functions: Arguments, Shapes, and Error Messages
 
 It's possible to construct user-defined functions that take in scalar/vector/matrix arguments, and produce a scalar/vector/matrix appropriately.
+
 
 ## Example
 
@@ -41,6 +42,7 @@ Suppose we have a `MatrixGrader` problem in which we want to provide students wi
 
 ```
 
+
 ### The Problem
 
 Our `rot(vec, axis, angle)` function works, but if students supply the function above with arguments of incorrect type, they receive unhelpful error messages:
@@ -53,6 +55,7 @@ Our `rot(vec, axis, angle)` function works, but if students supply the function 
 There was an error evaluating rot(...). Its input does not seem to be in its domain.
 
 ```
+
 
 ### The Solution
 
@@ -93,6 +96,7 @@ There was an error evaluating function rot(...)
 3rd input has an error: received a vector of length 3, expected a scalar
 
 ```
+
 
 ### Configuring specify_domain
 

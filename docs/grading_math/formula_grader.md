@@ -38,6 +38,7 @@ grader = FormulaGrader(
 
 The `sample_from` key must be a dictionary of 'variable_name': sampling_set pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.
 
+
 ### Variable Names
 
 Variable names are case-sensitive. They must start with a letter, and can be proceded by any combination of letters and numbers. There are two ways to write subscripts and superscripts:
@@ -111,6 +112,7 @@ grader = FormulaGrader(
 )
 ```
 
+
 ### User Functions
 
 You can make user-defined functions available for students to use in their answers. To add user-defined functions, pass in a dictionary to the `user_functions` key as follows.
@@ -133,7 +135,8 @@ grader = FormulaGrader(
 )
 ```
 
-### Choosing a function randomly
+
+### Choosing a Function Randomly
 
 You can also specify random functions by specifying a sampling set for a function. You can provide a list of functions to randomly choose from as follows.
 
@@ -180,7 +183,9 @@ grader = FormulaGrader(
 
 Constants are like variables that only ever have one value.
 
+
 ## Overriding Default Functions and Constants
+
 You can override default functions and constants if you really want, although this is discouraged and requires suppressing warnings with `suppress_warnings=True`. The following grader
 
 ```python
@@ -203,6 +208,7 @@ For some questions, you will want to restrict the sorts of input that are marked
 
 FormulaGrader offers a few ways to restrict what sort of answers will be marked correct.
 
+
 ### Forbidden Strings
 
 You can forbid students from entering certain strings using the `forbidden_strings` key:
@@ -219,6 +225,7 @@ grader = FormulaGrader(
 If a student tries to use one of these strings, then they receive the `forbidden_message`, without giving away what the forbidden string is. We recommend using this sparingly, as students may find it confusing. The default `forbidden_message` is "Invalid Input: This particular answer is forbidden".
 
 Forbidden strings and student answers are stripped of whitespace before being compared. Thus, if `x + y` is forbidden, then answers containing `x+y` or `x   +   y` will be rejected.
+
 
 ### Blacklists and Whitelists
 
@@ -256,6 +263,7 @@ grader = FormulaGrader(
 
 You cannot use a whitelist and a blacklist at the same time.
 
+
 ### Required Functions
 
 You can specifically require certain functions to appear in the solution. Any solution that does not include all of these functions will generate an error message. To do this, specify a list of strings of function names that are required.
@@ -267,6 +275,7 @@ grader = FormulaGrader(
     required_functions=['sin', 'cos']
 )
 ```
+
 
 ## Tolerance
 
@@ -312,6 +321,7 @@ We strongly recommend _not_ combining these suffixes with the variables names `k
 
 
 ## Sibling Variables
+
 When a student submits several mathematical expressions as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This can be done using *sibling variables*, which are available when `FormulaGrader` is used as a subgrader in **ordered** `ListGrader` problems.
 
 For example:
@@ -356,6 +366,7 @@ Notes:
 
 
 ## Comparer Functions
+
 Comparer functions allow you to compare the student input to the author's expectation using aspects other than equality. See [Comparer Functions](comparer_functions.md) for details.
 
 
@@ -371,3 +382,10 @@ We have made a number of other improvements over the edX formula graders, includ
 * If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the `debug` flag to `True`, and a more technical message will usually be displayed.
 * Full sampling details are included when the `debug` flag is set to `True`.
 * Enhancements to the AsciiMath renderer (the preview that students see when using `<textline />` inputs) are available using our [AsciiMath renderer definitions](renderer.md).
+
+Note that a few of these improvements have been merged into edX by the authors of this library.
+
+
+## Options Listing
+
+TO DO

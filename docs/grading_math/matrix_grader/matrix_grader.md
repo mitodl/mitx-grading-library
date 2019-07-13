@@ -1,8 +1,11 @@
 # MatrixGrader
-MatrixGrader is an extended version of FormulaGrader used to grade mathematical expressions containing scalars, vectors, and matrices. Authors and students may enter matrix (or vector) expressions by using variables sampled from matrices, or by entering a matrix entry-by-entry.
 
-## A first example
-A typical use of MatrixGrader might look like
+`MatrixGrader` is an extended version of `FormulaGrader` used to grade mathematical expressions containing scalars, vectors, and matrices. Authors and students may enter matrix (or vector) expressions by using variables sampled from matrices, or by entering a matrix entry-by-entry.
+
+
+## A First Example
+
+A typical use of `MatrixGrader` might look like
 
 ```pycon
 >>> from mitxgraders import *
@@ -20,6 +23,7 @@ A typical use of MatrixGrader might look like
 ```
 
 The next few lines call the grader as a check function. The inputs `'4*A*B^2*v'` and `'4*A*B*B*v'` are correct:
+
 ```pycon
 >>> result = grader1(None, '4*A*B^2*v')
 >>> result == {'grade_decimal': 1, 'msg': '', 'ok': True}
@@ -29,7 +33,9 @@ True
 True
 
 ```
+
 while the input `'4*B*A*B*v'` is incorrect because the matrix-sampled variables are non-commutative:
+
 ```pycon
 >>> result = grader1(None, '4*B*A*B*v')
 >>> result == {'msg': '', 'grade_decimal': 0, 'ok': False}
@@ -37,9 +43,11 @@ True
 
 ```
 
+
 ## Matrix Sampling
 
 In the MatrixGrader example above, the variables `A` and `B` were sampled from `RealMatrices()`. The `RealMatrices` sampling class samples from 2 by 2 matrices by default but can be configured to sample matrices of different shapes. See [Sampling](../sampling.md#variable-sampling-vectors-and-matrices) for more information about matrix and vector sampling.
+
 
 ## Matrix Entry
 
@@ -64,15 +72,18 @@ By default, students can only input vectors and **not matrices**. This is config
 
 The decision to disable matrix-entry by default is intended to prevent students from entering single-row or single-column matrices when a vector is expected.
 
+
 ## Matrix Operations and MathArrays
 
 `MatrixGrader` uses a custom subclass of [`numpy.ndarray`](https://docs.scipy.org/doc/numpy-1.14.0/reference/generated/numpy.ndarray.html) to internally represent matrices. Understanding how the `MathArray` class behaves is useful for creating `MatrixGrader` problems, and `MathArray` can be used directly by problem-authors to add extra matrices to a problem.
+
 
 ### How MatrixGrader uses MathArrays
 
 Whether a matrix is input entry-by-entry or represented through variables, `MathArray`s are used to evaluate student expressions.
 
 For example, consider the grader below.
+
 ```pycon
 >>> grader = MatrixGrader(
 ...     answers='2*A*[1, 2, 3] + v',
@@ -86,7 +97,9 @@ For example, consider the grader below.
 ... )
 
 ```
+
 When a student inputs `v + A*2*[1, 2, 3]` to the grader above, a calculation similar to
+
 ```pycon
 >>> v = MathArray([2, -1]) # Really, random samples would be chosen.
 >>> A = MathArray([[1, 2, 3], [4, 5, 6]])
@@ -94,9 +107,12 @@ When a student inputs `v + A*2*[1, 2, 3]` to the grader above, a calculation sim
 MathArray([30, 63])
 
 ```
+
 is performed (but repeated multiple times with different values for the random variables).
 
+
 ### Dimension and Shape
+
 `MathArray`s have dimension and shape. For example:
 
 | Student Input | Converted to   | Name   | dimension   | shape   |
@@ -113,6 +129,7 @@ Tensor math arrays (dimension 3+) currently have very little support.
     Note that a vector, a single-column matrix, and a single-row matrix are distinct entities. We suggest avoiding single-row and single-column matrices.
 
     See [A note about vectors](#a-note-about-vectors)
+
 
 ### Allowed operations
 
@@ -156,7 +173,8 @@ Tensor math arrays (dimension 3+) currently have very little support.
 
     *Note*: Negative exponents can give students "too much power". For example, if you want students to enter the inverse of `[[1, 2], [3, 4]]`, you probably want them to enter `[[-2, 1], [1.5, -0.5]]` not `[[1, 2], [3, 4]]^-1`. To this end, you can disable negative powers in MatrixGrader problems by setting `negative_powers=False`.
 
-### A note about vectors
+
+### A Note About Vectors
 
 Vectors are distinct from single-row matrices and single-column matrices, and can be left- or right-multiplied by a matrix:
 
@@ -180,6 +198,7 @@ MathArray([ 9, 12, 15])
 ```
 
 We suggest avoiding single-column and single-row matrices.
+
 
 ### Shape Errors
 
@@ -233,7 +252,8 @@ While grading a student's input, matrix-related errors can occur in three places
   - while evaluating the student's input, and
   - while comparing the student's input to the author's stored answer.
 
-### Parse errors:
+
+### Parse Errors:
 For example, student enters `'[[1, 2],[3] ]'`, a matrix missing an entry in second row:
 
 ```pycon
@@ -252,7 +272,8 @@ Unable to parse vector/matrix. If you're trying to enter a matrix, this is most 
 
 Such parse errors are **always** displayed to students.
 
-### Shape-mismatch errors during evaluation
+
+### Shape-Mismatch Errors During Evaluation
 
 If a student submits an answer that will raise shape-mismatch errors then an error is raised with a helpful message. This avoids consuming one of the student's attempts. For example:
 
@@ -271,7 +292,8 @@ Cannot add/subtract a vector of length 3 with a vector of length 2.
 
 If you would rather mark the student incorrect when shape errors occur (and also consume an attempt), set `shape_errors=False`.
 
-### Shape-mismatch errors during comparison
+
+### Shape-Mismatch Errors During Comparison
 
 If the author's answer is a 3-component vector, and the student submits a different 3-component vector, then they will be marked incorrect. However, if the student submits a 2-component vector or a number, they will receive an error message:
 
@@ -311,6 +333,7 @@ This behavior can be configured through the `answer_shape_mismatch` key. For exa
   - reveal the shape and the type
 
 we can use:
+
 ```pycon
 >>> grader = MatrixGrader(
 ...     answers='[1, 2, 3]',
@@ -330,7 +353,7 @@ True
 
 ```
 
-### Hiding all messages
+### Hiding All Error Messages
 
 MatrixGraders can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting `suppress_matrix_messages=True`, which overrides `answer_shape_mismatch={'is_raised'}` and `shape_errors`. In the following example, `A` and `B` are secretly matrices that don't commute, but students will never see a matrix error message from typing something like `1+A`.
 
@@ -356,11 +379,13 @@ MatrixGrader provides all the default functions of `FormulaGrader` (`sin`, `cos`
 
 Since `MatrixGrader` has all of `FormulaGrader`'s configuration options, additional functions can be supplied through the `user_functions` configuration key. If you supply addition matrix functions, you may wish you use the `specify_domain` decorator function. See [Function Listing: Specify Domain](../matrixfunctions.md) for details.
 
+
 ## Identity Matrix
 
 To make an n by n identity matrix available to students, specify the configuration key `identity_dim=n`. That is, the grader `MatrixGrader(identity_dim=4, ...)` will automatically have a constant `'I'` whose value is the 4 by 4 identity matrix.
 
 If you want a different name (besides `'I'`) for the identity, or if you encounter situations where identity matrices of different sizes are required, `mitxgraders.helpers.calc` provides an `identity` function. For example:
+
 ```pycon
 >>> from mitxgraders import MatrixGrader
 >>> from mitxgraders.helpers.calc import identity
@@ -374,6 +399,7 @@ If you want a different name (besides `'I'`) for the identity, or if you encount
 
 ```
 
+
 ## Configuration Options
 
 `MatrixGrader` has all of [`FormulaGrader`](../formula_grader.md)'s configuration options, plus some extras. The extras are:
@@ -385,4 +411,4 @@ If you want a different name (besides `'I'`) for the identity, or if you encount
 - `answer_shape_mismatch` (dict): A dictionary whose keys are listed below. Some or all keys may be set. Unset keys take default values. See [Handling Errors: Shape-mismatch errors during comparison](#shape-mismatch-errors-during-comparison) for details.
 
     - `'is_raised'` (bool): defaults to `True`
-    - `'msg_detail'`: one of `None`, `'type'`, or `'shape'`. Defaults to `'type'`
+    - `'msg_detail'` (None | 'type' | 'shape'): defaults to `'type'`

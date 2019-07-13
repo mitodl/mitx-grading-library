@@ -4,6 +4,7 @@ Whenever random variables/functions are involved, they need to be sampled from a
 
 These sampling classes are available for use in `FormulaGrader`, `MatrixGrader`, etc.
 
+
 ## Variable Sampling: Numbers (Scalars)
 
 These sampling sets generate a random number on demand. It may be real or complex.
@@ -25,6 +26,7 @@ Sample from a real interval defined by a `start` and a `stop` value. RealInterva
 >>> sampler = [3, 7]
 
 ```
+
 
 ### IntegerRange
 
@@ -67,9 +69,12 @@ Sample complex numbers from an annular sector in the complex plane, specified by
 
 ```
 
-## Variable Sampling: Vectors and Matrices
+
+## Variable Sampling: Vectors, Matrices and Tensors
+
 
 ### RealVectors
+
 Sample real vectors with specified shape (number of components) and norm.
 
 ```pycon
@@ -81,6 +86,7 @@ Sample real vectors with specified shape (number of components) and norm.
 >>> sampler = RealVectors()
 
 ```
+
 
 ### RealMatrices
 
@@ -96,6 +102,7 @@ True
 ```
 
 If you want to sample a matrix in a way that depends on a scalar, see `DependentSampler` below.
+
 
 ### IdentityMatrixMultiples
 
@@ -113,6 +120,7 @@ True
 
 ## Variable Sampling: Generic
 
+
 ### DiscreteSet
 
 Sample from any discrete set of values that are specified in a tuple. A single value may also be provided, but this case should usually be specified as a constant instead of as a sampling set.
@@ -126,6 +134,7 @@ Sample from any discrete set of values that are specified in a tuple. A single v
 >>> sampler = (1, 3, 5, 7, 9)
 
 ```
+
 
 ### DependentSampler
 
@@ -156,6 +165,7 @@ Samples functions from a specific list of functions. You can also specify just a
 >>> functionsampler = SpecificFunctions(lambda x: x*x)
 
 ```
+
 
 ### RandomFunction
 

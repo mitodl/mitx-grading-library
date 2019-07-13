@@ -23,9 +23,29 @@ True
 
 ```
 
-Each element of answers is set as an answer that is passed as the answers key into the subgrader. This should be set up as two input boxes that the student types in. Note that the `answers` key is provided as a python list of individual answers for a `ListGrader`.
+Answers are provided as a python list of individual `ItemGrader` answers. For `ListGrader`s, they must be provided as a list; all the `ItemGrader` flexibility is allowed only in the individual answers. Each element of answers is set as an answer that is passed as the answers key into the subgrader. This particular example should be set up as two input boxes that the student types in, as follows.
 
-In the above example, the item grader just sees single strings as the answer. You can do more complicated things though, like the following.
+```xml
+<problem>
+<p>What are the most common pets?</p>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = ListGrader(
+    answers=['cat', 'dog'],
+    subgraders=StringGrader()
+)
+</script>
+
+<customresponse cfn="grader" inline="1">
+  <p style="display:inline">First answer: </p><textline math="1" inline="1" correct_answer="cat"/>
+  <br/>
+  <p style="display:inline">Second answer: </p><textline math="1" inline="1" correct_answer="dog"/>
+</customresponse>
+</problem>
+```
+
+In the above example, the item grader just sees single strings as the answer. The full versatility of the `ItemGrader` answer scheme is available though, such as in the following.
 
 ```pycon
 >>> answer1 = (

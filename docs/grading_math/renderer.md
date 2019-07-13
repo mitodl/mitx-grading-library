@@ -15,7 +15,7 @@ The `textline` tag treats the student input as AsciiMath for the purpose of gene
 This article describes how to use our new AsciiMath renderer definitions with a `<textline>` tag.
 
 
-## How it works
+## How it Works
 
 The renderer definitions are located in a javascript file, `MJxPrep.js`, which should be uploaded to the static assets folder for your course. This javascript file loads two components: symbol definitions and a preprocessor.
 
