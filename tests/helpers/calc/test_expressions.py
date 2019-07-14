@@ -199,7 +199,6 @@ def test_suffix_capitalization_error():
     with raises(CalcError, match=match):
         evaluator('5m', variables, functions, suffixes)
 
-
 def test_floor2ceiling():
     value, used = evaluator('floor(1.5)')
     assert value == 1
@@ -220,3 +219,30 @@ def test_floor2ceiling():
            "Its input does not seem to be in its domain.")
     with raises(CalcError, match=msg):
         evaluator('ceil(1+i)')
+
+def test_min_max():
+    assert evaluator('min(1.5, 2, 4, 3.7, 9)')[0] == 1.5
+    assert evaluator('min(1.5, -2, 4, -3.7, 9)')[0] == -3.7
+
+    msg = (r"There was an error evaluating min\(...\). "
+           r"Its input does not seem to be in its domain.")
+    with raises(CalcError, match=msg):
+        evaluator('min(1+i, 2)')
+
+    msg = (r"Wrong number of arguments passed to min\(...\): "
+           r"Expected at least 2 inputs, but received 1.")
+    with raises(ArgumentError, match=msg):
+        evaluator('min(1.5)')
+
+    assert evaluator('max(1.5, 2, 4, 3.7, 9)')[0] == 9
+    assert evaluator('max(1.5, -2, 4, -3.7, 9)')[0] == 9
+
+    msg = (r"There was an error evaluating max\(...\). "
+           r"Its input does not seem to be in its domain.")
+    with raises(CalcError, match=msg):
+        evaluator('max(1+i, 2)')
+
+    msg = (r"Wrong number of arguments passed to max\(...\): "
+           r"Expected at least 2 inputs, but received 1.")
+    with raises(ArgumentError, match=msg):
+        evaluator('max(1.5)')
