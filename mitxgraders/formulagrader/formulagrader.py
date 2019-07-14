@@ -431,6 +431,7 @@ class FormulaGrader(ItemGrader):
     default_variables = DEFAULT_VARIABLES.copy()
     default_suffixes = DEFAULT_SUFFIXES.copy()
 
+    # Default comparer for FormulaGrader
     default_comparer = staticmethod(equality_comparer)
 
     @classmethod
@@ -962,6 +963,9 @@ class NumericalGrader(FormulaGrader):
 
         failable_evals (int): Will always be 0
     """
+
+    # Default comparer for NumericalGrader (independent of FormulaGrader)
+    default_comparer = staticmethod(equality_comparer)
 
     @property
     def schema_config(self):
