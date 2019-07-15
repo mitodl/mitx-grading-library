@@ -1,6 +1,7 @@
-# User-Defined Matrix Functions
+# User-Defined Functions: Arguments, Shapes, and Error Messages
 
 It's possible to construct user-defined functions that take in scalar/vector/matrix arguments, and produce a scalar/vector/matrix appropriately.
+
 
 ## Example
 
@@ -41,6 +42,7 @@ Suppose we have a `MatrixGrader` problem in which we want to provide students wi
 
 ```
 
+
 ### The Problem
 
 Our `rot(vec, axis, angle)` function works, but if students supply the function above with arguments of incorrect type, they receive unhelpful error messages:
@@ -53,6 +55,7 @@ Our `rot(vec, axis, angle)` function works, but if students supply the function 
 There was an error evaluating rot(...). Its input does not seem to be in its domain.
 
 ```
+
 
 ### The Solution
 
@@ -94,6 +97,7 @@ There was an error evaluating function rot(...)
 
 ```
 
+
 ### Configuring specify_domain
 
 The decorator `specify_domain` accepts optional keyword arguments and should be called in either of two equivalent ways:
@@ -132,3 +136,37 @@ specifies that the function `some_func` must be called with three arguments:
 - 1st argument: scalar,
 - 2nd argument: 3 by 2 matrix, and a
 - 3rd argument: 4-component vector.
+
+
+### Arbitrary Same-Shape Arguments
+
+Some functions may allow an arbitrary number of arguments to be passed in. For example, consider a user-defined minimum function:
+
+```pycon
+>>> def my_min(*args):
+...     return min(*args)
+
+```
+
+To inform `specify_domain` that a function should accept arbitrarily many arguments of a certain shape, supply a single shape to `input_shapes`, and also pass in a `min_length` parameter, to specify the minimum number of arguments required. (If you specify `min_length` and have more than one shape in `input_shapes`, a `ConfigError` will result.) So, our `my_min` function can be decorated as follows:
+
+```pycon
+>>> @specify_domain(input_shapes=[1], display_name='min', min_length=2)
+... def my_min(*args):
+...     return min(*args)
+>>> my_min(1.5, 2.3, 4.6)
+1.5
+>>> try:
+...     my_min(1)
+... except StudentFacingError as error:
+...     print(error)
+Wrong number of arguments passed to min(...): Expected at least 2 inputs, but received 1.
+>>> try:
+...     my_min(MathArray([1, 2]), MathArray([3, 4]))
+... except StudentFacingError as error:
+...     print(error)
+There was an error evaluating function min(...)
+1st input has an error: received a vector of length 2, expected a scalar
+2nd input has an error: received a vector of length 2, expected a scalar
+
+```

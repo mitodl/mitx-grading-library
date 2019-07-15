@@ -777,7 +777,7 @@ class OrthogonalMatrices(SquareMatrixSamplingSet):
     =======
         Same as SquareMatrixSamplingSet, but:
             - unitdet (bool): Boolean specifying whether to sample from unit determinant
-                matrices SO(n) (True, default) or arbitrary determinant matrices O(n) (False)
+                matrices SO(n) (True) or arbitrary determinant matrices O(n) (False, default)
 
     The options 'complex' and 'norm' are ignored.
 
@@ -818,7 +818,7 @@ class OrthogonalMatrices(SquareMatrixSamplingSet):
 
     """
     schema_config = SquareMatrixSamplingSet.schema_config.extend({
-        Required('unitdet', default=True): bool
+        Required('unitdet', default=False): bool
     })
 
     def generate_sample(self):
@@ -845,7 +845,7 @@ class UnitaryMatrices(SquareMatrixSamplingSet):
     =======
         Same as SquareMatrixSamplingSet, but:
             - unitdet (bool): Boolean specifying whether to sample from unit determinant
-                matrices SU(n) (True, default) or arbitrary determinant matrices U(n) (False)
+                matrices SU(n) (True) or arbitrary determinant matrices U(n) (False, default)
 
     The options 'complex' and 'norm' are ignored.
 
@@ -889,7 +889,7 @@ class UnitaryMatrices(SquareMatrixSamplingSet):
 
     """
     schema_config = SquareMatrixSamplingSet.schema_config.extend({
-        Required('unitdet', default=True): bool
+        Required('unitdet', default=False): bool
     })
 
     def generate_sample(self):

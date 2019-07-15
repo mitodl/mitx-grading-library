@@ -42,46 +42,52 @@ By default, all of the following functions are made available to students in `Fo
 - `arccoth(x)` Inverse Hyperbolic Cotangent*
 - `floor(x)` Floor function (applies only to real numbers)
 - `ceil(x)` Ceiling function (applies only to real numbers)
+- `min(x, y, z, ...)` Minimum of the arguments (applies only to real numbers, 2 or more arguments)
+- `max(x, y, z, ...)` Maximum of the arguments (applies only to real numbers, 2 or more arguments)
 - `re(x)` Real part of a complex expression*
 - `im(x)` Imaginary part of a complex expression*
 - `conj(x)` Complex conjugate of a complex expression*
-- `kronecker(x, y)` Kronecker delta* (Note that we highly recommend integer sampling over a short range (eg, 1 to 4) when kronecker deltas appear in an answer, and using many samples (eg, 30) so that most permutations appear in the sampling.)
+- `kronecker(x, y)` Kronecker delta* (Note that we highly recommend integer sampling over a short range (eg, 1 to 4) when Kronecker deltas appear in an answer, and using many samples (eg, 30) so that most permutations appear in the sampling.)
+
 
 ## MatrixGrader Default Functions
 
 In `MatrixGrader` problems, all `FormulaGrader` functions are available by default, as are the following extra functions:
 
 - `abs(x)`: absolute value of a scalar or magnitude of a vector
-- `adj(x)`: Hermitian adjoint, same as `ctrans(x)`
-- `cross(x, y)`: cross product, inputs must be 3-component vectors
-- `ctrans(x)`: conjugate transpose, same as `adj(x)`
+- `adj(x)`: Hermitian adjoint, same as `ctrans(x)`*
+- `cross(x, y)`: cross product, inputs must be 3-component vectors*
+- `ctrans(x)`: conjugate transpose, same as `adj(x)`*
 - `det(x)`: determinant, input must be square matrix
 - `norm(x)`: Frobenius norm, works for scalars, vectors, and matrices
-- `trans(x)`: transpose
+- `trans(x)`: transpose*
 - `trace(x)`: trace
 
+
 ## Default Constants
+
 Available in `FormulaGrader`, `NumericalGrader`, and `MatrixGrader` by default:
 
-- `i`: imaginary unit
-- `j`: imaginary unit
+- `i`: imaginary unit (same as `j`)
+- `j`: imaginary unit (same as `i`)
 - `e`: approximately 2.718281828
 - `pi`: approximately 3.141592654
 
+
 ## Optional Constant Collections
-The `mitxgraders.helpers.calc` module provides a few collections of constants that can be imported for convenience and reuse. For example, `pauli` is a dictionary with keys `sigma_x`, `sigma_y`, and `sigma_z` that are [`MathArray`](matrix_grader/matrix_grader/#matrix-operations-and-matharrays) representations of the 2 by 2 Pauli matrices.
 
-The collections of mathematical constants provided by `mitxgraders.helpers.calc` are:
+We provide a few collections of constants that can be imported for convenience and reuse. For example, `pauli` is a dictionary with keys `sigma_x`, `sigma_y`, and `sigma_z` that are [`MathArray`](matrix_grader/matrix_grader/#matrix-operations-and-matharrays) representations of the 2x2 Pauli matrices.
 
-- `pauli`: MathArray representations of the 2 by 2 Pauli matrices, `sigma_x`, `sigma_y`, and `sigma_z`
+The collections of available mathematical constants are:
+
+- `pauli`: MathArray representations of the 2x2 Pauli matrices, `sigma_x`, `sigma_y`, and `sigma_z`
 - `cartesian_xyz`: MathArray representations of the three-dimensional Cartesian unit vectors, named `hatx`, `haty`, `hatz`
 - `cartesian_ijk`: MathArray representations of the three-dimensional Cartesian unit vectors, named `hati`, `hatj`, `hatk`
 
 Each collection is a dictionary that can be provided as a value of `user_constants`:
 
 ```pycon
->>> from mitxgraders import MatrixGrader
->>> from mitxgraders.helpers.calc import pauli
+>>> from mitxgraders import *
 >>> grader = MatrixGrader(
 ...   answers='sigma_x + sigma_z',
 ...   user_constants=pauli
