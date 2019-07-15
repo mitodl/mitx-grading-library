@@ -198,7 +198,7 @@ True
 ```
 
 !!! Note
-    - Orthogonal matrices sampling relies on features of newer versions of numpy and scipy than are currently available in edX. We expect this feature to be available by the end of 2019.
+    - Orthogonal matrix sampling relies on features of newer versions of numpy and scipy than are currently available in edX. We expect this feature to be available by the end of 2019.
 
 
 ### UnitaryMatrices
@@ -215,7 +215,7 @@ True
 ```
 
 !!! Note
-    - Unitary matrices sampling relies on features of newer versions of numpy and scipy than are currently available in edX. We expect this feature to be available by the end of 2019.
+    - Unitary matrix sampling relies on features of newer versions of numpy and scipy than are currently available in edX. We expect this feature to be available by the end of 2019.
 
 
 ## Variable Sampling: Generic
