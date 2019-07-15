@@ -953,3 +953,16 @@ def test_instructor_vars():
         grader(None, 'pi')
     with raises(UndefinedVariable, match=r"'y_\{0\}' not permitted in answer as a variable"):
         grader(None, 'y_{0}')
+
+def test_dependentsampler():
+    # Ensure that dependentsampler can make use of user-defined functions
+    grader = FormulaGrader(
+        answers='y',
+        variables=['x', 'y'],
+        user_functions={'f': lambda x: x**2},
+        sample_from={
+            'y': DependentSampler(depends=["x"], formula="f(x)")
+        }
+    )
+    assert grader(None, 'y')['ok']
+    assert grader(None, 'x^2')['ok']

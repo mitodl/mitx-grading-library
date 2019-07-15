@@ -33,10 +33,10 @@ from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
-    has_keys_of_type, text_string)
+    has_keys_of_type, text_string, Nullable)
 from mitxgraders.helpers.compatibility import coerce_string_keys_to_text_type
 from mitxgraders.helpers.calc import (
-    METRIC_SUFFIXES, CalcError, evaluator, MathArray)
+    METRIC_SUFFIXES, CalcError, evaluator, PARSER, MathArray)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -408,9 +408,21 @@ class DependentSampler(VariableSamplingSet):
 
     # Take in an individual or tuple of numbers
     schema_config = Schema({
-        Required('depends'): [text_string],
+        Required('depends', default=None): Nullable([text_string]),
         Required('formula'): text_string
     })
+
+    def __init__(self, config=None, **kwargs):
+        """Perform initialization"""
+        super(DependentSampler, self).__init__(config, **kwargs)
+
+        # Construct the 'depends' list (overwrites whatever was provided, as this does it better!)
+        try:
+            parsed = PARSER.parse(self.config['formula'])
+            self.config['depends'] = list(parsed.variables_used)
+        except CalcError:
+            raise ConfigError("Formula error in dependent sampling formula: " +
+                              self.config["formula"])
 
     def gen_sample(self):
         """Return a random entry from the given set"""
@@ -476,7 +488,7 @@ def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes, cons
         if not isinstance(sample_from[symbol], DependentSampler)
     ]
 
-    pruned_constants = { sym: constants[sym] for sym in constants if sym not in symbols }
+    pruned_constants = {sym: constants[sym] for sym in constants if sym not in symbols}
 
     # Generate the samples
     sample_list = []
