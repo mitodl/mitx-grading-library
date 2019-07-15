@@ -161,6 +161,8 @@ Samples functions from a specific list of functions. You can also specify just a
 ```pycon
 >>> # Select either sin or cos randomly
 >>> functionsampler = SpecificFunctions([np.cos, np.sin])
+>>> # Equivalent sampling set
+>>> functionsampler = [np.cos, np.sin]
 >>> # Always select a single lambda function
 >>> functionsampler = SpecificFunctions(lambda x: x*x)
 

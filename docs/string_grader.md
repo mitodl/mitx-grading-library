@@ -229,8 +229,9 @@ Your input is not in the expected format
 ## Option Listing
 
 Here is the full list of options specific to a `StringGrader`.
+
 ```python
-grader = SingleListGrader(
+grader = StringGrader(
     case_sensitive=bool,  # default True
     strip=bool,  # default True
     clean_spaces=bool,  # default True

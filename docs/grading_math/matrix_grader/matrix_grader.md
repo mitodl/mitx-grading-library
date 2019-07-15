@@ -2,6 +2,10 @@
 
 `MatrixGrader` is an extended version of `FormulaGrader` used to grade mathematical expressions containing scalars, vectors, and matrices. Authors and students may enter matrix (or vector) expressions by using variables sampled from matrices, or by entering a matrix entry-by-entry.
 
+Compared to `FormulaGrader`, `MatrixGrader` has enhanced error-handling capabilities specific to issues with arrays, extra functions for manipulating vectors and matrices, and partial credit options for component-by-component comparison.
+
+Do not let its name fool you: `MatrixGrader` is capable of handling vectors, matrices and tensors. We will sometimes refer to all of these possibilities as "arrays" (`MatrixGrader` just sounds cooler than `ArrayGrader` though, doesn't it?).
+
 
 ## A First Example
 
@@ -133,9 +137,9 @@ Tensor math arrays (dimension 3+) currently have very little support.
 
 ### Allowed operations
 
- `MathArray` support the usual binary operations for vectors and matrices, with appropriate shape restrictions. Compared to `numpy.ndarray`, `MathArray` has much more stringent shape restrictions.
+`MathArray`s support the usual binary operations for vectors and matrices, with appropriate shape restrictions. Compared to `numpy.ndarray`, `MathArray` has much more stringent shape restrictions.
 
- - **Addition and Subtraction**: Performed elementwise.
+- **Addition and Subtraction**: Performed elementwise.
 
     | Expression | raises error unless | result type |
     |---|---|---|
@@ -143,7 +147,7 @@ Tensor math arrays (dimension 3+) currently have very little support.
     | `MathArray +/- number`  | `number=0` | `MathArray` |
     | `number +/- MathArray`  | `number=0` | `MathArray` |
 
-  - **Multiplication**: Note that `vector * vector` is a dot product
+- **Multiplication**: Note that `vector * vector` is a dot product
 
     | Expression   | left-input shape | right-input shape | raises error unless | result type |
     |---|---|---|---|---|
@@ -154,14 +158,14 @@ Tensor math arrays (dimension 3+) currently have very little support.
     | `vector * matrix`     | `(k, )`    | `(m, n)`   | `m=k`   | `vector` with `n` components |
     | `matrix * matrix`     | `(m1, n1)` | `(m2, n2)` | `n1=m2` | `matrix` of shape `(m1, n2)`  |
 
-  - **Division**: Division either raises an error, or is performed elementwise:
+- **Division**: Division either raises an error, or is performed elementwise:
 
     | Expression | raises error unless | result type |
     |---|---|---|
     | `any / MathArray`     | always raises error | - |
     | `MathArray / number`  | -                   | `MathArray` (elementwise division) |
 
-  - **Powers**: If `A` is a MathArray, then `A^k` will always raise an error unless
+- **Powers**: If `A` is a MathArray, then `A^k` will always raise an error unless
     - `A` is a square matrix, *and*
     - `k` is an integer.
 
@@ -171,7 +175,7 @@ Tensor math arrays (dimension 3+) currently have very little support.
     - `(inverse of A)^|k|` if `k < 0`, and
     - the identity matrix if `k=0`.
 
-    *Note*: Negative exponents can give students "too much power". For example, if you want students to enter the inverse of `[[1, 2], [3, 4]]`, you probably want them to enter `[[-2, 1], [1.5, -0.5]]` not `[[1, 2], [3, 4]]^-1`. To this end, you can disable negative powers in MatrixGrader problems by setting `negative_powers=False`.
+    *Note*: Negative exponents can give students "too much power". For example, if you want students to enter the inverse of `[[1, 2], [3, 4]]`, you probably want them to enter `[[-2, 1], [1.5, -0.5]]` rather than `[[1, 2], [3, 4]]^-1`. To this end, you can disable negative powers in MatrixGrader problems by setting `negative_powers=False`.
 
 
 ### A Note About Vectors
@@ -217,9 +221,9 @@ Some sample error messages:
 |---  |--- |--- |
 | `'A+B'` | No  |  Cannot add/subtract a matrix of shape (rows: 3, cols: 2) with a matrix of shape (rows: 2, cols: 2). |
 | `'v*A'` | No  |  Cannot multiply a vector of length 2 with a matrix of shape (rows: 3, cols: 2).   |
-| `'B*v'` | Yes |  n/a  |
+| `'B*v'` | Yes |    |
 | `'A^2'`   | No  |  Cannot raise a non-square matrix to powers.    |
-| `'B^2'`   | Yes |  n/a    |
+| `'B^2'`   | Yes |      |
 
 <!-- Test the messages (internal verification, not shown in docs) -->
 <!-- ```pycon
@@ -254,7 +258,8 @@ While grading a student's input, matrix-related errors can occur in three places
 
 
 ### Parse Errors:
-For example, student enters `'[[1, 2],[3] ]'`, a matrix missing an entry in second row:
+
+For example, if a student enters `'[[1, 2],[3] ]'`, a matrix missing an entry in second row:
 
 ```pycon
 >>> grader = MatrixGrader(
@@ -327,7 +332,7 @@ The default handling of shape errors that arise when comparing student input to 
   - raise an error (do not mark student incorrect), and
   - reveal the desired type (above, a vector) but not the desired shape (above, 3-components)
 
-This behavior can be configured through the `answer_shape_mismatch` key. For example, to
+This behavior can be configured through the `answer_shape_mismatch` key. We can choose whether an error is presented or an attempt is consumed through the `is_raised` key, while we choose whether to reveal the desired input shape or type with the `msg_detail` key. For example, to
 
   - mark students wrong instead of raising an error, and
   - reveal the shape and the type
@@ -355,19 +360,26 @@ True
 
 ### Hiding All Error Messages
 
-MatrixGraders can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting `suppress_matrix_messages=True`, which overrides `answer_shape_mismatch={'is_raised'}` and `shape_errors`. In the following example, `A` and `B` are secretly matrices that don't commute, but students will never see a matrix error message from typing something like `1+A`.
+`MatrixGrader`s can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting `suppress_matrix_messages=True`, which overrides `answer_shape_mismatch={'is_raised'}` and `shape_errors`. In the following example, `A` and `B` are secretly matrices that don't commute, but students will never see a matrix error message from typing something like `1+A`.
 
-```
-grader = MatrixGrader(
-    answers=['A*B'],
-    variables=['A', 'B'],
-    sample_from={
-        'A': RealMatrices(),
-        'B': RealMatrices()
-    },
-    max_array_dim=0,
-    suppress_matrix_messages=True
-)
+```pycon
+>>> grader = MatrixGrader(
+...     answers='A*B',
+...     variables=['A', 'B'],
+...     sample_from={
+...         'A': RealMatrices(),
+...         'B': RealMatrices()
+...     },
+...     max_array_dim=0,
+...     suppress_matrix_messages=True
+... )
+>>> grader(None, 'A*B')['ok']
+True
+>>> grader(None, 'B*A')['ok']
+False
+>>> grader(None, 'A+1')['ok']
+False
+
 ```
 
 Note that this will also suppress error messages from trying to do things like `sin([1, 2])` or `[1, 2]^2`. If your answer needs to take functions of the non-commuting variables, then this option is insufficient.
@@ -375,20 +387,18 @@ Note that this will also suppress error messages from trying to do things like `
 
 ## Matrix Functions
 
-MatrixGrader provides all the default functions of `FormulaGrader` (`sin`, `cos`, etc.) plus some extras such as `trans(A)` (transpose) and `det(A)` (determinant). See [Mathematical Functions]('../functions_and_constants.md') for full list.
+`MatrixGrader` provides all the default functions of `FormulaGrader` (`sin`, `cos`, etc.) plus some extras such as `trans(A)` (transpose) and `det(A)` (determinant). See [Mathematical Functions]('../functions_and_constants.md') for full list.
 
-Since `MatrixGrader` has all of `FormulaGrader`'s configuration options, additional functions can be supplied through the `user_functions` configuration key. If you supply addition matrix functions, you may wish you use the `specify_domain` decorator function. See [Function Listing: Specify Domain](../matrixfunctions.md) for details.
+Since `MatrixGrader` has all of `FormulaGrader`'s configuration options, additional functions can be supplied through the `user_functions` configuration key. If you supply additional matrix functions, you may wish you use the `specify_domain` decorator function to provide meaningful error messages to students. See [User Functions](../user_functions.md) for details.
 
 
 ## Identity Matrix
 
-To make an n by n identity matrix available to students, specify the configuration key `identity_dim=n`. That is, the grader `MatrixGrader(identity_dim=4, ...)` will automatically have a constant `'I'` whose value is the 4 by 4 identity matrix.
+To make an nxn identity matrix available to students, specify the configuration key `identity_dim=n`. That is, the grader `MatrixGrader(identity_dim=4, ...)` will automatically have a constant `I` whose value is the 4 by 4 identity matrix.
 
-If you want a different name (besides `'I'`) for the identity, or if you encounter situations where identity matrices of different sizes are required, `mitxgraders.helpers.calc` provides an `identity` function. For example:
+If you want a different name (besides `I`) for the identity, or if you encounter situations where identity matrices of different sizes are required, you can use the `identity` function. For example:
 
 ```pycon
->>> from mitxgraders import MatrixGrader
->>> from mitxgraders.helpers.calc import identity
 >>> grader = MatrixGrader(
 ...     answers='[1, 2, 3]',
 ...     user_constants={
@@ -400,15 +410,29 @@ If you want a different name (besides `'I'`) for the identity, or if you encount
 ```
 
 
+## Partial Credit
+
+A special [comparer](../comparer_functions.md) called [`MatrixEntryComparer`](../comparer_functions.md#matrixentrycomparer) has been built to cater for partial credit in `MatrixGrader` problems. In order to facilitate the use of `MatrixEntryComparer`, if either of the following two configuration options are present, `MatrixGrader` will use `MatrixEntryComparer` as the default comparer instead of `equality_comparer`.
+
+- `entry_partial_credit`: `proportional` or a number
+- `entry_partial_msg`: The message to display
+
+See the documentation for `MatrixEntryComparer` for details on how these options work.
+
+
 ## Configuration Options
 
 `MatrixGrader` has all of [`FormulaGrader`](../formula_grader.md)'s configuration options, plus some extras. The extras are:
 
-- `idenity_dim`: If specified as a positive integer `n`, then an n by n identity matrix is added to the available constants with name `'I'`. Defaults to `None`.
+- `identity_dim`: If specified as a positive integer `n`, then an n by n identity matrix is added to the available constants with name `'I'`. Defaults to `None`.
 - `max_array_dim` (nonnegative int): Controls the maximum [dimension](#dimension-and-shape) of arrays that students can enter entry-by-entry. Default is `1`: vectors can be entered entry-by-entry, but not matrices.
 - `negative_powers` (bool): whether negative powers are enabled for square matrices (which calculate powers of matrix inverse). Defaults to `True`.
 - `shape_errors` (bool): See [Handling Errors: Shape-mismatch errors during evaluation](#shape-mismatch-errors-during-evaluation). Defaults to `True`.
+- `suppress_matrix_messages` (bool): See [Hiding All Error Messages](#hiding-all-error-messages). Defaults to `False`.
 - `answer_shape_mismatch` (dict): A dictionary whose keys are listed below. Some or all keys may be set. Unset keys take default values. See [Handling Errors: Shape-mismatch errors during comparison](#shape-mismatch-errors-during-comparison) for details.
 
     - `'is_raised'` (bool): defaults to `True`
     - `'msg_detail'` (None | 'type' | 'shape'): defaults to `'type'`
+
+- `entry_partial_credit`: If set to `proportional` or a number, uses this setting with `MatrixEntryComparer` as the default comparer.
+- `entry_partial_msg`: If set to a text value, uses this setting with `MatrixEntryComparer` as the default comparer.

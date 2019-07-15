@@ -488,6 +488,7 @@ class FormulaGrader(ItemGrader):
             Required('sample_from', default={}): dict,
             Required('failable_evals', default=0): NonNegative(int),
             Required('max_array_dim', default=0): NonNegative(int)
+            # Do not use this; use MatrixGrader instead
         })
 
     Utils = namedtuple('Utils', ['tolerance', 'within_tolerance'])

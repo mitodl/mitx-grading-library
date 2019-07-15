@@ -42,8 +42,8 @@ By default, all of the following functions are made available to students in `Fo
 - `arccoth(x)` Inverse Hyperbolic Cotangent*
 - `floor(x)` Floor function (applies only to real numbers)
 - `ceil(x)` Ceiling function (applies only to real numbers)
-- `min(x, y, z, ...)` Minimum of the arguments (applies only to real numbers, at least 2 arguments)
-- `max(x, y, z, ...)` Maximum of the arguments (applies only to real numbers, at least 2 arguments)
+- `min(x, y, z, ...)` Minimum of the arguments (applies only to real numbers, 2 or more arguments)
+- `max(x, y, z, ...)` Maximum of the arguments (applies only to real numbers, 2 or more arguments)
 - `re(x)` Real part of a complex expression*
 - `im(x)` Imaginary part of a complex expression*
 - `conj(x)` Complex conjugate of a complex expression*
@@ -55,12 +55,12 @@ By default, all of the following functions are made available to students in `Fo
 In `MatrixGrader` problems, all `FormulaGrader` functions are available by default, as are the following extra functions:
 
 - `abs(x)`: absolute value of a scalar or magnitude of a vector
-- `adj(x)`: Hermitian adjoint, same as `ctrans(x)`
-- `cross(x, y)`: cross product, inputs must be 3-component vectors
-- `ctrans(x)`: conjugate transpose, same as `adj(x)`
+- `adj(x)`: Hermitian adjoint, same as `ctrans(x)`*
+- `cross(x, y)`: cross product, inputs must be 3-component vectors*
+- `ctrans(x)`: conjugate transpose, same as `adj(x)`*
 - `det(x)`: determinant, input must be square matrix
 - `norm(x)`: Frobenius norm, works for scalars, vectors, and matrices
-- `trans(x)`: transpose
+- `trans(x)`: transpose*
 - `trace(x)`: trace
 
 

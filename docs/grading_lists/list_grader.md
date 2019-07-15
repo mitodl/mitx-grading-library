@@ -23,7 +23,7 @@ True
 
 ```
 
-Answers are provided as a python list of individual `ItemGrader` answers. For `ListGrader`s, they must be provided as a list; all the `ItemGrader` flexibility is allowed only in the individual answers. Each element of answers is set as an answer that is passed as the answers key into the subgrader. This particular example should be set up as two input boxes that the student types in, as follows.
+Answers are provided as a python list of individual `ItemGrader` answers (or a tuple of such lists). Note that the individual answers may take advantage of all of the usual `ItemGrader` flexibility, but `ListGrader` requires either a list, or a tuple of lists. Each element of answers is set as an answer that is passed as the answers key into the subgrader. This particular example should be set up as two input boxes that the student types in, as follows.
 
 ```xml
 <problem>

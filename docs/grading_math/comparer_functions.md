@@ -147,6 +147,8 @@ Here is an example of setting up a `LinearComparer` that doesn't care about shif
 
 ```
 
+Note that `LinearComparer` can only perform meaningful comparisons when random variables are used. If the answer is a numerical constant, then student answers will always be proportional to that constant, which probably isn't the desired behavior. Also note that when the answer is zero or the student supplies zero as their answer, partial credit cannot be assigned.
+
 
 ### MatrixEntryComparer
 
