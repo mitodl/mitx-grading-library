@@ -153,7 +153,7 @@ class IntegralGrader(AbstractGrader):
 
             For example,
 
-                innput_positions = {
+                input_positions = {
                     'lower': 1,
                     'upper': 2,
                     'integrand': 3
