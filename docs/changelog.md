@@ -25,7 +25,7 @@ Feature updates:
 * In math problems, introduced an option to apply a transforming function to the answer and student input before comparing.
 * Completely overhauled matrix sampling to allow most typical matrix types to be sampled.
 * Introduced instructor variables for math problems, which authors can use in constructing the problem, but students may not use in their responses.
-* `DependentSampler` now has access to constants.
+* `DependentSampler` now has access to constants and user functions, and no longer needs the `depends` key.
 * `DiscreteSet` will now work with arrays.
 * All comparers are now imported when using `from mitxgraders import *`.
 
