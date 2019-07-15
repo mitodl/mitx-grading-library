@@ -135,12 +135,6 @@
                         
                             
 <li >
-    <a href="../matrixfunctions/">User-Defined Matrix Functions</a>
-</li>
-
-                        
-                            
-<li >
     <a href="../sampling/">Sampling Sets</a>
 </li>
 
@@ -148,6 +142,12 @@
                             
 <li >
     <a href="../functions_and_constants/">Functions and Constants List</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../user_functions/">User-Defined Functions</a>
 </li>
 
                         
@@ -221,7 +221,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../functions_and_constants/">
+                        <a rel="next" href="../user_functions/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
@@ -254,7 +254,7 @@
                 <li class="third-level"><a href="#equalitycomparer">EqualityComparer</a></li>
                 <li class="third-level"><a href="#linearcomparer">LinearComparer</a></li>
                 <li class="third-level"><a href="#matrixentrycomparer">MatrixEntryComparer</a></li>
-            <li class="second-level"><a href="#custom-comparer-functions">Custom comparer functions</a></li>
+            <li class="second-level"><a href="#custom-comparer-functions">Custom Comparer Functions</a></li>
                 
     </ul>
 </div></div>
@@ -266,7 +266,7 @@
 <p>When an answer is passed into <code>FormulaGrader</code>, <code>NumericalGrader</code> or <code>MatrixGrader</code>, it is automatically paired up with a comparer. For example, the default comparer is <code>equality_comparer</code>. When you construct a grader like the following,</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
 &gt;&gt;&gt; grader1 = FormulaGrader(
-...     answers='a+b'
+...     answers='a+b',
 ...     variables=['a', 'b']
 ... )</code></pre>
 
@@ -277,7 +277,7 @@
 ...         'expect': {'comparer': equality_comparer, 'comparer_params': ['a+b']},
 ...         'grade_decimal': 1,
 ...         'msg': ''
-...     }
+...     },
 ...     variables=['a', 'b']
 ... )
 &gt;&gt;&gt; grader1 == grader2
@@ -372,7 +372,7 @@ False</code></pre>
 &gt;&gt;&gt; comparer = EqualityComparer(transform=np.real)</code></pre>
 
 
-<p>This comparer will take the real part of the answer and the student input before comparing the results.</p>
+<p>This comparer will take the real part of the answer and the student input before comparing the results. This is useful if only the real part of the answers need to agree.</p>
 <h3 id="linearcomparer">LinearComparer<a class="headerlink" href="#linearcomparer" title="Permanent link"> # </a></h3>
 <p>The <code>LinearComparer</code> checks if the student's answer is linearly related to the problem's answer, and can provide partial credit as appropriate. Here are all of the options:</p>
 <pre class="codehilite"><code class="language-python">comparer = LinearComparer(
@@ -387,7 +387,7 @@ False</code></pre>
 )</code></pre>
 
 
-<p>The first four settings specify how much credit to award the different situations, while the next four describe a message to display when that credit is awarded. Note that setting credit to <code>None</code> means that that type of credit will never be awarded, while setting credit to <code>0</code> means that it can be awarded (usually to display the relevant message).</p>
+<p>The first four settings specify how much credit to award the different situations, while the next four describe a message to display when that credit is awarded. Note that setting credit to <code>None</code> means that that type of credit will never be awarded, while setting credit to <code>0</code> means that it can be awarded (usually to display the relevant message). When the grading is performed, the largest credit of the available settings is awarded.</p>
 <p>Here is an example of a <code>LinearComparer</code> that can be used to award partial credit if students are off from the answer by a constant multiple.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; comparer = LinearComparer()</code></pre>
 
@@ -397,6 +397,7 @@ False</code></pre>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; comparer = LinearComparer(proportional=None, linear=1)</code></pre>
 
 
+<p>Note that <code>LinearComparer</code> can only perform meaningful comparisons when random variables are used. If the answer is a numerical constant, then student answers will always be proportional to that constant, which probably isn't the desired behavior. Also note that when the answer is zero or the student supplies zero as their answer, partial credit cannot be assigned.</p>
 <h3 id="matrixentrycomparer">MatrixEntryComparer<a class="headerlink" href="#matrixentrycomparer" title="Permanent link"> # </a></h3>
 <p>This comparer is used only for <code>MatrixGrader</code>s. It has a <code>transform</code> option that is exactly equivalent to <code>EqualityComparer</code>, but it also has two options related to partial credit.</p>
 <pre class="codehilite"><code class="language-python">comparer = MatrixEntryComparer(
@@ -407,8 +408,8 @@ False</code></pre>
 
 
 <p>When <code>entry_partial_credit</code> is set to a number, if at least one entry in the array is correct (but not all of them), that amount of credit is assigned. When partial credit is assigned, the message <code>entry_partial_msg</code> is displayed to the student, with the text <code>{error_locations}</code> replaced by a graphic displaying which entries are correct/incorrect. To turn off the message, simply set <code>entry_partial_msg=''</code>. Setting <code>entry_partial_msg=''</code> and <code>entry_partial_credit=0</code> makes this grader equivalent to <code>EqualityComparer</code>.</p>
-<p>Because this ability to assign partial credit to array input is so useful, the comparer for <code>MatrixGrader</code> can be set to <code>MatrixEntryComparer</code> using configuration options for <code>MatrixGrader</code>.</p>
-<h2 id="custom-comparer-functions">Custom comparer functions<a class="headerlink" href="#custom-comparer-functions" title="Permanent link"> # </a></h2>
+<p>Because this ability to assign partial credit to array input is so useful, <code>MatrixEntryComparer</code> can be set as the grader for <code>MatrixGrader</code>s using configuration options.</p>
+<h2 id="custom-comparer-functions">Custom Comparer Functions<a class="headerlink" href="#custom-comparer-functions" title="Permanent link"> # </a></h2>
 <p>In addition to using the built-in comparers, you can write your own.</p>
 <p>See <a href="https://github.com/mitodl/mitx-grading-library/tree/master/mitxgraders/comparers/comparers.py">comparers.py</a> for documentation and examples.</p></div>
         

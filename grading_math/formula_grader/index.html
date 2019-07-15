@@ -135,12 +135,6 @@
                         
                             
 <li >
-    <a href="../matrixfunctions/">User-Defined Matrix Functions</a>
-</li>
-
-                        
-                            
-<li >
     <a href="../sampling/">Sampling Sets</a>
 </li>
 
@@ -148,6 +142,12 @@
                             
 <li >
     <a href="../functions_and_constants/">Functions and Constants List</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../user_functions/">User-Defined Functions</a>
 </li>
 
                         
@@ -246,20 +246,20 @@
             <li class="second-level"><a href="#variables-and-sampling">Variables and Sampling</a></li>
                 
                 <li class="third-level"><a href="#variable-names">Variable Names</a></li>
-            <li class="second-level"><a href="#numbered-variables">Numbered Variables</a></li>
-                
+                <li class="third-level"><a href="#numbered-variables">Numbered Variables</a></li>
             <li class="second-level"><a href="#samples-and-failable-evaluations">Samples and Failable Evaluations</a></li>
+                
+            <li class="second-level"><a href="#constants">Constants</a></li>
                 
             <li class="second-level"><a href="#functions">Functions</a></li>
                 
                 <li class="third-level"><a href="#user-functions">User Functions</a></li>
-                <li class="third-level"><a href="#choosing-a-function-randomly">Choosing a function randomly</a></li>
-            <li class="second-level"><a href="#constants">Constants</a></li>
-                
+                <li class="third-level"><a href="#choosing-a-function-randomly">Choosing a Function Randomly</a></li>
             <li class="second-level"><a href="#overriding-default-functions-and-constants">Overriding Default Functions and Constants</a></li>
                 
             <li class="second-level"><a href="#restricting-student-input">Restricting Student Input</a></li>
                 
+                <li class="third-level"><a href="#instructor-variables">Instructor Variables</a></li>
                 <li class="third-level"><a href="#forbidden-strings">Forbidden Strings</a></li>
                 <li class="third-level"><a href="#blacklists-and-whitelists">Blacklists and Whitelists</a></li>
                 <li class="third-level"><a href="#required-functions">Required Functions</a></li>
@@ -273,231 +273,259 @@
                 
             <li class="second-level"><a href="#other-improvements">Other Improvements</a></li>
                 
+            <li class="second-level"><a href="#options-listing">Options Listing</a></li>
+                
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
 <h1 id="formulagrader">FormulaGrader<a class="headerlink" href="#formulagrader" title="Permanent link"> # </a></h1>
-<p>FormulaGrader is the grading class used to grade mathematical formulas and closely resembles the behavior of edX's <code>&lt;formularesponse /&gt;</code> tag, but with much more versatility.</p>
+<p><code>FormulaGrader</code> is the grading class used to grade mathematical formulas and closely resembles the behavior of edX's <code>&lt;formularesponse /&gt;</code> tag, but with much more versatility.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul>
-<li>All expressions are treated in a case sensitive manner. This means that variables <code>'m'</code> and <code>'M'</code> are distinct. Case-insensitive FormulaGraders were deprecated in <a href="../../changelog/#version-110">Version 1.1.0</a></li>
+<li>All expressions are treated in a case sensitive manner. This means that variables <code>m</code> and <code>M</code> are distinct. Case-insensitive <code>FormulaGrader</code>s were deprecated in <a href="../../changelog/#version-110">Version 1.1.0</a></li>
 <li>All whitespace is stripped from formulas that are entered. So, <code>1 + x ^ 2</code> is equivalent to <code>1+x^2</code>.</li>
 </ul>
 </div>
 <h2 id="variables-and-sampling">Variables and Sampling<a class="headerlink" href="#variables-and-sampling" title="Permanent link"> # </a></h2>
-<p>FormulaGrader grades a formula by numerical sampling. That is, random values are assigned to each of the unknown variables and unknown functions, then the numerical value of the student's input expression and author's answer are calculated. The sampling process is repeated, and if the student answer and author answer compare within the desired tolerance enough times, the student input is graded as correct.</p>
+<p><code>FormulaGrader</code> grades a formula by numerical sampling. That is, random values are assigned to each of the unknown variables and unknown functions, and the numerical value of the student's input expression and author's answer are calculated. The sampling process is repeated, and if the student answer and author answer compare within the desired tolerance enough times, the student input is graded as correct.</p>
 <p>Variables are configured by including a list of strings of each variable name as follows.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='1+x^2+y',
-    variables=['x', 'y']
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
+&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='1+x^2+y',
+...     variables=['x', 'y']
+... )</code></pre>
 
 
 <p>Note that the <code>answers</code> parameter follows all of the usual allowances from <code>ItemGrader</code>.</p>
-<p>The variables need to have numbers randomly assigned to them. Each is sampled from a <a href="../sampling/">sampling set</a>, which is <code>RealInterval()</code> by default (random numbers from 1 to 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the <code>sample_from</code> key.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='1+x^2+y+z/2',
-    variables=['x', 'y', 'z'],
-    sample_from={
-        'x': ComplexRectangle(),
-        'y': [2, 6],
-        'z': (1, 3, 4, 8)
-    }
-)</code></pre>
+<p>The variables need to have numbers randomly assigned to them. Each is sampled from a <a href="../sampling/">sampling set</a>, which is <code>RealInterval()</code> by default (random numbers between 1 and 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the <code>sample_from</code> key.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='1+x^2+y+z/2',
+...     variables=['x', 'y', 'z'],
+...     sample_from={
+...         'x': ComplexRectangle(),
+...         'y': [2, 6],
+...         'z': (1, 3, 4, 8)
+...     }
+... )</code></pre>
 
 
-<p>The <code>sample_from</code> key must be a dictionary of 'variable_name': sampling_set pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.</p>
+<p>The <code>sample_from</code> key must be a dictionary of <code>'variable_name': sampling_set</code> pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.</p>
 <h3 id="variable-names">Variable Names<a class="headerlink" href="#variable-names" title="Permanent link"> # </a></h3>
 <p>Variable names are case-sensitive. They must start with a letter, and can be proceded by any combination of letters and numbers. There are two ways to write subscripts and superscripts:</p>
 <ul>
-<li>Old edX style: <code>var_123</code> (note that multiple underscores may be used for backwards compatibility, although it is not recommended that this be used)</li>
+<li>Old edX style: <code>var_123</code> (we also allow the use of multiple underscores for backwards compatability with edX, although it is not recommended that this be used)</li>
 <li>Tensor style: <code>var_{123}</code>, <code>var_{123}^{456}</code> (subscript first), or <code>var^{456}</code></li>
 </ul>
 <p>Sub/superscripts can contain any combination of letters and numbers. Tensor style sub/superscripts are allowed to start with a <code>-</code> sign.</p>
-<p>All types of variable names are allowed to end with an arbitrary number of primes <code>'</code> (apostrophes, useful to indicate differentiation or different reference frames). Students on tables may need to disable "smart quotes" to enter this character.</p>
-<p>The AsciiMath rendered used in <code>&lt;textline&gt;</code> entries in edX has a number of special symbols that can help make variable names look like particular mathematical entries. A handful of these are <code>hatx</code>, <code>vecx</code>, <code>tildex</code>, <code>barx</code>, <code>dotx</code> and <code>ddotx</code>. There are also a handful of other reserved names in AsciiMath; we recommend testing your variables to ensure that they render as expected.</p>
-<h2 id="numbered-variables">Numbered Variables<a class="headerlink" href="#numbered-variables" title="Permanent link"> # </a></h2>
+<p>All types of variable names are allowed to end with an arbitrary number of primes <code>'</code> (apostrophes, useful to indicate differentiation or different reference frames). Students on tablets may need to disable "smart quotes" to enter this character.</p>
+<p>The AsciiMath renderer used in <code>&lt;textline&gt;</code> entries in edX has a number of special symbols that can help make variable names look like particular mathematical entries. A handful of these are <code>hatx</code>, <code>vecx</code>, <code>tildex</code>, <code>barx</code>, <code>dotx</code> and <code>ddotx</code>. There are also a handful of other reserved names in AsciiMath; we recommend testing your variables to ensure that they render as expected.</p>
+<h3 id="numbered-variables">Numbered Variables<a class="headerlink" href="#numbered-variables" title="Permanent link"> # </a></h3>
 <p>You can also specify special variables that are numbered. For example, if you specify that <code>a</code> is a numbered variable, students can include <code>a_{0}</code>, <code>a_{5}</code>, <code>a_{-2}</code>, etc, using any integer. All entries for a numbered variable will use the sampling set specified by the base name.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='a_{0} + a_{1}*x + 1/2*a_{2}*x^2',
-    variables=['x'],
-    numbered_vars=['a'],
-    sample_from={
-        'x': [-5, 5],
-        'a': [-10, 10]
-    }
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='a_{0} + a_{1}*x + 1/2*a_{2}*x^2',
+...     variables=['x'],
+...     numbered_vars=['a'],
+...     sample_from={
+...         'x': [-5, 5],
+...         'a': [-10, 10]
+...     }
+... )</code></pre>
 
 
 <p>If you have a variable name that would clash with a numbered variable (say, you defined <code>a_{0}</code> and also a numbered variable <code>a</code>), then the specific variable has precedence.</p>
 <h2 id="samples-and-failable-evaluations">Samples and Failable Evaluations<a class="headerlink" href="#samples-and-failable-evaluations" title="Permanent link"> # </a></h2>
 <p>To control the number of samples that are checked to ensure correctness, you can modify the <code>samples</code> key.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='1+x^2',
-    variables=['x'],
-    samples=10
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='1+x^2',
+...     variables=['x'],
+...     samples=10
+... )</code></pre>
 
 
 <p>The default for <code>samples</code> is 5.</p>
 <p>You may want to allow for a certain number of comparisons to fail before the student is marked incorrect. To do this, set <code>failable_evals</code>. This should be used very sparingly!</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='1+x^2',
-    variables=['x'],
-    samples=10,
-    failable_evals=1
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='1+x^2',
+...     variables=['x'],
+...     samples=10,
+...     failable_evals=1
+... )</code></pre>
 
 
+<h2 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link"> # </a></h2>
+<p>By default, four constants are defined: <code>e</code>, <code>pi</code>, and <code>i=j=sqrt(-1)</code>. You can define new constants by passing in a dictionary to <code>user_constants</code> as follows.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='1/sqrt(1-v^2/c^2)',
+...     variables=['v'],
+...     user_constants={
+...         'c': 3e8
+...     }
+... )</code></pre>
+
+
+<p>Constants are treated as variables that only ever have one value.</p>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link"> # </a></h2>
-<p>By default, a large array of mathematical functions are available for use. See the full list <a href="../functions_and_constants/">here</a>. Note that all functions are capable of handling complex expressions. In the following example, <code>z*z</code> is recognized to be different from <code>abs(z)^2</code>.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='abs(z)^2',
-    variables=['z'],
-    sample_from={
-        'z': ComplexRectangle()
-    }
-)</code></pre>
+<p>By default, a large array of mathematical functions are available for use. See the full list <a href="../functions_and_constants/">here</a>. Note that all functions are capable of handling complex expressions unless otherwise stated. In the following example, <code>z*z</code> is recognized to be different from <code>abs(z)^2</code>.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='abs(z)^2',
+...     variables=['z'],
+...     sample_from={
+...         'z': ComplexRectangle()
+...     }
+... )
+&gt;&gt;&gt; grader(None, 'z*z')['ok']
+False
+&gt;&gt;&gt; grader(None, 'z*conj(z)')['ok']
+True</code></pre>
 
 
 <h3 id="user-functions">User Functions<a class="headerlink" href="#user-functions" title="Permanent link"> # </a></h3>
 <p>You can make user-defined functions available for students to use in their answers. To add user-defined functions, pass in a dictionary to the <code>user_functions</code> key as follows.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='x*x',
-    variables=['x'],
-    user_functions={'f': lambda x: x*x}
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='x*x',
+...     variables=['x'],
+...     user_functions={'f': lambda x: x*x}
+... )</code></pre>
 
 
 <p>This defines a function <code>f(x) = x^2</code> that students may use. User-defined function names must start with a letter, and can use numbers and underscores, such as <code>my_func2</code>. They are also allowed to have apostrophes (primes) at the end of the name, such as to indicate derivatives. Eg, <code>f''</code>. Be careful about using quotation marks appropriately when using primes in function names, as in the following example.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers=&quot;f''(x)&quot;,
-    variables=['x'],
-    user_functions={&quot;f''&quot;: lambda x: x*x}
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers=&quot;f''(x)&quot;,
+...     variables=['x'],
+...     user_functions={&quot;f''&quot;: lambda x: x*x}
+... )</code></pre>
 
 
-<h3 id="choosing-a-function-randomly">Choosing a function randomly<a class="headerlink" href="#choosing-a-function-randomly" title="Permanent link"> # </a></h3>
+<h3 id="choosing-a-function-randomly">Choosing a Function Randomly<a class="headerlink" href="#choosing-a-function-randomly" title="Permanent link"> # </a></h3>
 <p>You can also specify random functions by specifying a sampling set for a function. You can provide a list of functions to randomly choose from as follows.</p>
-<pre class="codehilite"><code class="language-python">import numpy as np
-grader = FormulaGrader(
-    answers=&quot;f(x)&quot;,
-    variables=['x'],
-    user_functions={&quot;f&quot;: [np.sin, np.cos]}
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; grader = FormulaGrader(
+...     answers=&quot;f(x)&quot;,
+...     variables=['x'],
+...     user_functions={&quot;f&quot;: [np.sin, np.cos]}
+... )</code></pre>
 
 
 <p>Each time this formula is checked, the function <code>f</code> will be sampled from the list of available functions.</p>
 <p>You can also specify a random well-behaved function by using the <code>RandomFunction()</code> sampling set.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers=&quot;f''(x) + omega^2*f(x)&quot;,
-    variables=['x', 'omega'],
-    user_functions={
-        &quot;f&quot;: RandomFunction(),
-        &quot;f''&quot;: RandomFunction()
-    }
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers=&quot;f''(x) + omega^2*f(x)&quot;,
+...     variables=['x', 'omega'],
+...     user_functions={
+...         &quot;f&quot;: RandomFunction(),
+...         &quot;f''&quot;: RandomFunction()
+...     }
+... )</code></pre>
 
 
 <p>This allows you to grade mathematical expressions that involve unknown functions, such as the differential equation described in this example. See <a href="../sampling/#randomfunction">Sampling</a> for further options associated with <code>RandomFunction</code>.</p>
-<h2 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link"> # </a></h2>
-<p>By default, four constants are defined: <code>e</code>, <code>pi</code>, and <code>i=j=sqrt(-1)</code>. You can define new constants by passing in a dictionary to <code>user_constants</code> as follows.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='1/sqrt(1-v^2/c^2)',
-    variables=['v'],
-    user_constants={
-        'c': 3e8
-    }
-)</code></pre>
-
-
-<p>Constants are like variables that only ever have one value.</p>
 <h2 id="overriding-default-functions-and-constants">Overriding Default Functions and Constants<a class="headerlink" href="#overriding-default-functions-and-constants" title="Permanent link"> # </a></h2>
-<p>You can override default functions and constants if you really want, although this is discouraged and requires suppressing warnings with <code>suppress_warnings=True</code>. The following grader</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='x^2',
-    variables=['x'],
-    user_functions={'sin': lambda x: x*x},
-)</code></pre>
+<p>You can override default functions and constants if you really want, although this is discouraged and requires suppressing warnings with <code>suppress_warnings=True</code>. The following grader raises this warning when constructed:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; try:
+...     grader = FormulaGrader(
+...         answers='x^2',
+...         variables=['x'],
+...         user_functions={'sin': lambda x: x*x},
+...     )
+... except ConfigError as error:
+...     print(error)
+Warning: 'user_functions' contains entries 'sin' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</code></pre>
 
 
-<p>will raise an error</p>
-<blockquote>
-<p>ConfigError: Warning: 'user_functions' contains entries '['sin']' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</p>
-</blockquote>
 <p>The error can be suppressed by setting <code>suppress_warnings=True</code>.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='x^2',
+...     variables=['x'],
+...     user_functions={'sin': lambda x: x*x},
+...     suppress_warnings=True
+... )</code></pre>
+
+
 <h2 id="restricting-student-input">Restricting Student Input<a class="headerlink" href="#restricting-student-input" title="Permanent link"> # </a></h2>
 <p>For some questions, you will want to restrict the sorts of input that are marked correct. For example, if you want students to expand <code>sin(2*theta)</code>, then you don't want students to be able to just write <code>sin(2*theta)</code> and be graded correct.</p>
-<p>FormulaGrader offers a few ways to restrict what sort of answers will be marked correct.</p>
+<p><code>FormulaGrader</code> offers a number of ways to restrict what sort of answers will be marked correct.</p>
+<h3 id="instructor-variables">Instructor Variables<a class="headerlink" href="#instructor-variables" title="Permanent link"> # </a></h3>
+<p>In some situations, you need an extra variable to help define the problem in some way, particularly when using <code>DependentSampler</code>. Alternatively, you may want to remove a default constant such as <code>e</code>, <code>i</code>, <code>j</code> or <code>pi</code> from the problem. Both of these situations can be addressed by specifying particular variables to be instructor variables, as in the following.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='s/c',
+...     variables=['s', 'c', 'phi'],
+...     sample_from={
+...         's': DependentSampler(depends=['phi'], formula='sin(phi)'),
+...         'c': DependentSampler(depends=['phi'], formula='cos(phi)')
+...     },
+...     instructor_vars=['phi']
+... )</code></pre>
+
+
+<p>Here, students can use <code>s</code> and <code>c</code>, but not <code>phi</code> in their answer. The <code>instructor_vars</code> key accepts a list of the variables/constants you wish to make unavailable to students.</p>
 <h3 id="forbidden-strings">Forbidden Strings<a class="headerlink" href="#forbidden-strings" title="Permanent link"> # </a></h3>
 <p>You can forbid students from entering certain strings using the <code>forbidden_strings</code> key:</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='2*sin(theta)*cos(theta)',
-    variables=['theta'],
-    forbidden_strings=['*theta', 'theta*', 'theta/', '+theta', 'theta+', '-theta', 'theta-'],
-    forbidden_message=&quot;Your answer should only use trigonometric functions acting on theta, not multiples of theta&quot;
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='2*sin(theta)*cos(theta)',
+...     variables=['theta'],
+...     forbidden_strings=['*theta', 'theta*', 'theta/', '+theta', 'theta+', '-theta', 'theta-'],
+...     forbidden_message=&quot;Your answer should only use trigonometric functions acting on theta, not multiples of theta&quot;
+... )</code></pre>
 
 
 <p>If a student tries to use one of these strings, then they receive the <code>forbidden_message</code>, without giving away what the forbidden string is. We recommend using this sparingly, as students may find it confusing. The default <code>forbidden_message</code> is "Invalid Input: This particular answer is forbidden".</p>
 <p>Forbidden strings and student answers are stripped of whitespace before being compared. Thus, if <code>x + y</code> is forbidden, then answers containing <code>x+y</code> or <code>x   +   y</code> will be rejected.</p>
 <h3 id="blacklists-and-whitelists">Blacklists and Whitelists<a class="headerlink" href="#blacklists-and-whitelists" title="Permanent link"> # </a></h3>
 <p>You can disallow specific functions by adding them to the blacklist of functions as a list of disallowed function names. In the following example, <code>sin</code> is disallowed in correct answers.</p>
-<pre class="codehilite"><code class="language-python">import numpy as np
-grader = FormulaGrader(
-    answers='sqrt(1 - cos(x)^2)',
-    variables=['x'],
-    sample_from={'x': [0, np.pi]},
-    blacklist=['sin']
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='sqrt(1 - cos(x)^2)',
+...     variables=['x'],
+...     sample_from={'x': [0, np.pi]},
+...     blacklist=['sin']
+... )</code></pre>
 
 
-<p>If you want to exclude everything except for a specific set of functions, instead use a whitelist. In the following example, the only allowed functions in correct answers are sin and cos.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='sin(x)/cos(x)',
-    variables=['x'],
-    whitelist=['sin', 'cos']
-)</code></pre>
+<p>If you want to exclude everything except for a specific set of functions, instead use a whitelist. In the following example, the only allowed functions in correct answers are <code>sin</code> and <code>cos</code>.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='sin(x)/cos(x)',
+...     variables=['x'],
+...     whitelist=['sin', 'cos']
+... )</code></pre>
 
 
 <p>If you want to exclude all functions, use <code>whitelist=[None]</code>:</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='pi/2-x',
-    variables=['x'],
-    whitelist=[None]  # no functions are allowed
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='pi/2-x',
+...     variables=['x'],
+...     whitelist=[None]  # no functions are allowed
+... )</code></pre>
 
 
 <p>You cannot use a whitelist and a blacklist at the same time.</p>
 <h3 id="required-functions">Required Functions<a class="headerlink" href="#required-functions" title="Permanent link"> # </a></h3>
 <p>You can specifically require certain functions to appear in the solution. Any solution that does not include all of these functions will generate an error message. To do this, specify a list of strings of function names that are required.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='2*sin(theta)*cos(theta)',
-    variables=['theta'],
-    required_functions=['sin', 'cos']
-)</code></pre>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='2*sin(theta)*cos(theta)',
+...     variables=['theta'],
+...     required_functions=['sin', 'cos']
+... )</code></pre>
 
 
 <h2 id="tolerance">Tolerance<a class="headerlink" href="#tolerance" title="Permanent link"> # </a></h2>
-<p>Student inputs are compared to answers with a numerical tolerance. You can set this as an absolute number (eg, <code>0.1</code>) or a percentage (eg, <code>"0.01%"</code>, which is the default tolerance).  Tolerances must be nonnegative numbers or percentages.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='2*sin(theta)*cos(theta)',
-    variables=['theta'],
-    tolerance=0.00001
-)</code></pre>
+<p>Student inputs are compared to answers with a numerical tolerance. You can set this as an absolute number (eg, <code>0.1</code>) or a percentage (eg, <code>'0.01%'</code>, which is the default tolerance). Tolerances must be nonnegative numbers or percentages.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='2*sin(theta)*cos(theta)',
+...     variables=['theta'],
+...     tolerance=0.00001
+... )</code></pre>
 
 
 <p>Tolerances are necessary because of numerical roundoff error that lead to small differences in evaluations of algebraically equivalent expressions. Zero tolerance should be used sparingly, perhaps only with integer sampling and answers.</p>
 <p>Note that if the answer is exactly <code>0</code> (or can be sampled to be exactly <code>0</code>, such as when using integer sampling), percentage tolerances don't work (as any percentage of zero is still zero). This means that the student-supplied answer must also evaluate to exactly zero to be graded correctly. Note that answers like <code>cos(pi/2)</code> evaluate to approximately <code>10^(-16)</code> due to numerical roundoff error. If you want such answers to be graded correctly, make sure to use an absolute tolerance instead of a relative tolerance on such questions.</p>
 <h2 id="suffixes">Suffixes<a class="headerlink" href="#suffixes" title="Permanent link"> # </a></h2>
-<p>Numbers with a % at the end will be treated as percentages, and converted to the appropriate decimals. If you desire, you can also enable the use of metric suffixes by setting the appropriate setting as follows.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    answers='2m*a',  # Equivalent to '0.002*a'
-    variables=['a'],
-    metric_suffixes=True
-)</code></pre>
+<p>Numbers with a <code>%</code> at the end will be treated as percentages, and converted to the appropriate decimals. If you desire, you can also enable the use of metric suffixes by setting the appropriate setting as follows.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='2m*a',  # Equivalent to '0.002*a'
+...     variables=['a'],
+...     metric_suffixes=True
+... )</code></pre>
 
 
 <p>The included suffixes are:</p>
@@ -515,9 +543,7 @@ grader = FormulaGrader(
 <h2 id="sibling-variables">Sibling Variables<a class="headerlink" href="#sibling-variables" title="Permanent link"> # </a></h2>
 <p>When a student submits several mathematical expressions as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This can be done using <em>sibling variables</em>, which are available when <code>FormulaGrader</code> is used as a subgrader in <strong>ordered</strong> <code>ListGrader</code> problems.</p>
 <p>For example:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import ListGrader, FormulaGrader
-
-&gt;&gt;&gt; grader = ListGrader(
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = ListGrader(
 ...     answers=[
 ...         ('x', '2*x','3*x'),     # first input can be any of these 3 answers
 ...         'sibling_1^2',          # second input must be first input squared
@@ -549,9 +575,10 @@ grader = FormulaGrader(
 <ul>
 <li>Sibling variables are available to <code>FormulaGrader</code>, <code>NumericalGrader</code>, and <code>MatrixGrader</code>, but only in <strong>ordered</strong> <code>ListGrader</code> problems.</li>
 <li>The jth student input is referenced as <code>sibling_j</code>. (Exception: If nesting <code>ListGraders</code> with grouping, <code>sibling_j</code> refers to the jth member of any particular group.)</li>
+<li>Students are not able to use <code>sibling_j</code> in any of their answers.</li>
 </ul>
 <h2 id="comparer-functions">Comparer Functions<a class="headerlink" href="#comparer-functions" title="Permanent link"> # </a></h2>
-<p>Comparer functions allow you to compare the student input to the author's expectation using aspects other than equality. See <a href="../comparer_functions/">Comparer Functions</a> for details.</p>
+<p>Comparer functions allow you to compare the student input to the author's expectation using aspects other than equality, or to use a given scheme to assign partial credit. See <a href="../comparer_functions/">Comparer Functions</a> for details.</p>
 <h2 id="other-improvements">Other Improvements<a class="headerlink" href="#other-improvements" title="Permanent link"> # </a></h2>
 <p>We have made a number of other improvements over the edX formula graders, including:</p>
 <ul>
@@ -562,8 +589,28 @@ grader = FormulaGrader(
 <li>Similarly, when students use an unknown function, the resulting error message highlights that the unknown quantity was interpreted as a function. If a variable of that name exists, the error message suggests that a multiplication symbol was missing.</li>
 <li>If an unexpected error occurs, students will see a generic "invalid input" message. To see exactly where things went wrong, set the <code>debug</code> flag to <code>True</code>, and a more technical message will usually be displayed.</li>
 <li>Full sampling details are included when the <code>debug</code> flag is set to <code>True</code>.</li>
-<li>Enhancements to the AsciiMath renderer (the preview that students see when using <code>&lt;textline /&gt;</code> inputs) are available using our <a href="../renderer/">AsciiMath renderer definitions</a>.</li>
-</ul></div>
+<li>Enhancements to the AsciiMath renderer (the preview that students see when using <code>&lt;textline /&gt;</code> inputs) are available using our highly recommended <a href="../renderer/">AsciiMath renderer definitions</a>.</li>
+</ul>
+<p>Note that a few of these improvements have been merged into edX by the authors of this library.</p>
+<h2 id="options-listing">Options Listing<a class="headerlink" href="#options-listing" title="Permanent link"> # </a></h2>
+<p>Here is the full list of options specific to a <code>FormulaGrader</code>.</p>
+<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
+    variables=list,  # default []
+    numbered_vars=list,  # default []
+    sample_from=dict,  # default {}
+    samples=int,  # default 5
+    user_functions=dict,  # default {}
+    user_constants=dict,  # default {}
+    failable_evals=int,  # default 0
+    instructor_vars=list,  # default []
+    blacklist=list,  # default []
+    whitelist=list,  # default []
+    forbidden_strings=list,  # default []
+    forbidden_message=str,  # default 'Invalid Input: This particular answer is forbidden'
+    required_functions=list,  # default []
+    metric_suffixes=bool,  # default False
+    tolerance=(float | percentage),  # default '0.01%'
+)</code></pre></div>
         
     </div>
 

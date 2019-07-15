@@ -135,12 +135,6 @@
                         
                             
 <li >
-    <a href="../matrixfunctions/">User-Defined Matrix Functions</a>
-</li>
-
-                        
-                            
-<li >
     <a href="../sampling/">Sampling Sets</a>
 </li>
 
@@ -148,6 +142,12 @@
                             
 <li class="active">
     <a href="./">Functions and Constants List</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../user_functions/">User-Defined Functions</a>
 </li>
 
                         
@@ -226,7 +226,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../comparer_functions/">
+                        <a rel="prev" href="../user_functions/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -300,42 +300,43 @@
 <li><code>arccoth(x)</code> Inverse Hyperbolic Cotangent*</li>
 <li><code>floor(x)</code> Floor function (applies only to real numbers)</li>
 <li><code>ceil(x)</code> Ceiling function (applies only to real numbers)</li>
+<li><code>min(x, y, z, ...)</code> Minimum of the arguments (applies only to real numbers, 2 or more arguments)</li>
+<li><code>max(x, y, z, ...)</code> Maximum of the arguments (applies only to real numbers, 2 or more arguments)</li>
 <li><code>re(x)</code> Real part of a complex expression*</li>
 <li><code>im(x)</code> Imaginary part of a complex expression*</li>
 <li><code>conj(x)</code> Complex conjugate of a complex expression*</li>
-<li><code>kronecker(x, y)</code> Kronecker delta* (Note that we highly recommend integer sampling over a short range (eg, 1 to 4) when kronecker deltas appear in an answer, and using many samples (eg, 30) so that most permutations appear in the sampling.)</li>
+<li><code>kronecker(x, y)</code> Kronecker delta* (Note that we highly recommend integer sampling over a short range (eg, 1 to 4) when Kronecker deltas appear in an answer, and using many samples (eg, 30) so that most permutations appear in the sampling.)</li>
 </ul>
 <h2 id="matrixgrader-default-functions">MatrixGrader Default Functions<a class="headerlink" href="#matrixgrader-default-functions" title="Permanent link"> # </a></h2>
 <p>In <code>MatrixGrader</code> problems, all <code>FormulaGrader</code> functions are available by default, as are the following extra functions:</p>
 <ul>
 <li><code>abs(x)</code>: absolute value of a scalar or magnitude of a vector</li>
-<li><code>adj(x)</code>: Hermitian adjoint, same as <code>ctrans(x)</code></li>
-<li><code>cross(x, y)</code>: cross product, inputs must be 3-component vectors</li>
-<li><code>ctrans(x)</code>: conjugate transpose, same as <code>adj(x)</code></li>
+<li><code>adj(x)</code>: Hermitian adjoint, same as <code>ctrans(x)</code>*</li>
+<li><code>cross(x, y)</code>: cross product, inputs must be 3-component vectors*</li>
+<li><code>ctrans(x)</code>: conjugate transpose, same as <code>adj(x)</code>*</li>
 <li><code>det(x)</code>: determinant, input must be square matrix</li>
 <li><code>norm(x)</code>: Frobenius norm, works for scalars, vectors, and matrices</li>
-<li><code>trans(x)</code>: transpose</li>
+<li><code>trans(x)</code>: transpose*</li>
 <li><code>trace(x)</code>: trace</li>
 </ul>
 <h2 id="default-constants">Default Constants<a class="headerlink" href="#default-constants" title="Permanent link"> # </a></h2>
 <p>Available in <code>FormulaGrader</code>, <code>NumericalGrader</code>, and <code>MatrixGrader</code> by default:</p>
 <ul>
-<li><code>i</code>: imaginary unit</li>
-<li><code>j</code>: imaginary unit</li>
+<li><code>i</code>: imaginary unit (same as <code>j</code>)</li>
+<li><code>j</code>: imaginary unit (same as <code>i</code>)</li>
 <li><code>e</code>: approximately 2.718281828</li>
 <li><code>pi</code>: approximately 3.141592654</li>
 </ul>
 <h2 id="optional-constant-collections">Optional Constant Collections<a class="headerlink" href="#optional-constant-collections" title="Permanent link"> # </a></h2>
-<p>The <code>mitxgraders.helpers.calc</code> module provides a few collections of constants that can be imported for convenience and reuse. For example, <code>pauli</code> is a dictionary with keys <code>sigma_x</code>, <code>sigma_y</code>, and <code>sigma_z</code> that are <a href="../matrix_grader/matrix_grader/#matrix-operations-and-matharrays"><code>MathArray</code></a> representations of the 2 by 2 Pauli matrices.</p>
-<p>The collections of mathematical constants provided by <code>mitxgraders.helpers.calc</code> are:</p>
+<p>We provide a few collections of constants that can be imported for convenience and reuse. For example, <code>pauli</code> is a dictionary with keys <code>sigma_x</code>, <code>sigma_y</code>, and <code>sigma_z</code> that are <a href="../matrix_grader/matrix_grader/#matrix-operations-and-matharrays"><code>MathArray</code></a> representations of the 2x2 Pauli matrices.</p>
+<p>The collections of available mathematical constants are:</p>
 <ul>
-<li><code>pauli</code>: MathArray representations of the 2 by 2 Pauli matrices, <code>sigma_x</code>, <code>sigma_y</code>, and <code>sigma_z</code></li>
+<li><code>pauli</code>: MathArray representations of the 2x2 Pauli matrices, <code>sigma_x</code>, <code>sigma_y</code>, and <code>sigma_z</code></li>
 <li><code>cartesian_xyz</code>: MathArray representations of the three-dimensional Cartesian unit vectors, named <code>hatx</code>, <code>haty</code>, <code>hatz</code></li>
 <li><code>cartesian_ijk</code>: MathArray representations of the three-dimensional Cartesian unit vectors, named <code>hati</code>, <code>hatj</code>, <code>hatk</code></li>
 </ul>
 <p>Each collection is a dictionary that can be provided as a value of <code>user_constants</code>:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import MatrixGrader
-&gt;&gt;&gt; from mitxgraders.helpers.calc import pauli
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
 &gt;&gt;&gt; grader = MatrixGrader(
 ...   answers='sigma_x + sigma_z',
 ...   user_constants=pauli

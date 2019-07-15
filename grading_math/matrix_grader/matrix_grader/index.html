@@ -135,12 +135,6 @@
                         
                             
 <li >
-    <a href="../../matrixfunctions/">User-Defined Matrix Functions</a>
-</li>
-
-                        
-                            
-<li >
     <a href="../../sampling/">Sampling Sets</a>
 </li>
 
@@ -148,6 +142,12 @@
                             
 <li >
     <a href="../../functions_and_constants/">Functions and Constants List</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../user_functions/">User-Defined Functions</a>
 </li>
 
                         
@@ -226,7 +226,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../../matrixfunctions/">
+                        <a rel="prev" href="../../sampling/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -243,7 +243,7 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#matrixgrader">MatrixGrader</a></li>
-            <li class="second-level"><a href="#a-first-example">A first example</a></li>
+            <li class="second-level"><a href="#a-first-example">A First Example</a></li>
                 
             <li class="second-level"><a href="#matrix-sampling">Matrix Sampling</a></li>
                 
@@ -254,17 +254,19 @@
                 <li class="third-level"><a href="#how-matrixgrader-uses-matharrays">How MatrixGrader uses MathArrays</a></li>
                 <li class="third-level"><a href="#dimension-and-shape">Dimension and Shape</a></li>
                 <li class="third-level"><a href="#allowed-operations">Allowed operations</a></li>
-                <li class="third-level"><a href="#a-note-about-vectors">A note about vectors</a></li>
+                <li class="third-level"><a href="#a-note-about-vectors">A Note About Vectors</a></li>
                 <li class="third-level"><a href="#shape-errors">Shape Errors</a></li>
             <li class="second-level"><a href="#handling-errors">Handling Errors</a></li>
                 
-                <li class="third-level"><a href="#parse-errors">Parse errors:</a></li>
-                <li class="third-level"><a href="#shape-mismatch-errors-during-evaluation">Shape-mismatch errors during evaluation</a></li>
-                <li class="third-level"><a href="#shape-mismatch-errors-during-comparison">Shape-mismatch errors during comparison</a></li>
-                <li class="third-level"><a href="#hiding-all-messages">Hiding all messages</a></li>
+                <li class="third-level"><a href="#parse-errors">Parse Errors:</a></li>
+                <li class="third-level"><a href="#shape-mismatch-errors-during-evaluation">Shape-Mismatch Errors During Evaluation</a></li>
+                <li class="third-level"><a href="#shape-mismatch-errors-during-comparison">Shape-Mismatch Errors During Comparison</a></li>
+                <li class="third-level"><a href="#hiding-all-error-messages">Hiding All Error Messages</a></li>
             <li class="second-level"><a href="#matrix-functions">Matrix Functions</a></li>
                 
             <li class="second-level"><a href="#identity-matrix">Identity Matrix</a></li>
+                
+            <li class="second-level"><a href="#partial-credit">Partial Credit</a></li>
                 
             <li class="second-level"><a href="#configuration-options">Configuration Options</a></li>
                 
@@ -273,9 +275,11 @@
         <div class="col-md-9" role="main">
 
 <h1 id="matrixgrader">MatrixGrader<a class="headerlink" href="#matrixgrader" title="Permanent link"> # </a></h1>
-<p>MatrixGrader is an extended version of FormulaGrader used to grade mathematical expressions containing scalars, vectors, and matrices. Authors and students may enter matrix (or vector) expressions by using variables sampled from matrices, or by entering a matrix entry-by-entry.</p>
-<h2 id="a-first-example">A first example<a class="headerlink" href="#a-first-example" title="Permanent link"> # </a></h2>
-<p>A typical use of MatrixGrader might look like</p>
+<p><code>MatrixGrader</code> is an extended version of <code>FormulaGrader</code> used to grade mathematical expressions containing scalars, vectors, and matrices. Authors and students may enter matrix (or vector) expressions by using variables sampled from matrices, or by entering a matrix entry-by-entry.</p>
+<p>Compared to <code>FormulaGrader</code>, <code>MatrixGrader</code> has enhanced error-handling capabilities specific to issues with arrays, extra functions for manipulating vectors and matrices, and partial credit options for component-by-component comparison.</p>
+<p>Do not let its name fool you: <code>MatrixGrader</code> is capable of handling vectors, matrices and tensors. We will sometimes refer to all of these possibilities as "arrays" (<code>MatrixGrader</code> just sounds cooler than <code>ArrayGrader</code> though, doesn't it?).</p>
+<h2 id="a-first-example">A First Example<a class="headerlink" href="#a-first-example" title="Permanent link"> # </a></h2>
+<p>A typical use of <code>MatrixGrader</code> might look like</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
 &gt;&gt;&gt; grader1 = MatrixGrader(
 ...   answers='4*A*B^2*v',
@@ -425,7 +429,7 @@ MathArray([30, 63])</code></pre>
 <p>See <a href="#a-note-about-vectors">A note about vectors</a></p>
 </div>
 <h3 id="allowed-operations">Allowed operations<a class="headerlink" href="#allowed-operations" title="Permanent link"> # </a></h3>
-<p><code>MathArray</code> support the usual binary operations for vectors and matrices, with appropriate shape restrictions. Compared to <code>numpy.ndarray</code>, <code>MathArray</code> has much more stringent shape restrictions.</p>
+<p><code>MathArray</code>s support the usual binary operations for vectors and matrices, with appropriate shape restrictions. Compared to <code>numpy.ndarray</code>, <code>MathArray</code> has much more stringent shape restrictions.</p>
 <ul>
 <li>
 <p><strong>Addition and Subtraction</strong>: Performed elementwise.</p>
@@ -550,10 +554,10 @@ MathArray([30, 63])</code></pre>
 <li><code>(inverse of A)^|k|</code> if <code>k &lt; 0</code>, and</li>
 <li>the identity matrix if <code>k=0</code>.</li>
 </ul>
-<p><em>Note</em>: Negative exponents can give students "too much power". For example, if you want students to enter the inverse of <code>[[1, 2], [3, 4]]</code>, you probably want them to enter <code>[[-2, 1], [1.5, -0.5]]</code> not <code>[[1, 2], [3, 4]]^-1</code>. To this end, you can disable negative powers in MatrixGrader problems by setting <code>negative_powers=False</code>.</p>
+<p><em>Note</em>: Negative exponents can give students "too much power". For example, if you want students to enter the inverse of <code>[[1, 2], [3, 4]]</code>, you probably want them to enter <code>[[-2, 1], [1.5, -0.5]]</code> rather than <code>[[1, 2], [3, 4]]^-1</code>. To this end, you can disable negative powers in MatrixGrader problems by setting <code>negative_powers=False</code>.</p>
 </li>
 </ul>
-<h3 id="a-note-about-vectors">A note about vectors<a class="headerlink" href="#a-note-about-vectors" title="Permanent link"> # </a></h3>
+<h3 id="a-note-about-vectors">A Note About Vectors<a class="headerlink" href="#a-note-about-vectors" title="Permanent link"> # </a></h3>
 <p>Vectors are distinct from single-row matrices and single-column matrices, and can be left- or right-multiplied by a matrix:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; vec = MathArray([1, 2, 3])
 &gt;&gt;&gt; row = MathArray([[1, 2, 3]])
@@ -603,7 +607,7 @@ MathArray([ 9, 12, 15])</code></pre>
 <tr>
 <td><code>'B*v'</code></td>
 <td>Yes</td>
-<td>n/a</td>
+<td></td>
 </tr>
 <tr>
 <td><code>'A^2'</code></td>
@@ -613,7 +617,7 @@ MathArray([ 9, 12, 15])</code></pre>
 <tr>
 <td><code>'B^2'</code></td>
 <td>Yes</td>
-<td>n/a</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -648,8 +652,8 @@ Cannot raise a non-square matrix to powers.
 <li>while evaluating the student's input, and</li>
 <li>while comparing the student's input to the author's stored answer.</li>
 </ul>
-<h3 id="parse-errors">Parse errors:<a class="headerlink" href="#parse-errors" title="Permanent link"> # </a></h3>
-<p>For example, student enters <code>'[[1, 2],[3] ]'</code>, a matrix missing an entry in second row:</p>
+<h3 id="parse-errors">Parse Errors:<a class="headerlink" href="#parse-errors" title="Permanent link"> # </a></h3>
+<p>For example, if a student enters <code>'[[1, 2],[3] ]'</code>, a matrix missing an entry in second row:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
 ...     answers='[[1, 2], [3, 4]]',
 ...     max_array_dim=2, # allow students to enter matrices entry-by-entry
@@ -663,7 +667,7 @@ Unable to parse vector/matrix. If you're trying to enter a matrix, this is most 
 
 
 <p>Such parse errors are <strong>always</strong> displayed to students.</p>
-<h3 id="shape-mismatch-errors-during-evaluation">Shape-mismatch errors during evaluation<a class="headerlink" href="#shape-mismatch-errors-during-evaluation" title="Permanent link"> # </a></h3>
+<h3 id="shape-mismatch-errors-during-evaluation">Shape-Mismatch Errors During Evaluation<a class="headerlink" href="#shape-mismatch-errors-during-evaluation" title="Permanent link"> # </a></h3>
 <p>If a student submits an answer that will raise shape-mismatch errors then an error is raised with a helpful message. This avoids consuming one of the student's attempts. For example:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
 ...     answers='[11, 22, 33]',
@@ -677,7 +681,7 @@ Cannot add/subtract a vector of length 3 with a vector of length 2.</code></pre>
 
 
 <p>If you would rather mark the student incorrect when shape errors occur (and also consume an attempt), set <code>shape_errors=False</code>.</p>
-<h3 id="shape-mismatch-errors-during-comparison">Shape-mismatch errors during comparison<a class="headerlink" href="#shape-mismatch-errors-during-comparison" title="Permanent link"> # </a></h3>
+<h3 id="shape-mismatch-errors-during-comparison">Shape-Mismatch Errors During Comparison<a class="headerlink" href="#shape-mismatch-errors-during-comparison" title="Permanent link"> # </a></h3>
 <p>If the author's answer is a 3-component vector, and the student submits a different 3-component vector, then they will be marked incorrect. However, if the student submits a 2-component vector or a number, they will receive an error message:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
 ...     answers='[1, 2, 3]',
@@ -707,7 +711,7 @@ Expected answer to be a vector, but input is a scalar</code></pre>
 <li>raise an error (do not mark student incorrect), and</li>
 <li>reveal the desired type (above, a vector) but not the desired shape (above, 3-components)</li>
 </ul>
-<p>This behavior can be configured through the <code>answer_shape_mismatch</code> key. For example, to</p>
+<p>This behavior can be configured through the <code>answer_shape_mismatch</code> key. We can choose whether an error is presented or an attempt is consumed through the <code>is_raised</code> key, while we choose whether to reveal the desired input shape or type with the <code>msg_detail</code> key. For example, to</p>
 <ul>
 <li>mark students wrong instead of raising an error, and</li>
 <li>reveal the shape and the type</li>
@@ -730,30 +734,34 @@ Expected answer to be a vector, but input is a scalar</code></pre>
 True</code></pre>
 
 
-<h3 id="hiding-all-messages">Hiding all messages<a class="headerlink" href="#hiding-all-messages" title="Permanent link"> # </a></h3>
-<p>MatrixGraders can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting <code>suppress_matrix_messages=True</code>, which overrides <code>answer_shape_mismatch={'is_raised'}</code> and <code>shape_errors</code>. In the following example, <code>A</code> and <code>B</code> are secretly matrices that don't commute, but students will never see a matrix error message from typing something like <code>1+A</code>.</p>
-<pre class="codehilite"><code>grader = MatrixGrader(
-    answers=['A*B'],
-    variables=['A', 'B'],
-    sample_from={
-        'A': RealMatrices(),
-        'B': RealMatrices()
-    },
-    max_array_dim=0,
-    suppress_matrix_messages=True
-)</code></pre>
+<h3 id="hiding-all-error-messages">Hiding All Error Messages<a class="headerlink" href="#hiding-all-error-messages" title="Permanent link"> # </a></h3>
+<p><code>MatrixGrader</code>s can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting <code>suppress_matrix_messages=True</code>, which overrides <code>answer_shape_mismatch={'is_raised'}</code> and <code>shape_errors</code>. In the following example, <code>A</code> and <code>B</code> are secretly matrices that don't commute, but students will never see a matrix error message from typing something like <code>1+A</code>.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
+...     answers='A*B',
+...     variables=['A', 'B'],
+...     sample_from={
+...         'A': RealMatrices(),
+...         'B': RealMatrices()
+...     },
+...     max_array_dim=0,
+...     suppress_matrix_messages=True
+... )
+&gt;&gt;&gt; grader(None, 'A*B')['ok']
+True
+&gt;&gt;&gt; grader(None, 'B*A')['ok']
+False
+&gt;&gt;&gt; grader(None, 'A+1')['ok']
+False</code></pre>
 
 
 <p>Note that this will also suppress error messages from trying to do things like <code>sin([1, 2])</code> or <code>[1, 2]^2</code>. If your answer needs to take functions of the non-commuting variables, then this option is insufficient.</p>
 <h2 id="matrix-functions">Matrix Functions<a class="headerlink" href="#matrix-functions" title="Permanent link"> # </a></h2>
-<p>MatrixGrader provides all the default functions of <code>FormulaGrader</code> (<code>sin</code>, <code>cos</code>, etc.) plus some extras such as <code>trans(A)</code> (transpose) and <code>det(A)</code> (determinant). See <a href="" title="../functions_and_constants.md">Mathematical Functions</a> for full list.</p>
-<p>Since <code>MatrixGrader</code> has all of <code>FormulaGrader</code>'s configuration options, additional functions can be supplied through the <code>user_functions</code> configuration key. If you supply addition matrix functions, you may wish you use the <code>specify_domain</code> decorator function. See <a href="../../matrixfunctions/">Function Listing: Specify Domain</a> for details.</p>
+<p><code>MatrixGrader</code> provides all the default functions of <code>FormulaGrader</code> (<code>sin</code>, <code>cos</code>, etc.) plus some extras such as <code>trans(A)</code> (transpose) and <code>det(A)</code> (determinant). See <a href="" title="../functions_and_constants.md">Mathematical Functions</a> for full list.</p>
+<p>Since <code>MatrixGrader</code> has all of <code>FormulaGrader</code>'s configuration options, additional functions can be supplied through the <code>user_functions</code> configuration key. If you supply additional matrix functions, you may wish you use the <code>specify_domain</code> decorator function to provide meaningful error messages to students. See <a href="../../user_functions/">User Functions</a> for details.</p>
 <h2 id="identity-matrix">Identity Matrix<a class="headerlink" href="#identity-matrix" title="Permanent link"> # </a></h2>
-<p>To make an n by n identity matrix available to students, specify the configuration key <code>identity_dim=n</code>. That is, the grader <code>MatrixGrader(identity_dim=4, ...)</code> will automatically have a constant <code>'I'</code> whose value is the 4 by 4 identity matrix.</p>
-<p>If you want a different name (besides <code>'I'</code>) for the identity, or if you encounter situations where identity matrices of different sizes are required, <code>mitxgraders.helpers.calc</code> provides an <code>identity</code> function. For example:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import MatrixGrader
-&gt;&gt;&gt; from mitxgraders.helpers.calc import identity
-&gt;&gt;&gt; grader = MatrixGrader(
+<p>To make an nxn identity matrix available to students, specify the configuration key <code>identity_dim=n</code>. That is, the grader <code>MatrixGrader(identity_dim=4, ...)</code> will automatically have a constant <code>I</code> whose value is the 4 by 4 identity matrix.</p>
+<p>If you want a different name (besides <code>I</code>) for the identity, or if you encounter situations where identity matrices of different sizes are required, you can use the <code>identity</code> function. For example:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
 ...     answers='[1, 2, 3]',
 ...     user_constants={
 ...         'I_2': identity(2),  # the 2 by 2 identity
@@ -762,20 +770,32 @@ True</code></pre>
 ... )</code></pre>
 
 
+<h2 id="partial-credit">Partial Credit<a class="headerlink" href="#partial-credit" title="Permanent link"> # </a></h2>
+<p>A special <a href="../../comparer_functions/">comparer</a> called <a href="../../comparer_functions/#matrixentrycomparer"><code>MatrixEntryComparer</code></a> has been built to cater for partial credit in <code>MatrixGrader</code> problems. In order to facilitate the use of <code>MatrixEntryComparer</code>, if either of the following two configuration options are present, <code>MatrixGrader</code> will use <code>MatrixEntryComparer</code> as the default comparer instead of <code>equality_comparer</code>.</p>
+<ul>
+<li><code>entry_partial_credit</code>: <code>proportional</code> or a number</li>
+<li><code>entry_partial_msg</code>: The message to display</li>
+</ul>
+<p>See the documentation for <code>MatrixEntryComparer</code> for details on how these options work.</p>
 <h2 id="configuration-options">Configuration Options<a class="headerlink" href="#configuration-options" title="Permanent link"> # </a></h2>
 <p><code>MatrixGrader</code> has all of <a href="../../formula_grader/"><code>FormulaGrader</code></a>'s configuration options, plus some extras. The extras are:</p>
 <ul>
-<li><code>idenity_dim</code>: If specified as a positive integer <code>n</code>, then an n by n identity matrix is added to the available constants with name <code>'I'</code>. Defaults to <code>None</code>.</li>
+<li><code>identity_dim</code>: If specified as a positive integer <code>n</code>, then an n by n identity matrix is added to the available constants with name <code>'I'</code>. Defaults to <code>None</code>.</li>
 <li><code>max_array_dim</code> (nonnegative int): Controls the maximum <a href="#dimension-and-shape">dimension</a> of arrays that students can enter entry-by-entry. Default is <code>1</code>: vectors can be entered entry-by-entry, but not matrices.</li>
 <li><code>negative_powers</code> (bool): whether negative powers are enabled for square matrices (which calculate powers of matrix inverse). Defaults to <code>True</code>.</li>
 <li><code>shape_errors</code> (bool): See <a href="#shape-mismatch-errors-during-evaluation">Handling Errors: Shape-mismatch errors during evaluation</a>. Defaults to <code>True</code>.</li>
+<li><code>suppress_matrix_messages</code> (bool): See <a href="#hiding-all-error-messages">Hiding All Error Messages</a>. Defaults to <code>False</code>.</li>
 <li>
 <p><code>answer_shape_mismatch</code> (dict): A dictionary whose keys are listed below. Some or all keys may be set. Unset keys take default values. See <a href="#shape-mismatch-errors-during-comparison">Handling Errors: Shape-mismatch errors during comparison</a> for details.</p>
 <ul>
 <li><code>'is_raised'</code> (bool): defaults to <code>True</code></li>
-<li><code>'msg_detail'</code>: one of <code>None</code>, <code>'type'</code>, or <code>'shape'</code>. Defaults to <code>'type'</code></li>
+<li><code>'msg_detail'</code> (None | 'type' | 'shape'): defaults to <code>'type'</code></li>
 </ul>
 </li>
+<li>
+<p><code>entry_partial_credit</code>: If set to <code>proportional</code> or a number, uses this setting with <code>MatrixEntryComparer</code> as the default comparer.</p>
+</li>
+<li><code>entry_partial_msg</code>: If set to a text value, uses this setting with <code>MatrixEntryComparer</code> as the default comparer.</li>
 </ul></div>
         
     </div>

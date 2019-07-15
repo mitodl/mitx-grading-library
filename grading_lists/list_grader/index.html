@@ -135,12 +135,6 @@
                         
                             
 <li >
-    <a href="../../grading_math/matrixfunctions/">User-Defined Matrix Functions</a>
-</li>
-
-                        
-                            
-<li >
     <a href="../../grading_math/sampling/">Sampling Sets</a>
 </li>
 
@@ -148,6 +142,12 @@
                             
 <li >
     <a href="../../grading_math/functions_and_constants/">Functions and Constants List</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../grading_math/user_functions/">User-Defined Functions</a>
 </li>
 
                         
@@ -278,7 +278,7 @@
 True</code></pre>
 
 
-<p>Answers are provided as a python list of individual <code>ItemGrader</code> answers. For <code>ListGrader</code>s, they must be provided as a list; all the <code>ItemGrader</code> flexibility is allowed only in the individual answers. Each element of answers is set as an answer that is passed as the answers key into the subgrader. This particular example should be set up as two input boxes that the student types in, as follows.</p>
+<p>Answers are provided as a python list of individual <code>ItemGrader</code> answers (or a tuple of such lists). Note that the individual answers may take advantage of all of the usual <code>ItemGrader</code> flexibility, but <code>ListGrader</code> requires either a list, or a tuple of lists. Each element of answers is set as an answer that is passed as the answers key into the subgrader. This particular example should be set up as two input boxes that the student types in, as follows.</p>
 <pre class="codehilite"><code class="language-xml">&lt;problem&gt;
 &lt;p&gt;What are the most common pets?&lt;/p&gt;
 

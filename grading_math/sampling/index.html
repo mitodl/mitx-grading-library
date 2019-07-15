@@ -134,12 +134,6 @@
 
                         
                             
-<li >
-    <a href="../matrixfunctions/">User-Defined Matrix Functions</a>
-</li>
-
-                        
-                            
 <li class="active">
     <a href="./">Sampling Sets</a>
 </li>
@@ -148,6 +142,12 @@
                             
 <li >
     <a href="../functions_and_constants/">Functions and Constants List</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../user_functions/">User-Defined Functions</a>
 </li>
 
                         
@@ -221,7 +221,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../matrixfunctions/">
+                        <a rel="next" href="../matrix_grader/matrix_grader/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
@@ -249,11 +249,15 @@
                 <li class="third-level"><a href="#integerrange">IntegerRange</a></li>
                 <li class="third-level"><a href="#complexrectangle">ComplexRectangle</a></li>
                 <li class="third-level"><a href="#complexsector">ComplexSector</a></li>
-            <li class="second-level"><a href="#variable-sampling-vectors-and-matrices">Variable Sampling: Vectors and Matrices</a></li>
+            <li class="second-level"><a href="#variable-sampling-vectors-matrices-and-tensors">Variable Sampling: Vectors, Matrices and Tensors</a></li>
                 
-                <li class="third-level"><a href="#realvectors">RealVectors</a></li>
-                <li class="third-level"><a href="#realmatrices">RealMatrices</a></li>
+                <li class="third-level"><a href="#realvectors-and-complexvectors">RealVectors and ComplexVectors</a></li>
+                <li class="third-level"><a href="#realmatrices-and-complexmatrices">RealMatrices and ComplexMatrices</a></li>
+                <li class="third-level"><a href="#realtensors-and-complextensors">RealTensors and ComplexTensors</a></li>
                 <li class="third-level"><a href="#identitymatrixmultiples">IdentityMatrixMultiples</a></li>
+                <li class="third-level"><a href="#squarematrices">SquareMatrices</a></li>
+                <li class="third-level"><a href="#orthogonalmatrices">OrthogonalMatrices</a></li>
+                <li class="third-level"><a href="#unitarymatrices">UnitaryMatrices</a></li>
             <li class="second-level"><a href="#variable-sampling-generic">Variable Sampling: Generic</a></li>
                 
                 <li class="third-level"><a href="#discreteset">DiscreteSet</a></li>
@@ -279,27 +283,30 @@
 &gt;&gt;&gt; # This is equivalent to
 &gt;&gt;&gt; sampler = RealInterval([3, 7])
 &gt;&gt;&gt; # The default is [1, 5]
-&gt;&gt;&gt; sampler = RealInterval()
+&gt;&gt;&gt; RealInterval() == RealInterval([1, 5])
+True
 &gt;&gt;&gt; # A list can also be used to specify an interval
 &gt;&gt;&gt; sampler = [3, 7]</code></pre>
 
 
 <h3 id="integerrange">IntegerRange<a class="headerlink" href="#integerrange" title="Permanent link"> # </a></h3>
-<p>Sample from an integer defined by a <code>start</code> and a <code>stop</code> value (both start and stop are included in the range). IntegerRange can be initialized using explicit values, or an interval.</p>
+<p>Sample from an integer defined by a <code>start</code> and a <code>stop</code> value (both start and stop are included in the range). <code>IntegerRange</code> can be initialized using explicit values, or an interval.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Generate random integers between 3 and 7 inclusive
 &gt;&gt;&gt; sampler = IntegerRange(start=3, stop=7)
 &gt;&gt;&gt; # This is equivalent to
 &gt;&gt;&gt; sampler = IntegerRange([3, 7])
 &gt;&gt;&gt; # The default is [1, 5]
-&gt;&gt;&gt; sampler = IntegerRange()</code></pre>
+&gt;&gt;&gt; IntegerRange() == IntegerRange([1, 5])
+True</code></pre>
 
 
 <h3 id="complexrectangle">ComplexRectangle<a class="headerlink" href="#complexrectangle" title="Permanent link"> # </a></h3>
 <p>Sample complex numbers from a rectangle in the complex plane, specified by a real range and an imaginary range.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Select random complex numbers from 0 to 1 + i
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Select random complex numbers in a rectangle from 0 to 1 + i
 &gt;&gt;&gt; sampler = ComplexRectangle(re=[0, 1], im=[0, 1])
 &gt;&gt;&gt; # The default is re=[1, 3], im=[1, 3]
-&gt;&gt;&gt; sampler = ComplexRectangle()</code></pre>
+&gt;&gt;&gt; ComplexRectangle() == ComplexRectangle(re=[1, 3], im=[1, 3])
+True</code></pre>
 
 
 <h3 id="complexsector">ComplexSector<a class="headerlink" href="#complexsector" title="Permanent link"> # </a></h3>
@@ -308,30 +315,53 @@
 &gt;&gt;&gt; # Select random complex numbers from inside the unit circle
 &gt;&gt;&gt; sampler = ComplexSector(modulus=[0, 1], argument=[-np.pi, np.pi])
 &gt;&gt;&gt; # The default is modulus=[1, 3], argument=[0, pi/2]
-&gt;&gt;&gt; sampler = ComplexSector()</code></pre>
-
-
-<h2 id="variable-sampling-vectors-and-matrices">Variable Sampling: Vectors and Matrices<a class="headerlink" href="#variable-sampling-vectors-and-matrices" title="Permanent link"> # </a></h2>
-<h3 id="realvectors">RealVectors<a class="headerlink" href="#realvectors" title="Permanent link"> # </a></h3>
-<p>Sample real vectors with specified shape (number of components) and norm.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # sample real vectors with 4 components and norm between 5 and 10
-&gt;&gt;&gt; sampler = RealVectors(shape=4, norm=[5, 10])
-&gt;&gt;&gt; # For consistency with RealMatrices, shape can be specified as list:
-&gt;&gt;&gt; sampler = RealVectors(shape=[4], norm=[5, 10])
-&gt;&gt;&gt; # The default is 3 component vectors with norm from 1 to 5
-&gt;&gt;&gt; sampler = RealVectors()</code></pre>
-
-
-<h3 id="realmatrices">RealMatrices<a class="headerlink" href="#realmatrices" title="Permanent link"> # </a></h3>
-<p>Sample real matrices of a specific shape and norm. (<code>RealMatrices</code> uses the Frobenius norm.)</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3 by 2 real matrices with norm between 5 and 10
-&gt;&gt;&gt; sampler = RealMatrices(shape=[3, 2], norm=[5, 10])
-&gt;&gt;&gt; # the default is shape=[2, 2] and norm=[1, 5]
-&gt;&gt;&gt; RealMatrices() == RealMatrices({'norm': [1, 5], 'shape': (2, 2)})
+&gt;&gt;&gt; ComplexSector() == ComplexSector(modulus=[1, 3], argument=[0, np.pi/2])
 True</code></pre>
 
 
-<p>If you want to sample a matrix in a way that depends on a scalar, see <code>DependentSampler</code> below.</p>
+<h2 id="variable-sampling-vectors-matrices-and-tensors">Variable Sampling: Vectors, Matrices and Tensors<a class="headerlink" href="#variable-sampling-vectors-matrices-and-tensors" title="Permanent link"> # </a></h2>
+<p>We have a broad range of sampling sets for vectors, matrices and tensors. The following options are common to many of these sets:</p>
+<ul>
+<li><code>shape</code>: Either be a number (to specify a vector of that dimension), or a tuple or list of numbers (to specify a matrix/tensor with those dimensions).</li>
+<li><code>norm</code>: Specify a <code>RealInterval</code> for the norm of the object. (Frobenius norm is used.)</li>
+</ul>
+<p>If you want to sample a vector/matrix/tensor in a way that depends on a scalar, see <a href="#dependentsampler"><code>DependentSampler</code></a> below.</p>
+<h3 id="realvectors-and-complexvectors">RealVectors and ComplexVectors<a class="headerlink" href="#realvectors-and-complexvectors" title="Permanent link"> # </a></h3>
+<p>Sample real/complex vectors with specified shape (number of components) and norm.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample real vectors with 4 components and unit norm
+&gt;&gt;&gt; sampler = RealVectors(shape=4, norm=[1, 1])
+&gt;&gt;&gt; # The default is 3 component vectors with norm from 1 to 5
+&gt;&gt;&gt; RealVectors() == RealVectors(shape=3, norm=[1, 5])
+True
+&gt;&gt;&gt; # Similarly for complex vectors
+&gt;&gt;&gt; ComplexVectors() == ComplexVectors(shape=3, norm=[1, 5])
+True</code></pre>
+
+
+<h3 id="realmatrices-and-complexmatrices">RealMatrices and ComplexMatrices<a class="headerlink" href="#realmatrices-and-complexmatrices" title="Permanent link"> # </a></h3>
+<p>Sample real/complex matrices of a specific shape and norm. An extra option exists to specify that the matrix be upper or lower triangular. The given shape must be a list or tuple of two numbers.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3 by 2 real matrices with norm between 5 and 10
+&gt;&gt;&gt; sampler = RealMatrices(shape=[3, 2], norm=[5, 10])
+&gt;&gt;&gt; # The default is shape=[2, 2] and norm=[1, 5]
+&gt;&gt;&gt; RealMatrices() == RealMatrices({'norm': [1, 5], 'shape': (2, 2)})
+True
+&gt;&gt;&gt; # Similarly for complex matrices
+&gt;&gt;&gt; ComplexMatrices() == ComplexMatrices({'norm': [1, 5], 'shape': (2, 2)})
+True
+&gt;&gt;&gt; # Sample an upper triangular real 2x2 matrix.
+&gt;&gt;&gt; sampler = RealMatrices(triangular='upper')
+&gt;&gt;&gt; # Sample a lower triangular complex 2x2 matrix.
+&gt;&gt;&gt; sampler = ComplexMatrices(triangular='lower')</code></pre>
+
+
+<h3 id="realtensors-and-complextensors">RealTensors and ComplexTensors<a class="headerlink" href="#realtensors-and-complextensors" title="Permanent link"> # </a></h3>
+<p>Sample real/complex tensors of a specific shape and norm. A shape must be provided as a list or tuple of three or more numbers (there is no default).</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3x2x4 real tensors with norm between 5 and 10
+&gt;&gt;&gt; sampler = RealTensors(shape=[3, 2, 4], norm=[5, 10])
+&gt;&gt;&gt; # Sample 2x2x2x2 complex tensors with unit norm
+&gt;&gt;&gt; sampler = ComplexTensors(shape=[2, 2, 2, 2], norm=[1, 1])</code></pre>
+
+
 <h3 id="identitymatrixmultiples">IdentityMatrixMultiples<a class="headerlink" href="#identitymatrixmultiples" title="Permanent link"> # </a></h3>
 <p>Sample square matrices of a given dimension consisting of the identity matrix multiplied by a scalar. The <code>sampler</code> parameter can be any scalar sampling set listed above. This sampling set is useful when you want a variable that will commute with other matrices, but can also be added to them.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3x3 matrices consisting of a random number between 1 and 3 multiplying the identity
@@ -341,6 +371,64 @@ True</code></pre>
 True</code></pre>
 
 
+<h3 id="squarematrices">SquareMatrices<a class="headerlink" href="#squarematrices" title="Permanent link"> # </a></h3>
+<p>This is a general sampling set for square matrices. A large number of options for specifying properties of square matrices are included:</p>
+<ul>
+<li><code>dimension</code> (int): Specify the number of dimensions of the matrix (default 2)</li>
+<li><code>complex</code> (bool): Should the matrix be complex (True) or real (False, default) (ignored if <code>hermitian</code> or <code>antihermitian</code> are selected)</li>
+<li><code>traceless</code> (bool): Whether or not the matrix should be traceless (default False)</li>
+<li><code>determinant</code> (None | 0 | 1): Specify the determinant of the matrix (default None for no restriction)</li>
+<li><code>symmetry</code>: Choose from the following symmetries: <code>None</code>, <code>'diagonal'</code>, <code>'symmetric'</code>, <code>'antisymmetric'</code>, <code>'hermitian'</code>, <code>'antihermitian'</code> (default <code>None</code>)</li>
+<li><code>norm</code> (float): Specify a <code>RealInterval</code> to sample the norm of the matrix (default <code>[1, 5]</code>; ignored if <code>determinant=1</code> is specified)</li>
+</ul>
+<p>Note that some combinations of options do not exist (e.g., odd-dimension, unit-determinant antisymmetric matrix). If you select such a combination, an error message will result.</p>
+<p>Other types of square matrices can be sampled using <code>RealMatrices</code>, <code>ComplexMatrices</code>, <code>IdentityMatrixMultiples</code>, <code>OrthogonalMatrices</code> and <code>UnitaryMatrices</code>.</p>
+<p>Here are a handful of examples:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # By default, we generate real 2x2 matrices with no restrictions:
+&gt;&gt;&gt; SquareMatrices() == SquareMatrices(dimension=2, complex=False, traceless=False, determinant=None, symmetry=None, norm=[1,5])
+True
+
+&gt;&gt;&gt; # Diagonal, complex, traceless and unit determinant
+&gt;&gt;&gt; matrices = SquareMatrices(symmetry='diagonal', complex=True, traceless=True,
+...                           determinant=1)
+
+&gt;&gt;&gt; # Symmetric, real, zero determinant
+&gt;&gt;&gt; matrices = SquareMatrices(symmetry='symmetric', determinant=0)
+
+&gt;&gt;&gt; # Hermitian (enforces complex)
+&gt;&gt;&gt; matrices = SquareMatrices(symmetry='hermitian')</code></pre>
+
+
+<h3 id="orthogonalmatrices">OrthogonalMatrices<a class="headerlink" href="#orthogonalmatrices" title="Permanent link"> # </a></h3>
+<p>Sample from orthogonal matrices of a given dimension. To sample special orthogonal matrices (unit determinant), use the <code>unitdet=True</code> option.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3x3 orthogonal matrices with unit determinant
+&gt;&gt;&gt; sampler = OrthogonalMatrices(dimension=3, unitdet=True)
+&gt;&gt;&gt; # The default is dimension=2 and unitdet=False
+&gt;&gt;&gt; OrthogonalMatrices() == OrthogonalMatrices(dimension=2, unitdet=False)
+True</code></pre>
+
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul>
+<li>Orthogonal matrices sampling relies on features of newer versions of numpy and scipy than are currently available in edX. We expect this feature to be available by the end of 2019.</li>
+</ul>
+</div>
+<h3 id="unitarymatrices">UnitaryMatrices<a class="headerlink" href="#unitarymatrices" title="Permanent link"> # </a></h3>
+<p>Sample from unitary matrices of a given dimension. To sample special unitary matrices (unit determinant), use the <code>unitdet=True</code> option.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3x3 unitary matrices with unit determinant
+&gt;&gt;&gt; sampler = UnitaryMatrices(dimension=3, unitdet=True)
+&gt;&gt;&gt; # The default is dimension=2 and unitdet=False
+&gt;&gt;&gt; UnitaryMatrices() == UnitaryMatrices(dimension=2, unitdet=False)
+True</code></pre>
+
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul>
+<li>Unitary matrices sampling relies on features of newer versions of numpy and scipy than are currently available in edX. We expect this feature to be available by the end of 2019.</li>
+</ul>
+</div>
 <h2 id="variable-sampling-generic">Variable Sampling: Generic<a class="headerlink" href="#variable-sampling-generic" title="Permanent link"> # </a></h2>
 <h3 id="discreteset">DiscreteSet<a class="headerlink" href="#discreteset" title="Permanent link"> # </a></h3>
 <p>Sample from any discrete set of values that are specified in a tuple. A single value may also be provided, but this case should usually be specified as a constant instead of as a sampling set.</p>
@@ -349,11 +437,13 @@ True</code></pre>
 &gt;&gt;&gt; # Always select 3.5
 &gt;&gt;&gt; sampler = DiscreteSet(3.5)
 &gt;&gt;&gt; # A tuple can also be used to specify a discrete set
-&gt;&gt;&gt; sampler = (1, 3, 5, 7, 9)</code></pre>
+&gt;&gt;&gt; sampler = (1, 3, 5, 7, 9)
+&gt;&gt;&gt; # Select randomly between two matrices
+&gt;&gt;&gt; sampler = DiscreteSet((MathArray([[1, 0], [0, 1]]), MathArray([[0, 1], [1, 0]])))</code></pre>
 
 
 <h3 id="dependentsampler">DependentSampler<a class="headerlink" href="#dependentsampler" title="Permanent link"> # </a></h3>
-<p>Compute a value for a variable based on the values of other variables. The sampler must be initialized with a list of variables that it depends on, as well as the formula used to perform the computation. The formula can use any base functions, but no user-defined functions. <code>DependentSampler</code>s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that <code>DependentSampler</code> can depend on vector/matrix quantities as well as scalars.</p>
+<p>Compute a value for a variable based on the values of other constants/variables. The sampler must be initialized with a list of variables that it depends on, as well as the formula used to perform the computation. The formula can use any base functions, but no user-defined functions. <code>DependentSampler</code>s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that <code>DependentSampler</code> can depend on vector/matrix quantities as well as scalars.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Set radius based on the random values of x, y and z
 &gt;&gt;&gt; sampler = DependentSampler(depends=[&quot;x&quot;, &quot;y&quot;, &quot;z&quot;], formula=&quot;sqrt(x^2+y^2+z^2)&quot;)
 &gt;&gt;&gt; # Construct a matrix that depends on a variable
@@ -361,11 +451,13 @@ True</code></pre>
 
 
 <h2 id="function-sampling">Function Sampling<a class="headerlink" href="#function-sampling" title="Permanent link"> # </a></h2>
-<p>When a random function can be specified, we need a sampling set that returns a random function on demand.</p>
+<p>We have two methods for selecting a random function.</p>
 <h3 id="specificfunctions">SpecificFunctions<a class="headerlink" href="#specificfunctions" title="Permanent link"> # </a></h3>
 <p>Samples functions from a specific list of functions. You can also specify just a single function, but usually this shouldn't be done as a sampling set.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Select either sin or cos randomly
 &gt;&gt;&gt; functionsampler = SpecificFunctions([np.cos, np.sin])
+&gt;&gt;&gt; # Equivalent sampling set specified as a list
+&gt;&gt;&gt; functionsampler = [np.cos, np.sin]
 &gt;&gt;&gt; # Always select a single lambda function
 &gt;&gt;&gt; functionsampler = SpecificFunctions(lambda x: x*x)</code></pre>
 
@@ -388,7 +480,7 @@ True</code></pre>
 &gt;&gt;&gt; functionsampler = RandomFunction(input_dim=2, output_dim=3)</code></pre>
 
 
-<p>Finally, if you want to generate a complex random function, simply set <code>complex=True</code>. In this situation, the randomly generated function works as previously, but the sinusoid coefficients are complex numbers.</p>
+<p>Finally, if you want to generate a complex random function, set <code>complex=True</code>. In this situation, the randomly generated function works as previously, but the sinusoid coefficients are complex numbers.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; functionsampler = RandomFunction(complex=True)</code></pre></div>
         
     </div>
