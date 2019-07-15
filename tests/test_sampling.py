@@ -275,8 +275,8 @@ def test_dependent_sampler():
     symbols = ["x", "y"]
     samples = 1
     sample_from = {
-        'x': DependentSampler(depends=["y"], formula="1"),
-        'y': DependentSampler(depends=["x"], formula="1")
+        'x': DependentSampler(depends=["y"], formula="y"),
+        'y': DependentSampler(depends=["x"], formula="x")
     }
     funcs, suffs, consts = {}, {}, {}
     with raises(ConfigError, match="Circularly dependent DependentSamplers detected: x, y"):
@@ -307,3 +307,21 @@ def test_overriding_constant_with_dependent_sampling():
     assert a == 10
     assert b == 11
     assert c == 12
+
+def test_dependent_sampler_infers_dependence():
+    sampler = DependentSampler(formula="a+1")
+    assert sampler.config['depends'] == ['a']
+
+    sampler = DependentSampler(formula="x^2+y^2+sin(c)")
+    assert set(sampler.config['depends']) == set(['x', 'y', 'c'])
+
+    # Test that 'depends' is now ignored
+    symbols = ["x", "y"]
+    samples = 1
+    sample_from = {
+        'x': DependentSampler(depends=["y"], formula="1"),
+        'y': DependentSampler(depends=["x"], formula="1")
+    }
+    funcs, suffs, consts = {}, {}, {}
+    # This does NOT raise an error; the depends entry is ignored
+    gen_symbols_samples(symbols, samples, sample_from, funcs, suffs, consts)

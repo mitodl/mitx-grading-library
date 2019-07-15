@@ -240,15 +240,18 @@ Sample from any discrete set of values that are specified in a tuple. A single v
 
 ### DependentSampler
 
-Compute a value for a variable based on the values of other constants/variables. The sampler must be initialized with a list of variables that it depends on, as well as the formula used to perform the computation. The formula can use any base functions, but no user-defined functions. `DependentSampler`s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that `DependentSampler` can depend on vector/matrix quantities as well as scalars.
+Compute a value for a variable based on the values of other constants/variables. The sampler is simply initialized with the desired formula, which can use any base or user-defined functions (except for randomly sampled functions, see below). `DependentSampler`s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that `DependentSampler` can depend on vector/matrix quantities as well as scalars.
 
 ```pycon
 >>> # Set radius based on the random values of x, y and z
->>> sampler = DependentSampler(depends=["x", "y", "z"], formula="sqrt(x^2+y^2+z^2)")
+>>> sampler = DependentSampler(formula="sqrt(x^2+y^2+z^2)")
 >>> # Construct a matrix that depends on a variable
->>> sampler = DependentSampler(depends=["x"], formula="[[x,0],[0,-x^2]]")
+>>> sampler = DependentSampler(formula="[[x,0],[0,-x^2]]")
 
 ```
+
+!!! Note
+    - Previous versions required a list of variables that the formula depends on to be passed to `DependentSampler` using the `depends` key. This is now obsolete, as this variable list is dynamically inferred. Anything passed to the `depends` key is now ignored.
 
 
 ## Function Sampling

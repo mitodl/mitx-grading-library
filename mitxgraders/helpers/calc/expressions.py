@@ -330,6 +330,8 @@ class MathParser(object):
         self.grammar = self.get_grammar()
 
         # Internal storage that is reset at the end of calls to MathParser.parse
+        # Needed at the instance level because callbacks during parsing only have
+        # access to self
         self.variables_used = set()
         self.functions_used = set()
         self.suffixes_used = set()
@@ -439,7 +441,7 @@ class MathParser(object):
         name = Combine(front +
                        Optional(subscripts |
                                 (Optional(lower_indices) + Optional(upper_indices))
-                               ) +
+                                ) +
                        ZeroOrMore("'"))
         # Define a variable as a pyparsing result that contains one object name
         variable = Group(name("varname"))("variable")
@@ -456,7 +458,7 @@ class MathParser(object):
                          Suppress("(") +
                          Group(delimitedList(expression))("arguments") +
                          Suppress(")")
-                        )("function")
+                         )("function")
         function.setParseAction(self.function_parse_action)
 
         # Define parentheses
@@ -540,7 +542,11 @@ class MathParser(object):
         self.cache[cache_key] = parsed
         return parsed
 
-EvalMetaData = namedtuple('EvalMetaData', ['variables_used', 'functions_used', 'suffixes_used', 'max_array_dim_used'])
+EvalMetaData = namedtuple('EvalMetaData',
+                          ['variables_used',
+                           'functions_used',
+                           'suffixes_used',
+                           'max_array_dim_used'])
 class MathExpression(object):
     """
     Holds the parse tree for mathematical expression; returned by MathParser.
@@ -576,6 +582,7 @@ class MathExpression(object):
 
     def __str__(self):
         return self.tree.asXML()
+
     def __repr__(self):
         return self.__str__()
 
@@ -683,9 +690,9 @@ class MathExpression(object):
             result = self.eval_node(self.tree, actions, allow_inf)
             # set metadata after metadata_dict has been mutated
             metadata = EvalMetaData(variables_used=self.variables_used,
-                                         functions_used=self.functions_used,
-                                         suffixes_used=self.suffixes_used,
-                                         max_array_dim_used=metadata_dict['max_array_dim_used'])
+                                    functions_used=self.functions_used,
+                                    suffixes_used=self.suffixes_used,
+                                    max_array_dim_used=metadata_dict['max_array_dim_used'])
         except OverflowError:
             raise CalcOverflowError("Numerical overflow occurred. "
                                     "Does your input generate very large numbers?")
