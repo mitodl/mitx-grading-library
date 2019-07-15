@@ -243,11 +243,165 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#integralgrader">IntegralGrader</a></li>
+            <li class="second-level"><a href="#xml-setup">XML Setup</a></li>
+                
+            <li class="second-level"><a href="#specifying-the-input-format">Specifying the Input Format</a></li>
+                
+            <li class="second-level"><a href="#specifying-the-answer">Specifying the Answer</a></li>
+                
+            <li class="second-level"><a href="#other-options">Other Options</a></li>
+                
+            <li class="second-level"><a href="#option-listing">Option Listing</a></li>
+                
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="integralgrader">IntegralGrader<a class="headerlink" href="#integralgrader" title="Permanent link"> # </a></h1></div>
+<h1 id="integralgrader">IntegralGrader<a class="headerlink" href="#integralgrader" title="Permanent link"> # </a></h1>
+<p><code>IntegralGrader</code> is a specialized grading class used to grade the construction of integrals. Students can input the limits on the integral, the variable of integration, and the integrand (or some subset thereof), and will be graded correct if their construction is numerically equivalent to the instructor's construction. This method of grading allows for arbitrary variable substitutions and redefinitions.</p>
+<p>The grader numerically evaluates the student- and instructor-specified integrals using <code>scipy.integrate.quad</code>. This quadrature-based integration technique is efficient and flexible. It handles many integrals with poles in the integrand and can integrate over infinite domains.</p>
+<p>However, some integrals may behave badly. These include, but are not limited to,
+the following:</p>
+<ul>
+<li>integrals with highly oscillatory integrands</li>
+<li>integrals that evaluate analytically to zero</li>
+</ul>
+<p>In some cases, problems might be avoided by using the integrator_options configuration key to provide extra instructions to <code>scipy.integrate.quad</code>, as documented below.</p>
+<h2 id="xml-setup">XML Setup<a class="headerlink" href="#xml-setup" title="Permanent link"> # </a></h2>
+<p>We recommend copying the following XML to set up a problem using <code>IntegralGrader</code>:</p>
+<pre class="codehilite"><code class="language-XML">&lt;style&gt;
+  .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline input {
+    min-width: 0 !important;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax {
+    display: inline-block !important;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax_Preview {
+    display: inline-block !important;
+  }
+&lt;/style&gt;
+
+&lt;span&gt;
+  &lt;customresponse cfn=&quot;grader&quot;&gt;
+    &lt;table&gt;
+      &lt;col style=&quot;width:10%&quot;/&gt;
+      &lt;col style=&quot;width:90%&quot;/&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;
+          &lt;td colspan=&quot;2&quot;&gt;
+            &lt;textline size=&quot;5&quot; correct_answer=&quot;1&quot;/&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+          &lt;td&gt;
+            &lt;p&gt; \( \displaystyle \huge{ \int }\)&lt;/p&gt;
+          &lt;/td&gt;
+          &lt;td&gt;
+            &lt;br/&gt;
+            &lt;textline inline=&quot;1&quot; size=&quot;10&quot; correct_answer=&quot;e^x&quot; trailing_text=&quot;  [mathjaxinline] dx [/mathjaxinline]&quot;/&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+          &lt;td colspan=&quot;2&quot;&gt;
+            &lt;textline size=&quot;5&quot; correct_answer=&quot;0&quot;/&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/customresponse&gt;
+&lt;/span&gt;</code></pre>
+
+
+<p>This sets up an integral where students can input the limits of integration and the integrand (the variable of integration has been fixed to be <code>x</code> in this case).</p>
+<p>Further examples of formatting integrals are shown in the example course.</p>
+<h2 id="specifying-the-input-format">Specifying the Input Format<a class="headerlink" href="#specifying-the-input-format" title="Permanent link"> # </a></h2>
+<p>The grader must be told which input is what, based on the order that the inputs appear in the XML. This is done through the <code>input_positions</code> dictionary. If not specified, it is assumed that the following positions are used:</p>
+<pre class="codehilite"><code class="language-python">input_positions = {
+    'lower': 1,
+    'upper': 2,
+    'integrand': 3,
+    'integration_variable': 4
+}</code></pre>
+
+
+<p>This requires students to enter all four parameters in the indicated order.</p>
+<p>If the author overrides the default <code>input_positions</code> value, any subset of the keys ('lower', 'upper', 'integrand', 'integration_variable') may be specified. Key values should be</p>
+<ul>
+<li>continuous integers starting at 1, or</li>
+<li>(default) None, indicating that the parameter is not entered by student</li>
+</ul>
+<p>For example,</p>
+<pre class="codehilite"><code class="language-python">input_positions = {
+    'lower': 1,
+    'upper': 2,
+    'integrand': 3
+}</code></pre>
+
+
+<p>indicates that the problem has 3 input boxes which represent the lower limit, upper limit, and integrand in that order. The <code>integration_variable</code> is NOT entered by student and is instead given by the value specified by author in 'answers'.</p>
+<p>Here is a sample grader for the above XML:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
+&gt;&gt;&gt; grader = IntegralGrader(
+...     answers={
+...         'lower':'0',
+...         'upper':'1',
+...         'integrand':'e^x',
+...         'integration_variable':'x'
+...     },
+...     input_positions = {
+...         'upper': 1,
+...         'integrand': 2,
+...         'lower': 3
+...     }
+... )</code></pre>
+
+
+<h2 id="specifying-the-answer">Specifying the Answer<a class="headerlink" href="#specifying-the-answer" title="Permanent link"> # </a></h2>
+<p>The author's answer should be specified as a dictionary with the following keys:</p>
+<pre class="codehilite"><code class="language-python">answers = {
+    'lower': 'lower_limit',
+    'upper': 'upper_limit',
+    'integrand': 'integrand',
+    'integration_variable': 'variable_of_integration'
+}</code></pre>
+
+
+<p>Note that each entry is a string value.</p>
+<p><code>IntegralGrader</code> can handle integrals over both finite and infinite domains. A special constant <code>'infty'</code> is recognized to cater for the infinite case (and takes on the special value <code>float('inf')</code>).</p>
+<h2 id="other-options">Other Options<a class="headerlink" href="#other-options" title="Permanent link"> # </a></h2>
+<p>If you wish to allow a student's integrand to be complex-valued at any point in the domain of the integral, set <code>complex_integrand=True</code>. If set to False (the default), a student's submission will be graded as incorrect if their integrand becomes complex anywhere in the domain.</p>
+<p>You can modify the integration options used by <a href="https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.integrate.quad.html"><code>scipy.integrate.quad</code></a> by passing a dictionary of keyword-argument values using the option <code>integrator_options</code>.</p>
+<p>The following options from <code>FormulaGrader</code> are available for use in <code>IntegralGrader</code>:</p>
+<ul>
+<li><code>user_constants</code></li>
+<li><code>user_functions</code></li>
+<li><code>whitelist</code></li>
+<li><code>blacklist</code></li>
+<li><code>tolerance</code></li>
+<li><code>samples</code> (default: 1)</li>
+<li><code>variables</code></li>
+<li><code>sample_from</code></li>
+<li><code>failable_evals</code></li>
+</ul>
+<p>Unless otherwise specified, the defaults are the same as in <code>FormulaGrader</code>.</p>
+<h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
+<p>Here is the full list of options specific to an <code>IntegralGrader</code>.</p>
+<pre class="codehilite"><code class="language-python">grader = IntegralGrader(
+    input_positions=dict,
+    answers=dict,
+    complex_integrand=dict,  # default {'full_output': 1}
+    integrator_options=bool,  # default False
+    # The below options are the same as in FormulaGrader
+    variables=list,  # default []
+    sample_from=dict,  # default {}
+    samples=int,  # default 1
+    user_functions=dict,  # default {}
+    user_constants=dict,  # default {}
+    failable_evals=int,  # default 0
+    blacklist=list,  # default []
+    whitelist=list,  # default []
+    tolerance=(float | percentage),  # default '0.01%'
+)</code></pre></div>
         
     </div>
 
