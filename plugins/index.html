@@ -245,6 +245,8 @@
         <li class="first-level active"><a href="#plugins">Plugins</a></li>
             <li class="second-level"><a href="#overriding-library-defaults">Overriding Library Defaults</a></li>
                 
+            <li class="second-level"><a href="#inserting-plugins-into-the-library">Inserting Plugins into the Library</a></li>
+                
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -262,7 +264,9 @@
 
 
 <p>When this code is included in a file in the plugins folder, it automatically runs every time the library is loaded, leading to course-wide defaults. If for some reason you need to reset to the library defaults for a specific problem, you can call <code>clear_registered_defaults()</code> on the class in that problem.</p>
-<p>An example plugin has been provided for you in <code>defaults_sample.py</code>. The code in this plugin is commented out so that it doesn't change anything by default. If you are interested in overriding library defaults on a course-wide basis, we recommend copying this file to <code>defaults.py</code> and setting the desired defaults using the code templates provided. This is particularly useful if you wish to use attempt-based partial credit throughout your course.</p></div>
+<p>An example plugin has been provided for you in <code>defaults_sample.py</code>. The code in this plugin is commented out so that it doesn't change anything by default. If you are interested in overriding library defaults on a course-wide basis, we recommend copying this file to <code>defaults.py</code> and setting the desired defaults using the code templates provided. This is particularly useful if you wish to use attempt-based partial credit throughout your course.</p>
+<h2 id="inserting-plugins-into-the-library">Inserting Plugins into the Library<a class="headerlink" href="#inserting-plugins-into-the-library" title="Permanent link"> # </a></h2>
+<p>To use a plugin, you will need to download the <code>python_lib.zip</code> file, unzip it, put the plugin in the plugins directory, and rezip everything. Your new zip file should unzip to have the <code>mitxgraders</code> and <code>voluptuous</code> directories.</p></div>
         
     </div>
 
