@@ -22,3 +22,8 @@ StringGrader.register_defaults({
 When this code is included in a file in the plugins folder, it automatically runs every time the library is loaded, leading to course-wide defaults. If for some reason you need to reset to the library defaults for a specific problem, you can call `clear_registered_defaults()` on the class in that problem.
 
 An example plugin has been provided for you in `defaults_sample.py`. The code in this plugin is commented out so that it doesn't change anything by default. If you are interested in overriding library defaults on a course-wide basis, we recommend copying this file to `defaults.py` and setting the desired defaults using the code templates provided. This is particularly useful if you wish to use attempt-based partial credit throughout your course.
+
+
+## Inserting Plugins into the Library
+
+To use a plugin, you will need to download the `python_lib.zip` file, unzip it, put the plugin in the plugins directory, and rezip everything. Your new zip file should unzip to have the `mitxgraders` and `voluptuous` directories.

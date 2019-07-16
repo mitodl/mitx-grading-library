@@ -1,0 +1,57 @@
+<problem display_name="Input Validation" showanswer="always" weight="10" attempts="">
+
+<p><code>StringGrader</code> can enforce that the student input matches a given regex pattern as part of its grading. This is useful in giving students error messages if their input doesn't match the required format, and helps prevent them from making input errors that are not meaningfully part of the assessment.</p>
+
+<p>As an example, type the chemical formula for ethane in the following box. Try the following inputs:</p>
+
+<ul>
+  <li>CH_3 CH_3</li>
+  <li>C_2H_6</li>
+  <li>CH3CH3</li>
+  <li>NO_2</li>
+</ul>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = StringGrader(
+    answers=('C_2H_6', 'CH_3CH_3'),   # Here we have two possible answers
+    validation_pattern=r'([CNOH](_[0-9])?)+',  # This is the pattern to match
+    explain_validation='err',   # Given an error message if the pattern isn't met
+    invalid_msg='Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen',
+    strip_all=True,   # Removes all spaces from the input
+)
+</script>
+
+<customresponse cfn="grader" expect='CH_3CH_3'>
+  <textline />
+</customresponse>
+
+
+<p>Pattern matching can also be used in conjuction with <code>accept_any</code> to grade students based on whether their input matches the given regex pattern. Here's an example.</p>
+
+<p>Use the <code>min</code> function in python to take the minimum of some numbers. Try the following inputs:</p>
+
+<ul>
+  <li>min(1.5, 2)</li>
+  <li>min(1, -2, 3, 4.6000001, 5, 6, 7, 8, 9, 10)</li>
+  <li>max(1, 2)</li>
+  <li>min(1+2j, 3)</li>
+</ul>
+
+<script type="text/python" system_path="python_lib">
+grader2 = StringGrader(
+    # Note that we don't have an answer
+    validation_pattern=r'min\(-?[0-9.]+(,-?[0-9.]+)+\)',  # This is the pattern to match
+    explain_validation=None,   # No message explaining the validation
+    strip_all=True,   # Removes all spaces from the input
+)
+</script>
+
+<customresponse cfn="grader2" expect='min(1, 2)'>
+  <textline />
+</customresponse>
+
+
+<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string4.xml" target="_blank">View source</a>
+
+</problem>

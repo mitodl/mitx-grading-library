@@ -1,6 +1,6 @@
 <html display_name="FormulaGrader and NumericalGrader">
 
-<p>Any time you want to grade numbers or formulas, these are your graders. The basic grader is <code>FormulaGrader</code>. <code>NumericalGrader</code> is a specialized version of FormulaGrader that cannot have any unknown variables, but otherwise, just sets some defaults a bit differently to FormulaGrader.</p>
+<p>Any time you want to grade numbers or formulas, these are your graders. The basic grader is <code>FormulaGrader</code>. <code>NumericalGrader</code> is a specialized version of FormulaGrader that cannot have any unknown variables, but otherwise, just sets some defaults a bit differently to <code>FormulaGrader</code>. If you want to handle vectors or matrices, you want <code>MatrixGrader</code>, which is a specialized version of <code>FormulaGrader</code>.</p>
 
 <p>These graders have significant extensions over the edX capabilities, as we demonstrate here. Furthermore, we use our own parser for these graders, and have incorporated substantial improvements over the edX formularesponse and numericalresponse problem types.</p>
 

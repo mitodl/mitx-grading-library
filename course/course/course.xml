@@ -13,6 +13,9 @@
         <problem url_name="string1"/>
         <problem url_name="string2"/>
         <problem url_name="string3"/>
+        <problem url_name="string4"/>
+        <problem url_name="string5"/>
+        <problem url_name="string6"/>
       </vertical>
     </sequential>
     <sequential url_name="formulagrader" display_name="FormulaGrader and NumericalGrader">
@@ -29,6 +32,11 @@
         <problem url_name="formula9"/>
         <problem url_name="formula10"/>
         <problem url_name="formula11"/>
+        <!-- Update comparers to import using * -->
+        <!-- set_default_comparer -->
+        <!-- LinearComparer -->
+        <!-- EqualityComparer with transform -->
+        <!-- Mention expanded function listing? -->
       </vertical>
     </sequential>
     <sequential url_name="matrixgrader" display_name="MatrixGrader">
@@ -42,7 +50,17 @@
         <problem url_name="matrix6"/>
         <problem url_name="matrix7"/>
         <problem url_name="matrix8"/>
+        <!-- Matrix sampling -->
+        <!-- MatrixEntryComparer in a previous example -->
         <problem url_name="matrixtech"/>
+      </vertical>
+    </sequential>
+    <sequential url_name="integralgrader" display_name="IntegralGrader">
+      <vertical url_name="v-integral" display_name="IntegralGrader">
+        <html url_name="integralinfo"/>
+        <problem url_name="integral1"/>
+        <!-- Example 2 - 4 boxes -->
+        <!-- Example 3 - 1 box (example of why it's still useful, infinite integration) -->
       </vertical>
     </sequential>
     <sequential url_name="singlelistgrader" display_name="SingleListGrader">
@@ -52,6 +70,7 @@
         <problem url_name="singlelist2"/>
         <problem url_name="singlelist3"/>
         <problem url_name="singlelist4"/>
+        <!-- Expanded expect structure -->
       </vertical>
     </sequential>
     <sequential url_name="listgrader" display_name="ListGrader">
@@ -62,12 +81,7 @@
         <problem url_name="list3"/>
         <problem url_name="list4"/>
         <problem url_name="list5"/>
-      </vertical>
-    </sequential>
-    <sequential url_name="integralgrader" display_name="IntegralGrader">
-      <vertical url_name="v-integral" display_name="IntegralGrader">
-        <html url_name="integralinfo"/>
-        <problem url_name="integral1"/>
+        <!-- Use no partial credit in eigenvalue example -->
       </vertical>
     </sequential>
     <sequential url_name="usage" display_name="Usage">
