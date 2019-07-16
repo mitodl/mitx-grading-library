@@ -17,6 +17,6 @@ grader = SingleListGrader(
   <textline correct_answer="cat, dog"/>
 </customresponse>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/singlelist2.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/singlelist2.xml" target="_blank">View source</a></p>
 
 </problem>

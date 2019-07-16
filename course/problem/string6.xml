@@ -15,7 +15,8 @@ grader = StringGrader(
 )
 </script>
 
-<customresponse cfn="grader" expect="cat">
+<!-- Note the extra argument to the customresponse tag! -->
+<customresponse cfn="grader" expect="cat" cfn_extra_args="attempt">
   <textline />
 </customresponse>
 
@@ -25,6 +26,6 @@ grader = StringGrader(
 <p>We apologize that there is no mechanism by which you can reset your attempts for this question!</p>
 
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string6.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string6.xml" target="_blank">View source</a></p>
 
 </problem>

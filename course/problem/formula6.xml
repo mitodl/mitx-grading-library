@@ -25,6 +25,6 @@ grader = FormulaGrader(
   <textline math="1" inline="1" correct_answer="2*sin(x)*cos(x)"/>
 </customresponse>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula6.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula6.xml" target="_blank">View source</a></p>
 
 </problem>

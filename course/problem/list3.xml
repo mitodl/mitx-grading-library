@@ -41,6 +41,6 @@ grader = ListGrader(
 
 <p>Note that such questions are often most cleanly presented using an HTML table, as shown here.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list3.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list3.xml" target="_blank">View source</a></p>
 
 </problem>

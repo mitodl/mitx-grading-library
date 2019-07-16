@@ -23,6 +23,6 @@ grader = ListGrader(
 
 <p>Note that partial credit is awarded if applicable.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list2.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list2.xml" target="_blank">View source</a></p>
 
 </problem>

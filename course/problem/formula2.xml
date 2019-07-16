@@ -25,6 +25,6 @@ grader = FormulaGrader(
 
 <p>When using textline input (as in the above example), the math preview doesn't natively recognize fact() as a function. This affects a number of other functions too, including a number of standard edX functions. We've developed a series of renderer definitions as a javascript library to teach the renderer how to make it look pretty. These definitions are loaded through the MathJax preprocessor in the textline tag. See the documentation for details.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula2.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula2.xml" target="_blank">View source</a></p>
 
 </problem>

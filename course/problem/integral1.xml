@@ -69,6 +69,6 @@ grader = IntegralGrader(
 
 <p>While the expected answer is 1, e^x and 0 (top to bottom), by making a substitution \(x = 2u\), an equivalent integral is 0.5, 2*e^(2*x), 0 (top to bottom). As these integrals integrate to the same value, they will both be graded correct.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/integral1.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/integral1.xml" target="_blank">View source</a></p>
 
 </problem>

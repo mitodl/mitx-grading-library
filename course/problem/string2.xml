@@ -10,8 +10,8 @@ grader = StringGrader(
 )
 </script>
 
-<customresponse cfn="grader">
-  <textline correct_answer="Hat "/>
+<customresponse cfn="grader" answer="Hat ">
+  <textline/>
 </customresponse>
 
 <p>Here is another example, where the answer is <code>two  spaces</code>, complete with two spaces between the words. By default, multiple consecutive spaces are turned into single spaces, but again, you can control this behavior.</p>
@@ -29,6 +29,6 @@ grader2 = StringGrader(
 </customresponse>
 
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string2.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string2.xml" target="_blank">View source</a></p>
 
 </problem>

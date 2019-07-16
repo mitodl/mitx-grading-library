@@ -48,7 +48,7 @@ grader = MatrixGrader(
 <h3>Resources</h3>
 <ul>
   <li>
-    <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrixtech.xml" target="_blank">View source</a>
+    <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrixtech.xml" target="_blank">View source</a></p>
   </li>
   <li>
     <a href="https://mitodl.github.io/mitx-grading-library/grading_math/matrixfunctions/" target="_blank">Documentation for <code>specify_domain</code></a>

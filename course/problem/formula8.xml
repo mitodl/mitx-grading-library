@@ -24,6 +24,6 @@ grader = FormulaGrader(
 
 <p>We have a number of built-in comparison functions for various purposes.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula8.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula8.xml" target="_blank">View source</a></p>
 
 </problem>

@@ -37,6 +37,6 @@ grader = FormulaGrader(
 
 <p>Note: We have now managed to merge a number of these enhancements into edX!</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula1.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula1.xml" target="_blank">View source</a></p>
 
 </problem>

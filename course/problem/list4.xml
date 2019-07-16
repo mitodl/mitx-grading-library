@@ -32,6 +32,6 @@ grader = ListGrader(
 
 <p>Note that repeating an object will be graded incorrectly.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list4.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list4.xml" target="_blank">View source</a></p>
 
 </problem>

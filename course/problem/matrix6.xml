@@ -32,6 +32,6 @@ grader = MatrixGrader(
 
 <p>In addition to <code>cartesian_xyz</code>, we also define <code>cartesian_ijk</code> for those that prefer the \(\hat{i}\), \(\hat{j}\) and \(\hat{k}\) unit vectors, as well as the Pauli matrices as <code>pauli</code>.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix6.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix6.xml" target="_blank">View source</a></p>
 
 </problem>

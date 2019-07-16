@@ -30,6 +30,6 @@ grader = FormulaGrader(
 
 <p>User-defined functions often don't render quite right when using textline inputs. For example, try typing in <code>1/H(x)</code> in the box above. If you make extensive use of user-defined functions, we suggest incorporating those functions into the AsciiMath renderer definitions file we provide. See the documentation for details.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula5.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula5.xml" target="_blank">View source</a></p>
 
 </problem>

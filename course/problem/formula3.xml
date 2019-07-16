@@ -38,6 +38,6 @@ grader2 = FormulaGrader(
 
 <script type="text/javascript" src="/static/MJxPrep.js"></script>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula3.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula3.xml" target="_blank">View source</a></p>
 
 </problem>

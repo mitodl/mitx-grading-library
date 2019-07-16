@@ -20,6 +20,6 @@ grader = ListGrader(
 
 <p>Try testing different orderings to your answer, entering the same answer twice, etc.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list1.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list1.xml" target="_blank">View source</a></p>
 
 </problem>

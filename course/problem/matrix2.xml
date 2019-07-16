@@ -24,6 +24,6 @@ grader = MatrixGrader(
     <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="100" />
 </customresponse>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix2.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix2.xml" target="_blank">View source</a></p>
 
 </problem>

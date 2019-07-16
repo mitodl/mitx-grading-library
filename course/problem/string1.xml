@@ -23,6 +23,6 @@ grader = StringGrader(
   <textline correct_answer="wolf"/>
 </customresponse>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string1.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string1.xml" target="_blank">View source</a></p>
 
 </problem>
