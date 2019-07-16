@@ -11,7 +11,7 @@ pytest-cov==2.7.1
 
 # For documentation
 mkdocs==0.17.5
-mkdocs-cinder
+mkdocs-cinder==0.11.0
 
 # For uploading to edge
 requests
