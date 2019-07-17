@@ -181,7 +181,7 @@ class MatrixEntryComparer(CorrelatedComparer):
 
     default_msg = "Some array entries are incorrect, marked below:\n{error_locations}"
     schema_config = EqualityComparer.schema_config.extend({
-        Required('entry_partial_credit', default=0): Any(All(Number, Range(0, 1)), 'proportional'),
+        Required('entry_partial_credit', default=0): Any(All(float, Range(0, 1)), 0, 1, 'proportional'),
         Required('entry_partial_msg', default=default_msg): text_string
     })
 
