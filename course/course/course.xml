@@ -48,7 +48,6 @@
         <!-- set_default_comparer -->
         <!-- LinearComparer -->
         <!-- EqualityComparer with transform -->
-        <!-- Mention expanded function listing? -->
       </vertical>
     </sequential>
     <sequential url_name="matrixgrader" display_name="MatrixGrader">
@@ -79,10 +78,11 @@
       <vertical url_name="v-matrixgrader8" display_name="Noncommuting Variables">
         <problem url_name="matrix8"/>
       </vertical>
-        <!-- Matrix sampling -->
-        <!-- MatrixEntryComparer in a previous example -->
-      <vertical url_name="v-matrixgradertech" display_name="MatrixGrader">
-        <problem url_name="matrixtech"/>
+      <vertical url_name="v-matrixgrader9" display_name="Matrix Sampling">
+        <problem url_name="matrix9"/>
+      </vertical>
+      <vertical url_name="v-matrixgrader10" display_name="User Functions and Array Arguments">
+        <problem url_name="matrix10"/>
       </vertical>
     </sequential>
     <sequential url_name="integralgrader" display_name="IntegralGrader">

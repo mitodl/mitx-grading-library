@@ -1,19 +1,18 @@
 <problem display_name="Restrictions on Input" showanswer="always" weight="10" attempts="">
 
-  <p>Sometimes you want students to answer a question like "What is \(\sin(2x)\)?". The answer you want is "2*sin(x)*cos(x)". However, students can type in "sin(2*x)" and will still be graded correct.</p>
+<p>Sometimes you want students to answer a question like "What is \(\sin(2x)\)?". The answer you want is "2*sin(x)*cos(x)". However, students can type in "sin(2*x)" and will still be graded correct.</p>
 
-  <p>We introduce a number of tools to address this. The first is the concept of whitelists and blacklists. It's possible to set a blacklist of functions, which disallows the use of those mathematical functions in the answer. It's also possible to instead have a whitelist, where you specify the only functions that you want students to have access to.</p>
+<p>We introduce a number of tools to address this. The first is the concept of whitelists and blacklists. It's possible to set a blacklist of functions, which disallows the use of those mathematical functions in the answer. It's also possible to instead have a whitelist, where you specify the only functions that you want students to have access to.</p>
 
-  <p>You can also require the use of a certain function in the answer. This may sound good, but remember that "0*cos(1)" technically makes use of the cos function.</p>
+<p>You can also require the use of a certain function in the answer. This may sound good, but remember that "0*cos(1)" technically makes use of the cos function.</p>
 
-  <p>Finally, you can also specify forbidden strings. These are strings that are not allowed to be used in the answer. In the above example, disallowing "+x", "x+", "x*", "*x", "-x" "x-" and "x/" should stop students from entering anything like "sin(2*x)".</p>
+<p>Finally, you can also specify forbidden strings. These are strings that are not allowed to be used in the answer. In the above example, disallowing "+x", "x+", "x*", "*x", "-x" "x-" and "x/" should stop students from entering anything like "sin(2*x)".</p>
 
-  <p>The answer to the below question is <code>2*sin(x)*cos(x)</code>. You can try entering <code>sin(2*x)</code> in any clever form, but most expressions will be stymied.</p>
+<p>The answer to the below question is <code>2*sin(x)*cos(x)</code>. You can try entering <code>sin(2*x)</code> in any clever form, but most expressions will be stymied (it is possible to get around it though - can you figure out how?).</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
 grader = FormulaGrader(
-    answers='2*sin(x)*cos(x)',
     variables=['x'],
     whitelist=['sin', 'cos'],
     required_functions=['sin', 'cos'],
@@ -21,8 +20,8 @@ grader = FormulaGrader(
 )
 </script>
 
-<customresponse cfn="grader" inline="1">
-  <textline math="1" inline="1" correct_answer="2*sin(x)*cos(x)"/>
+<customresponse cfn="grader" inline="1" expect="2*sin(x)*cos(x)">
+  <textline math="1" inline="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
 </customresponse>
 
 <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula6.xml" target="_blank">View source</a></p>

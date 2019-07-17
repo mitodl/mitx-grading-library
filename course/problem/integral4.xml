@@ -40,7 +40,7 @@ grader = IntegralGrader(
         </td>
         <td>
           <br/>
-          <textline inline="1" size="10" correct_answer="e^x" math="1" trailing_text="  [mathjaxinline] dx [/mathjaxinline]"/>
+          <textline inline="1" size="10" correct_answer="e^x" math="1" trailing_text="  [mathjaxinline] dx [/mathjaxinline]" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
         </td>
       </tr>
     </tbody>

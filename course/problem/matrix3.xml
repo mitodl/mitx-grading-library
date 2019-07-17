@@ -1,7 +1,7 @@
 <problem display_name="Cross Products" showanswer="always" weight="10" attempts="">
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader, RealMatrices, RealVectors
+from mitxgraders import *
 
 grader = MatrixGrader(
   answers='abs(cross(vecb-veca, vecc-veca))/abs(vecb-veca)',

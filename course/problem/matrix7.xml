@@ -17,8 +17,7 @@
 </ul>
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader
-from mitxgraders.comparers import vector_phase_comparer
+from mitxgraders import *
 grader = MatrixGrader(
     answers={
         'comparer': vector_phase_comparer,
@@ -44,8 +43,6 @@ grader = MatrixGrader(
 </ul>
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader
-from mitxgraders.comparers import vector_span_comparer
 grader2 = MatrixGrader(
     answers={
         'comparer': vector_span_comparer,
@@ -61,6 +58,7 @@ grader2 = MatrixGrader(
 </customresponse>
 </p>
 
+<p>
 <h3>Resources</h3>
 <ul>
   <li>
@@ -70,5 +68,6 @@ grader2 = MatrixGrader(
     <a href="https://mitodl.github.io/mitx-grading-library/grading_math/comparer_functions/" target="_blank">Documentation for <code>comparer_functions</code></a>
   </li>
 </ul>
+</p>
 
 </problem>

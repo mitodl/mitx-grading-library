@@ -1,8 +1,8 @@
 <problem display_name="Improvements over edX" showanswer="always" weight="10" attempts="">
 
-  <p>The following is a simple formularesponse problem, except that we're using our library instead of edX. There is a variable <code>m</code>, and the answer is <code>m*(1-sin(2*m))</code>.</p>
+<p>The following is a simple formularesponse problem, except that we're using our library instead of edX. There is a variable <code>m</code>, and the answer is <code>m*(1-sin(2*m))</code>.</p>
 
-  <p>The interesting part is what happens when you have a mistake in your input. Try the following:</p>
+<p>The interesting part is what happens when you have a mistake in your input. Try the following:</p>
 
   <ul>
     <li><code>m*(1-sin(2*m)</code> (missing closing parentheses)</li>
@@ -11,20 +11,18 @@
     <li><code>m(1-sin(2*m))</code> (forgot multiplication before brackets)</li>
     <li><code>m*(1-sin(2m))</code> (forgot multiplication in 2*m)</li>
     <li><code>x*(1-sin(2*m))</code> (unknown variable x)</li>
+    <li><code>f(1-sin(2*m))</code> (unknown function f)</li>
     <li><code>1/0</code> (division by zero)</li>
     <li><code>10^400</code> (overflow)</li>
   </ul>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
-grader = FormulaGrader(
-    answers='m*(1-sin(2*m))',
-    variables=['m']
-)
 </script>
 
-<customresponse cfn="grader">
-  <textline math="1" correct_answer="m*(1-sin(2*m))"/>
+<!-- Note that the grader is inlined here, and infers the answer from the answer key -->
+<customresponse cfn="FormulaGrader(variables=['m'])" expect="m*(1-sin(2*m))">
+  <textline math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
 </customresponse>
 
 <p>For comparison, the following box is an edX formularesponse grader with exactly the same configuration.</p>
@@ -34,6 +32,8 @@ grader = FormulaGrader(
     <responseparam type="tolerance" default="0.1%"/>
   </textline>
 </formularesponse>
+
+<p>We recommend looking at the code here to see just how straightforward setting this up is!</p>
 
 <p>Note: We have now managed to merge a number of these enhancements into edX!</p>
 

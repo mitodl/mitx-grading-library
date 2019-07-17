@@ -50,14 +50,14 @@ grader = IntegralGrader(
         </td>
         <td>
           <br/>
-          <textline inline="1" size="10" correct_answer="e^x" math="1"/>
+          <textline inline="1" size="10" correct_answer="e^x" math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
         </td>
         <td>
           <p style="display:inline">\(d\)</p>
         </td>
         <td>
           <br/>
-          <textline inline="1" size="10" correct_answer="x" math="1"/>
+          <textline inline="1" size="10" correct_answer="x" math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
         </td>
       </tr>
       <tr>

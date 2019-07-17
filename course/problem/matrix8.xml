@@ -30,15 +30,6 @@ grader = MatrixGrader(
   <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" inline="1" />
 </customresponse>
 
-
-<h3>Resources</h3>
-<ul>
-  <li>
-    <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix7.xml" target="_blank">View source</a></p>
-  </li>
-  <li>
-    <a href="https://mitodl.github.io/mitx-grading-library/grading_math/comparer_functions/" target="_blank">Documentation for <code>comparer_functions</code></a>
-  </li>
-</ul>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix8.xml" target="_blank">View source</a></p>
 
 </problem>

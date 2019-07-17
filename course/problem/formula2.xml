@@ -1,27 +1,34 @@
-<problem display_name="Factorial Function" showanswer="always" weight="10" attempts="">
+<problem display_name="Expanded Function Listing" showanswer="always" weight="10" attempts="">
 
-  <p>We have significantly expanded the sampling capabilities of our grader compared to edX. For example, we can sample integers, allowing us to use the factorial function. Here is an example.</p>
+<p>We have significantly expanded the <a href="https://mitodl.github.io/mitx-grading-library/grading_math/functions_and_constants/">list of mathematical functions</a> that the grader recognizes. In this example, we demonstrate the use of the factorial function.</p>
 
-  <p>What is the Taylor series expansion of \(\exp(x)\) about \(x = 0\)? (Answer: <code>x^n/fact(n)</code>). Try typing <code>fact(n-1)</code> to see what happens in that case, too.</p>
+<p>What is the Taylor series expansion of \(\exp(x)\) about \(x = 0\)?</p>
+
+<p>Suggested answers:</p>
+
+<ul>
+  <li><code>x^n/fact(n)</code></li>
+  <li><code>x^n/fact(n-1)</code></li>
+  <li><code>x^n/fact(n+1/2)</code></li>
+</ul>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
 grader = FormulaGrader(
-    answers='x^n/fact(n)',
     variables=['x', 'n'],
     sample_from={
-        'x': RealInterval(),
         'n': IntegerRange([3, 8])
+        # We tell n to sample integers, but this isn't actually necessary...
     }
 )
 </script>
 
 <p style="display:inline">[mathjaxinline]e^x = \sum_{n = 0}^\infty[/mathjaxinline] </p>
-<customresponse cfn="grader" inline="1">
-  <textline math="1" inline="1" correct_answer="x^n/fact(n)" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+<customresponse cfn="grader" inline="1" expect="x^n/fact(n)">
+  <textline math="1" inline="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
 </customresponse>
 
-<p>Update: we now use the gamma function to compute factorials, so expressions like <code>fact(1.5)</code> will be accepted!</p>
+<p>Note that we use the gamma function to compute factorials, so expressions like <code>fact(1.5)</code> are accepted!</p>
 
 <p>When using textline input (as in the above example), the math preview doesn't natively recognize fact() as a function. This affects a number of other functions too, including a number of standard edX functions. We've developed a series of renderer definitions as a javascript library to teach the renderer how to make it look pretty. These definitions are loaded through the MathJax preprocessor in the textline tag. See the documentation for details.</p>
 

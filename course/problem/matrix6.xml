@@ -14,7 +14,7 @@
 </ul>
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader, cartesian_xyz
+from mitxgraders import *
 grader = MatrixGrader(
    answers='v_x*t*hatx + (v_y*t-g*t^2/2)*haty',
    variables=['v_x', 'v_y', 'g', 't'],
@@ -30,7 +30,7 @@ grader = MatrixGrader(
 
 <p>Note that in this example, we set <code>max_array_dim</code> to 0, meaning that students cannot enter vector or matrix quantities manually. If we hadn't, the grader would accept the answer <code>[v_x*t,v_y*t-g*t^2/2,0]</code>.</p>
 
-<p>In addition to <code>cartesian_xyz</code>, we also define <code>cartesian_ijk</code> for those that prefer the \(\hat{i}\), \(\hat{j}\) and \(\hat{k}\) unit vectors, as well as the Pauli matrices as <code>pauli</code>.</p>
+<p>In addition to <code>cartesian_xyz</code>, we also define <code>cartesian_ijk</code> for those that prefer the \(\hat{i}\), \(\hat{j}\) and \(\hat{k}\) unit vectors, as well as the Pauli matrices <code>sigma_x</code>, <code>sigma_y</code> and <code>sigma_z</code> as <code>pauli</code>.</p>
 
 <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix6.xml" target="_blank">View source</a></p>
 

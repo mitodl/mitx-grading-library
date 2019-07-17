@@ -1,0 +1,86 @@
+<problem display_name="Matrix Sampling" showanswer="always" weight="10" attempts="">
+
+<p>A large number of options are available for sampling vectors/matrices/tensors. Here are the options available for the different array types:</p>
+
+<h3>Vectors</h3>
+
+<ul>
+  <li>Dimension</li>
+  <li>Range for norm</li>
+  <li>Complex</li>
+</ul>
+
+<h3>Tensors</h3>
+
+<ul>
+  <li>Dimensions</li>
+  <li>Range for norm (Frobenius norm)</li>
+  <li>Complex</li>
+</ul>
+
+<h3>General Matrices</h3>
+
+<ul>
+  <li>Dimensions</li>
+  <li>Range for norm (Frobenius norm)</li>
+  <li>Complex</li>
+  <li>Upper/lower triangular</li>
+</ul>
+
+<h3>Square Matrices</h3>
+
+<ul>
+  <li>Square Dimension</li>
+  <li>Range for norm (Frobenius norm)</li>
+  <li>Complex</li>
+  <li>Multiple of identity</li>
+  <li>Orthogonal*</li>
+  <li>Unitary*</li>
+  <li>Diagonal/Symmetric/Antisymmetric/Hermitian/Antihermitian</li>
+  <li>Unit/zero determinant</li>
+  <li>Traceless</li>
+</ul>
+
+<p>* Code exists to sample orthogonal and unitary matrices, but relies on the upcoming python 3 upgrade for edX. When this upgrade occurs, we'll demonstrate it here!</p>
+
+<p>Here is an example of using a Hermitian matrix. Let \(H\) be Hermitian, and take vectors \(\vec{u}\) and \(\vec{v}\). Compute \(\vec{u} \cdot (H \vec{v})\).</p>
+
+<p>Suggested inputs:</p>
+
+<ul>
+  <li><code>u*H*v</code></li>
+  <li><code>u*adj(H)*v</code> (correct)</li>
+  <li><code>u*trans(H)*v</code> (incorrect)</li>
+</ul>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = MatrixGrader(
+    variables=['u', 'v', 'H'],
+    sample_from={
+        'u': RealVectors(shape=3),
+        'v': RealVectors(shape=3),
+        'H': SquareMatrices(symmetry='hermitian', dimension=3)
+    },
+    max_array_dim=0  # Students can't enter their own matrices
+)
+</script>
+
+<p style="display:inline">Quantity = </p>
+<customresponse cfn="grader" expect="u*H*v" inline="1">
+  <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" inline="1" />
+</customresponse>
+
+<p>
+<h3>Resources</h3>
+<ul>
+  <li>
+    <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix9.xml" target="_blank">View source</a></p>
+  </li>
+  <li>
+    <a href="https://mitodl.github.io/mitx-grading-library/grading_math/sampling/#variable-sampling-vectors-matrices-and-tensors" target="_blank">Documentation for vector, matrix and tensor sampling</a>
+  </li>
+</ul>
+</p>
+
+</problem>

@@ -13,9 +13,9 @@ grader = ListGrader(
 </script>
 
 <customresponse cfn="grader" inline="1">
-  <p style="display:inline">First answer: </p><textline math="1" inline="1" correct_answer="1"/>
+  <p style="display:inline">First answer: </p><textline inline="1" correct_answer="1"/>
   <br/>
-  <p style="display:inline">Second answer: </p><textline math="1" inline="1" correct_answer="-1"/>
+  <p style="display:inline">Second answer: </p><textline inline="1" correct_answer="-1"/>
 </customresponse>
 
 <p>Try testing different orderings to your answer, entering the same answer twice, etc.</p>

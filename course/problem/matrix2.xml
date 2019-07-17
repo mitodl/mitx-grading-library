@@ -7,7 +7,7 @@ grader = MatrixGrader(
     answers='[[cos(theta), -sin(theta)], [sin(theta), cos(theta)]]',
     variables=['theta'],
     max_array_dim=2,
-    entry_partial_credit=True
+    entry_partial_credit='proportional'
 )
 </script>
 
