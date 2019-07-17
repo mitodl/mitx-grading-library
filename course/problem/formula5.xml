@@ -1,6 +1,6 @@
 <problem display_name="User Functions and Constants" showanswer="always" weight="10" attempts="">
 
-  <p>It is possible to specify user-defined constants and functions. Here, we add a constant tau (= 2*pi), and also define the Heaviside step function H(x). You can also specify an unknown function, for which we sample a well-behaved random function. In the following example, the answer is <code>H(x)*f''(tau)</code>, where f'' is a random function.</p>
+<p>It is possible to specify user-defined constants and functions. Here, we add a constant tau (= 2*pi), and also define the Heaviside step function H(x). You can also specify an unknown function, for which we sample a well-behaved random function. In the following example, the answer is <code>H(x)*f''(tau)</code>, where f'' is a random function.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
@@ -11,7 +11,6 @@ def heaviside(x):
     return 0
 
 grader = FormulaGrader(
-    answers="H(x)*f''(tau)",
     user_constants={'tau': 6.2831853072},
     user_functions={
         "H": heaviside,
@@ -24,12 +23,16 @@ grader = FormulaGrader(
 )
 </script>
 
-<customresponse cfn="grader" inline="1">
-  <textline math="1" inline="1" correct_answer="H(x)*f''(tau)"/>
+<customresponse cfn="grader" inline="1" expect="H(x)*f''(tau)">
+  <textline math="1" inline="1"/>
 </customresponse>
 
-<p>User-defined functions often don't render quite right when using textline inputs. For example, try typing in <code>1/H(x)</code> in the box above. If you make extensive use of user-defined functions, we suggest incorporating those functions into the AsciiMath renderer definitions file we provide. See the documentation for details.</p>
+<p>Try typing <code>1/H(x)</code> in the box above. Do you see a problem? Try the box below - it's exactly the same, except that we've loaded our AsciiMath preprocessor to ensure that the rendering is picture perfect. We strongly recommend using our AsciiMath renderer to ensure that students see a math preview that matches with what they should be writing on paper.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula5.xml" target="_blank">View source</a>
+<customresponse cfn="grader" inline="1" expect="H(x)*f''(tau)">
+  <textline math="1" inline="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+</customresponse>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula5.xml" target="_blank">View source</a></p>
 
 </problem>

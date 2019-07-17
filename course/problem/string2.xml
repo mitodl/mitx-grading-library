@@ -1,20 +1,34 @@
 <problem display_name="StringGrader Options" showanswer="always" weight="10" attempts="">
 
-<p>By default, StringGrader strips all whitespace from both the answer and input. It is also case sensitive by default. You can turn off both of these behaviors. For example, the answer below is "Hat ", with a single space at the end. This is case sensitive, and requires the space at the end.</p>
+<p>By default, StringGrader strips all leading/trailing whitespace from both the answer and input. It is also case sensitive by default. You can control both of these behaviors. For example, the answer below is "Hat ", with a single space at the end. This is case sensitive, and requires the space at the end.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
 grader = StringGrader(
-    answers='Hat ',
     case_sensitive=True,
     strip=False
 )
 </script>
 
-<customresponse cfn="grader">
-  <textline correct_answer="Hat "/>
+<customresponse cfn="grader" answer="Hat ">
+  <textline/>
 </customresponse>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string2.xml" target="_blank">View source</a>
+<p>Here is another example, where the answer is <code>two  spaces</code>, complete with two spaces between the words. By default, multiple consecutive spaces are turned into single spaces, but again, you can control this behavior.</p>
+
+<script type="text/python" system_path="python_lib">
+grader2 = StringGrader(
+    case_sensitive=True,
+    strip=True,
+    clean_spaces=False
+)
+</script>
+
+<customresponse cfn="grader2" expect="two  spaces">
+  <textline/>
+</customresponse>
+
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string2.xml" target="_blank">View source</a></p>
 
 </problem>

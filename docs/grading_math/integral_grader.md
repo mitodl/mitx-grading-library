@@ -118,6 +118,8 @@ Here is a sample grader for the above XML:
 
 ```
 
+Note that when students specify their own variable of integration, it must not conflict with a variable already present in the problem.
+
 
 ## Specifying the Answer
 

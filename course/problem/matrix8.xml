@@ -1,4 +1,4 @@
-<problem display_name="Matrix Grader: Noncommuting Variables" showanswer="always" weight="10" attempts="">
+<problem display_name="Noncommuting Variables" showanswer="always" weight="10" attempts="">
 
 <p>Sometimes, you want to work with non-commuting variables or operations. These can be straightforwardly implemented as matrices, as in the following example. Note that although we secretly have matrix variables, students do not need to know this, and hence we never give error messages that have anything to do with matrices.</p>
 
@@ -30,15 +30,6 @@ grader = MatrixGrader(
   <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" inline="1" />
 </customresponse>
 
-
-<h3>Resources</h3>
-<ul>
-  <li>
-    <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix7.xml" target="_blank">View source</a>
-  </li>
-  <li>
-    <a href="https://mitodl.github.io/mitx-grading-library/grading_math/comparer_functions/" target="_blank">Documentation for <code>comparer_functions</code></a>
-  </li>
-</ul>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix8.xml" target="_blank">View source</a></p>
 
 </problem>

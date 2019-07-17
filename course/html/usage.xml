@@ -14,9 +14,7 @@
 <pre>&lt;problem&gt;
 &lt;script type=&quot;text/python&quot; system_path=&quot;python_lib&quot;&gt;
 from mitxgraders import *
-grader = StringGrader(
-    answers=&apos;cat&apos;
-)
+grader = StringGrader()
 &lt;/script&gt;
 
 &lt;customresponse cfn=&quot;grader&quot;&gt;
@@ -43,19 +41,17 @@ grader = StringGrader(
 
 <pre>\begin{edXscript}
 from mitxgraders import *
-grader = StringGrader(
-    answers=&apos;cat&apos;
-)
+grader = StringGrader()
 \end{edXscript}</pre>
 
-<p>Then, put the customresponse tags in an edXxml tag:</p>
+<p>Next, construct an edXabox command as follows:</p>
+
+<pre>\edXabox{type="custom" expect="something" cfn="grader"}</pre>
+
+<p>Alternatively, you can put the customresponse tags in an edXxml tag:</p>
 
 <pre>\edXxml{&lt;customresponse cfn=&quot;grader&quot;&gt;
     &lt;textline correct_answer=&quot;cat&quot;/&gt;
 &lt;/customresponse&gt;}</pre>
-
-<p>You can also use the edXabox command as follows:</p>
-
-<pre>\edXabox{type="custom" expect="something" cfn="grader"}</pre>
 
 </html>

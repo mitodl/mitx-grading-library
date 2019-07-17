@@ -1,7 +1,7 @@
-<problem display_name="MatrixGrader: Cross Product Demo" showanswer="always" weight="10" attempts="">
+<problem display_name="Cross Products" showanswer="always" weight="10" attempts="">
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader, RealMatrices, RealVectors
+from mitxgraders import *
 
 grader = MatrixGrader(
   answers='abs(cross(vecb-veca, vecc-veca))/abs(vecb-veca)',
@@ -39,6 +39,6 @@ grader = MatrixGrader(
     <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="100" />
 </customresponse>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix3.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix3.xml" target="_blank">View source</a></p>
 
 </problem>

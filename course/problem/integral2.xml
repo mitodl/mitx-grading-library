@@ -1,0 +1,83 @@
+<problem display_name="General Integrals" showanswer="always" weight="10" attempts="">
+
+<p>This is the same problem as previously, except now, the student can choose their variable of integration.</p>
+
+<span>
+<style>
+  .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline input {
+    min-width: 0 !important;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax {
+    display: inline-block !important;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax_Preview {
+    display: inline-block !important;
+  }
+</style>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = IntegralGrader(
+    answers={
+        'lower':'0',
+        'upper':'1',
+        'integrand':'e^x',
+        'integration_variable':'x'
+    },
+    input_positions = {
+        'upper': 1,
+        'integrand': 2,
+        'integration_variable': 3,
+        'lower': 4
+    }
+)
+</script>
+
+<customresponse cfn="grader" inline="1">
+  <table>
+    <col style="width:10%"/>
+    <col style="width:30%"/>
+    <col style="width:3%"/>
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <textline size="5" correct_answer="1"/>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p> \( \displaystyle \huge{ \int }\)</p>
+        </td>
+        <td>
+          <br/>
+          <textline inline="1" size="10" correct_answer="e^x" math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+        </td>
+        <td>
+          <p style="display:inline">\(d\)</p>
+        </td>
+        <td>
+          <br/>
+          <textline inline="1" size="10" correct_answer="x" math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <textline size="5" correct_answer="0"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</customresponse>
+</span>
+
+<p>Try the following inputs:</p>
+
+<ul>
+  <li><code>1</code>, <code>e^x</code>, <code>x</code>, <code>0</code> (top to bottom, left to right)</li>
+  <li><code>1</code>, <code>e^u</code>, <code>u</code>, <code>0</code> (top to bottom, left to right)</li>
+  <li><code>0.5</code>, <code>2*e^(2*u)</code>, <code>u</code>, <code>0</code> (top to bottom, left to right)</li>
+</ul>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/integral2.xml" target="_blank">View source</a></p>
+
+</problem>

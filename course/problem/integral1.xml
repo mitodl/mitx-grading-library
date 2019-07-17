@@ -1,4 +1,4 @@
-<problem display_name="IntegralGrader Example" showanswer="always" weight="10" attempts="">
+<problem display_name="Motivating Example" showanswer="always" weight="10" attempts="">
 
 <p>This style of problem is used in an introductory calculus course, to assess students on setting up an integral. It works by comparing the value of the integral that the student inputs to the value of the integral in the answer. Thus, different variables of integration can be used, and equivalent integrals are graded correct. (Credit: Jennifer French, MIT)</p>
 
@@ -54,7 +54,7 @@ grader = IntegralGrader(
         </td>
         <td>
           <br/>
-          <formulaequationinput inline="1" size="10" correct_answer="e^x" trailing_text="  [mathjaxinline] dx [/mathjaxinline]"/>
+          <textline inline="1" size="10" correct_answer="e^x" math="1" trailing_text="  [mathjaxinline] dx [/mathjaxinline]" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
         </td>
       </tr>
       <tr>
@@ -67,8 +67,8 @@ grader = IntegralGrader(
 </customresponse>
 </span>
 
-<p>While the expected answer is 1, e^x and 0 (top to bottom), by making a substitution \(x = 2u\), an equivalent integral is 0.5, 2*e^(2*x), 0 (top to bottom). As these integrals integrate to the same value, they will both be graded correct.</p>
+<p>While the expected answer is <code>1</code>, <code>e^x</code> and <code>0</code> (top to bottom), by making a substitution \(x = 2u\), an equivalent integral is <code>0.5</code>, <code>2*e^(2*x)</code>, <code>0</code> (top to bottom). As these integrals integrate to the same value, they will both be graded correct.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/integral1.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/integral1.xml" target="_blank">View source</a></p>
 
 </problem>

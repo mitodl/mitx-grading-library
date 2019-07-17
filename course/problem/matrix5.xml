@@ -1,8 +1,7 @@
-<problem display_name="MatrixGrader: Grading Eigenvectors" showanswer="always" weight="10" attempts="">
+<problem display_name="Grading Eigenvectors" showanswer="always" weight="10" attempts="">
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader
-from mitxgraders.comparers import eigenvector_comparer
+from mitxgraders import *
 
 grader = MatrixGrader(
     answers={
@@ -36,14 +35,16 @@ grader = MatrixGrader(
   <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="40" />
 </customresponse>
 
+<p>
 <h3>Resources</h3>
 <ul>
   <li>
-    <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix5.xml" target="_blank">View source</a>
+    <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix5.xml" target="_blank">View source</a></p>
   </li>
   <li>
     <a href="https://mitodl.github.io/mitx-grading-library/grading_math/comparer_functions" target="_blank">Documentation for <code>comparer_function</code>s</a>
   </li>
 </ul>
+</p>
 
 </problem>

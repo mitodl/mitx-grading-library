@@ -1,11 +1,10 @@
 <problem display_name="Complex Sampling" showanswer="always" weight="10" attempts="">
 
-  <p>We have expanded the function evaluations to return complex numbers where appropriate. This means that you no longer need to be very careful about ensuring you set your ranges so that that square roots never act on a negative number! Here's an example where the answer is <code>sqrt(1-x)</code>, and x is sampled from 0 to 10. edX will basically always grade the student wrong in this situation. Here's our take.</p>
+<p>We have expanded the function evaluations to return complex numbers where appropriate. This means that you no longer need to be very careful about ensuring you set your ranges so that that square roots never act on a negative number! Here's an example where the answer is <code>sqrt(1-x)</code>, and x is sampled from 0 to 10. edX will basically always grade the student wrong in this situation. Here's our take.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
 grader = FormulaGrader(
-    answers='sqrt(1-x)',
     variables=['x'],
     sample_from={
         'x': RealInterval([0,10])
@@ -13,16 +12,15 @@ grader = FormulaGrader(
 )
 </script>
 
-<customresponse cfn="grader">
-  <textline math="1" correct_answer="sqrt(1-x)"/>
+<customresponse cfn="grader" expect="sqrt(1-x)">
+  <textline math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
 </customresponse>
 
-  <p>You can also specify that a variable to be sampled is complex. We have added functions re, im, abs and conj to allow for manipulating complex expressions. Here is an example that asks for the modulus of z squared. You can enter <code>abs(z)^2</code>, <code>z*conj(z)</code>, <code>re(z)^2+im(z)^2</code>, or whatever else does the job. Note that <code>z^2</code> will be graded incorrect.</p>
+<p>You can also specify that a variable to be sampled is complex. We have added functions <code>re</code>, <code>im</code>, <code>abs</code> and <code>conj</code> to allow for manipulating complex expressions. Here is an example that asks for the modulus of z squared. You can enter <code>abs(z)^2</code>, <code>z*conj(z)</code>, <code>re(z)^2+im(z)^2</code>, or whatever else does the job. Note that <code>z^2</code> will be graded incorrect.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
 grader2 = FormulaGrader(
-    answers='abs(z)^2',
     variables=['z'],
     sample_from={
         'z': ComplexRectangle()
@@ -30,14 +28,14 @@ grader2 = FormulaGrader(
 )
 </script>
 
-<customresponse cfn="grader2">
-  <textline math="1" correct_answer="abs(z)^2"/>
+<customresponse cfn="grader2" expect="abs(z)^2">
+  <textline math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
 </customresponse>
 
-<p>Note that "re" and "im" display correctly as functions, and "conj" displays with a nice overline. To accomplish this, we use AsciiMath renderer definitions loaded as a javascript file. There is also an option to display "conj" with a star instead of a bar. See the documentation for details.</p>
+<p>Note that <code>re</code> and <code>im</code> display correctly as functions, and <code>conj</code> displays with a nice overline. To accomplish this, we use AsciiMath renderer definitions loaded as a javascript file. There is also an option to display <code>conj</code> with a star instead of a bar. See the documentation for details.</p>
 
 <script type="text/javascript" src="/static/MJxPrep.js"></script>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula3.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula3.xml" target="_blank">View source</a></p>
 
 </problem>

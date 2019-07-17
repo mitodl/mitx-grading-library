@@ -1,21 +1,18 @@
 <problem display_name="Numbered Variables" showanswer="always" weight="10" attempts="">
 
-  <p>If you have a system that contains a large or infinite number of numbered coefficients such as \(a_1\), \(a_2\), etc, it can be a pain to initialize all of these variables as independent variables that the grader should accept. Numbered variables allows you to specify that "a" is a numbered variable, and the system will then accept any entry of the form "a_{##}" where ## is an integer.</p>
+<p>If you have a system that contains a large or infinite number of numbered coefficients such as \(a_1\), \(a_2\), etc, it can be a pain to initialize all of these variables as independent variables that the grader should accept. Numbered variables allows you to specify that "a" is a numbered variable, and the system will then accept any entry of the form <code>a_{##}</code> where ## is an integer.</p>
 
-  <p>The answer to the problem below is <code>a_{0} + a_{1} + a_{-1}</code>. Try including <code>a_{42}</code> in your expression. The grader will be happy to parse your expression and grade you appropriately.</p>
+<p>The answer to the problem below is <code>a_{0} + a_{1} + a_{-1}</code>. Try including <code>a_{42}</code> in your expression. The grader will be happy to parse your expression and grade you appropriately.</p>
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import FormulaGrader
-grader = FormulaGrader(
-    answers='a_{0} + a_{1} + a_{-1}',
-    numbered_vars=['a']
-)
+from mitxgraders import *
 </script>
 
-<customresponse cfn="grader" inline="1">
-  <textline math="1" inline="1" correct_answer="a_{0} + a_{1} + a_{-1}"/>
+<!-- Notice the inlined grader! -->
+<customresponse cfn="FormulaGrader(numbered_vars=['a'])" inline="1" expect="a_{0} + a_{1} + a_{-1}">
+  <textline math="1" inline="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
 </customresponse>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula9.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula9.xml" target="_blank">View source</a></p>
 
 </problem>

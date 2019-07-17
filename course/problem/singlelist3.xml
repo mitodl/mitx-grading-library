@@ -1,8 +1,8 @@
 <problem display_name="Length Checking" showanswer="always" weight="10" attempts="">
 
-  <p>By default, the grader accepts any number of inputs in the list (try it in some of the other examples!). If you want to raise an error if the number of inputs is wrong, then you can do that too.</p>
+<p>By default, the grader accepts any number of inputs in the list (try it in some of the other examples!). If you want to raise an error if the number of inputs is wrong, then you can do that too.</p>
 
-  <p>In 3D, what are the components of the \(\hat{y}\) unit vector? (Answer: 0, 1, 0). Try putting in two or four components instead of three. Also note that this input is ordered. (Note that you should probably use the <code>MatrixGrader</code> for this question instead of a <code>SingleListGrader</code>!)</p>
+<p>In 3D, what are the components of the \(\hat{y}\) unit vector? (Answer: 0, 1, 0). Try putting in two or four components instead of three. Also note that this input is ordered. (Note that you should probably use the <code>MatrixGrader</code> for this question instead of a <code>SingleListGrader</code>!)</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
@@ -18,6 +18,6 @@ grader = SingleListGrader(
   <textline correct_answer="0, 1, 0"/>
 </customresponse>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/singlelist3.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/singlelist3.xml" target="_blank">View source</a></p>
 
 </problem>

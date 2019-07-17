@@ -1,0 +1,19 @@
+<problem display_name="Inlining Graders" showanswer="always" weight="10" attempts="">
+
+<p>Any grader in the library can be "inlined" as in the following example. In the following example, the grader is included in the customresponse tag, with the answer inferred from the customresponse tag. This makes setting up simple graders really quick and easy!</p>
+
+<p>The answer below is "cat".</p>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+</script>
+
+<!-- The cfn entry is actually a line of python code! -->
+<customresponse cfn="StringGrader()" expect="cat">
+  <textline />
+</customresponse>
+
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string5.xml" target="_blank">View source</a></p>
+
+</problem>

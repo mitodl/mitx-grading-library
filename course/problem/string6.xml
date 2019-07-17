@@ -1,0 +1,31 @@
+<problem display_name="Attempt-Based Partial Credit" showanswer="always" weight="10" attempts="">
+
+<p>The library is capable of awarding reduced credit based on the attempt number for the student. This problem demonstrates how it works.</p>
+
+<p>For a student's first attempt, they can be awarded maximum credit (10/10). A student's second attempt will be awarded at most 9/10. Each attempt will decrease by 1, to a minimum of 1/10. When credit is decreased because of attempt-based partial credit, students receive a message informing them of this by default.</p>
+
+<p>The answer is "cat".</p>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = StringGrader(
+    attempt_based_credit=True,
+    minimum_credit=0.1,    # Note: Number between 0 and 1
+    decrease_credit_steps=9
+)
+</script>
+
+<!-- Note the extra argument to the customresponse tag! -->
+<customresponse cfn="grader" expect="cat" cfn_extra_args="attempt">
+  <textline />
+</customresponse>
+
+
+<p>Note that attempt-based partial credit applies to all graders; this is just an example of using it with a StringGrader. It's also possible to set course-wide defaults to apply attempt-based partial credit to all your questions through the use of a plugin (which we provide a sample for).</p>
+
+<p>We apologize that there is no mechanism by which you can reset your attempts for this question!</p>
+
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/string6.xml" target="_blank">View source</a></p>
+
+</problem>

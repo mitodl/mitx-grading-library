@@ -10,9 +10,24 @@
     <sequential url_name="stringgrader" display_name="StringGrader">
       <vertical url_name="v-string" display_name="StringGrader">
         <html url_name="stringinfo"/>
+      </vertical>
+      <vertical url_name="v-string1" display_name="Basic Usage">
         <problem url_name="string1"/>
+      </vertical>
+      <vertical url_name="v-string2" display_name="StringGrader Options">
         <problem url_name="string2"/>
+      </vertical>
+      <vertical url_name="v-string3" display_name="Accepting Anything">
         <problem url_name="string3"/>
+      </vertical>
+      <vertical url_name="v-string4" display_name="Input Validation">
+        <problem url_name="string4"/>
+      </vertical>
+      <vertical url_name="v-string5" display_name="Inlining Graders">
+        <problem url_name="string5"/>
+      </vertical>
+      <vertical url_name="v-string6" display_name="Attempt-Based Partial Credit">
+        <problem url_name="string6"/>
       </vertical>
     </sequential>
     <sequential url_name="formulagrader" display_name="FormulaGrader and NumericalGrader">
@@ -29,48 +44,105 @@
         <problem url_name="formula9"/>
         <problem url_name="formula10"/>
         <problem url_name="formula11"/>
+        <!-- Update comparers to import using * -->
+        <!-- set_default_comparer -->
+        <!-- LinearComparer -->
+        <!-- EqualityComparer with transform -->
       </vertical>
     </sequential>
     <sequential url_name="matrixgrader" display_name="MatrixGrader">
       <vertical url_name="v-matrixgrader" display_name="MatrixGrader">
         <html url_name="matrixinfo"/>
+      </vertical>
+      <vertical url_name="v-matrixgrader1" display_name="First Example">
         <problem url_name="matrix1"/>
+      </vertical>
+      <vertical url_name="v-matrixgrader2" display_name="Entry-by-Entry Input">
         <problem url_name="matrix2"/>
+      </vertical>
+      <vertical url_name="v-matrixgrader3" display_name="Cross Products">
         <problem url_name="matrix3"/>
+      </vertical>
+      <vertical url_name="v-matrixgrader4" display_name="Vectors vs Single-Row/Column Matrix">
         <problem url_name="matrix4"/>
+      </vertical>
+      <vertical url_name="v-matrixgrader5" display_name="Grading Eigenvectors">
         <problem url_name="matrix5"/>
+      </vertical>
+      <vertical url_name="v-matrixgrader6" display_name="Vector Problems">
         <problem url_name="matrix6"/>
+      </vertical>
+      <vertical url_name="v-matrixgrader7" display_name="Normalization and Phase of Vectors">
         <problem url_name="matrix7"/>
+      </vertical>
+      <vertical url_name="v-matrixgrader8" display_name="Noncommuting Variables">
         <problem url_name="matrix8"/>
-        <problem url_name="matrixtech"/>
       </vertical>
-    </sequential>
-    <sequential url_name="singlelistgrader" display_name="SingleListGrader">
-      <vertical url_name="v-singlelist" display_name="SingleListGrader">
-        <html url_name="singlelistinfo"/>
-        <problem url_name="singlelist1"/>
-        <problem url_name="singlelist2"/>
-        <problem url_name="singlelist3"/>
-        <problem url_name="singlelist4"/>
+      <vertical url_name="v-matrixgrader9" display_name="Matrix Sampling">
+        <problem url_name="matrix9"/>
       </vertical>
-    </sequential>
-    <sequential url_name="listgrader" display_name="ListGrader">
-      <vertical url_name="v-list" display_name="ListGrader">
-        <html url_name="listinfo"/>
-        <problem url_name="list1"/>
-        <problem url_name="list2"/>
-        <problem url_name="list3"/>
-        <problem url_name="list4"/>
-        <problem url_name="list5"/>
+      <vertical url_name="v-matrixgrader10" display_name="User Functions and Array Arguments">
+        <problem url_name="matrix10"/>
       </vertical>
     </sequential>
     <sequential url_name="integralgrader" display_name="IntegralGrader">
       <vertical url_name="v-integral" display_name="IntegralGrader">
         <html url_name="integralinfo"/>
+      </vertical>
+      <vertical url_name="v-integral1" display_name="Motivating Example">
         <problem url_name="integral1"/>
       </vertical>
+      <vertical url_name="v-integral2" display_name="General Integrals">
+        <problem url_name="integral2"/>
+      </vertical>
+      <vertical url_name="v-integral3" display_name="Infinite Integrals">
+        <problem url_name="integral3"/>
+      </vertical>
+      <vertical url_name="v-integral4" display_name="Complex Integration">
+        <problem url_name="integral4"/>
+      </vertical>
     </sequential>
-    <sequential url_name="usage" display_name="Usage">
+    <sequential url_name="singlelistgrader" display_name="SingleListGrader">
+      <vertical url_name="v-singlelist" display_name="SingleListGrader">
+        <html url_name="singlelistinfo"/>
+      </vertical>
+      <vertical url_name="v-singlelist1" display_name="Basic Example">
+        <problem url_name="singlelist1"/>
+      </vertical>
+      <vertical url_name="v-singlelist2" display_name="Multiple Answers">
+        <problem url_name="singlelist2"/>
+      </vertical>
+      <vertical url_name="v-singlelist3" display_name="Length Checking">
+        <problem url_name="singlelist3"/>
+      </vertical>
+      <vertical url_name="v-singlelist4" display_name="Multiple Delimiters">
+        <problem url_name="singlelist4"/>
+      </vertical>
+      <vertical url_name="v-singlelist5" display_name="Feedback Structures">
+        <problem url_name="singlelist5"/>
+      </vertical>
+    </sequential>
+    <sequential url_name="listgrader" display_name="ListGrader">
+      <vertical url_name="v-list" display_name="ListGrader">
+        <html url_name="listinfo"/>
+      </vertical>
+      <vertical url_name="v-list1" display_name="Unordered Input">
+        <problem url_name="list1"/>
+      </vertical>
+      <vertical url_name="v-list2" display_name="Embedded Lists">
+        <problem url_name="list2"/>
+      </vertical>
+      <vertical url_name="v-list3" display_name="Grouped Input">
+        <problem url_name="list3"/>
+      </vertical>
+      <vertical url_name="v-list4" display_name="Partially-Ordered Input">
+        <problem url_name="list4"/>
+      </vertical>
+      <vertical url_name="v-list5" display_name="Eigensystem Example">
+        <problem url_name="list5"/>
+      </vertical>
+    </sequential>
+    <sequential url_name="s-usage" display_name="Usage">
       <vertical url_name="v-usage" display_name="Usage">
         <html url_name="usage"/>
       </vertical>

@@ -1,6 +1,6 @@
 <problem display_name="Partially-Ordered Input" showanswer="always" weight="10" attempts="">
 
-  <p>Sometimes you will want partially-ordered input. In the following example, we want "Halloween" in the first box, and "ghost", "bat" and "pumpkin" in any order in the other boxes.</p>
+<p>Sometimes you will want partially-ordered input. In the following example, we want "Halloween" in the first box, and "ghost", "bat" and "pumpkin" in any order in the other boxes.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
@@ -30,8 +30,8 @@ grader = ListGrader(
   <p style="display:inline">Object: </p><textline inline="1" correct_answer="pumpkin"/>
 </customresponse>
 
-<p>Note that repeating an object will be graded incorrectly.</p>
+<p>Note that repeating an object will be graded as incorrect.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list4.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list4.xml" target="_blank">View source</a></p>
 
 </problem>

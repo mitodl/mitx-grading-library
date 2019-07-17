@@ -1,29 +1,22 @@
 <problem display_name="Kronecker Deltas" showanswer="always" weight="10" attempts="">
 
-  <p>
-    The Kronecker delta often appears in expressions, and is included in the library. To invoke it, use <code>kronecker(x, y)</code>. Note that when using the AsciiMath preprocessor, this will render correctly. We decided against calling it <code>delta(x, y)</code>, as [mathjaxinline]\delta[/mathjaxinline] is a common user function name, and we do not support name overloading of functions.
-  </p>
+<p>The Kronecker delta often appears in math expressions, and is included in the library. To invoke it, use <code>kronecker(x, y)</code>. Note that when using the AsciiMath preprocessor, this will render correctly. We decided against calling it <code>delta(x, y)</code>, as [mathjaxinline]\delta[/mathjaxinline] is a common user function name, and we do not support name overloading of functions.</p>
 
-  <p>
-    When using a Kronecker delta in a solution, we strongly recommend using integer sampling in a small range (e.g., 1 to 4) and using many samples (e.g., 30) so that the various possible permutations are triggered in the grading.
-  </p>
+<p>When using a Kronecker delta in a solution, we strongly recommend using integer sampling in a small range (e.g., 1 to 4) and using many samples (e.g., 30) so that the various possible permutations are triggered in the grading.</p>
 
-  <p>
-    What is the derivative [mathjaxinline]\frac{\partial x_i}{\partial x_j}[/mathjaxinline]?
-  </p>
+<p>What is the derivative [mathjaxinline]\frac{\partial x_i}{\partial x_j}[/mathjaxinline]?</p>
 
-  <p>Suggested inputs:</p>
-  <ul>
-    <li><code>kronecker(i, j)</code> is the correct input</li>
-    <li><code>kronecker(i+1, j+1)</code> is also correct</li>
-    <li><code>kronecker(i+1, j)</code> is incorrect</li>
-    <li><code>1</code> and <code>0</code> are incorrect, but may be graded as correct in very rare circumstances, depending on the ranges and number of samples used</li>
-  </ul>
+<p>Suggested inputs:</p>
+<ul>
+  <li><code>kronecker(i, j)</code> is the correct input</li>
+  <li><code>kronecker(i+1, j+1)</code> is also correct</li>
+  <li><code>kronecker(i+1, j)</code> is incorrect</li>
+  <li><code>1</code> and <code>0</code> are incorrect, but may be graded as correct in very rare circumstances, depending on the ranges and number of samples used</li>
+</ul>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
 grader = FormulaGrader(
-    answers='kronecker(i, j)',
     variables=['i', 'j'],
     sample_from={
         'i': IntegerRange([1, 4]),
@@ -35,15 +28,10 @@ grader = FormulaGrader(
 </script>
 
 <p style="display:inline">[mathjaxinline]\displaystyle \frac{\partial x_i}{\partial x_j} =[/mathjaxinline] </p>
-<customresponse cfn="grader" inline="1">
-  <textline math="1" inline="1" correct_answer="x^n/fact(n)" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+<customresponse cfn="grader" inline="1" expect="kronecker(i, j)">
+  <textline math="1" inline="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
 </customresponse>
 
-  <h3>Resources</h3>
-  <ul>
-    <li>
-      <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula11.xml" target="_blank">View source</a>
-    </li>
-  </ul>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula11.xml" target="_blank">View source</a></p>
 
 </problem>

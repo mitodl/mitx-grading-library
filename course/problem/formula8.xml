@@ -1,12 +1,11 @@
 <problem display_name="Custom Comparison Function" showanswer="always" weight="10" attempts="">
 
-  <p>By default, FormulaGrader the numerically samples the author formula and student formula then compares the numerical samples for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. For example, if grading angles in degrees, it may be useful to compare formulas modulo 360.</p>
+<p>By default, <code>FormulaGrader</code> numerically samples the author formula and student formula then compares the numerical samples for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. For example, if grading angles in degrees, it may be useful to compare formulas modulo 360.</p>
 
-  <p>The answer to the below question is <code>b^2/a</code>. You can enter <code>b^2/a + 2*360</code>, or plus any integer multiple of 360.</p>
+<p>The answer to the below question is <code>b^2/a</code>. You can enter <code>b^2/a + 2*360</code>, or plus any integer multiple of 360.</p>
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import FormulaGrader
-from mitxgraders.comparers import congruence_comparer
+from mitxgraders import *
 grader = FormulaGrader(
     answers={
         'comparer': congruence_comparer,
@@ -19,11 +18,11 @@ grader = FormulaGrader(
 </script>
 
 <customresponse cfn="grader" inline="1">
-  <textline math="1" inline="1" correct_answer="b^2/a"/>
+  <textline math="1" inline="1" correct_answer="b^2/a" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
 </customresponse>
 
 <p>We have a number of built-in comparison functions for various purposes.</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula8.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula8.xml" target="_blank">View source</a></p>
 
 </problem>

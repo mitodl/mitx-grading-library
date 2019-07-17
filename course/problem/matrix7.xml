@@ -1,4 +1,4 @@
-<problem display_name="Matrix Grader: Normalization and phase of vectors" showanswer="always" weight="10" attempts="">
+<problem display_name="Normalization and Phase of Vectors" showanswer="always" weight="10" attempts="">
 
 <p>One of the perennial issues in grading vectors is dealing with normalization and phase conventions. We have a couple of custom comparers to help address these issues.</p>
 
@@ -17,8 +17,7 @@
 </ul>
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader
-from mitxgraders.comparers import vector_phase_comparer
+from mitxgraders import *
 grader = MatrixGrader(
     answers={
         'comparer': vector_phase_comparer,
@@ -44,8 +43,6 @@ grader = MatrixGrader(
 </ul>
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader
-from mitxgraders.comparers import vector_span_comparer
 grader2 = MatrixGrader(
     answers={
         'comparer': vector_span_comparer,
@@ -61,14 +58,16 @@ grader2 = MatrixGrader(
 </customresponse>
 </p>
 
+<p>
 <h3>Resources</h3>
 <ul>
   <li>
-    <a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix7.xml" target="_blank">View source</a>
+    <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix7.xml" target="_blank">View source</a></p>
   </li>
   <li>
     <a href="https://mitodl.github.io/mitx-grading-library/grading_math/comparer_functions/" target="_blank">Documentation for <code>comparer_functions</code></a>
   </li>
 </ul>
+</p>
 
 </problem>

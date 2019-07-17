@@ -1,7 +1,7 @@
-<problem display_name="MatrixGrader: Vectors vs single-row/column matrix" showanswer="always" weight="10" attempts="">
+<problem display_name="Vectors vs Single-Row/Column Matrix" showanswer="always" weight="10" attempts="">
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader
+from mitxgraders import *
 
 grader_1 = MatrixGrader(
   answers='[1, 2]',
@@ -51,11 +51,11 @@ grader_2 = MatrixGrader(
   </tr>
 </table>
 
-<p>Here, we use a MathJax preprocessor to display vectors as columns rather than rows (the default display from AsciiMAth). This is an option that can be turned on or off inside the preprocessor.</p>
+<p>Here, we use a MathJax preprocessor to display vectors as columns rather than rows (the default display from AsciiMath). This is an option that can be turned on or off inside the preprocessor.</p>
 
 <h3>Avoiding Confusion</h3>
 <p>In "real" problems, we strongly recommend disallowing entry-by-entry matrix input (by default, this is disallowed) unless it is needed, to avoid potential confusion between <code>[1, 2]</code> and <code>[[1], [2]]</code> (or <code>[1, 2]</code> and <code>[[1, 2]]</code> with the column vector option turned off).</p>
 
-<a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix4.xml" target="_blank">View source</a>
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/matrix4.xml" target="_blank">View source</a></p>
 
 </problem>
