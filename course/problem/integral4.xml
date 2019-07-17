@@ -1,0 +1,60 @@
+<problem display_name="Complex Integration" showanswer="always" weight="10" attempts="">
+
+<p>In this problem, we show that the grader can even handle complex integration (when the option is turned on). Note that it will struggle if the integrand is highly oscillatory or the integral is slowly convergent, however.</p>
+
+<span>
+<style>
+  .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline input {
+    min-width: 0 !important;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax {
+    display: inline-block !important;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax_Preview {
+    display: inline-block !important;
+  }
+</style>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = IntegralGrader(
+    answers={
+        'lower':'0',
+        'upper':'pi',
+        'integrand':'sin(x)',
+        'integration_variable':'x'
+    },
+    input_positions = {
+        'integrand': 1
+    },
+    complex_integrand=True  # Without this, student integrands that evaluate to a complex number raise an error
+)
+</script>
+
+<customresponse cfn="grader" inline="1">
+  <table>
+    <tbody>
+      <tr>
+        <td>
+          <p> \( \displaystyle \huge{ \int }_0^\pi\)</p>
+        </td>
+        <td>
+          <br/>
+          <textline inline="1" size="10" correct_answer="e^x" math="1" trailing_text="  [mathjaxinline] dx [/mathjaxinline]"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</customresponse>
+</span>
+
+<p>Try the following inputs:</p>
+
+<ul>
+  <li><code>sin(x)</code></li>
+  <li><code>-i*exp(i*x)</code></li>
+</ul>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/integral4.xml" target="_blank">View source</a></p>
+
+</problem>

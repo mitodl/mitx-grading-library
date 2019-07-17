@@ -1,7 +1,28 @@
 <problem display_name="Eigensystem Example" showanswer="always" weight="10" attempts="">
+
+<p>Here is the jewel in the crown of ListGrader: the ability to nest ListGraders.</p>
+
+<p>Find the eigenvalues and eigenvectors of the matrix</p>
+
+\[M =
+  \begin{bmatrix}
+    1 &amp; x \\
+    x &amp; -1
+  \end{bmatrix}
+\]
+
+<p>Answer: (pairs may be in any order, but correct vector must go with correct value)</p>
+<ul>
+  <li>1st pair: <code>+sqrt(1+x^2)</code>, <code>[1+sqrt(1+x^2), x]</code></li>
+  <li>2nd pair: <code>-sqrt(1+x^2)</code>, <code>[1-sqrt(1+x^2), x]</code></li>
+</ul>
+
+<p>The eigenvectors can be multiplied by any constant. Try using <code>5*[1-sqrt(1+x^2), x]</code> for the second eigenvector, for example.</p>
+
+<p>In this problem, partial credit is only awarded if you get both the eigenvalue and eigenvector in the pairing correct. Getting one correct but the other incorrect will result in no credit for that pair.</p>
+
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader, FormulaGrader, ListGrader
-from mitxgraders.comparers import eigenvector_comparer
+from mitxgraders import *
 
 # A simple answer that will be passed to FormulaGrader
 expect_value_0 = '-sqrt(1+x^2)'
@@ -36,28 +57,12 @@ grader = ListGrader(
         subgraders=[
             FormulaGrader(variables=['x']),
             MatrixGrader(variables=['x'])
-        ]
+        ],
+        partial_credit=False  # Must get eigenvalue-eigenvector pair correct to receive credit
     )
 )
 </script>
 
-  <p>Here is the jewel in the crown of ListGrader: the ability to nest ListGraders.</p>
-
-  <p>Find the eigenvalues and eigenvectors of the matrix</p>
-
-  \[M =
-    \begin{bmatrix}
-      1 &amp; x \\
-      x &amp; -1
-    \end{bmatrix}
-  \]
-
-  <p>Answer: (pairs may be in any order, but correct vector must go with correct value)</p>
-  <ul>
-    <li>1st pair: <code>+sqrt(1+x^2)</code>, <code>[1+sqrt(1+x^2), x]</code></li>
-    <li>2nd pair: <code>-sqrt(1+x^2)</code>, <code>[1-sqrt(1+x^2), x]</code></li>
-  </ul>
-  <p>The eigenvectors can be multiplied by any constant. Try using <code>5*[1-sqrt(1+x^2), x]</code> for the second eigenvector, for example.</p>
 
 <customresponse cfn="grader">
   <table>

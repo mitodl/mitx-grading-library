@@ -1,4 +1,4 @@
-<problem display_name="Matrix Grader: Normalization and phase of vectors" showanswer="always" weight="10" attempts="">
+<problem display_name="Normalization and Phase of Vectors" showanswer="always" weight="10" attempts="">
 
 <p>One of the perennial issues in grading vectors is dealing with normalization and phase conventions. We have a couple of custom comparers to help address these issues.</p>
 

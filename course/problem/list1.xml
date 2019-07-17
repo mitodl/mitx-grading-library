@@ -1,6 +1,6 @@
 <problem display_name="Unordered Input" showanswer="always" weight="10" attempts="">
 
-  <p>A common problem is to have two answers, and want them to be able to be entered in any order, but not the same answer twice. Here is how to do that with ListGrader.</p>
+  <p>A common problem is to have two answers, and want them to be able to be entered in any order, but not the same answer twice. Here is how to do that with a <code>ListGrader</code>, where you specify subgraders to grade the individual entries.</p>
 
   <p>What are the two roots of unity? (Answer: +1 and -1)</p>
 

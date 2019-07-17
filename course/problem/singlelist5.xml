@@ -1,0 +1,34 @@
+<problem display_name="Feedback Structures" showanswer="always" weight="10" attempts="">
+
+<p>You can construct powerful grading and feedback structures for SingleListGraders. Here is an example.</p>
+
+<p>What is the greatest cartoon pairing of all time? (Admittedly, a little subjective!) Try the following answers (note that ordering is unimportant):</p>
+
+<ul>
+  <li>Mickey, Minnie</li>
+  <li>Bugs Bunny, Daffy Duck</li>
+  <li>Bugs Bunny, Elmer Fudd</li>
+  <li>Tom, Jerry</li>
+</ul>
+
+<p>Also try mixing the answers from different pairings together, noting the different messages and grades you can receive.</p>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = SingleListGrader(
+    answers=(
+        {'expect': ['Mickey', 'Minnie'], 'grade_decimal': 0.6, 'msg': 'A little old, no? Can you even name hijinks that they got up to?'},
+        {'expect': ['Tom', 'Jerry'], 'grade_decimal': 0.8, 'msg': 'These guys were good, but their repertoire was really limited!'},
+        {'expect': ['Bugs Bunny', ('Daffy Duck', {'expect': 'Elmer Fudd', 'grade_decimal':0.5, 'msg': 'Elmer is an odd choice...'})], 'grade_decimal': 1, 'msg': 'Ah yes, that golden oldie!'}
+    ),
+    subgrader=StringGrader()
+)
+</script>
+
+<customresponse cfn="grader" expect="Bugs, Daffy">
+  <textline />
+</customresponse>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/singlelist5.xml" target="_blank">View source</a></p>
+
+</problem>

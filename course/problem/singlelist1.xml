@@ -1,17 +1,14 @@
 <problem display_name="Basic Example" showanswer="always" weight="10" attempts="">
 
-  <p>Here is a basic example of SingleListGrader. The answer is "cat" and "dog", in any order, separated by a comma.</p>
+<p>Here is a basic example of <code>SingleListGrader</code>. The answer is "cat" and "dog", in any order, separated by a comma.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
-grader = SingleListGrader(
-    answers=['cat', 'dog'],
-    subgrader=StringGrader()
-)
 </script>
 
-<customresponse cfn="grader">
-  <textline correct_answer="cat, dog"/>
+<!-- As this grader is a simple one, we've coded it inline in the customresponse tag, and infer the answers from the expect key. -->
+<customresponse cfn="SingleListGrader(subgrader=StringGrader())" expect="cat, dog">
+  <textline />
 </customresponse>
 
 <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/singlelist1.xml" target="_blank">View source</a></p>

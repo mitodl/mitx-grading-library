@@ -1,6 +1,6 @@
 <problem display_name="Embedded Lists" showanswer="always" weight="10" attempts="">
 
-  <p>It's possible to have a SingleListGrader inside a ListGrader. Separate the numbers between 1 and 10 inclusive into even and odd numbers. Put the odd numbers in one box, and the even numbers in the other. Order is unimportant.</p>
+<p>It's possible to have a <code>SingleListGrader</code> inside a <code>ListGrader</code>. Separate the numbers between 1 and 10 inclusive into even and odd numbers. Put the odd numbers in one box, and the even numbers in the other. Order is unimportant.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *

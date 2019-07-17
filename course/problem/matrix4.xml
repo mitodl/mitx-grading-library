@@ -1,4 +1,4 @@
-<problem display_name="MatrixGrader: Vectors vs single-row/column matrix" showanswer="always" weight="10" attempts="">
+<problem display_name="Vectors vs Single-Row/Column Matrix" showanswer="always" weight="10" attempts="">
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import MatrixGrader

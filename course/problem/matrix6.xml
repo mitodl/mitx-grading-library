@@ -1,4 +1,4 @@
-<problem display_name="Matrix Grader: Vector Problems" showanswer="always" weight="10" attempts="">
+<problem display_name="Vector Problems" showanswer="always" weight="10" attempts="">
 
 <p>The matrix grader has some pre-defined constants that you can use in your problems. It is common in physics for unit vectors to be present in problems. Rather than define scalar variables <code>hatx</code>, <code>haty</code> and <code>hatz</code>, you can load vector quantities for these constants. Then, if students make vector errors in their entries, they will be informed so.</p>
 

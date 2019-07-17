@@ -1,26 +1,28 @@
-<problem display_name="MatrixGrader: Entry-by-entry input" showanswer="always" weight="10" attempts="">
+<problem display_name="Entry-by-Entry Input" showanswer="always" weight="10" attempts="">
 
 <script type="text/python" system_path="python_lib">
-from mitxgraders import MatrixGrader, RealMatrices, RealVectors
+from mitxgraders import *
 
 grader = MatrixGrader(
-  answers='[[-cos(theta), -sin(theta)], [-sin(theta), cos(theta)]]',
-  variables=['theta'],
-  max_array_dim=2
+    answers='[[cos(theta), -sin(theta)], [sin(theta), cos(theta)]]',
+    variables=['theta'],
+    max_array_dim=2,
+    entry_partial_credit=True
 )
 </script>
 
-<p>A linear transformation \(\mathcal{T}: \mathbb{R}^2 \rightarrow \mathbb{R}^2\) rotates vectors counter-clockwise by angle \(\theta\) then reflects them over the \(y\)-axis. Enter the matrix representation of \(\mathcal{T}\).</p>
+<p>A linear transformation \(\mathcal{T}: \mathbb{R}^2 \rightarrow \mathbb{R}^2\) rotates vectors counter-clockwise by angle \(\theta\). Enter the matrix representation of \(\mathcal{T}\) acting on a vector \(\vec{v} = (x, y)\).</p>
 
 <p>This problem requires entry-by-entry input of a matrix. Suggested inputs:</p>
 
 <ul>
-  <li><code>[[-cos(theta), -sin(theta)], [-sin(theta), cos(theta)]]</code>, correct answers</li>
-  <li><code>-[[cos(theta), sin(theta)], [sin(theta), -cos(theta)]]</code>, also correct</li>
+  <li><code>[[cos(theta), -sin(theta)], [sin(theta), cos(theta)]]</code>, correct answer</li>
+  <li><code>-[[-cos(theta), sin(theta)], [-sin(theta), -cos(theta)]]</code>, also correct</li>
+  <li>Partial credit with feedback has been turned on for this problem. Try changing some entries to be incorrect!</li>
   <li>Try inputting ill-formed matrices such as <code>[[1, 2], [3]]</code></li>
 </ul>
 
-<customresponse cfn="grader" expect="[[-cos(theta), -sin(theta)], [-sin(theta), cos(theta)]]">
+<customresponse cfn="grader" expect="[[cos(theta), -sin(theta)], [sin(theta), cos(theta)]]">
     <textline math="true" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" size="100" />
 </customresponse>
 

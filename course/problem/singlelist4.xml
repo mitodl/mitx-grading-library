@@ -1,11 +1,10 @@
 <problem display_name="Multiple Delimiters" showanswer="always" weight="10" attempts="">
 
-  <p>It's possible to list SingleListGraders by using different delimiters. In the following example, the answer is "a, b; c, d". You can also use "c, d; a, b". However, the sublists are ordered, so "b, a; c, d" is only partly correct (and receives partial credit).</p>
+<p>It's possible to nest SingleListGraders by using different delimiters. In the following example, the answer is "a, b; c, d". You can also use "c, d; a, b". However, the sublists are ordered, so "b, a; c, d" is only partly correct (and receives partial credit).</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *
 grader = SingleListGrader(
-    answers=[['a', 'b'], ['c', 'd']],
     subgrader=SingleListGrader(
         subgrader=StringGrader(),
         ordered=True
@@ -14,8 +13,9 @@ grader = SingleListGrader(
 )
 </script>
 
-<customresponse cfn="grader">
-  <textline correct_answer="a, b; c, d"/>
+<!-- Note that the answer can still be inferred when SingleListGraders are nested! -->
+<customresponse cfn="grader" expect="a, b; c, d">
+  <textline/>
 </customresponse>
 
 <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/singlelist4.xml" target="_blank">View source</a></p>

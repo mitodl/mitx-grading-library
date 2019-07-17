@@ -1,4 +1,4 @@
-<problem display_name="Tech Demo: specify_domain" showanswer="always" weight="10" attempts="">
+<problem display_name="User Functions and Array Arguments" showanswer="always" weight="10" attempts="">
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import MatrixGrader, specify_domain, RealVectors, RealMatrices

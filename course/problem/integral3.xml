@@ -1,0 +1,59 @@
+<problem display_name="Infinite Integrals" showanswer="always" weight="10" attempts="">
+
+<p>In this example, there is only one box for students to fill in: the integrand. IntegralGrader is still useful in this case, as there still substitutions that can be made that keep the limits invariant. Note that the limits of integration are infinite in this case, showing off the power of out integrator.</p>
+
+<span>
+<style>
+  .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline input {
+    min-width: 0 !important;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax {
+    display: inline-block !important;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax_Preview {
+    display: inline-block !important;
+  }
+</style>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+grader = IntegralGrader(
+    answers={
+        'lower':'0',
+        'upper':'infty',
+        'integrand':'e^(-x^2/2)',
+        'integration_variable':'x'
+    },
+    input_positions = {
+        'integrand': 1
+    }
+)
+</script>
+
+<customresponse cfn="grader" inline="1">
+  <table>
+    <tbody>
+      <tr>
+        <td>
+          <p> \( \displaystyle \huge{ \int }_0^\infty\)</p>
+        </td>
+        <td>
+          <br/>
+          <textline inline="1" size="10" correct_answer="e^x" math="1" trailing_text="  [mathjaxinline] dx [/mathjaxinline]"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</customresponse>
+</span>
+
+<p>Try the following inputs:</p>
+
+<ul>
+  <li><code>e^(-x^2/2)</code></li>
+  <li><code>e^(-x/2)/2/sqrt(x)</code></li>
+</ul>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/integral3.xml" target="_blank">View source</a></p>
+
+</problem>

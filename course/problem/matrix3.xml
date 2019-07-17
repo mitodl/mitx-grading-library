@@ -1,4 +1,4 @@
-<problem display_name="MatrixGrader: Cross Product Demo" showanswer="always" weight="10" attempts="">
+<problem display_name="Cross Products" showanswer="always" weight="10" attempts="">
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import MatrixGrader, RealMatrices, RealVectors

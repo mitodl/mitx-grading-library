@@ -1,6 +1,6 @@
 <problem display_name="Grouped Input" showanswer="always" weight="10" attempts="">
 
-  <p>Often you will want to group input. There are three lions, two dogs and one bird. In the following boxes, write the singular of each animal, and the corresponding number of each animal. Order is unimportant, but the pairing must be right.</p>
+<p>Often you will want to group input. There are three lions, two dogs and one bird. In the following boxes, write the singular of each animal, and the corresponding number of each animal. Order is unimportant, but the pairing must be right.</p>
 
 <script type="text/python" system_path="python_lib">
 from mitxgraders import *

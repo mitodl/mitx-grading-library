@@ -1,5 +1,5 @@
 <html display_name="IntegralGrader">
 
-<p>It is possible to construct specialized-purpose graders that leverage the framework of the library. An example of this is <code>IntegralGrader</code>, which grades the construction of an integral. Below are a few examples to demonstrate how this works.</p>
+<p>It is possible to construct specialized-purpose graders that leverage the framework of the library. An example of this is <code>IntegralGrader</code>, which grades the construction of an integral. We include are a few examples to demonstrate how this works.</p>
 
 </html>
