@@ -7,10 +7,10 @@ import sys
 import six
 from imp import reload
 from pytest import raises, approx
-from voluptuous import Error
+from voluptuous import Error, Schema, Required
 import mitxgraders
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, __version__
-from mitxgraders.baseclasses import AbstractGrader, ItemGrader
+from mitxgraders.baseclasses import AbstractGrader, ItemGrader, ObjectWithSchema
 from mitxgraders.exceptions import MITxError, StudentFacingError
 from tests.helpers import mock
 
@@ -607,3 +607,29 @@ def test_debuglog_persistence():
     grader('cat', 'cat')
     # Demand that the debug logs are different objects
     assert log1 is not grader.debuglog
+
+def test_coerce2unicode():
+    # Ensure that unicode coercion works for ObjectWithSchema configuration
+    class Foo(ObjectWithSchema):
+        schema_config = Schema({
+            Required('a'): 'cat',
+            Required('b'): ('bear', 'whale'),
+            Required('c'): ['otter', 'seal'],
+            Required('d'): {'moose': ('antlers', 'tundra')}
+        })
+
+    foo = Foo(
+        a='cat',
+        b=('bear', 'whale'),
+        c=['otter', 'seal'],
+        d={'moose': ('antlers', 'tundra')}
+    )
+
+    config = foo.config
+    assert all([isinstance(x, six.text_type) for x in config])
+
+    assert isinstance(foo.config['a'], six.text_type)
+    assert all([isinstance(x, six.text_type) for x in config['b']])
+    assert all([isinstance(x, six.text_type) for x in config['c']])
+    assert all([isinstance(x, six.text_type) for x in config['d']])
+    assert all([isinstance(x, six.text_type) for x in config['d']['moose']])
