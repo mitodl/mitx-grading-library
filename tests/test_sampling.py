@@ -283,9 +283,15 @@ def test_dependent_sampler():
         gen_symbols_samples(symbols, samples, sample_from, funcs, suffs, consts)
 
     with raises(ConfigError, match=r"Formula error in dependent sampling formula: 1\+\(2"):
-        symbols = ["x"]
-        samples = 1
-        sample_from = {'x': DependentSampler(depends=[], formula="1+(2")}
+        DependentSampler(formula="1+(2")
+
+    symbols = ["x"]
+    samples = 1
+    sample_from = {'x': DependentSampler(formula="min(j, i)")}
+    with raises(ConfigError, match=r"Formula error in dependent sampling formula: min\(j, i\)"):
+        gen_symbols_samples(symbols, samples, sample_from, funcs, suffs, {'i': 1j, 'j': 1j})
+
+    with raises(ConfigError, match=r"DependentSamplers depend on undefined quantities: i, j"):
         gen_symbols_samples(symbols, samples, sample_from, funcs, suffs, consts)
 
     with raises(Exception, match="DependentSampler must be invoked with compute_sample."):

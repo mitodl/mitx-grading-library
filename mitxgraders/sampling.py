@@ -514,6 +514,23 @@ def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes, cons
                     progress_made = True
 
             if not progress_made:
+                # Two possible causes
+                # 1: Depends on variables that are undefined
+                # Check for this first
+                all_depends = set()
+                for symbol, dependencies in list(unevaluated_dependents.items()):
+                    for item in dependencies:
+                        all_depends.add(item)
+                bad_items = []
+                for item in all_depends:
+                    if item not in unevaluated_dependents and item not in sample_dict:
+                        bad_items.append(item)
+                if bad_items:
+                    bad_symbols = ", ".join(sorted(bad_items))
+                    raise ConfigError("DependentSamplers depend on undefined quantities: " +
+                                      bad_symbols)
+
+                # 2: Circular dependencies
                 bad_symbols = ", ".join(sorted(unevaluated_dependents.keys()))
                 raise ConfigError("Circularly dependent DependentSamplers detected: " +
                                   bad_symbols)
