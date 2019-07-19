@@ -18,6 +18,7 @@ from voluptuous.humanize import validate_with_humanized_errors as voluptuous_val
 from mitxgraders.version import __version__
 from mitxgraders.exceptions import ConfigError, MITxError, StudentFacingError
 from mitxgraders.helpers.validatorfuncs import text_string, Positive
+from mitxgraders.helpers.compatibility import ensure_text
 
 class DefaultValuesMeta(abc.ABCMeta):
     """
@@ -75,8 +76,37 @@ class ObjectWithSchema(object):
         if isinstance(use_config, dict):
             use_config = self.apply_registered_defaults(use_config)
 
+        # Coerce all strings in use_config to be unicode (both keys and values)
+        use_config = ObjectWithSchema.coerce2unicode(use_config)
+
         # Validate the configuration
         self.config = self.validate_config(use_config)
+
+    @staticmethod
+    def coerce2unicode(obj):
+        """
+        Takes in an object and coerces every string
+        contained in a list/dictionary/tuple key/value to unicode.
+
+        Returns a copy of obj with coerced entries.
+
+        Warning: this is a superficial deep copy with coercion;
+        only tuples, lists, dicts and string types are recreated,
+        with other references remaining intact.
+        """
+        if isinstance(obj, six.string_types):
+            return ensure_text(obj)
+        elif isinstance(obj, tuple):
+            return tuple(ObjectWithSchema.coerce2unicode(item) for item in obj)
+        elif isinstance(obj, list):
+            return [ObjectWithSchema.coerce2unicode(item) for item in obj]
+        elif isinstance(obj, dict):
+            # Coerce both keys and values
+            return {ObjectWithSchema.coerce2unicode(k): ObjectWithSchema.coerce2unicode(v)
+                    for k, v in obj.items()}
+        else:
+            # obj is something else - return as is
+            return obj
 
     def apply_registered_defaults(self, config):
         """

@@ -111,7 +111,7 @@ def test_author_facing_decorator_raises_errors_with_invalid_config():
 
     match = (r"expected shape specification to be a positive integer, or a "
              r"list/tuple of positive integers \(min length 1, max length None\) @ "
-             r"data\['input_shapes'\]\[1\]. Got 0")
+             r"data\[u?'input_shapes'\]\[1\]. Got 0")
     with raises(Error, match=match):
         @specify_domain(input_shapes=[5, 0, [1, 2]])
         def g():

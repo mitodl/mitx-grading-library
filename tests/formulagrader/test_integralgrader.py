@@ -26,7 +26,7 @@ def test_wrong_number_of_inputs_raises_error():
     )
     student_input = ['a', 'b']
     expected_message = (r"Expected 3 student inputs but found 2. "
-                        r"Inputs should  appear in order \['integrand', 'lower', 'upper'\].")
+                        r"Inputs should  appear in order \[u?'integrand', u?'lower', u?'upper'\].")
     with raises(ConfigError, match=expected_message):
         grader(None, student_input)
 
