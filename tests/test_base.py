@@ -12,6 +12,7 @@ import mitxgraders
 from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, __version__
 from mitxgraders.baseclasses import AbstractGrader, ItemGrader, ObjectWithSchema
 from mitxgraders.exceptions import MITxError, StudentFacingError
+from mitxgraders.attemptcredit import LinearCredit, GeometricCredit
 from tests.helpers import mock
 
 def test_debug_with_author_message():
@@ -355,10 +356,11 @@ def test_attempt_based_grading_single():
     # Test basic usage
     grader = StringGrader(
         answers='cat',
-        attempt_based_credit=True,
-        decrease_credit_after=3,
-        decrease_credit_steps=3,
-        minimum_credit=0.1,
+        attempt_based_credit=LinearCredit(
+            decrease_credit_after=3,
+            decrease_credit_steps=3,
+            minimum_credit=0.1
+        ),
         attempt_based_credit_msg=False
     )
 
@@ -386,7 +388,7 @@ def test_attempt_based_grading_single():
     # Ensure it turns off properly
     grader = StringGrader(
         answers='cat',
-        attempt_based_credit=False
+        attempt_based_credit=None
     )
 
     expected_result = {'msg': '', 'grade_decimal': 1, 'ok': True}
@@ -396,7 +398,7 @@ def test_attempt_based_grading_single():
     # Ensure that wrong answers are always zeros
     grader = StringGrader(
         answers='cat',
-        attempt_based_credit=True
+        attempt_based_credit=LinearCredit()
     )
 
     expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
@@ -406,8 +408,7 @@ def test_attempt_based_grading_single():
     # Ensure that zero credit is graded as false appropriately
     grader = StringGrader(
         answers='cat',
-        attempt_based_credit=True,
-        minimum_credit=0,
+        attempt_based_credit=LinearCredit(minimum_credit=0),
         attempt_based_credit_msg=False
     )
 
@@ -418,10 +419,11 @@ def test_attempt_based_grading_single():
     # Ensure that messages are included as appropriate
     grader = StringGrader(
         answers='cat',
-        attempt_based_credit=True,
-        minimum_credit=0,
-        decrease_credit_after=1,
-        decrease_credit_steps=2,
+        attempt_based_credit=LinearCredit(
+            minimum_credit=0,
+            decrease_credit_after=1,
+            decrease_credit_steps=2
+        ),
         attempt_based_credit_msg=True
     )
 
@@ -430,12 +432,12 @@ def test_attempt_based_grading_single():
     expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'dog', attempt=1) == expected_result
 
-    expected_result = {'msg': 'Maximum credit for attempt #2 is 0.50.', 'grade_decimal': 0.5, 'ok': 'partial'}
+    expected_result = {'msg': 'Maximum credit for attempt #2 is 50%.', 'grade_decimal': 0.5, 'ok': 'partial'}
     assert grader(None, 'cat', attempt=2) == expected_result
     expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'dog', attempt=2) == expected_result
 
-    expected_result = {'msg': 'Maximum credit for attempt #3 is 0.00.', 'grade_decimal': 0, 'ok': False}
+    expected_result = {'msg': 'Maximum credit for attempt #3 is 0%.', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'cat', attempt=3) == expected_result
     expected_result = {'msg': '', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'dog', attempt=3) == expected_result
@@ -444,10 +446,11 @@ def test_attempt_based_grading_single():
     # Also test that reduced-value entries are affected by partial credit as expected
     grader = StringGrader(
         answers={'expect': 'cat', 'msg': 'Meow!', 'grade_decimal': 0.5},
-        attempt_based_credit=True,
-        minimum_credit=0,
-        decrease_credit_after=1,
-        decrease_credit_steps=2,
+        attempt_based_credit=LinearCredit(
+            minimum_credit=0,
+            decrease_credit_after=1,
+            decrease_credit_steps=2,
+        ),
         attempt_based_credit_msg=True,
         wrong_msg='too bad'
     )
@@ -457,12 +460,12 @@ def test_attempt_based_grading_single():
     expected_result = {'msg': 'too bad', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'dog', attempt=1) == expected_result
 
-    expected_result = {'msg': 'Meow!<br/>\n<br/>\nMaximum credit for attempt #2 is 0.50.', 'grade_decimal': 0.25, 'ok': 'partial'}
+    expected_result = {'msg': 'Meow!<br/>\n<br/>\nMaximum credit for attempt #2 is 50%.', 'grade_decimal': 0.25, 'ok': 'partial'}
     assert grader(None, 'cat', attempt=2) == expected_result
     expected_result = {'msg': 'too bad', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'dog', attempt=2) == expected_result
 
-    expected_result = {'msg': 'Meow!<br/>\n<br/>\nMaximum credit for attempt #3 is 0.00.', 'grade_decimal': 0, 'ok': False}
+    expected_result = {'msg': 'Meow!<br/>\n<br/>\nMaximum credit for attempt #3 is 0%.', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'cat', attempt=3) == expected_result
     expected_result = {'msg': 'too bad', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'dog', attempt=3) == expected_result
@@ -470,7 +473,7 @@ def test_attempt_based_grading_single():
     # Ensure that things behave when an attempt number is not passed in
     grader = StringGrader(
         answers='cat',
-        attempt_based_credit=True
+        attempt_based_credit=LinearCredit()
     )
 
     msg = ("Attempt number not passed to grader as keyword argument 'attempt'. "
@@ -482,7 +485,7 @@ def test_attempt_based_grading_single():
     # Ensure that debug info is passed along
     grader = StringGrader(
         answers='cat',
-        attempt_based_credit=True,
+        attempt_based_credit=LinearCredit(),
         debug=True
     )
 
@@ -499,7 +502,7 @@ def test_attempt_based_grading_single():
     expected_result = {'msg': msg, 'grade_decimal': 1, 'ok': True}
     assert grader(None, 'cat', attempt=1) == expected_result
 
-    template = ("Maximum credit for attempt #3 is 0.60.\n\n<pre>"
+    template = ("Maximum credit for attempt #3 is 60%.\n\n<pre>"
                 "MITx Grading Library Version {version}\n"
                 "{debug_content}\n"
                 "{attempt_msg}"
@@ -511,11 +514,33 @@ def test_attempt_based_grading_single():
     expected_result = {'msg': msg, 'grade_decimal': 0.6, 'ok': 'partial'}
     assert grader(None, 'cat', attempt=3) == expected_result
 
+    # Ensure that percentages round nicely
+    grader = StringGrader(
+        answers='cat',
+        attempt_based_credit=GeometricCredit(factor=0.5),
+        attempt_based_credit_msg=True
+    )
+
+    expected_result = {'msg': '', 'grade_decimal': 1, 'ok': True}
+    assert grader(None, 'cat', attempt=1) == expected_result
+    expected_result = {'msg': 'Maximum credit for attempt #2 is 50%.', 'grade_decimal': 0.5, 'ok': 'partial'}
+    assert grader(None, 'cat', attempt=2) == expected_result
+    expected_result = {'msg': 'Maximum credit for attempt #3 is 25%.', 'grade_decimal': 0.25, 'ok': 'partial'}
+    assert grader(None, 'cat', attempt=3) == expected_result
+    expected_result = {'msg': 'Maximum credit for attempt #4 is 12.5%.', 'grade_decimal': 0.125, 'ok': 'partial'}
+    assert grader(None, 'cat', attempt=4) == expected_result
+    expected_result = {'msg': 'Maximum credit for attempt #5 is 6.2%.', 'grade_decimal': 0.0625, 'ok': 'partial'}
+    assert grader(None, 'cat', attempt=5) == expected_result
+    expected_result = {'msg': 'Maximum credit for attempt #6 is 3.1%.', 'grade_decimal': 0.0313, 'ok': 'partial'}
+    assert grader(None, 'cat', attempt=6)['msg'] == expected_result['msg']
+    assert grader(None, 'cat', attempt=6)['ok'] == expected_result['ok']
+    assert abs(grader(None, 'cat', attempt=6)['grade_decimal'] - expected_result['grade_decimal']) <= 0.001
+
 def test_attempt_based_grading_list():
     grader = ListGrader(
         answers=['cat', 'dog'],
         subgraders=StringGrader(),
-        attempt_based_credit=True,
+        attempt_based_credit=LinearCredit(),
     )
 
     expected_result = {
@@ -528,7 +553,7 @@ def test_attempt_based_grading_list():
     assert grader(None, ['cat', 'dog'], attempt=1) == expected_result
 
     expected_result = {
-        'overall_message': 'Maximum credit for attempt #5 is 0.20.',
+        'overall_message': 'Maximum credit for attempt #5 is 20%.',
         'input_list': [
             {'ok': 'partial', 'grade_decimal': 0.2, 'msg': ''},
             {'ok': 'partial', 'grade_decimal': 0.2, 'msg': ''}
@@ -537,7 +562,7 @@ def test_attempt_based_grading_list():
     assert grader(None, ['cat', 'dog'], attempt=5) == expected_result
 
     expected_result = {
-        'overall_message': 'Maximum credit for attempt #5 is 0.20.',
+        'overall_message': 'Maximum credit for attempt #5 is 20%.',
         'input_list': [
             {'ok': 'partial', 'grade_decimal': 0.2, 'msg': ''},
             {'ok': False, 'grade_decimal': 0, 'msg': ''}
