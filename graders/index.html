@@ -249,6 +249,9 @@
                 
             <li class="second-level"><a href="#attempt-based-partial-credit">Attempt-Based Partial Credit</a></li>
                 
+                <li class="third-level"><a href="#reciprocalcredit">ReciprocalCredit</a></li>
+                <li class="third-level"><a href="#geometriccredit">GeometricCredit</a></li>
+                <li class="third-level"><a href="#linearcredit">LinearCredit</a></li>
             <li class="second-level"><a href="#option-listing">Option Listing</a></li>
                 
     </ul>
@@ -298,15 +301,44 @@ Warning: 'variables' contains entries 'pi' which will override default values. I
 
 <p>Once this is done, you can enable attempt-based partial credit for your graders. The syntax is as follows.</p>
 <pre class="codehilite"><code class="language-python">grader = FakeGradingClass(
-    attempt_based_credit=True,     # default False
-    decrease_credit_after=1,       # default 1
-    minimum_credit=0.2,            # default 0.2
-    decrease_credit_steps=4,       # default 4
+    attempt_based_credit=(None | function),  # default None
     attempt_based_credit_msg=True  # default True
 )</code></pre>
 
 
-<p>Attempt-based partial credit is turned on by setting <code>attempt_based_credit=True</code>. When it is turned on, the first attempt a student makes will be eligible for full credit, while subsequent attempts may have a decreasing maximum score.</p>
+<p>Attempt-based partial credit is turned on by specifying a function to convert an attempt number into an amount of credit. We provide three functions to do this, but you can of course write your own.</p>
+<p>If a student's credit has been decreased from the maximum by attempt-based partial credit, the student can be provided with a message informing them of the maximum possible credit at that attempt number. This is controlled by the <code>attempt_based_credit_msg</code> setting. We recommend that this setting be left on, as it will likely lead to confusion otherwise.</p>
+<p>When using nested graders, the <code>attempt_based_credit</code> setting need only be applied to the grader that is provided to edX in the <code>cfn</code> key.</p>
+<p>Note that if attempt-based partial credit is turned on but the <code>cfn_extra_args="attempt"</code> entry is missing from the <code>customresponse</code> tag, an error message results.</p>
+<p>Attempt-based partial credit can be set on a course-wide basis through the use of <a href="../plugins/">plugins</a>.</p>
+<h3 id="reciprocalcredit">ReciprocalCredit<a class="headerlink" href="#reciprocalcredit" title="Permanent link"> # </a></h3>
+<p>This function simply awards credit based on the reciprocal of the attempt number. There are no options to set.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(attempt_based_credit=ReciprocalCredit())
+&gt;&gt;&gt; grader('cat', 'cat', attempt=1) == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=2) == {'grade_decimal': 0.5, 'msg': 'Maximum credit for attempt #2 is 50%.', 'ok': 'partial'}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=3) == {'grade_decimal': 0.3333, 'msg': 'Maximum credit for attempt #3 is 33.3%.', 'ok': 'partial'}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=4) == {'grade_decimal': 0.25, 'msg': 'Maximum credit for attempt #4 is 25%.', 'ok': 'partial'}
+True</code></pre>
+
+
+<h3 id="geometriccredit">GeometricCredit<a class="headerlink" href="#geometriccredit" title="Permanent link"> # </a></h3>
+<p>This function decreases the possible credit by a factor for each attempt, forming a geometric progression. You may choose the factor, which defaults to 0.5.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(attempt_based_credit=GeometricCredit(factor=0.5))
+&gt;&gt;&gt; grader('cat', 'cat', attempt=1) == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=2) == {'grade_decimal': 0.5, 'msg': 'Maximum credit for attempt #2 is 50%.', 'ok': 'partial'}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=3) == {'grade_decimal': 0.25, 'msg': 'Maximum credit for attempt #3 is 25%.', 'ok': 'partial'}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=4) == {'grade_decimal': 0.125, 'msg': 'Maximum credit for attempt #4 is 12.5%.', 'ok': 'partial'}
+True</code></pre>
+
+
+<h3 id="linearcredit">LinearCredit<a class="headerlink" href="#linearcredit" title="Permanent link"> # </a></h3>
+<p>This function allows the first few attempts to have maximum credit, then linearly decreases credit until a minimum threshold is reached.</p>
 <ul>
 <li>
 <p>The maximum score begins to decrease after the attempt specified in <code>decrease_credit_after</code>. By default, all attempts after the first will have decreasing credit.</p>
@@ -317,12 +349,30 @@ Warning: 'variables' contains entries 'pi' which will override default values. I
 <li>
 <p>The number of attempts the credit decreases for is specified in <code>decrease_credit_steps</code>. So, using the defaults, attempts 1, 2, 3, 4, 5, and 6 are eligible for maximum credits of 1, 0.8, 0.6, 0.4, 0.2 and 0.2, respectively.</p>
 </li>
-<li>
-<p>If a student's credit has been decreased from the maximum by attempt-based partial credit, the student can be provided with a message informing them of the maximum possible credit at that attempt number. This is controlled by the <code>attempt_based_credit_msg</code> setting. We recommend that this setting be left on, as it will likely lead to confusion otherwise.</p>
-</li>
 </ul>
-<p>When using nested graders, these settings need only be applied to the grader that is provided to edX in the <code>cfn</code> key. These settings can be set on a course-wide basis through the use of <a href="../plugins/">plugins</a>.</p>
-<p>Note that if attempt-based partial credit is turned on but the <code>cfn_extra_args="attempt"</code> entry is missing from the <code>customresponse</code> tag, an error message results.</p>
+<p>The following example demonstrates the default settings.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; creditor = LinearCredit(
+...     decrease_credit_after=1,  # First attempt receives full credit
+...     minimum_credit=0.2,       # Minimum credit
+...     decrease_credit_steps=4   # Number of attempts on the linear slope
+... )
+&gt;&gt;&gt; creditor == LinearCredit()
+True
+&gt;&gt;&gt; grader = StringGrader(attempt_based_credit=creditor)
+&gt;&gt;&gt; grader('cat', 'cat', attempt=1) == {'grade_decimal': 1, 'msg': '', 'ok': True}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=2) == {'grade_decimal': 0.8, 'msg': 'Maximum credit for attempt #2 is 80%.', 'ok': 'partial'}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=3) == {'grade_decimal': 0.6, 'msg': 'Maximum credit for attempt #3 is 60%.', 'ok': 'partial'}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=4) == {'grade_decimal': 0.4, 'msg': 'Maximum credit for attempt #4 is 40%.', 'ok': 'partial'}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=5) == {'grade_decimal': 0.2, 'msg': 'Maximum credit for attempt #5 is 20%.', 'ok': 'partial'}
+True
+&gt;&gt;&gt; grader('cat', 'cat', attempt=6) == {'grade_decimal': 0.2, 'msg': 'Maximum credit for attempt #6 is 20%.', 'ok': 'partial'}
+True</code></pre>
+
+
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to all graders.</p>
 <pre class="codehilite"><code class="language-python">grader = AbstractGrader(
