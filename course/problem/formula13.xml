@@ -2,7 +2,7 @@
 
 <p>Sometimes, you may wish to apply a transforming function on both the student input and instructor answer before performing the comparison. This example demonstrates such a use case.</p>
 
-<p>Here, the problem explicitly requests an equality after the imaginary part of the input is taken. The expected answer is <code>x</code>, but adding a real component to the answer should still be graded as correct. Try entering <code>x+1</code>. (Note that <code>x</code> is sampled as a complex variable.)</p>
+<p>Here, the problem explicitly requests an equality after the imaginary part of the input is taken. The expected answer is <code>x</code>, but adding a real component to the answer should still be graded as correct. Try entering <code>x+1</code> (correct) and <code>x+i</code> (incorrect). (Note that <code>x</code> is sampled as a complex variable.)</p>
 
 <script type="text/python" system_path="python_lib">
 import numpy as np
@@ -15,9 +15,17 @@ comparer = EqualityComparer(transform=np.imag)
 FormulaGrader.set_default_comparer(comparer)
 </script>
 
+<style>
+/* Used to top-align the first element of every row, used for lining up "thing=" with input textboxes, as well as lining up a closing brace at the end */
+.brackettable td:first-child, .brackettable td:last-child {
+  vertical-align: top !important;
+  padding-top: 2px !important;
+}
+</style>
+
 <!-- The inline grader uses the comparers set above -->
 <customresponse cfn="FormulaGrader(variables=['x'], sample_from={'x': ComplexRectangle()})" expect="x">
-  <table>
+  <table class='brackettable'>
     <tr>
       <td>
         [mathjaxinline]\displaystyle f = \mathrm{Im} \bigg([/mathjaxinline]
@@ -32,7 +40,7 @@ FormulaGrader.set_default_comparer(comparer)
   </table>
 </customresponse>
 
-<p>The default comparer, used when no other comparer is specified, is called `equality_comparer`. This example also demonstrates changing that default.</p>
+<p>The default comparer, used when no other comparer is specified, is called <code>equality_comparer</code>. This example also demonstrates changing that default.</p>
 
 
 <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula13.xml" target="_blank">View source</a></p>

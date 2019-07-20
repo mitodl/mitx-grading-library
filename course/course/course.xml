@@ -69,7 +69,6 @@
       </vertical>
       <vertical url_name="v-formula12" display_name="Automatic Partial Credit">
         <problem url_name="formula12"/>
-        <!-- LinearComparer -->
       </vertical>
       <vertical url_name="v-formula13" display_name="Transforming Inputs">
         <problem url_name="formula13"/>
