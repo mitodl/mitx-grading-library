@@ -13,11 +13,12 @@ import abc
 import pprint
 import six
 import json
+from decimal import Decimal
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
 from mitxgraders.exceptions import ConfigError, MITxError, StudentFacingError
-from mitxgraders.helpers.validatorfuncs import text_string, Positive
+from mitxgraders.helpers.validatorfuncs import text_string, Positive, is_callable
 from mitxgraders.helpers.compatibility import ensure_text
 
 class DefaultValuesMeta(abc.ABCMeta):
@@ -175,22 +176,11 @@ class AbstractGrader(ObjectWithSchema):
         suppress_warnings (bool): Whether to suppress warnings that the given
             configuration may lead to unintended consequences (default False)
 
-        attempt_based_credit (bool): Whether to award different amounts of credit
-            based on the attempt number. Requires the attempt number to be passed to the
-            grader; see documentation. When using lists, only applies to the grader
-            that is passed through to edX. (default False)
-
-        decrease_credit_after (positive int): The last attempt number to award maximum
-            credit to (default 1)
-
-        minimum_credit (float between 0 and 1): The minimum amount of credit to be awarded
-            after using too many attempts (default 0.2)
-
-        decrease_credit_steps (positive int): How many attempts it takes to get to minimum
-            credit. So, if set to 1, after decrease_credit_after attempts, the next attempt
-            will receive minimum_credit. If set to 2, the next attempt will be halfway
-            between 1 and minimum_credit, and the attempt after that will be awarded
-            minimum_credit. (default 4)
+        attempt_based_credit (None | function): Function to specify maximum credit available
+            given the attempt number (function should be unary and return a number between
+            0 and 1 inclusive). Set to None to disable attempt-based partial credit. This
+            setting is applied to all inputs in the problem, and only needs to be set on
+            the grader that is passed through to edX. (default None)
 
         attempt_based_credit_msg (bool): When maximum credit has been decreased due to
             attempt number, present the student with a message explaining so (default True)
@@ -203,12 +193,9 @@ class AbstractGrader(ObjectWithSchema):
         Classes that inherit from AbstractGrader should extend this schema.
         """
         return Schema({
-            Required('debug', default=False): bool,  # Use to turn on debug output
+            Required('debug', default=False): bool,
             Required('suppress_warnings', default=False): bool,
-            Required('attempt_based_credit', default=False): bool,
-            Required('decrease_credit_after', default=1): Positive(int),
-            Required('decrease_credit_steps', default=4): Positive(int),
-            Required('minimum_credit', default=0.2): Any(All(float, Range(0, 1)), 0, 1),
+            Required('attempt_based_credit', default=None): Any(None, is_callable),
             Required('attempt_based_credit_msg', default=True): bool
         })
 
@@ -357,23 +344,18 @@ class AbstractGrader(ObjectWithSchema):
                    'The attribute <code>cfn_extra_args="attempt"</code> may need to be '
                    "set in the <code>customresponse</code> tag.")
             raise ConfigError(msg)
-        self.log("Attempt number {}".format(attempt_number))
 
-        # How far past the point of decreasing credit are we?
         if attempt_number < 1:  # Just in case edX has issues
             attempt_number = 1
-        steps = attempt_number - self.config['decrease_credit_after']
-        if steps <= 0:
-            return
+        self.log("Attempt number {}".format(attempt_number))
 
-        # Compute the credit to be awarded
-        min_cred = self.config['minimum_credit']
-        decrease_steps = self.config['decrease_credit_steps']
-        if steps >= decrease_steps:
-            credit = min_cred
-        else:
-            # Linear interpolation
-            credit = 1 + (min_cred - 1) * steps / decrease_steps
+        # Compute the maximum credit
+        credit = self.config['attempt_based_credit'](attempt_number)
+        credit = float(credit)  # In case graders return integers 0 or 1
+        credit = round(credit, 4)
+        if credit == 1:
+            # Don't do any modifications
+            return
         self.log("Maximum credit is {}".format(credit))
 
         # Multiply all grades by credit, updating from 'ok'=True to 'partial' as needed
@@ -394,14 +376,18 @@ class AbstractGrader(ObjectWithSchema):
 
         # Append the message if credit was reduced
         if self.config['attempt_based_credit_msg'] and changed_result:
-            msg = "Maximum credit for attempt #{} is {:04.2f}."
+            credit_decimal = Decimal(credit * 100).quantize(Decimal('.1'))
+            if credit_decimal == int(credit_decimal):
+                # Used to get rid of .0 appearing in percentages
+                credit_decimal = int(credit_decimal)
+            msg = "Maximum credit for attempt #{} is {}%."
             if "input_list" in result:
                 key = 'overall_message'
             else:
                 key = 'msg'
             if result[key]:
                 result[key] += '\n\n'
-            result[key] += msg.format(attempt_number, credit)
+            result[key] += msg.format(attempt_number, credit_decimal)
 
     @staticmethod
     def grade_decimal_to_ok(grade):

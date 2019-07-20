@@ -31,6 +31,7 @@ from mitxgraders.matrixsampling import *
 from mitxgraders.exceptions import ConfigError, StudentFacingError, InvalidInput, MissingInput
 from mitxgraders.helpers.calc import *
 from mitxgraders.comparers import *
+from mitxgraders.attemptcredit import *
 
 def import_plugins():
     """Imports all plugins into the global namespace"""
