@@ -1,97 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-     <loc>None</loc>
+     <loc>/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/edx/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/graders/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/item_grader/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/string_grader/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_math/formula_grader/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_math/numerical_grader/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_math/matrix_grader/matrix_grader/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_math/sampling/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_math/functions_and_constants/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_math/user_functions/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_math/comparer_functions/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_math/renderer/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_math/integral_grader/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_lists/single_list_grader/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/grading_lists/list_grader/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/plugins/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/faq/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>None</loc>
+     <loc>/changelog/</loc>
      <lastmod>2019-07-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
