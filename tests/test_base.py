@@ -534,7 +534,7 @@ def test_attempt_based_grading_single():
     expected_result = {'msg': 'Maximum credit for attempt #6 is 3.1%.', 'grade_decimal': 0.0313, 'ok': 'partial'}
     assert grader(None, 'cat', attempt=6)['msg'] == expected_result['msg']
     assert grader(None, 'cat', attempt=6)['ok'] == expected_result['ok']
-    assert grader(None, 'cat', attempt=6)['grade_decimal'] == approx(expected_result['grade_decimal'])
+    assert abs(grader(None, 'cat', attempt=6)['grade_decimal'] - expected_result['grade_decimal']) <= 0.001
 
 def test_attempt_based_grading_list():
     grader = ListGrader(
