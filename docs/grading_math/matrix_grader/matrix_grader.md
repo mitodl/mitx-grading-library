@@ -158,6 +158,8 @@ Tensor math arrays (dimension 3+) currently have very little support.
     | `vector * matrix`     | `(k, )`    | `(m, n)`   | `m=k`   | `vector` with `n` components |
     | `matrix * matrix`     | `(m1, n1)` | `(m2, n2)` | `n1=m2` | `matrix` of shape `(m1, n2)`  |
 
+    *Note*: Matrix multiplication may give students "too much power" for the type of problem you're asking. For example, if you want students to enter the product of two matrices or dot product of two vectors, you don't want them just entering the two quantities with a `*` between them. You can disable multiplication in MatrixGrader problems by setting `forbidden_strings=['*']`.
+
 - **Division**: Division either raises an error, or is performed elementwise:
 
     | Expression | raises error unless | result type |

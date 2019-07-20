@@ -1,0 +1,48 @@
+<problem display_name="Transforming Inputs" showanswer="always" weight="10" attempts="">
+
+<p>Sometimes, you may wish to apply a transforming function on both the student input and instructor answer before performing the comparison. This example demonstrates such a use case.</p>
+
+<p>Here, the problem explicitly requests an equality after the imaginary part of the input is taken. The expected answer is <code>x</code>, but adding a real component to the answer should still be graded as correct. Try entering <code>x+1</code> (correct) and <code>x+i</code> (incorrect). (Note that <code>x</code> is sampled as a complex variable.)</p>
+
+<script type="text/python" system_path="python_lib">
+import numpy as np
+from mitxgraders import *
+
+# Construct the comparer: transform the inputs by taking the imaginary part before checking equality
+comparer = EqualityComparer(transform=np.imag)
+
+# Set the default comparer for all FormulaGraders in this problem
+FormulaGrader.set_default_comparer(comparer)
+</script>
+
+<style>
+/* Used to top-align the first element of every row, used for lining up "thing=" with input textboxes, as well as lining up a closing brace at the end */
+.brackettable td:first-child, .brackettable td:last-child {
+  vertical-align: top !important;
+  padding-top: 2px !important;
+}
+</style>
+
+<!-- The inline grader uses the comparers set above -->
+<customresponse cfn="FormulaGrader(variables=['x'], sample_from={'x': ComplexRectangle()})" expect="x">
+  <table class='brackettable'>
+    <tr>
+      <td>
+        [mathjaxinline]\displaystyle f = \mathrm{Im} \bigg([/mathjaxinline]
+      </td>
+      <td>
+        <textline math="1" size="30" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+      </td>
+      <td>
+        [mathjaxinline]\bigg)[/mathjaxinline]
+      </td>
+    </tr>
+  </table>
+</customresponse>
+
+<p>The default comparer, used when no other comparer is specified, is called <code>equality_comparer</code>. This example also demonstrates changing that default.</p>
+
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula13.xml" target="_blank">View source</a></p>
+
+</problem>

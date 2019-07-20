@@ -1,15 +1,19 @@
 <problem display_name="Sibling Variables" showanswer="always" weight="10" attempts="">
 
+<p>When a student submits several mathematical inputs as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This problem uses sibling variables to score subsequent answers based off of the previous one. Sibling variables are available to FormulaGraders, NumericalGraders, and MatrixGraders when used inside an <strong>ordered</strong> ListGrader.</p>
+
+<p>Use Newton's Method on \(f(x)=x^2 - 9\) to calculate the square root of 9. Use anything in the interval \( (4, 6) \) as your starting value, \(x_0\). Round answers to no fewer than 6 decimal places.</p>
+
+<p>Suggested inputs:</p>
+
+<ul>
+  <li><code>[5, 3.4, 3.0235294]</code> is a correct input</li>
+  <li><code>[4.5, 3.25, 3.0096154]</code> is a correct input</li>
+  <li>Try changing one or two values in the lists above.</li>
+</ul>
+
 <script type="loncapa/python">
 from mitxgraders import *
-
-# The grader for the first box: a number between 4 and 6
-initial_subgrader = NumericalGrader(
-    answers={
-        'comparer': between_comparer,
-        'comparer_params': ['4', '6']
-    }
-)
 
 # The grader for the second and third boxes: apply Newton's iterations
 iteration_subgrader = NumericalGrader(
@@ -25,29 +29,20 @@ iteration_subgrader = NumericalGrader(
 grader = ListGrader(
     ordered=True,
     answers=[
-        '5', # anything between 4 and 6 accepted
+        # First answer: accept anything between 4 and 6
+        {'comparer': between_comparer, 'comparer_params': ['4', '6']},
+        # Second and third answers: use sibling variables
         'sibling_1 - f(sibling_1)/df(sibling_1)',
-        'sibling_2 - f(sibling_2)/df(sibling_2)',
+        'sibling_2 - f(sibling_2)/df(sibling_2)'
+        # Note that students cannot use sibling variables in their answers
     ],
     subgraders=[
-        initial_subgrader,
+        NumericalGrader(),  # Standard grader for the first box
         iteration_subgrader,
         iteration_subgrader
     ]
 )
 </script>
-
-<p>When a student submits several mathematical inputs as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This problem uses sibling variables to score subsequent answers based off of the previous one. Sibling variables are available to FormulaGraders, NumericalGraders, and MatrixGraders when used inside an <strong>ordered</strong> ListGrader.</p>
-
-<p>Use Newton's Method on \(f(x)=x^2 - 9\) to calculate the square root of 9. Use anything in the interval \( (4, 6) \) as your starting value, \(x_0\). Round answers to no fewer than 6 decimal places.</p>
-
-<p>Suggested inputs:</p>
-
-<ul>
-  <li><code>[5, 3.4, 3.0235294]</code> is a correct input</li>
-  <li><code>[4.5, 3.25, 3.0096154]</code> is a correct input</li>
-  <li>Try changing one or two values in the lists above.</li>
-</ul>
 
 <customresponse cfn="grader">
   <table>

@@ -33,21 +33,45 @@
     <sequential url_name="formulagrader" display_name="FormulaGrader and NumericalGrader">
       <vertical url_name="v-formula" display_name="FormulaGrader and NumericalGrader">
         <html url_name="formulainfo"/>
+      </vertical>
+      <vertical url_name="v-formula1" display_name="Improvements over edX">
         <problem url_name="formula1"/>
+      </vertical>
+      <vertical url_name="v-formula2" display_name="Expanded Function Listing">
         <problem url_name="formula2"/>
-        <problem url_name="formula3"/>
-        <problem url_name="formula4"/>
-        <problem url_name="formula5"/>
-        <problem url_name="formula6"/>
-        <problem url_name="formula7"/>
-        <problem url_name="formula8"/>
-        <problem url_name="formula9"/>
-        <problem url_name="formula10"/>
+      </vertical>
+      <vertical url_name="v-formula11" display_name="Kronecker Deltas">
         <problem url_name="formula11"/>
-        <!-- Update comparers to import using * -->
-        <!-- set_default_comparer -->
-        <!-- LinearComparer -->
-        <!-- EqualityComparer with transform -->
+      </vertical>
+      <vertical url_name="v-formula3" display_name="Complex Sampling">
+        <problem url_name="formula3"/>
+      </vertical>
+      <vertical url_name="v-formula7" display_name="Dependent Sampling">
+        <problem url_name="formula7"/>
+      </vertical>
+      <vertical url_name="v-formula4" display_name="More General Names">
+        <problem url_name="formula4"/>
+      </vertical>
+      <vertical url_name="v-formula5" display_name="User Functions and Constants">
+        <problem url_name="formula5"/>
+      </vertical>
+      <vertical url_name="v-formula9" display_name="Numbered Variables">
+        <problem url_name="formula9"/>
+      </vertical>
+      <vertical url_name="v-formula10" display_name="Sibling Variables">
+        <problem url_name="formula10"/>
+      </vertical>
+      <vertical url_name="v-formula6" display_name="Restrictions on Input">
+        <problem url_name="formula6"/>
+      </vertical>
+      <vertical url_name="v-formula8" display_name="Custom Comparison Functions">
+        <problem url_name="formula8"/>
+      </vertical>
+      <vertical url_name="v-formula12" display_name="Automatic Partial Credit">
+        <problem url_name="formula12"/>
+      </vertical>
+      <vertical url_name="v-formula13" display_name="Transforming Inputs">
+        <problem url_name="formula13"/>
       </vertical>
     </sequential>
     <sequential url_name="matrixgrader" display_name="MatrixGrader">

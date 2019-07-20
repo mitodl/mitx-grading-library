@@ -158,10 +158,7 @@ Here is the full list of options specific to all graders.
 grader = AbstractGrader(
     debug=bool,  # default False
     wrong_msg=str,  # default ''
-    attempt_based_credit=bool,  # default False
-    decrease_credit_after=int,  # default 1
-    minimum_credit=float,  # default 0.2
-    decrease_credit_steps=int,  # default 4
+    attempt_based_credit=(None | function),  # default None
     attempt_based_credit_msg=bool,  # default True
 )
 ```

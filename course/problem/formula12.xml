@@ -1,0 +1,56 @@
+<problem display_name="Automatic Partial Credit" showanswer="always" weight="10" attempts="">
+
+<p>This powerful feature allows you to assign automatic partial credit in formula problems when the student's input is off by a numerical factor (e.g., <code>2</code>, <code>pi</code>, <code>-1</code>, <code>sqrt(3)</code>, etc). It works by performing sampling as usual, and then performing checking to see if the student's results are described by a linear transformation of the answer. Partial credit can then be awarded based on which linear relation worked, and a message can also be included.</p>
+
+<ul>
+  <li>Equality: The answer and the student input were the same</li>
+  <li>Proportionality: The answer and the student input were related by a constant multiplicative factor</li>
+  <li>Offset: The answer and the student input differed only by a constant offset (useful for arbitrary offsets and integration constants)</li>
+  <li>Linear: The answer and the student input were related by a linear transformation \(y = mx + c\)</li>
+</ul>
+
+<p>Below, the correct answer is <code>x</code>. Different messages and credit have been assigned to the different possible relations. It is also possible to turn off credit for whichever relations are desired. Note that all valid relations are checked, and the most highly-scoring one determines the students' grade. Try the following inputs:</p>
+
+<ul>
+  <li><code>x</code></li>
+  <li><code>x+1</code></li>
+  <li><code>2*x</code></li>
+  <li><code>2*x+1</code></li>
+  <li><code>x^2</code></li>
+  <li><code>0</code></li>
+</ul>
+
+<script type="text/python" system_path="python_lib">
+from mitxgraders import *
+
+# Construct the comparer
+comparer = LinearComparer(
+    # Assign credit amounts
+    equals=1,
+    proportional=0.5,
+    offset=0.7,
+    linear=0.3,
+    # Assign messages
+    proportional_msg='The submitted answer differs from the expected answer by a constant factor.',
+    offset_msg='The submitted answer differs from the expected answer by a constant offset.',
+    linear_msg='The submitted answer differs from the expected answer by a linear transformation.'
+)
+
+# Set the default comparer for all FormulaGraders in this problem
+FormulaGrader.set_default_comparer(comparer)
+</script>
+
+<!-- The inline grader uses the comparers set above -->
+<customresponse cfn="FormulaGrader(variables=['x'])" inline="1" expect='x'>
+  <textline math="1" inline="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+</customresponse>
+
+<p>If the instructor answer is 0, then only equality and offsets can be awarded any credit.</p>
+
+<p>The default comparer, used when no other comparer is specified, is called <code>equality_comparer</code>. This example also demonstrates changing that default.</p>
+
+<p>While the default comparer can be assigned course-wide through the use of plugins, we recommend against doing so, as you will not always want to award such partial credit (for example, when dimensional analysis trivially provides the algebraic dependence on variables). We recommend constructing the desired partial credit comparer in a plugin, and invoking it using <code>FormulaGrader.set_default_comparer(comparer)</code> in problems as necessary.</p>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula12.xml" target="_blank">View source</a></p>
+
+</problem>
