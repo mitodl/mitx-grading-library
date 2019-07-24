@@ -15,7 +15,7 @@
   }
 </style>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = IntegralGrader(
     answers={

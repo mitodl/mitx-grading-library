@@ -4,7 +4,7 @@
 
 <p>Here, the problem explicitly requests an equality after the imaginary part of the input is taken. The expected answer is <code>x</code>, but adding a real component to the answer should still be graded as correct. Try entering <code>x+1</code> (correct) and <code>x+i</code> (incorrect). (Note that <code>x</code> is sampled as a complex variable.)</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 import numpy as np
 from mitxgraders import *
 

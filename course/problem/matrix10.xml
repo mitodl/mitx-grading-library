@@ -18,7 +18,7 @@
     <li><code>f(a, [1, 2], b)</code>, or anything where arguments have the wrong shape, will produce interesting error messages</li>
 </ul>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 
 # This is a contrived example demonstrate the usage of specify_domain

@@ -53,7 +53,7 @@
   <li><code>u*trans(H)*v</code> (incorrect)</li>
 </ul>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = MatrixGrader(
     variables=['u', 'v', 'H'],

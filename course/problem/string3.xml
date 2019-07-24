@@ -4,7 +4,7 @@
 
 <p>Please enter your favorite color in the textbox below.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = StringGrader(
     # Note that the expect entry here is irrelevant
@@ -21,7 +21,7 @@ grader = StringGrader(
 
 <p>What do you think about this problem?</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 grader2 = StringGrader(
     # Note that the expect entry here is irrelevant
     answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},

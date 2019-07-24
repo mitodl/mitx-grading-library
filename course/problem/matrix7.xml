@@ -16,7 +16,7 @@
   <li><code>exp(i*1.2345)*[1, i]*1.01</code></li>
 </ul>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = MatrixGrader(
     answers={
@@ -42,7 +42,7 @@ grader = MatrixGrader(
   <li><code>[1, i+0.1]</code></li>
 </ul>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 grader2 = MatrixGrader(
     answers={
         'comparer': vector_span_comparer,

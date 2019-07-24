@@ -29,7 +29,7 @@ Answers are provided as a python list of individual `ItemGrader` answers (or a t
 <problem>
 <p>What are the most common pets?</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = ListGrader(
     answers=['cat', 'dog'],
@@ -38,9 +38,9 @@ grader = ListGrader(
 </script>
 
 <customresponse cfn="grader" inline="1">
-  <p style="display:inline">First answer: </p><textline math="1" inline="1" correct_answer="cat"/>
+  <p style="display:inline">First answer: </p><textline inline="1" correct_answer="cat"/>
   <br/>
-  <p style="display:inline">Second answer: </p><textline math="1" inline="1" correct_answer="dog"/>
+  <p style="display:inline">Second answer: </p><textline inline="1" correct_answer="dog"/>
 </customresponse>
 </problem>
 ```

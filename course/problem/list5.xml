@@ -21,7 +21,7 @@
 
 <p>In this problem, partial credit is only awarded if you get both the eigenvalue and eigenvector in the pairing correct. Getting one correct but the other incorrect will result in no credit for that pair.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 
 # A simple answer that will be passed to FormulaGrader

@@ -13,7 +13,7 @@
   <li><code>hatx*haty</code></li>
 </ul>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = MatrixGrader(
    answers='v_x*t*hatx + (v_y*t-g*t^2/2)*haty',

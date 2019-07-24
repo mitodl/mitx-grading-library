@@ -2,7 +2,7 @@
 
 <p>It is possible to specify user-defined constants and functions. Here, we add a constant tau (= 2*pi), and also define the Heaviside step function H(x). You can also specify an unknown function, for which we sample a well-behaved random function. In the following example, the answer is <code>H(x)*f''(tau)</code>, where f'' is a random function.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 
 def heaviside(x):

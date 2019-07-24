@@ -1,6 +1,6 @@
 <problem display_name="First Example" showanswer="always" weight="10" attempts="">
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 
 grader = MatrixGrader(

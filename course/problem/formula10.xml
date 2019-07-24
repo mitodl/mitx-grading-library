@@ -12,7 +12,7 @@
   <li>Try changing one or two values in the lists above.</li>
 </ul>
 
-<script type="loncapa/python">
+<script type="text/python">
 from mitxgraders import *
 
 # The grader for the second and third boxes: apply Newton's iterations

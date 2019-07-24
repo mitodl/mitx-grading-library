@@ -11,7 +11,7 @@
   <li>NO_2</li>
 </ul>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = StringGrader(
     answers=('C_2H_6', 'CH_3CH_3'),   # Here we have two possible answers
@@ -38,7 +38,7 @@ grader = StringGrader(
   <li>min(1+2j, 3)</li>
 </ul>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 grader2 = StringGrader(
     # Note that we don't have an answer
     validation_pattern=r'min\(-?[0-9]+\.?[0-9]*(,-?[0-9]+\.?[0-9]*)+\)',  # This is the pattern to match

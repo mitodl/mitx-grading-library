@@ -2,7 +2,7 @@
 
 <p>We have expanded the function evaluations to return complex numbers where appropriate. This means that you no longer need to be very careful about ensuring you set your ranges so that that square roots never act on a negative number! Here's an example where the answer is <code>sqrt(1-x)</code>, and x is sampled from 0 to 10. edX will basically always grade the student wrong in this situation. Here's our take.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = FormulaGrader(
     variables=['x'],
@@ -18,7 +18,7 @@ grader = FormulaGrader(
 
 <p>You can also specify that a variable to be sampled is complex. We have added functions <code>re</code>, <code>im</code>, <code>abs</code> and <code>conj</code> to allow for manipulating complex expressions. Here is an example that asks for the modulus of z squared. You can enter <code>abs(z)^2</code>, <code>z*conj(z)</code>, <code>re(z)^2+im(z)^2</code>, or whatever else does the job. Note that <code>z^2</code> will be graded incorrect.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader2 = FormulaGrader(
     variables=['z'],

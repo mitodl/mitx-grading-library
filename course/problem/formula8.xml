@@ -4,7 +4,7 @@
 
 <p>The answer to the below question is <code>b^2/a</code>. You can enter <code>b^2/a + 2*360</code>, or plus any integer multiple of 360.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = FormulaGrader(
     answers={

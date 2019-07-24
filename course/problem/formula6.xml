@@ -10,7 +10,7 @@
 
 <p>The answer to the below question is <code>2*sin(x)*cos(x)</code>. You can try entering <code>sin(2*x)</code> in any clever form, but most expressions will be stymied (it is possible to get around it though - can you figure out how?).</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = FormulaGrader(
     variables=['x'],

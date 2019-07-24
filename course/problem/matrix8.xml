@@ -12,7 +12,7 @@
   <li><code>nabla * A + 1</code> (incorrect, but looks like a matrix + a scalar)</li>
 </ul>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = MatrixGrader(
     variables=['nabla', 'A'],

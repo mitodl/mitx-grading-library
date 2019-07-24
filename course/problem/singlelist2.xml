@@ -2,7 +2,7 @@
 
 <p>Here is an example where multiple answers are accepted. You can either enter ("cat" or "feline") and "dog", or "goat" and "vole". The entries should be comma separated, and can appear in any order. Note that mixing one set of answers with the other set will only give you partial credit though.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = SingleListGrader(
     answers=(

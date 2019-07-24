@@ -2,7 +2,7 @@
 
 <p>Here is a basic example of <code>SingleListGrader</code>. The answer is "cat" and "dog", in any order, separated by a comma.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 </script>
 

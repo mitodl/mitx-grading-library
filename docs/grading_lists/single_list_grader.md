@@ -216,7 +216,7 @@ Just as for normal `ItemGrader`s, the `answers` key can be inferred from the `ex
 ```XML
 <problem>
 
-<script type="loncapa/python">
+<script type="text/python">
 from mitxgraders import *
 </script>
 

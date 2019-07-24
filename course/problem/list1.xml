@@ -4,7 +4,7 @@
 
   <p>What are the two roots of unity? (Answer: +1 and -1)</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = ListGrader(
     answers=['1', '-1'],

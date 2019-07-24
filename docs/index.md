@@ -29,7 +29,7 @@ Use MITxGraders because it:
 Typical usage in an edX course looks like:
 ```XML
 <problem>
-<script type="loncapa/python">
+<script type="text/python">
 from mitxgraders import *
 grader = FormulaGrader(
     variables=["x"],
@@ -52,7 +52,7 @@ The next example grader would grade an unordered list of mathematical expression
 
 ```XML
 <problem>
-<script type="loncapa/python">
+<script type="text/python">
 from mitxgraders import *
 grader = ListGrader(
     answers=['x-2', 'x+2'],

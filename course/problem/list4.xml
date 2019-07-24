@@ -2,7 +2,7 @@
 
 <p>Sometimes you will want partially-ordered input. In the following example, we want "Halloween" in the first box, and "ghost", "bat" and "pumpkin" in any order in the other boxes.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = ListGrader(
     answers=[

@@ -13,7 +13,7 @@
 
 <p>Also try mixing the answers from different pairings together, noting the different messages and grades you can receive.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = SingleListGrader(
     answers=(

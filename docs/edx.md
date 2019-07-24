@@ -6,7 +6,7 @@ To create an edX problem using the MITx Grading Library, you need to create a "B
 <problem>
 
 <!-- Define the grader -->
-<script type="loncapa/python">
+<script type="text/python">
 from mitxgraders import *
 grader = FormulaGrader(variables=["x"])
 </script>
@@ -40,7 +40,7 @@ If you provide an `answers` key to the grader, it will ignore whatever is specif
 ```XML
 <problem>
 
-<script type="loncapa/python">
+<script type="text/python">
 from mitxgraders import *
 mygrader = FormulaGrader(
     answers={'expect': '2*x', 'msg': 'Good job!'},
@@ -68,7 +68,7 @@ If you are using multiple inputs (such as when using a `ListGrader`) or a `Singl
 
 ```XML
 <problem>
-<script type="loncapa/python">
+<script type="text/python">
 from mitxgraders import *
 grader = ListGrader(
     answers=['x-2', 'x+2'],
@@ -102,7 +102,7 @@ Because the `cfn` parameter of the `customresponse` tag is executed as python co
 <problem>
 
 <!-- Make sure to remember to import the library! -->
-<script type="loncapa/python">
+<script type="text/python">
 from mitxgraders import *
 </script>
 

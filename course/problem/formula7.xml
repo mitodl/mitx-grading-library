@@ -4,7 +4,7 @@
 
 <p>The answer to the below question is <code>x/r</code>. You can also enter <code>x/sqrt(x^2+y^2)</code>.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = FormulaGrader(
     variables=['x', 'y', 'r'],

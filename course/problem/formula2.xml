@@ -14,7 +14,7 @@
   <li><code>x^n/fact(n+1/2)</code></li>
 </ul>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = FormulaGrader(
     variables=['x', 'n'],

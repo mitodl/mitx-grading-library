@@ -12,7 +12,7 @@
 <p>To use in a problem, create an advanced problem, and enter the following to see if things are working:</p>
 
 <pre>&lt;problem&gt;
-&lt;script type=&quot;text/python&quot; system_path=&quot;python_lib&quot;&gt;
+&lt;script type=&quot;text/python&quot;&gt;
 from mitxgraders import *
 grader = StringGrader()
 &lt;/script&gt;

@@ -2,7 +2,7 @@
 
 <p>By default, StringGrader strips all leading/trailing whitespace from both the answer and input. It is also case sensitive by default. You can control both of these behaviors. For example, the answer below is "Hat ", with a single space at the end. This is case sensitive, and requires the space at the end.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = StringGrader(
     case_sensitive=True,
@@ -16,7 +16,7 @@ grader = StringGrader(
 
 <p>Here is another example, where the answer is <code>two  spaces</code>, complete with two spaces between the words. By default, multiple consecutive spaces are turned into single spaces, but again, you can control this behavior.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 grader2 = StringGrader(
     case_sensitive=True,
     strip=True,

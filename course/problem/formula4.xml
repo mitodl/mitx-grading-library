@@ -2,7 +2,7 @@
 
 <p>Variable names can now include primes at the end! Here, the answer is <code>x'+v*t</code> (a Galilean change of coordinate).</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = FormulaGrader(variables=["x'", 'v', 't'])
 # Note that we don't inline thise, because escaping quotation marks isn't pretty!
@@ -15,7 +15,7 @@ grader = FormulaGrader(variables=["x'", 'v', 't'])
 
 <p>You can also use tensor notation for variable names. Here, the answer is <code>T_{x}^{13} + 2*T_{y}^{13}</code>. Notice that the preview box styles these correctly. The caret to indicate raised indices is not confused with the caret to indicate powers.</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader2 = FormulaGrader(
     variables=['T_{x}^{13}', 'T_{y}^{13}']

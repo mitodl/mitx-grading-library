@@ -14,7 +14,7 @@
 
 <p>The answer is "cat".</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 
 # This modification wraps the attempt number around at 10

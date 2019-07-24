@@ -2,7 +2,7 @@
 
 <p>It's possible to nest SingleListGraders by using different delimiters. In the following example, the answer is "a, b; c, d". You can also use "c, d; a, b". However, the sublists are ordered, so "b, a; c, d" is only partly correct (and receives partial credit).</p>
 
-<script type="text/python" system_path="python_lib">
+<script type="text/python">
 from mitxgraders import *
 grader = SingleListGrader(
     subgrader=SingleListGrader(
