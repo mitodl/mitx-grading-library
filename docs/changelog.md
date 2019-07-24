@@ -6,6 +6,10 @@ This is a major new version with many new features added. We have been very care
 
 ## Version 2.0
 
+### Version 2.0.1
+
+* Fixed a bug in StringGrader regex validation that only required the start of student input to match the pattern.
+
 ### Version 2.0.0
 
 Feature updates:
