@@ -157,15 +157,20 @@ class StringGrader(ItemGrader):
         # Apply the validation pattern
         pattern = self.config['validation_pattern']
         if pattern is not None:
+            # Make sure that the pattern matches the entire input
+            testpattern = pattern
+            if not pattern.endswith("^"):
+                testpattern += "$"
+
             if not accept_any:
                 # Make sure that expect matches the pattern
                 # If it doesn't, a student can never get this right
-                if re.match(pattern, expect) is None:
+                if re.match(testpattern, expect) is None:
                     msg = "The provided answer '{}' does not match the validation pattern '{}'"
                     raise ConfigError(msg.format(answer['expect'], pattern))
 
             # Check to see if the student input matches the validation pattern
-            if re.match(pattern, student) is None:
+            if re.match(testpattern, student) is None:
                 return self.construct_message(self.config['invalid_msg'],
                                               self.config['explain_validation'])
 

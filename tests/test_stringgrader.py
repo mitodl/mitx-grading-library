@@ -182,6 +182,7 @@ def test_validation():
                           debug=False)
     assert grader(None, '1') == {'ok': False, 'grade_decimal': 0, 'msg': ''}
     assert grader(None, '(1234566542)')['ok']
+    assert not grader(None, '(1234566542)a')['ok']
 
     grader = StringGrader(accept_any=True,
                           validation_pattern=r"\([0-9]+\)",
