@@ -282,7 +282,7 @@ True</code></pre>
 <pre class="codehilite"><code class="language-xml">&lt;problem&gt;
 &lt;p&gt;What are the most common pets?&lt;/p&gt;
 
-&lt;script type=&quot;text/python&quot; system_path=&quot;python_lib&quot;&gt;
+&lt;script type=&quot;text/python&quot;&gt;
 from mitxgraders import *
 grader = ListGrader(
     answers=['cat', 'dog'],
@@ -291,9 +291,9 @@ grader = ListGrader(
 &lt;/script&gt;
 
 &lt;customresponse cfn=&quot;grader&quot; inline=&quot;1&quot;&gt;
-  &lt;p style=&quot;display:inline&quot;&gt;First answer: &lt;/p&gt;&lt;textline math=&quot;1&quot; inline=&quot;1&quot; correct_answer=&quot;cat&quot;/&gt;
+  &lt;p style=&quot;display:inline&quot;&gt;First answer: &lt;/p&gt;&lt;textline inline=&quot;1&quot; correct_answer=&quot;cat&quot;/&gt;
   &lt;br/&gt;
-  &lt;p style=&quot;display:inline&quot;&gt;Second answer: &lt;/p&gt;&lt;textline math=&quot;1&quot; inline=&quot;1&quot; correct_answer=&quot;dog&quot;/&gt;
+  &lt;p style=&quot;display:inline&quot;&gt;Second answer: &lt;/p&gt;&lt;textline inline=&quot;1&quot; correct_answer=&quot;dog&quot;/&gt;
 &lt;/customresponse&gt;
 &lt;/problem&gt;</code></pre>
 

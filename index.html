@@ -287,7 +287,7 @@
 <h2 id="two-typical-examples">Two Typical Examples<a class="headerlink" href="#two-typical-examples" title="Permanent link"> # </a></h2>
 <p>Typical usage in an edX course looks like:</p>
 <pre class="codehilite"><code class="language-XML">&lt;problem&gt;
-&lt;script type=&quot;loncapa/python&quot;&gt;
+&lt;script type=&quot;text/python&quot;&gt;
 from mitxgraders import *
 grader = FormulaGrader(
     variables=[&quot;x&quot;],
@@ -308,7 +308,7 @@ grader = FormulaGrader(
 <p>The resulting problem would be similar to an edX <code>&lt;formularesponse /&gt;</code> problem, but allows students to use additional generic functions <code>f(x)</code> and <code>f'(x)</code> in their submissions.</p>
 <p>The next example grader would grade an unordered list of mathematical expressions.</p>
 <pre class="codehilite"><code class="language-XML">&lt;problem&gt;
-&lt;script type=&quot;loncapa/python&quot;&gt;
+&lt;script type=&quot;text/python&quot;&gt;
 from mitxgraders import *
 grader = ListGrader(
     answers=['x-2', 'x+2'],
@@ -420,5 +420,5 @@ grader = ListGrader(
 
 <!--
 MkDocs version : 0.17.5
-Build Date UTC : 2019-07-24 16:45:31
+Build Date UTC : 2019-07-24 18:01:56
 -->
