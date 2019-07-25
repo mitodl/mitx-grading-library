@@ -63,7 +63,6 @@ grader = ListGrader(
 )
 </script>
 
-
 <customresponse cfn="grader">
   <table>
     <tr>
@@ -73,13 +72,13 @@ grader = ListGrader(
     </tr>
     <tr>
       <th>1st Eigenpair</th>
-      <td><textline math="true"/></td>
-      <td><textline math="true" size="40"/></td>
+      <td><textline math="true" correct_answer="-sqrt(1+x^2)"/></td>
+      <td><textline math="true" correct_answer="[1-sqrt(1+x^2), x]" size="40"/></td>
     </tr>
     <tr>
       <th>2nd Eigenpair</th>
-      <td><textline math="true"/></td>
-      <td><textline math="true" size="40"/></td>
+      <td><textline math="true" correct_answer="sqrt(1+x^2)"/></td>
+      <td><textline math="true" correct_answer="1+sqrt(1+x^2), x]" size="40"/></td>
     </tr>
   </table>
 </customresponse>
