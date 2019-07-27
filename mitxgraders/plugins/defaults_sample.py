@@ -30,10 +30,7 @@ from mitxgraders.formulagrader.matrixgrader import MatrixGrader
 # Turn on attempt-based partial credit by default and modify related settings
 # This will turn on attempt-based partial credit for all graders
 # AbstractGrader.register_defaults({
-#     'attempt_based_credit': True,
-#     'decrease_credit_after': 1,
-#     'minimum_credit': 0.5,
-#     'decrease_credit_steps': 1,
+#     'attempt_based_credit': ReciprocalCredit(),
 #     'attempt_based_credit_msg': True
 # })
 # Note that if you do this, you will need to either pass cfn_extra_args="attempt" in every
