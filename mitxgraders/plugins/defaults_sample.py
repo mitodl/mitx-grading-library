@@ -19,6 +19,9 @@ from mitxgraders.formulagrader.integralgrader import IntegralGrader
 from mitxgraders.formulagrader.formulagrader import FormulaGrader, NumericalGrader
 from mitxgraders.formulagrader.matrixgrader import MatrixGrader
 
+# These will be needed to set attempt-based credit course-wide
+from mitxgraders.attemptcredit import LinearCredit, GeometricCredit, ReciprocalCredit
+
 # These modifications are commented out so that they don't override the normal defaults.
 # To use them, you need to uncomment them.
 
