@@ -310,7 +310,7 @@ if (window.MJxPrep) {
     overset: true,
     stackrel: true,
     tilde: true,
-    vec: true
+    vec: true,
     sqrt: true
   }
 
