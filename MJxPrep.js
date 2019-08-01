@@ -291,9 +291,12 @@ if (window.MJxPrep) {
   // Check for the AsciiMath object every 200ms
   var checkExist = setInterval(updateMathJax, 200);
 
-  // set of AsciiMath symbols classified as mover (math-overscript) tags
+  // FORBIDDEN_TO_WRAP includes things we've found problematic to wrap {:...:},
+  // namelu:
+  // - AsciiMath symbols classified as mover (math-overscript) tags
+  // - sqrt symbol (msqrt tag)
   // (This should be a Set object, but ie11 doesn't fully support Sets)
-  OVERSCRIPT_SYMBOLS = {
+  FORBIDDEN_TO_WRAP = {
     bar: true,
     conj: true,
     ddot: true,
@@ -308,11 +311,12 @@ if (window.MJxPrep) {
     stackrel: true,
     tilde: true,
     vec: true
+    sqrt: true
   }
 
   // callback function for String.prototype.replace
-  function wrapIfNotOverscript(match, substr) {
-    return OVERSCRIPT_SYMBOLS[substr]
+  function wrapIfNotForbidden(match, substr) {
+    return FORBIDDEN_TO_WRAP[substr]
       ? substr
       : '{:' + substr + ':}'
   }
@@ -355,7 +359,7 @@ if (window.MJxPrep) {
        (?![(}])                         # Negative lookahead: '(' (function) or '}' (tensor indices)
      */
     // This site is really useful for debugging: https://www.regextester.com/
-    eqn = eqn.replace(var_expr, wrapIfNotOverscript);
+    eqn = eqn.replace(var_expr, wrapIfNotForbidden);
 
     return eqn
   }
@@ -394,7 +398,8 @@ if (window.MJxPrep) {
 
       var front = eqn.slice(0, funcStart)
       var middle = eqn.slice(funcStart, funcEnd)
-      eqn = front + wrapIfNotOverscript(null, middle) + eqn.slice(funcEnd)
+      console.log(middle)
+      eqn = front + wrapIfNotForbidden(null, middle) + eqn.slice(funcEnd)
     }
 
     return eqn
