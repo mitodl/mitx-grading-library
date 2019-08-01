@@ -2,9 +2,12 @@
 
 # Version 2
 
-This is a major new version with many new features added. We have been very careful to preserve backwards compatability of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2.0. However, we do warn that we broke internal backwards compatability in a number of locations in order to accomodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.0.
+This is a major new version with many new features added. We have been very careful to preserve backwards compatibility of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2.0. However, we do warn that we broke internal backwards compatibility in a number of locations in order to accommodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.0.
 
 ## Version 2.0
+
+### Version 2.0.2
+* Fix a bug with custom AsciiMath preprocessor where lonely square roots (e.g., `x + sqrt + y`) rendered badly.
 
 ### Version 2.0.1
 
