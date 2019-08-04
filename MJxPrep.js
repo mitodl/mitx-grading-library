@@ -292,7 +292,7 @@ if (window.MJxPrep) {
   var checkExist = setInterval(updateMathJax, 200);
 
   // FORBIDDEN_TO_WRAP includes things we've found problematic to wrap {:...:},
-  // namelu:
+  // namely:
   // - AsciiMath symbols classified as mover (math-overscript) tags
   // - sqrt symbol (msqrt tag)
   // (This should be a Set object, but ie11 doesn't fully support Sets)
@@ -398,7 +398,6 @@ if (window.MJxPrep) {
 
       var front = eqn.slice(0, funcStart)
       var middle = eqn.slice(funcStart, funcEnd)
-      console.log(middle)
       eqn = front + wrapIfNotForbidden(null, middle) + eqn.slice(funcEnd)
     }
 
