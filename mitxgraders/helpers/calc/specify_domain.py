@@ -202,7 +202,7 @@ class SpecifyDomain(ObjectWithSchema):
     (3, 2) would work also). Use 'square' to indicate square matrix of any
     dimension:
     >>> @SpecifyDomain(input_shapes=[1, [3, 2], 2, 'square'])
-    ... def f(x, y, z):
+    ... def f(w, x, y, z):
     ...     pass # implement complicated stuff here
     >>> square_mat = MathArray([[1, 2], [3, 4]])
     >>> try:
