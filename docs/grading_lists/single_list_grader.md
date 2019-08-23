@@ -65,6 +65,26 @@ True
 
 Note that the list of answers can itself occur inside a dictionary that has a grade and message associated with it. In this case, the answers are evaluated as normal, and the overall grade is multiplied by `grade_decimal`. The message is only shown if all of the inputs received credit. So, note that `feline, anything` will get the "Good enough!" message, while the "something strange" message only appears if the student enters both `unicorn` and `lumberjack`.
 
+As a convenience, you can also provide an answer that is just a string, corresponding to what students would enter. Beware that spaces included after delimiters will be included in the following entry.
+
+```pycon
+>>> from mitxgraders import *
+>>> grader = SingleListGrader(
+...     answers='cat, dog',
+...     subgrader=StringGrader()
+... )
+>>> grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+>>> grader(None, 'dog, cat') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
+True
+>>> grader(None, 'cat, octopus') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
+True
+
+```
+
+This means that `SingleListGrader`s are capable of inferring answers from the `expect` keyword of a `customresponse` tag.
+
+
 
 ## Messages
 
