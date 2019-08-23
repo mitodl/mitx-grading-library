@@ -715,9 +715,9 @@ class SingleListGrader(ItemGrader):
         Defines the schema that answers should satisfy.
 
         This should be either a list or a string. If a string is provided,
-        it will be split into a list.
+        it will be split into a list by post_schema_ans_val.
         """
-        return Schema(Any(list, str))(expect)
+        return Schema(Any(list, text_string))(expect)
 
     def check_response(self, answer, student_input, **kwargs):
         """Check student_input against a given answer list"""
