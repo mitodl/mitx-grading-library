@@ -565,3 +565,40 @@ def test_overall_msg_nested():
     result = grader(None, 'a,b;c,e')
     assert result['grade_decimal'] == 0.75
     assert result['msg'] == ''
+
+def test_string_answers():
+    sg = StringGrader()
+
+    grader1 = SingleListGrader(
+        answers="an,apple",
+        subgrader=sg
+    )
+    grader2 = SingleListGrader(
+        answers=["an", "apple"],
+        subgrader=sg
+    )
+    assert(grader1 == grader2)
+
+    grader1 = SingleListGrader(
+        answers="this,is;a,test",
+        subgrader=SingleListGrader(subgrader=sg),
+        delimiter=";"
+    )
+    grader2 = SingleListGrader(
+        answers=[["this", "is"], ["a", "test"]],
+        subgrader=SingleListGrader(subgrader=sg),
+        delimiter=";"
+    )
+    assert(grader1 == grader2)
+
+    fg = FormulaGrader(variables=['x'])
+
+    grader1 = SingleListGrader(
+        answers="1+x,2*x^2",
+        subgrader=fg
+    )
+    grader2 = SingleListGrader(
+        answers=["1+x", "2*x^2"],
+        subgrader=fg
+    )
+    assert(grader1 == grader2)

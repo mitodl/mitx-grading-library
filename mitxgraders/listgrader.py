@@ -677,7 +677,14 @@ class SingleListGrader(ItemGrader):
         """
         # The structure of answer_tuple at this stage is:
         # tuple(dict('expect', 'grade_decimal', 'ok', 'msg'))
-        # where 'expect' is a list that needs validation.
+        # where 'expect' needs validation.
+
+        # Step 1: If 'expect' is a string, use infer_from_expect to convert it to a list.
+        for entry in answer_tuple:
+            if isinstance(entry['expect'], six.string_types):
+                entry['expect'] = self.infer_from_expect(entry['expect'])
+        # Redo schema validation to validate any modified answers
+        answer_tuple = self.schema_answers(answer_tuple)
 
         # Check that all lists in the tuple have the same length
         for answer_list in answer_tuple:
@@ -705,9 +712,12 @@ class SingleListGrader(ItemGrader):
     @staticmethod
     def validate_expect(expect):
         """
-        Defines the schema that answers should satisfy. For SingleListGrader, this is a list.
+        Defines the schema that answers should satisfy.
+
+        This should be either a list or a string. If a string is provided,
+        it will be split into a list.
         """
-        return Schema(list)(expect)
+        return Schema(Any(list, str))(expect)
 
     def check_response(self, answer, student_input, **kwargs):
         """Check student_input against a given answer list"""
