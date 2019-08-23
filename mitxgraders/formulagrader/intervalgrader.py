@@ -13,6 +13,7 @@ from mitxgraders.stringgrader import StringGrader
 from mitxgraders.listgrader import SingleListGrader, demand_no_empty
 from mitxgraders.formulagrader.formulagrader import FormulaGrader, NumericalGrader
 from mitxgraders.exceptions import ConfigError, InvalidInput, MissingInput
+from mitxgraders.helpers.validatorfuncs import text_string
 
 class IntervalGrader(SingleListGrader):
     """
@@ -20,18 +21,25 @@ class IntervalGrader(SingleListGrader):
     Both the interval bracketing and the numbers are graded.
     The following are examples of possible entries:
     * [1, 2)
-    * {0, 1+pi]
+    * [0, 1+pi]
 
-    Answers should be provided as a list of four entries:
-    * Open bracket
-    * First entry
-    * Second entry
-    * Closing bracket
-    Answers can also be inferred from the 'expect' keyword.
+    Answers can be provided in one of three ways:
+    * Inferred through the 'expect' keyword
+    * Supplied as a string
+    * Entered as a list of four entries:
+        - Open bracket
+        - Lower bound
+        - Upper bound
+        - Closing bracket
+    The second method can use all of the ItemGrader answer description functionality on
+    the answer as a whole, while the third can additionally apply the functionality to
+    each component of the answer.
 
     Grading works by first grading the entries. If the entries are awarded credit, then
-    that credit may be modified by the grading of the brackets. When partial credit is
-    turned on, each half of the interval is worth 50% of the overall credit.
+    that credit may be modified by the grading of the brackets. (So, when a grade_decimal
+    is specified for both the bracket and the bound, the two are multiplied together.)
+    When partial credit is turned on, each half of the interval is worth 50% of the overall
+    credit.
 
     No credit is awarded for getting the entries backwards.
 
@@ -42,8 +50,8 @@ class IntervalGrader(SingleListGrader):
 
         delimiter (str): Single character to use as the separator between entries (default ',')
 
-        subgrader (FormulaGrader): The grader to use to grade each individual entry 
-            (default NumericalGrader(tolerance=1e-13))
+        subgrader (FormulaGrader or NumericalGrader): The grader to use to grade each individual
+            entry (default NumericalGrader(tolerance=1e-13))
 
         partial_credit (bool): Whether to award partial credit for a partly-correct answer
             (default True)
@@ -63,8 +71,8 @@ class IntervalGrader(SingleListGrader):
 
             # Subgrader default is set to FormulaGrader() in initialization
             Required('subgrader', default=None): Any(FormulaGrader, None),
-            Required('opening_brackets', default='[('): All(str, Length(min=1)),
-            Required('closing_brackets', default='])'): All(str, Length(min=1))
+            Required('opening_brackets', default='[('): All(text_string, Length(min=1)),
+            Required('closing_brackets', default='])'): All(text_string, Length(min=1))
         })
 
     def __init__(self, config=None, **kwargs):
@@ -150,8 +158,8 @@ class IntervalGrader(SingleListGrader):
         """
         expect = expect.strip()
         # Check that the answer has at least 2 characters
-        if len(expect) < 2:
-            raise ConfigError('Invalid IntervalGrader answer: "{}"'.format(expect))
+        if len(expect) < 5:
+            raise ConfigError('Unable to read interval from answer: "{}"'.format(expect))
 
         # Parse the middle bit using SingleListGrader
         middle = super(IntervalGrader, self).infer_from_expect(expect[1:-1])
@@ -164,8 +172,8 @@ class IntervalGrader(SingleListGrader):
         """Check student_input against a given answer list"""
         # Split the student response
         student_input = student_input.strip()
-        if len(student_input) < 2:
-            raise MissingInput('Unable to extract opening and closing brackets from input.')
+        if len(student_input) < 5:
+            raise ConfigError('Unable to read interval from answer: "{}"'.format(student_input))
         s_opening = student_input[0]
         s_closing = student_input[-1]
         s_middle = student_input[1:-1]
@@ -218,7 +226,7 @@ class IntervalGrader(SingleListGrader):
             return grade_entry
 
         # Update the grade_decimal and ok entries, as well as the message
-        grade_entry['grade_decimal'] = best['grade_decimal']
+        grade_entry['grade_decimal'] *= best['grade_decimal']
         if best['msg']:
             if grade_entry['msg']:
                 grade_entry['msg'] += '\n'
