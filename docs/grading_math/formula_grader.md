@@ -122,6 +122,34 @@ By default, four constants are defined: `e`, `pi`, and `i=j=sqrt(-1)`. You can d
 Constants are treated as variables that only ever have one value.
 
 
+### Infinities
+
+When an expression results in an infinity, students are presented with an error message asking them to check for overflow. If you actually want infinity to be an acceptable answer, then you can specify `allow_inf=True`. This allows expressions to evaluate to infinity (or negative infinity), and also makes the constant `infty` available for students to use.
+
+```pycon
+>>> # Without allow_inf turned on:
+>>> grader = FormulaGrader(
+...     answers='infty',
+...     user_constants={
+...         'infty': float('inf')
+...     }
+... )
+>>> try:
+...     grader(None, 'infty')
+... except CalcError as error:
+...     print(error)
+Numerical overflow occurred. Does your expression generate very large numbers?
+>>> # With allow_inf turned on:
+>>> grader = FormulaGrader(
+...     answers='infty',
+...     allow_inf=True
+... )
+>>> grader(None, 'infty') == {'ok': True, 'msg': '', 'grade_decimal': 1}
+True
+
+```
+
+
 ## Functions
 
 By default, a large array of mathematical functions are available for use. See the full list [here](functions_and_constants.md). Note that all functions are capable of handling complex expressions unless otherwise stated. In the following example, `z*z` is recognized to be different from `abs(z)^2`.

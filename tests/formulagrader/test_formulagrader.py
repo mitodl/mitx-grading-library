@@ -966,3 +966,20 @@ def test_dependentsampler():
     )
     assert grader(None, 'y')['ok']
     assert grader(None, 'x^2')['ok']
+
+def test_infinity():
+    grader = FormulaGrader(
+        answers="infty",
+        allow_inf=True
+    )
+    assert grader(None, 'infty')['ok']
+    assert not grader(None, '-infty')['ok']
+    assert grader.default_variables['infty'] == float('inf')
+
+    grader = FormulaGrader(
+        answers='infty',
+        user_constants={'infty': float('inf')}
+    )
+    assert 'infty' not in grader.default_variables
+    with raises(CalcError, match='Numerical overflow occurred. Does your expression generate very large numbers?'):
+        grader(None, 'infty')

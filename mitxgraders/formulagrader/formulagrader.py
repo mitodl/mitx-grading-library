@@ -427,8 +427,8 @@ class FormulaGrader(ItemGrader):
             of constants/variables.
     """
 
-    default_functions = DEFAULT_FUNCTIONS.copy()
     default_variables = DEFAULT_VARIABLES.copy()
+    default_functions = DEFAULT_FUNCTIONS.copy()
     default_suffixes = DEFAULT_SUFFIXES.copy()
 
     # Default comparer for FormulaGrader
@@ -487,6 +487,7 @@ class FormulaGrader(ItemGrader):
             Required('numbered_vars', default=[]): All([text_string], all_unique),
             Required('sample_from', default={}): dict,
             Required('failable_evals', default=0): NonNegative(int),
+            Required('allow_inf', default=False): bool,
             Required('max_array_dim', default=0): NonNegative(int)
             # Do not use this; use MatrixGrader instead
         })
@@ -577,7 +578,14 @@ class FormulaGrader(ItemGrader):
         """
         super(FormulaGrader, self).__init__(config, **kwargs)
 
-        # finish validating
+        # If we are allowing infinities, add this to the default constants.
+        # Note that this is done before variable validation.
+        if self.config['allow_inf']:
+            # Make a new copy, so we don't change this for all FormulaGraders
+            self.default_variables = DEFAULT_VARIABLES.copy()
+            self.default_variables['infty'] = float('Inf')
+
+        # Finish validating
         validate_blacklist_whitelist_config(self.default_functions,
                                             self.config['blacklist'],
                                             self.config['whitelist'])
@@ -592,7 +600,7 @@ class FormulaGrader(ItemGrader):
                                                            self.config['blacklist'],
                                                            self.config['user_functions'])
 
-        # store the comparer utils
+        # Store the comparer utils
         self.comparer_utils = self.get_comparer_utils()
 
         # Set up the various lists we use
@@ -760,7 +768,8 @@ class FormulaGrader(ItemGrader):
                             functions=funclist,
                             suffixes=self.suffixes,
                             max_array_dim=self.config['max_array_dim']):
-                return evaluator(expression, variables, functions, suffixes, max_array_dim)
+                return evaluator(expression, variables, functions, suffixes, max_array_dim,
+                                 allow_inf=self.config['allow_inf'])
 
             # Compute the sibling values, and add them to varlist
             siblings_eval = {
