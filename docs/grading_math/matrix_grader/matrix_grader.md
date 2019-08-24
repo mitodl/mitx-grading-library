@@ -424,7 +424,7 @@ See the documentation for `MatrixEntryComparer` for details on how these options
 
 ## Configuration Options
 
-`MatrixGrader` has all of [`FormulaGrader`](../formula_grader.md)'s configuration options, plus some extras. The extras are:
+`MatrixGrader` has almost all of [`FormulaGrader`](../formula_grader.md)'s configuration options, plus some extras. The extras are:
 
 - `identity_dim`: If specified as a positive integer `n`, then an n by n identity matrix is added to the available constants with name `'I'`. Defaults to `None`.
 - `max_array_dim` (nonnegative int): Controls the maximum [dimension](#dimension-and-shape) of arrays that students can enter entry-by-entry. Default is `1`: vectors can be entered entry-by-entry, but not matrices.
@@ -438,3 +438,7 @@ See the documentation for `MatrixEntryComparer` for details on how these options
 
 - `entry_partial_credit`: If set to `proportional` or a number, uses this setting with `MatrixEntryComparer` as the default comparer.
 - `entry_partial_msg`: If set to a text value, uses this setting with `MatrixEntryComparer` as the default comparer.
+
+The `FormulaGrader` configuration keys that `MatrixGrader` does not have are:
+
+- `allow_inf`: We are unable to handle infinities appearing in vectors/matrices.

@@ -15,6 +15,7 @@ Defines:
 from __future__ import print_function, division, absolute_import, unicode_literals
 
 import six
+from numbers import Number
 import numpy as np
 import scipy.special as special
 from mitxgraders.helpers.calc.specify_domain import SpecifyDomain
@@ -421,7 +422,29 @@ def within_tolerance(x, y, tolerance):
     0.223607
     >>> within_tolerance(A, B, 0.25)
     True
+
+    Also works for infinities (ignores tolerance in this case)
+    >>> inf = float('inf')
+    >>> within_tolerance(inf, inf, 0)
+    True
+    >>> within_tolerance(-inf, -inf, 0)
+    True
+    >>> within_tolerance(inf, -inf, 0)
+    False
+    >>> within_tolerance(1, inf, '100%')
+    False
+    >>> within_tolerance(inf, 1, '100%')
+    False
+
+    However, cannot handle infinities in matrices.
     """
+    # Handle infinities separately, ignoring any tolerance
+    # Only do this for numbers, not matrices
+    inf = float('inf')
+    if isinstance(x, Number):
+        if x == inf or y == inf or x == -inf or y == -inf:
+            return x == y
+
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
     if isinstance(tolerance, six.text_type):
