@@ -97,7 +97,8 @@ class MatrixGrader(FormulaGrader):
                 Required('msg_detail', default='type'): Any(None, 'type', 'shape')
             },
             Optional('entry_partial_credit'): Any(All(Number, Range(0, 1)), 'proportional'),
-            Optional('entry_partial_msg'): text_string
+            Optional('entry_partial_msg'): text_string,
+            Required('allow_inf', default=False): False,  # Ensure that this is turned off
         })
 
     def __init__(self, config=None, **kwargs):
