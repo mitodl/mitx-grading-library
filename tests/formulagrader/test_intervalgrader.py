@@ -77,3 +77,19 @@ def test_subgraders():
 
     with raises(Error):
         IntervalGrader(subgrader=StringGrader())
+
+def test_inferring_answers():
+    grader = IntervalGrader()
+    grader1 = IntervalGrader(answers="(1,2]")
+    grader2 = IntervalGrader(answers=["(", "1", "2", "]"])
+    assert grader1 == grader2
+
+    assert grader("(1,2]", "(1,2]") == grader1("(1,2]", "(1,2]")
+    assert grader("(1,2]", "(1,2)") == grader1("(1,2]", "(1,2)")
+
+def test_formulas():
+    grader = IntervalGrader(
+        answers="(x, y^2 + 1)",
+        subgrader=FormulaGrader(variables=['x', 'y'])
+    )
+    assert grader(None, '(x, y^2+1]')['grade_decimal'] == 0.5

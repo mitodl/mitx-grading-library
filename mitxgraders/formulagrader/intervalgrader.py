@@ -6,6 +6,8 @@ as enclosing brackets.
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
+import six
+
 from voluptuous import Required, Schema, Any, All, Length
 
 from mitxgraders.baseclasses import AbstractGrader
@@ -22,6 +24,8 @@ class IntervalGrader(SingleListGrader):
     The following are examples of possible entries:
     * [1, 2)
     * [0, 1+pi]
+    By default, available brackets are [] and (), but other options are available through
+    configuration (e.g., <> and {}).
 
     Answers can be provided in one of three ways:
     * Inferred through the 'expect' keyword
@@ -96,6 +100,11 @@ class IntervalGrader(SingleListGrader):
         # The structure of answer_tuple at this stage is:
         # tuple(dict('expect', 'grade_decimal', 'ok', 'msg'))
         # where 'expect' is a list that needs validation.
+
+        # If 'expect' is a string, use infer_from_expect to convert it to a list.
+        for entry in answer_tuple:
+            if isinstance(entry['expect'], six.string_types):
+                entry['expect'] = self.infer_from_expect(entry['expect'])
 
         # Assert that all answers have length 4
         for answer_list in answer_tuple:
