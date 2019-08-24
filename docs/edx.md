@@ -64,7 +64,7 @@ Also worth noting is that the grader is stored in a python variable, which in th
 
 ## Using `correct_answer` for multiple inputs
 
-If you are using multiple inputs (such as when using a `ListGrader`) or a `SingleListGrader`, you must provide the `answers` key to the grader explicitly, as the `expect` or `answer` parameters in the `customresponse` tag are ignored by both edX and the grader. When using multiple inputs, it's recommended to provide a `correct_answer` parameter on the `textline` tags, which is what is used to show students the correct answer. Here is an example.
+If you are using multiple inputs (such as when using a `ListGrader`), you must provide the `answers` key to the grader explicitly, as the `expect` or `answer` parameters in the `customresponse` tag are ignored by both edX and the grader. When using multiple inputs, it's recommended to provide a `correct_answer` parameter on the `textline` tags, which is what is used to show students the correct answer. Here is an example.
 
 ```XML
 <problem>
