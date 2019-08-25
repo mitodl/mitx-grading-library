@@ -729,6 +729,16 @@ class SingleListGrader(ItemGrader):
         # Split the student response
         student_list = student_input.split(self.config['delimiter'])
 
+        # Check for the wrong number of entries
+        # This is done before empty entries, as this is the preferred error message
+        # if both apply.
+        if self.config['length_error'] and len(answers) != len(student_list):
+            msg = 'List length error: Expected {} terms in the list, but received {}. ' + \
+                  'Separate items with character "{}"'
+            raise MissingInput(msg.format(len(answers),
+                                          len(student_list),
+                                          self.config['delimiter']))
+
         # Check for empty entries in the list
         if self.config['missing_error']:
             bad_items = [idx+1 for (idx, item) in enumerate(student_list)
@@ -741,14 +751,6 @@ class SingleListGrader(ItemGrader):
                 msg += ', '.join(map(str, bad_items))
                 raise MissingInput(msg)
 
-        # Check for the wrong number of entries
-        if self.config['length_error'] and len(answers) != len(student_list):
-            msg = 'List length error: Expected {} terms in the list, but received {}. ' + \
-                  'Separate items with character "{}"'
-            raise MissingInput(msg.format(len(answers),
-                                          len(student_list),
-                                          self.config['delimiter']))
-
         # We need to keep track of missing and extra answers.
         # Idea is:
         #    use _AutomaticFailure to pad expect and answers to equal length
@@ -759,22 +761,29 @@ class SingleListGrader(ItemGrader):
 
         # Compute the results
         if self.config['ordered']:
-            input_list = [checker(*pair) for pair in zip(pad_ans, pad_stud)]
+            grade_list = [checker(*pair) for pair in zip(pad_ans, pad_stud)]
         else:
-            input_list = find_optimal_order(checker, pad_ans, pad_stud)
+            grade_list = find_optimal_order(checker, pad_ans, pad_stud)
 
+        # Convert the list of grades into the SingleListGrader result
+        return self.process_grade_list(grade_list, len(answers), msg, grade_decimal)
+
+    def process_grade_list(self, grade_list, num_answers, msg, grade_decimal):
+        """
+        Convert a list of grades into a single grade for returning.
+        """
         # Consolidate the separate results into a single result
-        result = consolidate_single_return(input_list,
-                                           n_expect=len(answers),
+        result = consolidate_single_return(grade_list,
+                                           n_expect=num_answers,
                                            partial_credit=self.config['partial_credit'])
 
         # Check if all inputs were awarded credit
         if not isinstance(self.config['subgrader'], SingleListGrader):
             # Check to see if all items were awarded credit
-            all_awarded = all(item['grade_decimal'] > 0 for item in input_list)
+            all_awarded = all(item['grade_decimal'] > 0 for item in grade_list)
         else:
             # Check to see if all_awarded was True for all of the child SingleListGraders
-            all_awarded = all(item['all_awarded'] for item in input_list)
+            all_awarded = all(item['all_awarded'] for item in grade_list)
 
         # Mark if all inputs were awarded in the result, so that any higher
         # level graders can use this information.
@@ -782,11 +791,14 @@ class SingleListGrader(ItemGrader):
 
         # Append the message if there is one (and it's deserved)
         if all_awarded and msg != '':
-                result['msg'] = msg if result['msg'] == '' else result['msg'] + '\n' + msg
+            result['msg'] = msg if result['msg'] == '' else result['msg'] + '\n' + msg
 
         # Apply the overall grade_decimal for this answer
         result['grade_decimal'] *= grade_decimal
         result['ok'] = AbstractGrader.grade_decimal_to_ok(result['grade_decimal'])
+
+        # Tack on the individual grades (may be used by subclasses)
+        result['individual'] = grade_list
 
         return result
 

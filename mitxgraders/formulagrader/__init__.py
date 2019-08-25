@@ -3,6 +3,8 @@ Contains classes for numerical and formula graders
 * NumericalGrader
 * FormulaGrader
 * MatrixGrader
+* IntegralGrader
+* IntervalGrader
 """
 from __future__ import print_function, division, absolute_import
 
@@ -28,10 +30,15 @@ from mitxgraders.formulagrader.integralgrader import (
     IntegralGrader,
 )
 
+from mitxgraders.formulagrader.intervalgrader import (
+    IntervalGrader,
+)
+
 # Set the objects to be *-imported from package
 __all__ = [
     "NumericalGrader",
     "FormulaGrader",
     "MatrixGrader",
-    "IntegralGrader"
+    "IntegralGrader",
+    "IntervalGrader"
 ]
