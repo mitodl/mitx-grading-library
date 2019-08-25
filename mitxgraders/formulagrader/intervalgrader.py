@@ -47,6 +47,13 @@ class IntervalGrader(SingleListGrader):
 
     No credit is awarded for getting the entries backwards.
 
+    Warning: If the formula you're typing in uses a function that has more than one argument
+    (or for whatever reason uses a comman), you should change the delimiter from a comma to
+    something else.
+
+    Warning: If using MJxPrep.js to format answers nicely, you will probably want to turn
+    off column vectors. Otherwise, "[1, 2]" will display as a vector rather than as an interval.
+
     Configuration options:
         opening_brackets (str): A string of allowed opening bracket characters (default '[(')
 
@@ -55,7 +62,7 @@ class IntervalGrader(SingleListGrader):
         delimiter (str): Single character to use as the separator between entries (default ',')
 
         subgrader (FormulaGrader or NumericalGrader): The grader to use to grade each individual
-            entry (default NumericalGrader(tolerance=1e-13))
+            entry (default NumericalGrader(tolerance=1e-13, allow_inf=True))
 
         partial_credit (bool): Whether to award partial credit for a partly-correct answer
             (default True)
@@ -73,7 +80,8 @@ class IntervalGrader(SingleListGrader):
             Required('length_error', default=True): True,
             Required('missing_error', default=True): True,
 
-            # Subgrader default is set to FormulaGrader() in initialization
+            # Subgrader default is set to NumericalGrader(tolerance=1e-13, allow_inf=True)
+            # in initialization
             Required('subgrader', default=None): Any(FormulaGrader, None),
             Required('opening_brackets', default='[('): All(text_string, Length(min=1)),
             Required('closing_brackets', default='])'): All(text_string, Length(min=1))
@@ -86,7 +94,7 @@ class IntervalGrader(SingleListGrader):
         # Step 1: Provide the default subgrader
         use_config = config if config else kwargs
         if use_config.get('subgrader') is None:
-            use_config['subgrader'] = NumericalGrader(tolerance=1e-13)
+            use_config['subgrader'] = NumericalGrader(tolerance=1e-13, allow_inf=True)
 
         # Step 2: Validate the configuration using SingleListGrader routines
         super(IntervalGrader, self).__init__(use_config)

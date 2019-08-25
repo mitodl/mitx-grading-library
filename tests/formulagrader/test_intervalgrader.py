@@ -70,7 +70,7 @@ def test_messages():
     assert grader("[1, 2)", "(1, 2)")['msg'] == 'yay!<br/>\ntesting'
 
 def test_subgraders():
-    assert IntervalGrader() == IntervalGrader(subgrader=NumericalGrader(tolerance=1e-13))
+    assert IntervalGrader() == IntervalGrader(subgrader=NumericalGrader(tolerance=1e-13, allow_inf=True))
 
     # Make sure this instantiates
     IntervalGrader(subgrader=FormulaGrader(tolerance=1e-13))
@@ -93,3 +93,9 @@ def test_formulas():
         subgrader=FormulaGrader(variables=['x', 'y'])
     )
     assert grader(None, '(x, y^2+1]')['grade_decimal'] == 0.5
+
+def test_infinite_interval():
+    grader = IntervalGrader(
+        answers="(0, infty)"
+    )
+    assert grader(None, '(0, infty)')['ok']
