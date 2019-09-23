@@ -48,7 +48,7 @@ class IntervalGrader(SingleListGrader):
     No credit is awarded for getting the entries backwards.
 
     Warning: If the formula you're typing in uses a function that has more than one argument
-    (or for whatever reason uses a comman), you should change the delimiter from a comma to
+    (or for whatever reason uses a comma), you should change the delimiter from a comma to
     something else.
 
     Warning: If using MJxPrep.js to format answers nicely, you will probably want to turn
