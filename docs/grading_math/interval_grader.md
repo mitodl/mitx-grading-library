@@ -101,9 +101,11 @@ The default delimiter is a comma. However, due to the way expressions are parsed
 
 ## Partial Credit (and how credit is assigned in general)
 
-Grading works by first using the subgrader to obtain the decimal grade for each expression the student submitted. For each correct expression, the bracket is then inspected. If the bracket is correct, then the score for that expression is kept (or if `grade_decimal` is set for the bracket, then the score for the expression is multiplied by that entry). If the bracket is incorrect, zero is awarded for that expression. The two resulting scores are then combined to obtain the overall score. If `partial_credit` is set to `False`, then the overall score must be 1 for any credit to be awarded. By default, `partial_credit` is `True`. When partial credit is turned on, each half of the interval is worth 50% of the overall credit. Note that no credit is awarded for getting the entries backwards.
+Grading works by first using the subgrader to obtain the decimal grade for each expression the student submitted. For each correct expression, the bracket is then inspected. If the bracket is correct, then the score for that expression is kept (or if `grade_decimal` is set for the bracket, then the score for the expression is multiplied by that entry). If the bracket is incorrect, zero is awarded for that expression. The two resulting scores are then combined to obtain the overall score. If `partial_credit` is set to `False`, then the overall score must be 1 for any credit to be awarded. By default, `partial_credit` is `True`. When partial credit is turned on, each half of the interval is worth 50% of the overall credit.
 
 To allow for partial credit when incorrect brackets are used, set up alternative answers using the `ItemGrader` answers specification, as demonstrated in an example above.
+
+Note that no credit is awarded for getting the entries backwards. If this should be graded correct, supply alternative answers to the grader using the `ItemGrader` answers specification.
 
 
 ## Options Listing
