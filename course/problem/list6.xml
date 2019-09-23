@@ -1,0 +1,82 @@
+<problem display_name="Styling Problems" showanswer="always" weight="10" attempts="">
+
+<p>You can use CSS and HTML tables combined with <code>ListGrader</code> to style your problems however you want them to look. Below is an example of a double integral. While it doesn't have the fancy invariance under transformations that <code>IntegralGrader</code> offers for single integrals, if your variables have physical significance, then the invariance is likely unnecessary.</p>
+
+<p>Enter the following integral:</p>
+
+[mathjax]\Phi = \int_0^a dx \int_0^b dy \frac{1}{\sqrt{x^2 + y^2 + a^2}}[/mathjax]
+
+<script type="text/python">
+from mitxgraders import *
+fg = FormulaGrader(variables=['x', 'y', 'a', 'b'])
+grader = ListGrader(
+    ordered=True,
+    answers=(
+        ['a', 'b', '1/sqrt(x^2+y^2+a^2)', '0', '0'],
+        ['b', 'a', '1/sqrt(x^2+y^2+a^2)', '0', '0'],
+    ),
+    subgraders=fg
+)
+</script>
+
+<style>
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline input {
+  min-width: 0 !important;
+}
+.xmodule_display.xmodule_CapaModule div.problem section div span.MathJax {
+  display: inline-block !important;
+}
+.xmodule_display.xmodule_CapaModule div.problem section div span.MathJax_Preview {
+  display: inline-block !important;
+}
+</style>
+
+<customresponse cfn="grader">
+
+<table>
+  <col style="width:10%"/>
+  <col style="width:10%"/>
+  <col style="width:10%"/>
+  <col style="width:70%"/>
+  <tbody>
+    <tr>
+      <td></td>
+      <td>
+        <textline size="3" correct_answer="a"/>
+      </td>
+      <td>
+        <textline size="3" correct_answer="b"/>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>\(\displaystyle \Phi =\) </td>
+      <td>
+        <p> \( \displaystyle \huge\int\)</p>
+      </td>
+      <td>
+        <p> \( \displaystyle \huge\int\)</p>
+      </td>
+      <td>
+        <br/>
+        <textline inline="1" size="40" correct_answer="1/sqrt(x^2+y^2+a^2)" math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js" trailing_text="\(dx \, dy\)"/>
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <textline size="3" correct_answer="0"/>
+      </td>
+      <td>
+        <textline size="3" correct_answer="0"/>
+      </td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+ 
+</customresponse>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/list6.xml" target="_blank">View source</a></p>
+
+</problem>

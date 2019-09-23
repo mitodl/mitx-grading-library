@@ -21,7 +21,7 @@ grader = FormulaGrader(
   <textline math="1" inline="1" correct_answer="b^2/a" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
 </customresponse>
 
-<p>We have a number of built-in comparison functions for various purposes.</p>
+<p>We have a number of built-in comparison functions for various purposes, and it is also straightforward to write your own (see <a href="/jump_to_id/formula14">this example</a>).</p>
 
 <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula8.xml" target="_blank">View source</a></p>
 

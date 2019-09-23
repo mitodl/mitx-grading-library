@@ -12,7 +12,7 @@ Both the enclosing brackets and the numbers are graded, and a variety of options
 
 !!! Warning
     - If using `MJxPrep.js` to format answers nicely, you will probably want to turn
-    off column vectors. Otherwise, `[1, 2]` will display as a vector rather than as an interval.
+    off column vectors, or simply not use the preprocessor for interval problems. Otherwise, `[1, 2]` will display as a vector rather than as an interval.
 
     - If your expressions use a comma in any way, you should change the delimiter from a comma to
     something else.

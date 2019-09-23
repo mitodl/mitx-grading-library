@@ -1,0 +1,39 @@
+<problem display_name="Basic Usage" showanswer="always" weight="10" attempts="">
+
+<p><code>IntervalGrader</code> is a specialized grader to grade two mathematical expressions, as well as an opening and a closing character. Below is a typical example.</p>
+
+<p>In what interval is \(x - x^2\) positive semidefinite? Use <code>()</code> to denote open intervals and <code>[]</code> to denote closed intervals, and separate the limits with a comma.</p>
+
+<p>Suggested answers:</p>
+
+<ul>
+  <li><code>[0, 1]</code> (correct answer)</li>
+  <li><code>[0, 2]</code></li>
+  <li><code>(0, 1)</code></li>
+</ul>
+
+<script type="text/python">
+from mitxgraders import *
+</script>
+
+<p style="display:inline">\(x \in\) </p>
+<customresponse cfn="IntervalGrader()" inline="1" expect="[0, 1]">
+  <textline math="1" inline="1" />
+</customresponse>
+
+
+<p>Each limit is a mathematical expression that can be parsed. Also, <code>infty</code> is understood to mean infinity, so you can have an interval end at infinity.</p>
+
+<p>Where is \(1/(x - \sqrt{2})\) positive?</p>
+
+<p style="display:inline">\(x \in\) </p>
+<customresponse cfn="IntervalGrader()" inline="1" expect="(sqrt(2), infty)">
+  <textline math="1" inline="1" />
+</customresponse>
+
+
+<p>Note: We have turned off the AsciiMath Preprocessor for these inputs, as otherwise, square brackets will render as column vectors!</p>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/interval1.xml" target="_blank">View source</a></p>
+
+</problem>

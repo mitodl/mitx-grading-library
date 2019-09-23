@@ -2,7 +2,7 @@
     "GRADER": [
         {
             "drop_count": 0,
-            "min_count": 0,
+            "min_count": 1,
             "short_label": "HW",
             "type": "Homework",
             "weight": 1
