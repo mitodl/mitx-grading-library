@@ -2,7 +2,16 @@
 
 # Version 2
 
-This is a major new version with many new features added. We have been very careful to preserve backwards compatibility of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2.0. However, we do warn that we broke internal backwards compatibility in a number of locations in order to accommodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.0.
+This is a major new version with many new features added. We have been very careful to preserve backwards compatibility of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2. However, we do warn that we broke internal backwards compatibility in a number of locations in order to accommodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.
+
+## Version 2.1
+
+### Version 2.1.0
+
+* Added a new grader `IntervalGrader`, which grades expressions for mathematical intervals.
+* Added `allow_inf` option to `FormulaGrader` and `NumericalGrader`, which allow for `infty` (infinity) to appear in expressions.
+* `SingleListGrader` can now be provided answers as a single string. It can also infer answers from the `expect` keyword of a `customresponse` tag.
+* 
 
 ## Version 2.0
 
