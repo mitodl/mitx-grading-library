@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
-    <title>Functions and Constants List - MITxGraders</title>
+    <title>IntervalGrader - MITxGraders</title>
 
     <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -140,8 +140,8 @@
 
                         
                             
-<li class="active">
-    <a href="./">Functions and Constants List</a>
+<li >
+    <a href="../functions_and_constants/">Functions and Constants List</a>
 </li>
 
                         
@@ -170,8 +170,8 @@
 
                         
                             
-<li >
-    <a href="../interval_grader/">IntervalGrader</a>
+<li class="active">
+    <a href="./">IntervalGrader</a>
 </li>
 
                         
@@ -227,12 +227,12 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../sampling/">
+                        <a rel="next" href="../integral_grader/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../user_functions/">
+                        <a rel="prev" href="../../grading_lists/single_list_grader/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -248,105 +248,109 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#mathematical-functions-and-constants">Mathematical Functions and Constants</a></li>
-            <li class="second-level"><a href="#formulagrader-and-numericalgrader-default-functions">FormulaGrader and NumericalGrader Default Functions</a></li>
+        <li class="first-level active"><a href="#intervalgrader">IntervalGrader</a></li>
+            <li class="second-level"><a href="#basic-usage">Basic Usage</a></li>
                 
-            <li class="second-level"><a href="#matrixgrader-default-functions">MatrixGrader Default Functions</a></li>
+            <li class="second-level"><a href="#brackets">Brackets</a></li>
                 
-            <li class="second-level"><a href="#default-constants">Default Constants</a></li>
+            <li class="second-level"><a href="#subgrader">Subgrader</a></li>
                 
-            <li class="second-level"><a href="#optional-constant-collections">Optional Constant Collections</a></li>
+            <li class="second-level"><a href="#delimiter">Delimiter</a></li>
+                
+            <li class="second-level"><a href="#partial-credit-and-how-credit-is-assigned-in-general">Partial Credit (and how credit is assigned in general)</a></li>
+                
+            <li class="second-level"><a href="#options-listing">Options Listing</a></li>
                 
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="mathematical-functions-and-constants">Mathematical Functions and Constants<a class="headerlink" href="#mathematical-functions-and-constants" title="Permanent link"> # </a></h1>
-<h2 id="formulagrader-and-numericalgrader-default-functions">FormulaGrader and NumericalGrader Default Functions<a class="headerlink" href="#formulagrader-and-numericalgrader-default-functions" title="Permanent link"> # </a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Below, expressions marked with a * may require our <a href="../renderer/">AsciiMath renderer definitions</a> to display properly in edX.</p>
-</div>
-<p>By default, all of the following functions are made available to students in <code>FormulaGrader</code> problems.</p>
+<h1 id="intervalgrader">IntervalGrader<a class="headerlink" href="#intervalgrader" title="Permanent link"> # </a></h1>
+<p><code>IntervalGrader</code> grades pairs of numbers enclosed in appropriate brackets. It is intended for use in grading intervals, but can be used to grade other pairs of numbers/formulas with enclosing characters. The following are examples of possible entries:</p>
 <ul>
-<li><code>sin(x)</code> Sine</li>
-<li><code>cos(x)</code> Cosine</li>
-<li><code>tan(x)</code> Tangent</li>
-<li><code>sec(x)</code> Secant</li>
-<li><code>csc(x)</code> Cosecant</li>
-<li><code>cot(x)</code> Cotangent</li>
-<li><code>sqrt(x)</code> Square Root</li>
-<li><code>log10(x)</code> Log (base 10)*</li>
-<li><code>log2(x)</code> Log (base 2)*</li>
-<li><code>ln(x)</code> Natural logarithm</li>
-<li><code>exp(x)</code> Exponential</li>
-<li><code>arccos(x)</code> Inverse Cosine</li>
-<li><code>arcsin(x)</code> Inverse Sine</li>
-<li><code>arctan(x)</code> Inverse Tangent</li>
-<li><code>arctan2(x, y)</code> Four-quadrant Inverse Tangent*</li>
-<li><code>arcsec(x)</code> Inverse Secant*</li>
-<li><code>arccsc(x)</code> Inverse Cosecant*</li>
-<li><code>arccot(x)</code> Inverse Cotangent*</li>
-<li><code>abs(x)</code> Absolute value (real) or modulus (complex)</li>
-<li><code>factorial(x)</code> and <code>fact(x)</code> Factorial*<ul>
-<li>domain: all complex numbers except negative integers. Large outputs may raise <code>OverflowError</code>s.</li>
+<li><code>[1, 2)</code></li>
+<li><code>[0, 1 + pi]</code></li>
 </ul>
+<p>Both the enclosing brackets and the numbers are graded, and a variety of options for partial credit are available.</p>
+<p><code>IntervalGrader</code> is an <code>ItemGrader</code>, and so can be used in lists as desired.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<ul>
+<li>
+<p>If using <code>MJxPrep.js</code> to format answers nicely, you will probably want to turn
+off column vectors. Otherwise, <code>[1, 2]</code> will display as a vector rather than as an interval.</p>
 </li>
-<li><code>sinh(x)</code> Hyperbolic Sine</li>
-<li><code>cosh(x)</code> Hyperbolic Cosine</li>
-<li><code>tanh(x)</code> Hyperbolic Tangent</li>
-<li><code>sech(x)</code> Hyperbolic Secant</li>
-<li><code>csch(x)</code> Hyperbolic Cosecant</li>
-<li><code>coth(x)</code> Hyperbolic Cotangent</li>
-<li><code>arcsinh(x)</code> Inverse Hyperbolic Sine*</li>
-<li><code>arccosh(x)</code> Inverse Hyperbolic Cosine*</li>
-<li><code>arctanh(x)</code> Inverse Hyperbolic Tangent*</li>
-<li><code>arcsech(x)</code> Inverse Hyperbolic Secant*</li>
-<li><code>arccsch(x)</code> Inverse Hyperbolic Cosecant*</li>
-<li><code>arccoth(x)</code> Inverse Hyperbolic Cotangent*</li>
-<li><code>floor(x)</code> Floor function (applies only to real numbers)</li>
-<li><code>ceil(x)</code> Ceiling function (applies only to real numbers)</li>
-<li><code>min(x, y, z, ...)</code> Minimum of the arguments (applies only to real numbers, 2 or more arguments)</li>
-<li><code>max(x, y, z, ...)</code> Maximum of the arguments (applies only to real numbers, 2 or more arguments)</li>
-<li><code>re(x)</code> Real part of a complex expression*</li>
-<li><code>im(x)</code> Imaginary part of a complex expression*</li>
-<li><code>conj(x)</code> Complex conjugate of a complex expression*</li>
-<li><code>kronecker(x, y)</code> Kronecker delta* (Note that we highly recommend integer sampling over a short range (eg, 1 to 4) when Kronecker deltas appear in an answer, and using many samples (eg, 30) so that most permutations appear in the sampling.)</li>
+<li>
+<p>If your expressions use a comma in any way, you should change the delimiter from a comma to
+something else.</p>
+</li>
 </ul>
-<h2 id="matrixgrader-default-functions">MatrixGrader Default Functions<a class="headerlink" href="#matrixgrader-default-functions" title="Permanent link"> # </a></h2>
-<p>In <code>MatrixGrader</code> problems, all <code>FormulaGrader</code> functions are available by default, as are the following extra functions:</p>
-<ul>
-<li><code>abs(x)</code>: absolute value of a scalar or magnitude of a vector</li>
-<li><code>adj(x)</code>: Hermitian adjoint, same as <code>ctrans(x)</code>*</li>
-<li><code>cross(x, y)</code>: cross product, inputs must be 3-component vectors*</li>
-<li><code>ctrans(x)</code>: conjugate transpose, same as <code>adj(x)</code>*</li>
-<li><code>det(x)</code>: determinant, input must be square matrix</li>
-<li><code>norm(x)</code>: Frobenius norm, works for scalars, vectors, and matrices</li>
-<li><code>trans(x)</code>: transpose*</li>
-<li><code>trace(x)</code>: trace</li>
-</ul>
-<h2 id="default-constants">Default Constants<a class="headerlink" href="#default-constants" title="Permanent link"> # </a></h2>
-<p>Available in <code>FormulaGrader</code>, <code>NumericalGrader</code>, and <code>MatrixGrader</code> by default:</p>
-<ul>
-<li><code>i</code>: imaginary unit (same as <code>j</code>)</li>
-<li><code>j</code>: imaginary unit (same as <code>i</code>)</li>
-<li><code>e</code>: approximately 2.718281828</li>
-<li><code>pi</code>: approximately 3.141592654</li>
-</ul>
-<h2 id="optional-constant-collections">Optional Constant Collections<a class="headerlink" href="#optional-constant-collections" title="Permanent link"> # </a></h2>
-<p>We provide a few collections of constants that can be imported for convenience and reuse. For example, <code>pauli</code> is a dictionary with keys <code>sigma_x</code>, <code>sigma_y</code>, and <code>sigma_z</code> that are <a href="../matrix_grader/matrix_grader/#matrix-operations-and-matharrays"><code>MathArray</code></a> representations of the 2x2 Pauli matrices.</p>
-<p>The collections of available mathematical constants are:</p>
-<ul>
-<li><code>pauli</code>: MathArray representations of the 2x2 Pauli matrices, <code>sigma_x</code>, <code>sigma_y</code>, and <code>sigma_z</code></li>
-<li><code>cartesian_xyz</code>: MathArray representations of the three-dimensional Cartesian unit vectors, named <code>hatx</code>, <code>haty</code>, <code>hatz</code></li>
-<li><code>cartesian_ijk</code>: MathArray representations of the three-dimensional Cartesian unit vectors, named <code>hati</code>, <code>hatj</code>, <code>hatk</code></li>
-</ul>
-<p>Each collection is a dictionary that can be provided as a value of <code>user_constants</code>:</p>
+</div>
+<h2 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link"> # </a></h2>
+<p>To use an <code>IntervalGrader</code>, you can simply call invoke it like a typical grader:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = MatrixGrader(
-...   answers='sigma_x + sigma_z',
-...   user_constants=pauli
-... )</code></pre></div>
+&gt;&gt;&gt; grader = IntervalGrader(answers='[0, 1]')
+&gt;&gt;&gt; grader(None, '[0, 1]') == {'ok': True, 'grade_decimal': 1, 'msg': ''}
+True</code></pre>
+
+
+<p>Answers may be specified by supplying the relevant answer as a string, as in the above example, either through the <code>answers</code> key or through the <code>expect</code> keyword of the <code>customresponse</code> tag. You can also break out the answer into four constituent parts in a list as follows:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
+&gt;&gt;&gt; grader = IntervalGrader(answers=['[', '0', '1', ']'])
+&gt;&gt;&gt; grader(None, '[0, 1]') == {'ok': True, 'grade_decimal': 1, 'msg': ''}
+True</code></pre>
+
+
+<p>Each individual answer component conforms to the <code>ItemGrader</code> answers specification, so you can do things like the following:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
+...     answers=[
+...         ('[', {'expect': '(', 'msg': 'Your opening bracket is wrong.', 'grade_decimal': 0.5}),
+...         '0',
+...         '1',
+...         (']', {'expect': ')', 'msg': 'Your closing bracket is wrong.', 'grade_decimal': 0.5}),
+...     ]
+... )
+&gt;&gt;&gt; grader(None, '[0, 1)') == {'ok': 'partial', 'grade_decimal': 0.75, 'msg': 'Your closing bracket is wrong.'}
+True</code></pre>
+
+
+<h2 id="brackets">Brackets<a class="headerlink" href="#brackets" title="Permanent link"> # </a></h2>
+<p>You can specify the opening and closing brackets that students may use. Specify each separately as a list of acceptable characters. Entries that do not use these brackets will receive an error message.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
+...     answers='[0,1]',
+...     opening_brackets='([{',
+...     closing_brackets=')]}'
+... )</code></pre>
+
+
+<p>The default for <code>opening_brackets</code> is <code>'[('</code>, while the default for <code>closing_brackets</code> is <code>'])'</code>.</p>
+<h2 id="subgrader">Subgrader<a class="headerlink" href="#subgrader" title="Permanent link"> # </a></h2>
+<p>Grading of the two math expressions is performed by a subgrader. The default subgrader is <code>NumericalGrader(tolerance=1e-13, allow_inf=True)</code>, which allows <code>infty</code> as an entry, and otherwise sets a tight absolute tolerance on the answers. If this default doesn't suit your requirements, you may specify your own <code>FormulaGrader</code> or <code>NumericalGrader</code> as the subgrader for the expressions. This is particularly useful if you want variables to be allowed to appear in the expressions.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
+...     answers='[a,b^2]',
+...     subgrader=FormulaGrader(variables=['a', 'b'])
+... )</code></pre>
+
+
+<h2 id="delimiter">Delimiter<a class="headerlink" href="#delimiter" title="Permanent link"> # </a></h2>
+<p>The default delimiter is a comma. However, due to the way expressions are parsed, if your expressions include commas in any location, the answer will not parse correctly. We suggest changing the delimiter to another character, as follows.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
+...     answers='[0:1]',
+...     delimiter=':'
+... )</code></pre>
+
+
+<h2 id="partial-credit-and-how-credit-is-assigned-in-general">Partial Credit (and how credit is assigned in general)<a class="headerlink" href="#partial-credit-and-how-credit-is-assigned-in-general" title="Permanent link"> # </a></h2>
+<p>Grading works by first using the subgrader to obtain the decimal grade for each expression the student submitted. For each correct expression, the bracket is then inspected. If the bracket is correct, then the score for that expression is kept (or if <code>grade_decimal</code> is set for the bracket, then the score for the expression is multiplied by that entry). If the bracket is incorrect, zero is awarded for that expression. The two resulting scores are then combined to obtain the overall score. If <code>partial_credit</code> is set to <code>False</code>, then the overall score must be 1 for any credit to be awarded. By default, <code>partial_credit</code> is <code>True</code>. When partial credit is turned on, each half of the interval is worth 50% of the overall credit. Note that no credit is awarded for getting the entries backwards.</p>
+<p>To allow for partial credit when incorrect brackets are used, set up alternative answers using the <code>ItemGrader</code> answers specification, as demonstrated in an example above.</p>
+<h2 id="options-listing">Options Listing<a class="headerlink" href="#options-listing" title="Permanent link"> # </a></h2>
+<p>Here is the full list of options specific to an <code>IntervalGrader</code>.</p>
+<pre class="codehilite"><code class="language-python">grader = IntervalGrader(
+    opening_brackets=str,  # defaykt '[('
+    closing_brackets=str,  # default '])'
+    delimiter=str,  # default ',', must be one character
+    partial_credit=bool  # default True
+)</code></pre></div>
         
     </div>
 

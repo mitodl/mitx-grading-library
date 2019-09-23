@@ -169,6 +169,12 @@
 </li>
 
                         
+                            
+<li >
+    <a href="../../interval_grader/">IntervalGrader</a>
+</li>
+
+                        
                         </ul>
                     </li>
                 
@@ -779,7 +785,7 @@ False</code></pre>
 </ul>
 <p>See the documentation for <code>MatrixEntryComparer</code> for details on how these options work.</p>
 <h2 id="configuration-options">Configuration Options<a class="headerlink" href="#configuration-options" title="Permanent link"> # </a></h2>
-<p><code>MatrixGrader</code> has all of <a href="../../formula_grader/"><code>FormulaGrader</code></a>'s configuration options, plus some extras. The extras are:</p>
+<p><code>MatrixGrader</code> has almost all of <a href="../../formula_grader/"><code>FormulaGrader</code></a>'s configuration options, plus some extras. The extras are:</p>
 <ul>
 <li><code>identity_dim</code>: If specified as a positive integer <code>n</code>, then an n by n identity matrix is added to the available constants with name <code>'I'</code>. Defaults to <code>None</code>.</li>
 <li><code>max_array_dim</code> (nonnegative int): Controls the maximum <a href="#dimension-and-shape">dimension</a> of arrays that students can enter entry-by-entry. Default is <code>1</code>: vectors can be entered entry-by-entry, but not matrices.</li>
@@ -797,6 +803,10 @@ False</code></pre>
 <p><code>entry_partial_credit</code>: If set to <code>proportional</code> or a number, uses this setting with <code>MatrixEntryComparer</code> as the default comparer.</p>
 </li>
 <li><code>entry_partial_msg</code>: If set to a text value, uses this setting with <code>MatrixEntryComparer</code> as the default comparer.</li>
+</ul>
+<p>The <code>FormulaGrader</code> configuration keys that <code>MatrixGrader</code> does not have are:</p>
+<ul>
+<li><code>allow_inf</code>: We are unable to handle infinities appearing in vectors/matrices.</li>
 </ul></div>
         
     </div>

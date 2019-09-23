@@ -169,6 +169,12 @@
 </li>
 
                         
+                            
+<li >
+    <a href="../interval_grader/">IntervalGrader</a>
+</li>
+
+                        
                         </ul>
                     </li>
                 
@@ -251,6 +257,7 @@
                 
             <li class="second-level"><a href="#constants">Constants</a></li>
                 
+                <li class="third-level"><a href="#infinities">Infinities</a></li>
             <li class="second-level"><a href="#functions">Functions</a></li>
                 
                 <li class="third-level"><a href="#user-functions">User Functions</a></li>
@@ -366,6 +373,29 @@
 
 
 <p>Constants are treated as variables that only ever have one value.</p>
+<h3 id="infinities">Infinities<a class="headerlink" href="#infinities" title="Permanent link"> # </a></h3>
+<p>When an expression results in an infinity, students are presented with an error message asking them to check for overflow. If you actually want infinity to be an acceptable answer, then you can specify <code>allow_inf=True</code>. This allows expressions to evaluate to infinity (or negative infinity), and also makes the constant <code>infty</code> available for students to use.</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Without allow_inf turned on:
+&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='infty',
+...     user_constants={
+...         'infty': float('inf')
+...     }
+... )
+&gt;&gt;&gt; try:
+...     grader(None, 'infty')
+... except CalcError as error:
+...     print(error)
+Numerical overflow occurred. Does your expression generate very large numbers?
+&gt;&gt;&gt; # With allow_inf turned on:
+&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='infty',
+...     allow_inf=True
+... )
+&gt;&gt;&gt; grader(None, 'infty') == {'ok': True, 'msg': '', 'grade_decimal': 1}
+True</code></pre>
+
+
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link"> # </a></h2>
 <p>By default, a large array of mathematical functions are available for use. See the full list <a href="../functions_and_constants/">here</a>. Note that all functions are capable of handling complex expressions unless otherwise stated. In the following example, <code>z*z</code> is recognized to be different from <code>abs(z)^2</code>.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
