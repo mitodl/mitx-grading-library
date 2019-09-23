@@ -250,6 +250,9 @@
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#change-log">Change Log</a></li>
         <li class="first-level "><a href="#version-2">Version 2</a></li>
+            <li class="second-level"><a href="#version-21">Version 2.1</a></li>
+                
+                <li class="third-level"><a href="#version-210">Version 2.1.0</a></li>
             <li class="second-level"><a href="#version-20">Version 2.0</a></li>
                 
                 <li class="third-level"><a href="#version-202">Version 2.0.2</a></li>
@@ -281,7 +284,15 @@
 
 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link"> # </a></h1>
 <h1 id="version-2">Version 2<a class="headerlink" href="#version-2" title="Permanent link"> # </a></h1>
-<p>This is a major new version with many new features added. We have been very careful to preserve backwards compatibility of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2.0. However, we do warn that we broke internal backwards compatibility in a number of locations in order to accommodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.0.</p>
+<p>This is a major new version with many new features added. We have been very careful to preserve backwards compatibility of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2. However, we do warn that we broke internal backwards compatibility in a number of locations in order to accommodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.</p>
+<h2 id="version-21">Version 2.1<a class="headerlink" href="#version-21" title="Permanent link"> # </a></h2>
+<h3 id="version-210">Version 2.1.0<a class="headerlink" href="#version-210" title="Permanent link"> # </a></h3>
+<ul>
+<li>Added a new grader <code>IntervalGrader</code>, which grades expressions for mathematical intervals.</li>
+<li>Added <code>allow_inf</code> option to <code>FormulaGrader</code> and <code>NumericalGrader</code>, which allow for <code>infty</code> (infinity) to appear in expressions.</li>
+<li><code>SingleListGrader</code> can now be provided answers as a single string. It can also infer answers from the <code>expect</code> keyword of a <code>customresponse</code> tag.</li>
+<li></li>
+</ul>
 <h2 id="version-20">Version 2.0<a class="headerlink" href="#version-20" title="Permanent link"> # </a></h2>
 <h3 id="version-202">Version 2.0.2<a class="headerlink" href="#version-202" title="Permanent link"> # </a></h3>
 <ul>
