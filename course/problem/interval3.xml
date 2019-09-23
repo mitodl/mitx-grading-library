@@ -1,0 +1,28 @@
+<problem display_name="Lists of IntervalGraders" showanswer="always" weight="10" attempts="">
+
+<p>As <code>IntervalGrader</code> is an ItemGrader, it can be nested in lists. Here is an example of such a usage.</p>
+
+<p>In what intervals is \(x(x-1)(x+1)\) positive? Enter your answer as a semicolon-separated list of intervals, using <code>infty</code> for \(\infty\). Your intervals may be in any order.</p>
+
+<ul>
+  <li><code>(-1, 0); (1, infty)</code> (correct answer)</li>
+  <li><code>(-1, 0)</code></li>
+  <li><code>(-1, 0); (1, 2); (3, infty)</code></li>
+</ul>
+
+<script type="text/python">
+from mitxgraders import *
+grader = SingleListGrader(
+    subgrader=IntervalGrader(),
+    delimiter=";"
+)
+</script>
+
+<p style="display:inline">\(x \in\) </p>
+<customresponse cfn="grader" inline="1" expect="(-1, 0); (1, infty)">
+  <textline math="1" inline="1" />
+</customresponse>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/interval3.xml" target="_blank">View source</a></p>
+
+</problem>

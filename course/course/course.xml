@@ -73,6 +73,9 @@
       <vertical url_name="v-formula13" display_name="Transforming Inputs">
         <problem url_name="formula13"/>
       </vertical>
+      <vertical url_name="v-formula14" display_name="Correlated Graders">
+        <problem url_name="formula14"/>
+      </vertical>
     </sequential>
     <sequential url_name="matrixgrader" display_name="MatrixGrader">
       <vertical url_name="v-matrixgrader" display_name="MatrixGrader">
@@ -126,6 +129,20 @@
         <problem url_name="integral4"/>
       </vertical>
     </sequential>
+    <sequential url_name="intervalgrader" display_name="IntervalGrader">
+      <vertical url_name="v-interval" display_name="IntervalGrader">
+        <html url_name="intervalinfo"/>
+      </vertical>
+      <vertical url_name="v-interval1" display_name="Basic Usage">
+        <problem url_name="interval1"/>
+      </vertical>
+      <vertical url_name="v-interval2" display_name="Partial Credit">
+        <problem url_name="interval2"/>
+      </vertical>
+      <vertical url_name="v-interval3" display_name="Lists of Intervals">
+        <problem url_name="interval3"/>
+      </vertical>
+    </sequential>
     <sequential url_name="singlelistgrader" display_name="SingleListGrader">
       <vertical url_name="v-singlelist" display_name="SingleListGrader">
         <html url_name="singlelistinfo"/>
@@ -164,6 +181,9 @@
       </vertical>
       <vertical url_name="v-list5" display_name="Eigensystem Example">
         <problem url_name="list5"/>
+      </vertical>
+      <vertical url_name="v-list6" display_name="Styling Problems">
+        <problem url_name="list6"/>
       </vertical>
     </sequential>
     <sequential url_name="s-usage" display_name="Usage">

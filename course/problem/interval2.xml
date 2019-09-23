@@ -1,0 +1,48 @@
+<problem display_name="Partial Credit" showanswer="always" weight="10" attempts="">
+
+<p>The partial credit options on <code>IntervalGrader</code> are completely customizable. The following example has the correct answer of <code>[0, 1)</code>. Almost every possible type of option is included in the below example, so try all sorts of different things to see what different messages you get, as well as the different grades you receive.</p>
+
+<p>Suggested answers:</p>
+
+<ul>
+  <li><code>[0, 1)</code> (correct answer)</li>
+  <li><code>[0, 2)</code></li>
+  <li><code>(1, 0]</code></li>
+  <li><code>[0, 1]</code></li>
+  <li><code>(0, 1)</code></li>
+  <li><code>[0, 2)</code></li>
+  <li><code>[-1, 2)</code></li>
+</ul>
+
+
+<script type="text/python">
+from mitxgraders import *
+grader = IntervalGrader(
+    answers=(
+        [
+            (
+                {'expect': '[', 'grade_decimal': 1, 'msg': 'Your left bracket is correct'},
+                {'expect': '(', 'grade_decimal': 0.5, 'msg': 'Your left bracket is incorrect'}
+            ),
+            {'expect': '0', 'grade_decimal': 1, 'msg': 'Your left limit is correct'},
+            {'expect': '1', 'grade_decimal': 1, 'msg': 'Your right limit is correct'},
+            (
+                {'expect': ')', 'grade_decimal': 1, 'msg': 'Your right bracket is correct'},
+                {'expect': ']', 'grade_decimal': 0.5, 'msg': 'Your right bracket is incorrect'}
+            )
+        ],
+        {'expect': '(1, 0]', 'grade_decimal': 0.5, 'msg': 'Your answer is backwards!'}
+    ),
+    wrong_msg='Your limits are wrong!'
+)
+</script>
+
+<p style="display:inline">\(x \in\) </p>
+<customresponse cfn="grader" inline="1" expect="[0, 1)">
+  <textline math="1" inline="1" />
+</customresponse>
+
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/interval2.xml" target="_blank">View source</a></p>
+
+</problem>

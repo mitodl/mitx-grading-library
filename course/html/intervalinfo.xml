@@ -1,0 +1,5 @@
+<html display_name="IntervalGrader">
+
+<p>Here is another example of a special-purpose grader that leverages multiple aspects of the library to perform its task. In this section, we demonstrate the <code>IntervalGrader</code>, which allows students to enter mathematical intervals, and be graded not only on the endpoints of the intervals, but also whether the intervals are open or closed.</p>
+
+</html>

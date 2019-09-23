@@ -1,0 +1,46 @@
+<problem display_name="Correlated Graders" showanswer="always" weight="10" attempts="">
+
+<p>If you want to have multiple numerical inputs and grade them together using a custom function, you can use custom comparers to do the job straightforwardly.</p>
+
+<p>Enter two numbers, \(a\) and \(b\), subject to the condition that \(a > 2 b\).</p>
+
+<script type="text/python">
+<![CDATA[
+import numpy as np
+from mitxgraders import *
+
+def my_comparer(comparer_params_eval, student_eval, utils):
+    a = comparer_params_eval[0]
+    b = student_eval
+
+    if not np.isreal(a):
+        raise InvalidInput("Input must be real.")
+    if not np.isreal(b):
+        raise InvalidInput("Input must be real.")
+
+    return a > 2*b
+
+
+grader = ListGrader(
+    answers=[
+        {'comparer': between_comparer, 'comparer_params': ['-infty', 'infty']},
+        {'comparer': my_comparer, 'comparer_params': ['sibling_1']}
+    ],
+    subgraders=NumericalGrader(allow_inf=True),
+    partial_credit=False,
+    ordered=True  # Needed for the use of sibling variables!
+)
+]]>
+</script>
+
+<customresponse cfn="grader" inline="1">
+  <p style="display:inline">\(a = \) </p><textline inline="1"/>
+  <br/>
+  <p style="display:inline">\(b = \) </p><textline inline="1"/>
+</customresponse>
+
+<p>To accomplish this, we use a <code>ListGrader</code> with <code>partial_credit</code> set to <code>False</code>, so that either the pair is correct, or the pair is incorrect. The first entry is graded using a <code>between_comparer</code> with a range of \(-\infty\) to \(\infty\), while the second is graded using our own custom comparer. To get access to the value of the first entry in the custom comparer, we use sibling variables.</p>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/formula14.xml" target="_blank">View source</a></p>
+
+</problem>
