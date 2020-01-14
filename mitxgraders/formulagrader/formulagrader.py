@@ -4,344 +4,19 @@ formulagrader.py
 from __future__ import print_function, division, absolute_import, unicode_literals
 
 from numbers import Number
-from functools import wraps
-from collections import namedtuple
-import pprint
-import re
-import itertools
 import numpy as np
 import six
-from mitxgraders.helpers.compatibility import ensure_text
-from voluptuous import Schema, Required, Any, All, Extra, Invalid, Length, Coerce
-from mitxgraders.comparers import equality_comparer, CorrelatedComparer
-from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
-                                  gen_symbols_samples, construct_functions,
-                                  construct_constants, construct_suffixes,
-                                  schema_user_functions, schema_user_functions_no_random,
-                                  validate_user_constants)
-from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
+from voluptuous import Schema, Required, Any, All, Invalid, Length
+from mitxgraders.comparers import equality_comparer
+from mitxgraders.sampling import schema_user_functions_no_random
+from mitxgraders.exceptions import MissingInput
 from mitxgraders.baseclasses import ItemGrader
-from mitxgraders.helpers.calc import (
-    PARSER, evaluator, within_tolerance, MathArray,
-    DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES)
-from mitxgraders.helpers.validatorfuncs import (
-    Positive, NonNegative, is_callable, PercentageString, all_unique,
-    is_callable_with_args, text_string)
+from mitxgraders.helpers.calc import evaluator, DEFAULT_VARIABLES
+from mitxgraders.helpers.validatorfuncs import NonNegative, PercentageString, is_callable_with_args, text_string
+from mitxgraders.helpers.math_helpers import MathMixin
+from mitxgraders.helpers.calc.mathfuncs import merge_dicts
 
-# Some of these validators are useful to other classes, e.g., IntegralGrader
-def validate_blacklist_whitelist_config(default_funcs, blacklist, whitelist):
-    """Validates the whitelist/blacklist configuration.
-
-    Arguments:
-        default_funcs: an iterable whose elements are are function names
-            Examples: {'func1':..., 'func2':..., ...} or ['func1', 'func2']
-        blacklist ([str]): a list of function names
-        whitelist ([str]): a list of function names
-
-    Notes: Voluptuous should already have type-checked blacklist and whitelist.
-    Now check:
-    1. whitelist/blacklist are not both used
-    2. All whitelist/blacklist functions actually exist in default_funcs
-    """
-    if blacklist and whitelist:
-        raise ConfigError("Cannot whitelist and blacklist at the same time")
-    for func in blacklist:
-        # no need to check user_functions too ... if you don't want student to
-        # use one of the user_functions, just don't add it in the first place.
-        if func not in default_funcs:
-            raise ConfigError("Unknown function in blacklist: {func}".format(func=func))
-
-    if whitelist == [None]:
-        return
-
-    for func in whitelist:
-        if func not in default_funcs:
-            raise ConfigError("Unknown function in whitelist: {func}".format(func=func))
-
-def validate_forbidden_strings_not_used(expr, forbidden_strings, forbidden_msg):
-    """
-    Ignoring whitespace, checking that expr does not contain any forbidden_strings.
-    Usage
-    =====
-    Passes validation if no forbidden strings used:
-    >>> validate_forbidden_strings_not_used(
-    ... '2*sin(x)*cos(x)',
-    ... ['*x', '+ x', '- x'],
-    ... 'A forbidden string was used!'
-    ... )
-    True
-
-    Fails validation if any forbidden string is used:
-    >>> try:
-    ...     validate_forbidden_strings_not_used(
-    ...         'sin(x+x)',
-    ...         ['*x', '+ x', '- x'],
-    ...         'A forbidden string was used!')
-    ... except InvalidInput as error:
-    ...     print(error)
-    A forbidden string was used!
-    """
-    stripped_expr = expr.replace(' ', '')
-    for forbidden in forbidden_strings:
-        check_for = forbidden.replace(' ', '')
-        if check_for in stripped_expr:
-            # Don't give away the specific string that is being checked for!
-            raise InvalidInput(forbidden_msg)
-    return True
-
-def validate_only_permitted_functions_used(used_funcs, permitted_functions):
-    """
-    Check that the used_funcs contains only permitted_functions
-    Arguments:
-        used_functions ({str}): set of used function names
-        permitted_functions ({str}): set of permitted function names
-    Usage
-    =====
-    >>> validate_only_permitted_functions_used(
-    ... set(['f', 'sin']),
-    ... set(['f', 'g', 'sin', 'cos'])
-    ... )
-    True
-    >>> try:
-    ...     validate_only_permitted_functions_used(
-    ...         set(['f', 'Sin', 'h']),
-    ...         set(['f', 'g', 'sin', 'cos']))
-    ... except InvalidInput as error:
-    ...     print(error)
-    Invalid Input: function(s) 'Sin', 'h' not permitted in answer
-    """
-    used_not_permitted = sorted([f for f in used_funcs if f not in permitted_functions])
-    if used_not_permitted:
-        func_names = ", ".join(["'{f}'".format(f=f) for f in used_not_permitted])
-        message = "Invalid Input: function(s) {} not permitted in answer".format(func_names)
-        raise InvalidInput(message)
-    return True
-
-def get_permitted_functions(default_funcs, whitelist, blacklist, always_allowed):
-    """
-    Constructs a set of functions whose usage is permitted.
-
-    Arguments:
-        default_funcs: an iterable whose elements are are function names
-            Examples: {'func1':..., 'func2':..., ...} or ['func1', 'func2']
-        blacklist ([str]): function names to remove from default_funcs
-        whitelist ([str]): function names to keep from default_funcs
-        always_allowed: an iterable whose elements are function names that
-            are always allowed.
-
-    Note: whitelist and blacklist cannot both be non-empty
-
-    Usage
-    =====
-    Whitelist some functions:
-    >>> default_funcs = {'sin': None, 'cos': None, 'tan': None}
-    >>> always_allowed = {'f1': None, 'f2': None}
-    >>> get_permitted_functions(
-    ...     default_funcs,
-    ...     ['sin', 'cos'],
-    ...     [],
-    ...     always_allowed
-    ... ) == set(['sin', 'cos', 'f1', 'f2'])
-    True
-
-    If whitelist=[None], all defaults are disallowed:
-    >>> default_funcs = {'sin': None, 'cos': None, 'tan': None}
-    >>> always_allowed = {'f1': None, 'f2': None}
-    >>> get_permitted_functions(
-    ...     default_funcs,
-    ...     [None],
-    ...     [],
-    ...     always_allowed
-    ... ) == set(['f1', 'f2'])
-    True
-
-    Blacklist some functions:
-    >>> default_funcs = {'sin': None, 'cos': None, 'tan': None}
-    >>> always_allowed = {'f1': None, 'f2': None}
-    >>> get_permitted_functions(
-    ...     default_funcs,
-    ...     [],
-    ...     ['sin', 'cos'],
-    ...     always_allowed
-    ... ) == set(['tan', 'f1', 'f2'])
-    True
-
-    Blacklist and whitelist cannot be simultaneously used:
-    >>> default_funcs = {'sin': None, 'cos': None, 'tan': None}
-    >>> always_allowed = {'f1': None, 'f2': None}
-    >>> try:
-    ...     get_permitted_functions(
-    ...         default_funcs,
-    ...         ['sin'],
-    ...         ['cos'],
-    ...         always_allowed)
-    ... except ValueError as error:
-    ...     print(error)
-    whitelist and blacklist cannot both be non-empty
-    """
-    # should never trigger except in doctest above,
-    # Grader's config validation should raise an error first
-    if whitelist and blacklist:
-        raise ValueError('whitelist and blacklist cannot both be non-empty')
-    if whitelist == []:
-        permitted_functions = set(always_allowed).union(
-            set(default_funcs)
-            ).difference(set(blacklist))
-    elif whitelist == [None]:
-        permitted_functions = set(always_allowed)
-    else:
-        permitted_functions = set(always_allowed).union(whitelist)
-    return permitted_functions
-
-def validate_required_functions_used(used_funcs, required_funcs):
-    """
-    Raise InvalidInput error if used_funcs does not contain all required_funcs
-
-    Examples:
-    >>> validate_required_functions_used(
-    ... ['sin', 'cos', 'f', 'g'],
-    ... ['cos', 'f']
-    ... )
-    True
-    >>> try:
-    ...     validate_required_functions_used(
-    ...     ['sin', 'cos', 'F', 'g'],
-    ...     ['cos', 'f'])
-    ... except InvalidInput as error:
-    ...     print(error)
-    Invalid Input: Answer must contain the function f
-    """
-    for func in required_funcs:
-        if func not in used_funcs:
-            msg = "Invalid Input: Answer must contain the function {}"
-            raise InvalidInput(msg.format(func))
-    return True
-
-def numbered_vars_regexp(numbered_vars):
-    """
-    Creates a regexp to match numbered variables. Catches the full string and the head.
-
-    Arguments:
-        numbered_vars ([str]): a list of variable heads
-
-    Usage
-    =====
-
-    Matches numbered variables:
-    >>> regexp = numbered_vars_regexp(['b', 'c', 'Cat'])
-    >>> regexp.match('b_{12}').groups()
-    ('b_{12}', 'b')
-    >>> regexp.match('b_{-3}').groups()
-    ('b_{-3}', 'b')
-    >>> regexp.match('b_{0}').groups()
-    ('b_{0}', 'b')
-
-    Other variables match, too, in case-sensitive fashion:
-    >>> regexp.match('Cat_{17}').groups()
-    ('Cat_{17}', 'Cat')
-
-    Stuff that shouldn't match does not match:
-    >>> regexp.match('b') == None
-    True
-    >>> regexp.match('b_{05}') == None
-    True
-    >>> regexp.match('b_{-05}') == None
-    True
-    >>> regexp.match('B_{0}') == None
-    True
-    """
-    head_list = '|'.join(map(re.escape, numbered_vars))
-    regexp = (r"^((" + head_list + ")"  # Start and match any head (capture full string, head)
-              r"_{"  # match _{
-              r"(?:[-]?[1-9]\d*|0)"  # match number pattern
-              r"})$")  # match closing }, close group, and end of string
-    return re.compile(regexp)
-
-def validate_no_collisions(config, keys):
-    """
-    Validates no collisions between iterable config fields specified by keys.
-
-    Usage
-    =====
-
-    Duplicate entries raise a ConfigError:
-    >>> keys = ['variables', 'user_constants', 'numbered_vars']
-    >>> try:
-    ...     validate_no_collisions({
-    ...         'variables':['a', 'b', 'c', 'x', 'y'],
-    ...         'user_constants':{'x': 5, 'y': 10},
-    ...         'numbered_vars':['phi', 'psi']
-    ...         }, keys)
-    ... except ConfigError as error:
-    ...     print(error)
-    'user_constants' and 'variables' contain duplicate entries: ['x', 'y']
-
-    >>> try:
-    ...     validate_no_collisions({
-    ...         'variables':['a', 'psi', 'phi', 'X', 'Y'],
-    ...         'user_constants':{'x': 5, 'y': 10},
-    ...         'numbered_vars':['phi', 'psi']
-    ...         }, keys)
-    ... except ConfigError as error:
-    ...     print(error)
-    'numbered_vars' and 'variables' contain duplicate entries: ['phi', 'psi']
-
-    Without duplicates, return True
-    >>> validate_no_collisions({
-    ...     'variables':['a', 'b', 'c', 'F', 'G'],
-    ...     'user_constants':{'x': 5, 'y': 10},
-    ...     'numbered_vars':['phi', 'psi']
-    ... }, keys)
-    True
-    """
-    dict_of_sets = {k: set(config[k]) for k in keys}
-    msg = "'{iter1}' and '{iter2}' contain duplicate entries: {duplicates}"
-
-    for k1, k2 in itertools.combinations(dict_of_sets, r=2):
-        k1, k2 = sorted([k1, k2])
-        duplicates = dict_of_sets[k1].intersection(dict_of_sets[k2])
-        if duplicates:
-            sorted_dups = list(sorted(duplicates))
-            raise ConfigError(msg.format(iter1=k1, iter2=k2, duplicates=sorted_dups))
-    return True
-
-def warn_if_override(config, key, defaults):
-    """
-    Raise an error if config[key] overlaps with defaults unless config['suppress_warnings'] is True.
-
-    Notes:
-        - config[key] and defaults must both be iterable.
-
-    Usage
-    =====
-
-    >>> config = {'vars': ['a', 'b', 'cat', 'psi', 'pi']}
-    >>> defaults = {'cat': 1, 'pi': 2}
-    >>> try:
-    ...     warn_if_override(config, 'vars', defaults) # doctest: +ELLIPSIS
-    ... except ConfigError as error:
-    ...     print(error)
-    Warning: 'vars' contains entries 'cat', 'pi' ...
-
-    >>> config = {'vars': ['a', 'b', 'cat', 'psi', 'pi'], 'suppress_warnings': True}
-    >>> warn_if_override(
-    ... config,
-    ... 'vars',
-    ... {'cat': 1, 'pi': 2}
-    ... ) == config
-    True
-
-    """
-    duplicates = set(defaults).intersection(set(config[key]))
-    if duplicates and not config.get('suppress_warnings', False):
-        text_dups = ', '.join(sorted(("'{}'".format(dup) for dup in duplicates)))
-        msg = ("Warning: '{key}' contains entries {duplicates} which will override default "
-               "values. If you intend to override defaults, you may suppress "
-               "this warning by adding 'suppress_warnings=True' to the grader configuration.")
-        raise ConfigError(msg.format(key=key, duplicates=text_dups))
-    return config
-
-class FormulaGrader(ItemGrader):
+class FormulaGrader(ItemGrader, MathMixin):
     """
     Grades mathematical expressions, like edX FormulaResponse. Note that comparison will
     always be performed in a case-sensitive nature, unlike edX, which allows for a
@@ -427,10 +102,7 @@ class FormulaGrader(ItemGrader):
             of constants/variables.
     """
 
-    default_variables = DEFAULT_VARIABLES.copy()
-    default_functions = DEFAULT_FUNCTIONS.copy()
-    default_suffixes = DEFAULT_SUFFIXES.copy()
-
+    # Comparer functionality
     # Default comparer for FormulaGrader
     default_comparer = staticmethod(equality_comparer)
 
@@ -458,48 +130,47 @@ class FormulaGrader(ItemGrader):
         """
         cls.set_default_comparer(equality_comparer)
 
+    @staticmethod
+    def eval_and_validate_comparer_params(scoped_eval, comparer_params, siblings_eval):
+        """
+        Evaluate the comparer_params, and make sure they contain no references
+        to empty siblings.
+
+        Arguments
+        =========
+        - scoped_eval (func): a unary function to evaluate math expressions.
+            Same keyword arguments as calc's evaluator, but with appropriate
+            default variables, functions, suffixes
+        - comparer_params ([str]): unevaluated expressions
+        - siblings_eval (dict): evaluated expressions
+        """
+
+        results = [scoped_eval(param, max_array_dim=float('inf'))
+                   for param in comparer_params]
+        # results is a list of (value, EvalMetaData) pairs
+        comparer_params_eval = [value for value, _ in results]
+        used_variables = set().union(*[used.variables_used for _, used in results])
+
+        for variable in used_variables:
+            if variable in siblings_eval and np.isnan(siblings_eval[variable]):
+                raise MissingInput('Cannot grade answer, a required input is missing.')
+
+        return comparer_params_eval
+
+    # Configuration
+
     @property
     def schema_config(self):
         """Define the configuration options for FormulaGrader"""
         # Construct the default ItemGrader schema
         schema = super(FormulaGrader, self).schema_config
-        # Append options
-        forbidden_default = "Invalid Input: This particular answer is forbidden"
+        # Apply the default math schema
+        schema = schema.extend(self.math_config_options)
+        # Append FormulaGrader-specific options
         return schema.extend({
-            Required('user_functions', default={}): schema_user_functions,
-            Required('user_constants', default={}): validate_user_constants(
-                Number, MathArray),
-            # Blacklist/Whitelist have additional validation that can't happen here, because
-            # their validation is correlated with each other
-            Required('blacklist', default=[]): [text_string],
-            Required('whitelist', default=[]): Any(
-                All([None], Length(min=1, max=1)),
-                [text_string]
-            ),
-            Required('forbidden_strings', default=[]): [text_string],
-            Required('forbidden_message', default=forbidden_default): text_string,
-            Required('required_functions', default=[]): [text_string],
-            Required('instructor_vars', default=[]): [text_string],
-            Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
-            Required('metric_suffixes', default=False): bool,
-            Required('samples', default=5): Positive(int),
-            Required('variables', default=[]): All([text_string], all_unique),
-            Required('numbered_vars', default=[]): All([text_string], all_unique),
-            Required('sample_from', default={}): dict,
-            Required('failable_evals', default=0): NonNegative(int),
             Required('allow_inf', default=False): bool,
-            Required('max_array_dim', default=0): NonNegative(int)
-            # Do not use this; use MatrixGrader instead
+            Required('max_array_dim', default=0): NonNegative(int)  # Do not use this; use MatrixGrader instead
         })
-
-    Utils = namedtuple('Utils', ['tolerance', 'within_tolerance'])
-
-    def get_comparer_utils(self):
-        """Get the utils for comparer function."""
-        def _within_tolerance(x, y):
-            return within_tolerance(x, y, self.config['tolerance'])
-        return self.Utils(tolerance=self.config['tolerance'],
-                          within_tolerance=_within_tolerance)
 
     schema_expect = Schema({
         Required('comparer_params'): [text_string],
@@ -537,16 +208,6 @@ class FormulaGrader(ItemGrader):
                 raise Invalid("Something's wrong with grader's 'answers' configuration key. "
                               "Please see documentation for accepted formats.")
 
-    debug_appendix_eval_header_template = (
-        "\n"
-        "==============================================================\n"
-        "{grader} Debug Info\n"
-        "==============================================================\n"
-        "Functions available during evaluation and allowed in answer:\n"
-        "{functions_allowed}\n"
-        "Functions available during evaluation and disallowed in answer:\n"
-        "{functions_disallowed}\n"
-    )
     debug_appendix_eval_template = (
         "\n"
         "==========================================\n"
@@ -556,16 +217,6 @@ class FormulaGrader(ItemGrader):
         "{variables}\n"
         "Student Eval: {student_eval}\n"
         "Compare to:  {comparer_params_eval}\n"
-        ""
-    )
-    debug_appendix_comparison_template = (
-        "\n"
-        "==========================================\n"
-        "Comparison Data for All {samples_total} Samples\n"
-        "==========================================\n"
-        "Comparer Function: {comparer}\n"
-        "Comparison Results:\n"
-        "{comparer_results}\n"
         ""
     )
 
@@ -582,102 +233,17 @@ class FormulaGrader(ItemGrader):
         # Note that this is done before variable validation.
         if self.config['allow_inf']:
             # Make a new copy, so we don't change this for all FormulaGraders
-            self.default_variables = DEFAULT_VARIABLES.copy()
-            self.default_variables['infty'] = float('Inf')
-
-        # Finish validating
-        validate_blacklist_whitelist_config(self.default_functions,
-                                            self.config['blacklist'],
-                                            self.config['whitelist'])
-        validate_no_collisions(self.config, keys=['variables', 'user_constants'])
-        warn_if_override(self.config, 'variables', self.default_variables)
-        warn_if_override(self.config, 'numbered_vars', self.default_variables)
-        warn_if_override(self.config, 'user_constants', self.default_variables)
-        warn_if_override(self.config, 'user_functions', self.default_functions)
-
-        self.permitted_functions = get_permitted_functions(self.default_functions,
-                                                           self.config['whitelist'],
-                                                           self.config['blacklist'],
-                                                           self.config['user_functions'])
+            self.default_variables = merge_dicts(DEFAULT_VARIABLES, {'infty': float('inf')})
 
         # Store the comparer utils
         self.comparer_utils = self.get_comparer_utils()
 
-        # Set up the various lists we use
-        self.functions, self.random_funcs = construct_functions(self.default_functions,
-                                                                self.config["user_functions"])
-        self.constants = construct_constants(self.default_variables, self.config["user_constants"])
-        self.suffixes = construct_suffixes(self.default_suffixes, self.config["metric_suffixes"])
-
-        # Construct the schema for sample_from
-        # First, accept all VariableSamplingSets
-        # Then, accept any list that RealInterval can interpret
-        # Finally, single numbers or tuples of numbers will be handled by DiscreteSet
-        schema_sample_from = Schema({
-            Required(varname, default=RealInterval()):
-                Any(VariableSamplingSet,
-                    All(list, Coerce(RealInterval)),
-                    Coerce(DiscreteSet))
-            for varname in (self.config['variables'] + self.config['numbered_vars'])
-        })
-        self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
-        # Note that voluptuous ensures that there are no orphaned entries in sample_from
+        # Perform standard math validation
+        self.validate_math_config()
 
     def check_response(self, answer, student_input, **kwargs):
         """Check the student response against a given answer"""
-
-        result, used_funcs = self.raw_check(answer, student_input, **kwargs)
-
-        if result['ok'] is True or result['ok'] == 'partial':
-            self.post_eval_validation(student_input, used_funcs)
-        return result
-
-    def get_used_vars(self, expressions):
-        """
-        Get the variables used in expressions
-
-        Arguments:
-            expressions: an iterable collection of expressions
-
-        Returns:
-            vars_used ({str}): set of variables used
-        """
-        is_empty = lambda x: x is None or x.strip() == ''
-        expressions = [expr for expr in expressions if not is_empty(expr)]
-        # Pre-parse all expressions (these all get cached)
-        parsed_expressions = [PARSER.parse(expr) for expr in expressions]
-        # Create a list of all variables used in the expressions
-        vars_used = set().union(*[p.variables_used for p in parsed_expressions])
-        return vars_used
-
-    def generate_variable_list(self, expressions):
-        """
-        Generates the list of variables required to perform a comparison and the
-        corresponding sampling dictionary, taking into account any numbered variables.
-
-        Returns variable_list, sample_from_dict
-        """
-        vars_used = self.get_used_vars(expressions)
-
-        # Initiate the variables list with a copy and sample_from dictionary
-        variable_list = list(self.config['variables'])
-        sample_from_dict = self.config['sample_from'].copy()
-
-        # Find all unassigned variables
-        bad_vars = set(var for var in vars_used if var not in variable_list)
-
-        # Check to see if any unassigned variables are numbered_vars
-        regexp = numbered_vars_regexp(self.config['numbered_vars'])
-        for var in bad_vars:
-            match = regexp.match(var)  # Returns None if no match
-            if match:
-                # This variable is a numbered_variable
-                # Go and add it to variable_list with the appropriate sampler
-                (full_string, head) = match.groups()
-                variable_list.append(full_string)
-                sample_from_dict[full_string] = sample_from_dict[head]
-
-        return variable_list, sample_from_dict
+        return self.check_math_response(answer, student_input, **kwargs)
 
     @staticmethod
     def sibling_varname(index):
@@ -687,7 +253,7 @@ class FormulaGrader(ItemGrader):
     @staticmethod
     def get_sibling_formulas(siblings, required_siblings):
         """
-        Returns a dict sibling formula inputs.
+        Returns a dict containing sibling formula inputs.
 
         Arguments:
             siblings ([dict]): each sibling dict has keys 'grader' and 'input'
@@ -707,37 +273,10 @@ class FormulaGrader(ItemGrader):
             if FormulaGrader.sibling_varname(i) in required_siblings
         }
 
-    def gen_var_and_func_samples(self, answer, student_input, sibling_formulas):
-        """
-        Generate a list of variable/function sampling dictionaries.
-        """
-
-        comparer_params = answer['expect']['comparer_params']
-        # Generate samples; Include siblings to get numbered_vars from them
-        expressions = (comparer_params
-                       + [student_input]
-                       + [sibling_formulas[key] for key in sibling_formulas])
-        variables, sample_from_dict = self.generate_variable_list(expressions)
-        var_samples = gen_symbols_samples(variables,
-                                          self.config['samples'],
-                                          sample_from_dict,
-                                          self.functions,
-                                          self.suffixes,
-                                          self.constants)
-
-        func_samples = gen_symbols_samples(list(self.random_funcs.keys()),
-                                           self.config['samples'],
-                                           self.random_funcs,
-                                           self.functions,
-                                           self.suffixes,
-                                           {})
-
-        return var_samples, func_samples
-
     def gen_evaluations(self, comparer_params, student_input, sibling_formulas,
                         var_samples, func_samples):
         """
-        Evaluate the comparer_params and student input.
+        Evaluate the comparer parameters and student inputs for the given samples.
 
         Returns:
             A tuple (list, list, set). The first two lists are comparer_params_evals
@@ -745,7 +284,6 @@ class FormulaGrader(ItemGrader):
             in config. The set is a record of mathematical functions used in the
             student's input.
         """
-
         funclist = self.functions.copy()
         varlist = {}
 
@@ -793,74 +331,32 @@ class FormulaGrader(ItemGrader):
             student_eval, meta = scoped_eval(student_input)
             student_evals.append(student_eval)
 
+            # TODO: Remove this if statement
             if self.config['debug']:
                 # Put the siblings and instructor variables back in for the debug output
                 varlist.update(var_samples[i])
                 varlist.update(siblings_eval)
-                self.log_eval_info(i, varlist, funclist, comparer_params_eval, student_eval)
+                self.log_eval_info(i, varlist, funclist,
+                                   comparer_params_eval=comparer_params_eval,
+                                   student_eval=student_eval)
 
         return comparer_params_evals, student_evals, meta.functions_used
-
-    def compare_evaluations(self, compare_params_evals, student_evals, comparer, utils):
-        """
-        Compare the student evaluations to the expected results.
-        """
-        results = []
-        if isinstance(comparer, CorrelatedComparer):
-            result = comparer(compare_params_evals, student_evals, utils)
-            results.append(ItemGrader.standardize_cfn_return(result))
-        else:
-            for compare_params_eval, student_eval in zip(compare_params_evals, student_evals):
-                result = comparer(compare_params_eval, student_eval, utils)
-                results.append(ItemGrader.standardize_cfn_return(result))
-
-        if self.config['debug']:
-            self.log_comparison_info(comparer, results)
-
-        return results
-
-    @staticmethod
-    def consolidate_results(results, answer, failable_evals):
-        """
-        Consolidate comparer result(s) into just one result.
-
-        Arguments:
-            results: a list of results dicts
-            answer (dict): correctness data for the expected answer
-            failable_evals: int
-        """
-
-        # answer contains extra keys, so prune them
-        pruned_answer = { key: answer[key] for key in ['ok', 'grade_decimal', 'msg'] }
-        correlated = isinstance(answer['expect']['comparer'], CorrelatedComparer)
-
-        # Correlated comparers return a single result, so failable_evals makes no sense
-        if correlated:
-            [result] = results
-            if result['ok'] is True:
-                return pruned_answer
-            return result
-
-        num_failures = 0
-        for result in results:
-            if result['ok'] != True:
-                num_failures += 1
-                if num_failures > failable_evals:
-                    return result
-
-        # This response appears to agree with the expected answer
-        return pruned_answer
 
     def raw_check(self, answer, student_input, **kwargs):
         """Perform the numerical check of student_input vs answer"""
 
+        # Extract sibling formulas to allow for sampling
         siblings = kwargs.get('siblings', None)
         comparer_params = answer['expect']['comparer_params']
         required_siblings = self.get_used_vars(comparer_params)
         # required_siblings might include some extra variable names, but no matter
         sibling_formulas = self.get_sibling_formulas(siblings, required_siblings)
 
-        var_samples, func_samples = self.gen_var_and_func_samples(answer, student_input, sibling_formulas)
+        # Generate samples, using student input, sibling formulas and any comparer
+        # parameters (including answers) as the list of expressions to check
+        var_samples, func_samples = self.gen_var_and_func_samples(student_input,
+                                                                  sibling_formulas,
+                                                                  comparer_params)
 
         (comparer_params_evals,
          student_evals,
@@ -870,83 +366,15 @@ class FormulaGrader(ItemGrader):
         # Get the comparer function
         comparer = answer['expect']['comparer']
         results = self.compare_evaluations(comparer_params_evals, student_evals,
-                                           comparer, self.comparer_utils)
+                                           comparer, self.get_comparer_utils())
+
         # Comparer function results might assign partial credit.
-        # But the answer we're testing against might only merit partial credit
+        # But the answer we're testing against might only merit partial credit.
         for result in results:
             result['grade_decimal'] *= answer['grade_decimal']
         consolidated = self.consolidate_results(results, answer, self.config['failable_evals'])
 
         return consolidated, functions_used
-
-    @staticmethod
-    def eval_and_validate_comparer_params(scoped_eval, comparer_params, siblings_eval):
-        """
-        Evaluate the comparer_params, and make sure they contain no references
-        to empty siblings.
-
-        Arguments
-        =========
-        - scoped_eval (func): a unary function to evaluate math expressions.
-            Same keyword arguments as calc's evaluator, but with appropriate
-            default variables, functions, suffixes
-        - comparer_params ([str]): unevaluated expressions
-        - siblings_eval (dict): evaluated expressions
-        """
-
-        results = [scoped_eval(param, max_array_dim=float('inf'))
-                   for param in comparer_params]
-        # results is a list of (value, EvalMetaData) pairs
-        comparer_params_eval = [value for value, _ in results]
-        used_variables = set().union(*[used.variables_used for _, used in results])
-
-        for variable in used_variables:
-            if variable in siblings_eval and np.isnan(siblings_eval[variable]):
-                raise MissingInput('Cannot grade answer, a required input is missing.')
-
-        return comparer_params_eval
-
-    def log_eval_info(self, index, varlist, funclist, comparer_params_eval, student_eval):
-        """Add sample information to debug log"""
-
-        if index == 0:
-            header = self.debug_appendix_eval_header_template.format(
-                grader=self.__class__.__name__,
-                # The regexp replaces memory locations, e.g., 0x10eb1e848 -> 0x...
-                functions_allowed=pprint.pformat({f: funclist[f] for f in funclist
-                                              if f in self.permitted_functions}),
-                functions_disallowed=pprint.pformat({f: funclist[f] for f in funclist
-                                                 if f not in self.permitted_functions}),
-            )
-            header = re.sub(r"0x[0-9a-fA-F]+", "0x...", header)
-            header = header.replace('RandomFunction.gen_sample.<locals>.', '')
-            self.log(header)
-        self.log(self.debug_appendix_eval_template.format(
-            sample_num=index + 1,  # to account for 0 index
-            samples_total=self.config['samples'],
-            variables=pprint.pformat(varlist),
-            student_eval=student_eval,
-            comparer_params_eval=comparer_params_eval
-        ))
-
-    def log_comparison_info(self, comparer, comparer_results):
-        """Add sample comparison information to debug log"""
-
-        self.log(self.debug_appendix_comparison_template.format(
-            samples_total=self.config['samples'],
-            comparer=re.sub(r"0x[0-9a-fA-F]+", "0x...", six.text_type(comparer)),
-            comparer_results=pprint.pformat(comparer_results)
-        ))
-
-    def post_eval_validation(self, expr, used_funcs):
-        """Runs several post-evaluation validator functions"""
-        validate_forbidden_strings_not_used(expr,
-                                            self.config['forbidden_strings'],
-                                            self.config['forbidden_message'])
-
-        validate_required_functions_used(used_funcs, self.config['required_functions'])
-
-        validate_only_permitted_functions_used(used_funcs, self.permitted_functions)
 
 class NumericalGrader(FormulaGrader):
     """

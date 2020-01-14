@@ -143,7 +143,11 @@ class EqualityComparer(Comparer):
             utils.validate_shape(student_eval, shape)
 
     def __call__(self, comparer_params_eval, student_eval, utils):
-        expected_eval = comparer_params_eval[0]
+        # Handle list or raw number input for comparer_params_eval
+        if isinstance(comparer_params_eval, list):
+            expected_eval = comparer_params_eval[0]
+        else:
+            expected_eval = comparer_params_eval
         self.validate(expected_eval, student_eval, utils)
 
         transform = self.config['transform']

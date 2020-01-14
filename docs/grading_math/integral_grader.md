@@ -168,8 +168,8 @@ Here is the full list of options specific to an `IntegralGrader`.
 grader = IntegralGrader(
     input_positions=dict,
     answers=dict,
-    complex_integrand=dict,  # default {'full_output': 1}
-    integrator_options=bool,  # default False
+    integrator_options=dict,  # default {'full_output': 1}
+    complex_integrand=bool,  # default False
     # The below options are the same as in FormulaGrader
     variables=list,  # default []
     sample_from=dict,  # default {}
