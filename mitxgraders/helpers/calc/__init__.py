@@ -33,5 +33,6 @@ __all__ = [
     "MathArray",
     "identity",
     "specify_domain",
-    "CalcError"
+    "CalcError",
+    "PARSER"
 ]

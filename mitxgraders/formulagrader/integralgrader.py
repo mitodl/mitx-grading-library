@@ -4,35 +4,24 @@ integralgrader.py
 Contains IntegralGrader, a class for grading an integral problem, consisting of lower
 and upper limits, and integration variable, and an integrand.
 """
-
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-import pprint as pp
-from functools import wraps
-from numbers import Number
 import six
+from functools import wraps
 from scipy import integrate
 from numpy import real, imag
-from voluptuous import Schema, Required, Any, All, Extra, Length, Coerce
-from mitxgraders.sampling import (VariableSamplingSet, schema_user_functions, RealInterval,
-                                  DiscreteSet, gen_symbols_samples, construct_functions,
-                                  construct_constants, has_keys_of_type, validate_user_constants)
-from mitxgraders.formulagrader import (
-    validate_blacklist_whitelist_config,
-    validate_only_permitted_functions_used,
-    get_permitted_functions,
-    validate_no_collisions,
-    warn_if_override
-)
+
+from voluptuous import Required, Any, Extra
+
 from mitxgraders.baseclasses import AbstractGrader
-from mitxgraders.exceptions import (
-    InvalidInput, ConfigError, StudentFacingError, MissingInput)
-from mitxgraders.helpers.calc import (
-    within_tolerance, evaluator, DEFAULT_VARIABLES, DEFAULT_FUNCTIONS)
+from mitxgraders.comparers import equality_comparer
+from mitxgraders.exceptions import (InvalidInput, ConfigError,
+                                    StudentFacingError, MissingInput)
+from mitxgraders.helpers.validatorfuncs import Positive, text_string
+from mitxgraders.helpers.math_helpers import MathMixin
+from mitxgraders.helpers.calc import evaluator, DEFAULT_VARIABLES
 from mitxgraders.helpers.calc.mathfuncs import merge_dicts
-from mitxgraders.helpers.validatorfuncs import (
-    Positive, NonNegative, all_unique, PercentageString, is_callable,
-    text_string)
+
 
 __all__ = ["IntegralGrader"]
 
@@ -97,7 +86,7 @@ def check_output_is_real(func, error, message):
 
     return wrapper
 
-class IntegralGrader(AbstractGrader):
+class IntegralGrader(AbstractGrader, MathMixin):
     """
     Grades a student-entered integral by comparing numerically with
     an author-specified integral.
@@ -182,8 +171,6 @@ class IntegralGrader(AbstractGrader):
         sample_from
         failable_evals
     """
-
-    default_functions = DEFAULT_FUNCTIONS.copy()
     default_variables = merge_dicts(DEFAULT_VARIABLES, {'infty': float('inf')})
 
     @property
@@ -191,13 +178,15 @@ class IntegralGrader(AbstractGrader):
         """Define the configuration options for IntegralGrader"""
         # Construct the default AbstractGrader schema
         schema = super(IntegralGrader, self).schema_config
+        # Apply the default math schema
+        schema = schema.extend(self.math_config_options)
+        # Append IntegralGrader-specific options
         default_input_positions = {
             'lower': 1,
             'upper': 2,
             'integrand': 3,
             'integration_variable': 4
         }
-        # Append options
         return schema.extend({
             Required('answers'): {
                 Required('lower'): text_string,
@@ -216,27 +205,13 @@ class IntegralGrader(AbstractGrader):
                 Extra: object
             },
             Required('complex_integrand', default=False): bool,
-            # Most of the below are copied from FormulaGrader
-            Required('user_functions', default={}): schema_user_functions,
-            Required('user_constants', default={}): validate_user_constants(Number),
-            # Blacklist/Whitelist have additional validation that can't happen here, because
-            # their validation is correlated with each other
-            Required('blacklist', default=[]): [text_string],
-            Required('whitelist', default=[]): Any(
-                All([None], Length(min=1, max=1)),
-                [text_string]
-            ),
-            Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
             Required('samples', default=1): Positive(int),  # default changed to 1
-            Required('variables', default=[]): All([text_string], all_unique),
-            Required('sample_from', default={}): dict,
-            Required('failable_evals', default=0): NonNegative(int)
         })
 
-    debug_appendix_template = (
+    debug_appendix_eval_template = (
         "\n"
         "==============================================\n"
-        "Integration Data for Sample Number {samplenum}\n"
+        "Integration Data for Sample Number {sample_num} of {samples_total}\n"
         "==============================================\n"
         "Variables: {variables}\n"
         "\n"
@@ -260,14 +235,30 @@ class IntegralGrader(AbstractGrader):
         ""
     )
 
+    def __init__(self, config=None, **kwargs):
+        super(IntegralGrader, self).__init__(config, **kwargs)
+        
+        # Validate input positions
+        self.true_input_positions = self.validate_input_positions(self.config['input_positions'])
+
+        # Perform standard math validation
+        self.validate_math_config()
+
     @staticmethod
     def validate_input_positions(input_positions):
+        """
+        Ensure that the provided student input positions are valid.
+        """
         used_positions_list = [input_positions[key] for key in input_positions
                                if input_positions[key] is not None]
         used_positions_set = set(used_positions_list)
+
+        # Ensure no position is used twice
         if len(used_positions_list) > len(used_positions_set):
             raise ConfigError("Key input_positions has repeated indices.")
-        if used_positions_set != set(range(1, len(used_positions_set)+1)):
+
+        # Ensure positions are sequential, starting at 1
+        if used_positions_set != set(range(1, len(used_positions_set) + 1)):
             msg = "Key input_positions values must be consecutive positive integers starting at 1"
             raise ConfigError(msg)
 
@@ -277,46 +268,9 @@ class IntegralGrader(AbstractGrader):
             for key in input_positions
         }
 
-    def __init__(self, config=None, **kwargs):
-        super(IntegralGrader, self).__init__(config, **kwargs)
-        self.true_input_positions = self.validate_input_positions(self.config['input_positions'])
-
-        # The below are copied from FormulaGrader.__init__
-        validate_blacklist_whitelist_config(self.default_functions,
-                                            self.config['blacklist'],
-                                            self.config['whitelist'])
-
-        validate_no_collisions(self.config, keys=['variables', 'user_constants'])
-        warn_if_override(self.config, 'variables', self.default_variables)
-        warn_if_override(self.config, 'user_constants', self.default_variables)
-        warn_if_override(self.config, 'user_functions', self.default_functions)
-
-        self.permitted_functions = get_permitted_functions(self.default_functions,
-                                                           self.config['whitelist'],
-                                                           self.config['blacklist'],
-                                                           self.config['user_functions'])
-
-        self.functions, self.random_funcs = construct_functions(self.default_functions,
-                                                                self.config["user_functions"])
-        self.constants = construct_constants(self.default_variables, self.config["user_constants"])
-
-        # Construct the schema for sample_from
-        # First, accept all VariableSamplingSets
-        # Then, accept any list that RealInterval can interpret
-        # Finally, single numbers or tuples of numbers will be handled by DiscreteSet
-        schema_sample_from = Schema({
-            Required(varname, default=RealInterval()):
-                Any(VariableSamplingSet,
-                    All(list, Coerce(RealInterval)),
-                    Coerce(DiscreteSet))
-            for varname in self.config['variables']
-        })
-        self.config['sample_from'] = schema_sample_from(self.config['sample_from'])
-        # Note that voluptuous ensures that there are no orphaned entries in sample_from
-
     def validate_user_integration_variable(self, varname):
-        """Check the integration variable has no other meaning and is valid variable name"""
-        if (varname in self.functions or varname in self.random_funcs or varname in self.constants):
+        """Check the integration variable has no other meaning and is a valid variable name"""
+        if varname in self.functions or varname in self.random_funcs or varname in self.constants:
             msg = ("Cannot use {} as integration variable; it is already has "
                    "another meaning in this problem.")
             raise InvalidInput(msg.format(varname))
@@ -350,10 +304,13 @@ class IntegralGrader(AbstractGrader):
     def check(self, answers, student_input, **kwargs):
         """Validates and cleans student_input, then checks response and handles errors"""
         answers = self.config['answers'] if answers is None else answers
+
         # If only a single input has been provided, wrap it in a list
         # This is possible if only the integrand is required from the student
         if not isinstance(student_input, list):
             student_input = [student_input]
+
+        # Validate the input
         structured_input = self.structure_and_validate_input(student_input)
         for key in structured_input:
             if structured_input[key] == '':
@@ -363,37 +320,60 @@ class IntegralGrader(AbstractGrader):
 
         # Now perform the computations
         try:
-            result, used_funcs = self.raw_check(answers, structured_input)
-            if result['ok'] is True or result['ok'] == 'partial':
-                self.post_eval_validation(used_funcs)
-            return result
+            return self.check_math_response(answers, structured_input)
         except IntegrationError as error:
             msg = "There appears to be an error with the integral you entered: {}"
             raise IntegrationError(msg.format(six.text_type(error)))
 
-    def raw_check(self, answer, cleaned_input):
+    def raw_check(self, answer, student_input, **kwargs):
         """Perform the numerical check of student_input vs answer"""
+        # This is a simpler version of the raw_check function from FormulaGrader,
+        # which is complicated by sibling variables and comparers
 
-        var_samples = gen_symbols_samples(self.config['variables'],
-                                          self.config['samples'],
-                                          self.config['sample_from'],
-                                          self.functions, {}, self.constants)
+        # Generate samples
+        var_samples, func_samples = self.gen_var_and_func_samples(answer, student_input)
 
-        func_samples = gen_symbols_samples(list(self.random_funcs.keys()),
-                                           self.config['samples'],
-                                           self.random_funcs,
-                                           self.functions, {}, {} )
+        # Evaluate integrals
+        (instructor_evals,
+         student_evals,
+         functions_used) = self.gen_evaluations(answer, student_input, var_samples, func_samples)
 
-        # Make a copy of the functions and variables lists
-        # We'll add the sampled functions/variables in
-        funcscope = self.functions.copy()
-        varscope = self.constants.copy()
+        # Compare results
+        results = self.compare_evaluations(instructor_evals, student_evals,
+                                           equality_comparer, self.get_comparer_utils())
 
-        num_failures = 0
+        # Consolidate results across multiple samples
+        consolidated = self.consolidate_results(results, None, self.config['failable_evals'])
+
+        return consolidated, functions_used
+
+    def gen_evaluations(self, answer, student_input, var_samples, func_samples, **kwargs):
+        """
+        Evaluate the comparer parameters and student inputs for the given samples.
+
+        Returns:
+            A tuple (list, list, set). The first two lists are instructor_evals
+            and student_evals. These have length equal to number of samples specified
+            in config. The set is a record of mathematical functions used in the
+            student's input.
+        """
+        # Similar to FormulaGrader, but specialized to IntegralGrader
+        funclist = self.functions.copy()
+        varlist = {}
+
+        instructor_evals = []
+        student_evals = []
+
+        # Create a list of instructor variables to remove from student evaluation
+        var_blacklist = []
+        for var in self.config['instructor_vars']:
+            if var in var_samples[0]:
+                var_blacklist.append(var)
+
         for i in range(self.config['samples']):
             # Update the functions and variables listings with this sample
-            funcscope.update(func_samples[i])
-            varscope.update(var_samples[i])
+            funclist.update(func_samples[i])
+            varlist.update(var_samples[i])
 
             # Evaluate integrals. Error handling here is in two parts because
             # 1. custom error messages we've added
@@ -404,20 +384,25 @@ class IntegralGrader(AbstractGrader):
                     answer['lower'],
                     answer['upper'],
                     answer['integration_variable'],
-                    varscope=varscope,
-                    funcscope=funcscope
+                    varscope=varlist,
+                    funcscope=funclist
                 )
             except IntegrationError as error:
                 msg = "Integration Error with author's stored answer: {}"
                 raise ConfigError(msg.format(six.text_type(error)))
 
+            # Before performing student evaluation, scrub the instructor
+            # variables so that students can't use them
+            for key in var_blacklist:
+                del varlist[key]
+
             student_re, student_im, used_funcs = self.evaluate_int(
-                cleaned_input['integrand'],
-                cleaned_input['lower'],
-                cleaned_input['upper'],
-                cleaned_input['integration_variable'],
-                varscope=varscope,
-                funcscope=funcscope
+                student_input['integrand'],
+                student_input['lower'],
+                student_input['upper'],
+                student_input['integration_variable'],
+                varscope=varlist,
+                funcscope=funclist
                 )
 
             # scipy raises integration warnings when things go wrong,
@@ -433,37 +418,29 @@ class IntegralGrader(AbstractGrader):
             if len(expected_im) == 4:
                 raise ConfigError(expected_im[3])
 
-            self.log(self.debug_appendix_template.format(
-                samplenum=i,
-                variables=pp.pformat(varscope),
-                student_re_eval=student_re[0],
-                student_re_error=student_re[1],
-                student_re_neval=student_re[2]['neval'],
-                student_im_eval=student_im[0],
-                student_im_error=student_im[1],
-                student_im_neval=student_im[2]['neval'],
-                author_re_eval=expected_re[0],
-                author_re_error=expected_re[1],
-                author_re_neval=expected_re[2]['neval'],
-                author_im_eval=expected_im[0],
-                author_im_error=expected_im[1],
-                author_im_neval=expected_im[2]['neval'],
-            ))
-
-            # Check if expressions agree
+            # Save results
             expected = expected_re[0] + (expected_im[0] or 0)*1j
             student = student_re[0] + (student_im[0] or 0)*1j
-            if not within_tolerance(expected, student, self.config['tolerance']):
-                num_failures += 1
-                if num_failures > self.config["failable_evals"]:
-                    return {'ok': False, 'grade_decimal': 0, 'msg': ''}, used_funcs
+            instructor_evals.append(expected)
+            student_evals.append(student)
 
-        # This response appears to agree with the expected answer
-        return {
-            'ok': True,
-            'grade_decimal': 1,
-            'msg': ''
-        }, used_funcs
+            # Put the instructor variables back in for the debug output
+            varlist.update(var_samples[i])
+            self.log_eval_info(i, varlist, funclist,
+                               student_re_eval=student_re[0],
+                               student_re_error=student_re[1],
+                               student_re_neval=student_re[2]['neval'],
+                               student_im_eval=student_im[0],
+                               student_im_error=student_im[1],
+                               student_im_neval=student_im[2]['neval'],
+                               author_re_eval=expected_re[0],
+                               author_re_error=expected_re[1],
+                               author_re_neval=expected_re[2]['neval'],
+                               author_im_eval=expected_im[0],
+                               author_im_error=expected_im[1],
+                               author_im_neval=expected_im[2]['neval'])
+
+        return instructor_evals, student_evals, used_funcs
 
     @staticmethod
     def get_limits_and_funcs(integrand_str, lower_str, upper_str, integration_var,
@@ -534,7 +511,3 @@ class IntegralGrader(AbstractGrader):
             varscope[integration_var] = int_var_initial
 
         return result_re, result_im, used_funcs
-
-    def post_eval_validation(self, used_funcs):
-        """Runs post-evaluation validator functions"""
-        validate_only_permitted_functions_used(used_funcs, self.permitted_functions)
