@@ -10,6 +10,7 @@ import six
 from functools import wraps
 from scipy import integrate
 from numpy import real, imag
+from abc import abstractproperty
 
 from voluptuous import Required, Any, Extra
 
@@ -86,7 +87,159 @@ def check_output_is_real(func, error, message):
 
     return wrapper
 
-class IntegralGrader(AbstractGrader, MathMixin):
+class SummationGraderBase(AbstractGrader, MathMixin):
+    """
+    Abstract base class that incorporates the common components of IntegralGrader and SumGrader.
+    """
+    default_variables = merge_dicts(DEFAULT_VARIABLES, {'infty': float('inf')})
+
+    @abstractproperty
+    @property
+    def wording(self):
+        """Returns a dictionary with keys 'noun' and 'adjective' that describe the function of this class"""
+    
+    def __init__(self, config=None, **kwargs):
+        super(SummationGraderBase, self).__init__(config, **kwargs)
+    
+        # Validate input positions
+        self.true_input_positions = self.validate_input_positions(self.config['input_positions'])
+    
+        # Perform standard math validation
+        self.validate_math_config()
+
+    @staticmethod
+    def validate_input_positions(input_positions):
+        """
+        Ensure that the provided student input positions are valid.
+        """
+        used_positions_list = [input_positions[key] for key in input_positions
+                               if input_positions[key] is not None]
+        used_positions_set = set(used_positions_list)
+        
+        # Ensure no position is used twice
+        if len(used_positions_list) > len(used_positions_set):
+            raise ConfigError("Key input_positions has repeated indices.")
+        
+        # Ensure positions are sequential, starting at 1
+        if used_positions_set != set(range(1, len(used_positions_set) + 1)):
+            msg = "Key input_positions values must be consecutive positive integers starting at 1"
+            raise ConfigError(msg)
+        
+        return {
+            key: input_positions[key] - 1  # Turn 1-based indexing into 0-based indexing
+            if input_positions[key] is not None else None
+            for key in input_positions
+        }
+
+    def get_limits_and_funcs(self, integrand_str, lower_str, upper_str, dummy_var,
+                             varscope, funcscope):
+        """
+        Evals lower/upper limits and gets the functions used in limits and integrand/summand.
+        Treats integrands and summands identically; we just call it integrand here.
+        """
+        lower, lower_used = evaluator(lower_str,
+                                      variables=varscope,
+                                      functions=funcscope,
+                                      suffixes=self.suffixes,
+                                      allow_inf=True)
+        upper, upper_used = evaluator(upper_str,
+                                      variables=varscope,
+                                      functions=funcscope,
+                                      suffixes=self.suffixes,
+                                      allow_inf=True)
+        
+        varscope[dummy_var] = (upper + lower) / 2
+        _, integrand_used = evaluator(integrand_str,
+                                      variables=varscope,
+                                      functions=funcscope,
+                                      suffixes=self.suffixes,
+                                      allow_inf=True)
+        
+        used_funcs = lower_used.functions_used.union(upper_used.functions_used, integrand_used.functions_used)
+        
+        return lower, upper, used_funcs
+
+    def structure_and_validate_input(self, student_input):
+        """Validates and structures the received input against the expected input based on the configuration"""
+        used_inputs = [key for key in self.true_input_positions
+                       if self.true_input_positions[key] is not None]
+        if len(used_inputs) != len(student_input):
+            # This is a ConfigError because it should only be trigged if author
+            # included wrong number of inputs in the <customresponse> problem.
+            sorted_inputs = sorted(used_inputs, key=lambda x: self.true_input_positions[x])
+            msg = ("Expected {expected} student inputs but found {found}. "
+                   "Inputs should  appear in order {order}.")
+            raise ConfigError(msg.format(expected=len(used_inputs),
+                                         found=len(student_input),
+                                         order=sorted_inputs)
+                              )
+
+        structured_input = transform_list_to_dict(student_input,
+                                                  self.config['answers'],
+                                                  self.true_input_positions)
+
+        return structured_input
+
+    def validate_user_dummy_variable(self, varname):
+        """Check the dummy variable has no other meaning and is a valid variable name"""
+        if varname in self.functions or varname in self.random_funcs or varname in self.constants:
+            msg = ("Cannot use {varname} as {adj} variable; it is already has "
+                   "another meaning in this problem.")
+            raise InvalidInput(msg.format(varname=varname, adj=self.wording['adjective']))
+
+        if not is_valid_variable_name(varname):
+            msg = ("{adj} variable {varname} is an invalid variable name."
+                   "Variable name should begin with a letter and contain alphanumeric"
+                   "characters or underscores thereafter, but may end in single quotes.")
+            raise InvalidInput(msg.format(varname=varname, adj=self.wording['adjective'].title()))
+
+    def check(self, answers, student_input, **kwargs):
+        """Validates and cleans student_input, then checks response and handles errors"""
+        answers = self.config['answers'] if answers is None else answers
+
+        # If only a single input has been provided, wrap it in a list
+        # This is possible if only the integrand/summand is required from the student
+        if not isinstance(student_input, list):
+            student_input = [student_input]
+
+        # Validate the input
+        structured_input = self.structure_and_validate_input(student_input)
+        for key in structured_input:
+            if structured_input[key] == '':
+                msg = "Please enter a value for {key}, it cannot be empty."
+                raise MissingInput(msg.format(key=key))
+        self.validate_user_dummy_variable(structured_input[self.wording['adjective'] + '_variable'])
+
+        # Now perform the computations
+        try:
+            return self.check_math_response(answers, structured_input)
+        except IntegrationError as error:
+            msg = "There appears to be an error with the {} you entered: {}"
+            raise IntegrationError(msg.format(self.wording['noun'], six.text_type(error)))
+
+    def raw_check(self, answer, student_input, **kwargs):
+        """Perform the numerical check of student_input vs answer"""
+        # This is a simpler version of the raw_check function from FormulaGrader,
+        # which is complicated by sibling variables and comparers
+        
+        # Generate samples
+        var_samples, func_samples = self.gen_var_and_func_samples(answer, student_input)
+        
+        # Evaluate integrals/sums
+        (instructor_evals,
+         student_evals,
+         functions_used) = self.gen_evaluations(answer, student_input, var_samples, func_samples)
+        
+        # Compare results
+        results = self.compare_evaluations(instructor_evals, student_evals,
+                                           equality_comparer, self.get_comparer_utils())
+        
+        # Consolidate results across multiple samples
+        consolidated = self.consolidate_results(results, None, self.config['failable_evals'])
+        
+        return consolidated, functions_used
+
+class IntegralGrader(SummationGraderBase):
     """
     Grades a student-entered integral by comparing numerically with
     an author-specified integral.
@@ -170,8 +323,20 @@ class IntegralGrader(AbstractGrader, MathMixin):
         variables
         sample_from
         failable_evals
+        numbered_vars
+        instructor_vars
+        forbidden_strings
+        forbidden_message
+        required_functions
+        metric_suffixes
     """
-    default_variables = merge_dicts(DEFAULT_VARIABLES, {'infty': float('inf')})
+
+    @property
+    def wording(self):
+        return {
+            'noun': 'integral',
+            'adjective': 'integration'
+        }
 
     @property
     def schema_config(self):
@@ -234,118 +399,6 @@ class IntegralGrader(AbstractGrader, MathMixin):
         "Number of integrand evaluations: {author_im_neval}\n"
         ""
     )
-
-    def __init__(self, config=None, **kwargs):
-        super(IntegralGrader, self).__init__(config, **kwargs)
-        
-        # Validate input positions
-        self.true_input_positions = self.validate_input_positions(self.config['input_positions'])
-
-        # Perform standard math validation
-        self.validate_math_config()
-
-    @staticmethod
-    def validate_input_positions(input_positions):
-        """
-        Ensure that the provided student input positions are valid.
-        """
-        used_positions_list = [input_positions[key] for key in input_positions
-                               if input_positions[key] is not None]
-        used_positions_set = set(used_positions_list)
-
-        # Ensure no position is used twice
-        if len(used_positions_list) > len(used_positions_set):
-            raise ConfigError("Key input_positions has repeated indices.")
-
-        # Ensure positions are sequential, starting at 1
-        if used_positions_set != set(range(1, len(used_positions_set) + 1)):
-            msg = "Key input_positions values must be consecutive positive integers starting at 1"
-            raise ConfigError(msg)
-
-        return {
-            key: input_positions[key] - 1  # Turn 1-based indexing into 0-based indexing
-            if input_positions[key] is not None else None
-            for key in input_positions
-        }
-
-    def validate_user_integration_variable(self, varname):
-        """Check the integration variable has no other meaning and is a valid variable name"""
-        if varname in self.functions or varname in self.random_funcs or varname in self.constants:
-            msg = ("Cannot use {} as integration variable; it is already has "
-                   "another meaning in this problem.")
-            raise InvalidInput(msg.format(varname))
-
-        if not is_valid_variable_name(varname):
-            msg = ("Integration variable {} is an invalid variable name."
-                   "Variable name should begin with a letter and contain alphanumeric"
-                   "characters or underscores thereafter, but may end in single quotes.")
-            raise InvalidInput(msg.format(varname))
-
-    def structure_and_validate_input(self, student_input):
-        used_inputs = [key for key in self.true_input_positions
-                       if self.true_input_positions[key] is not None]
-        if len(used_inputs) != len(student_input):
-            # This is a ConfigError because it should only be trigged if author
-            # included wrong number of inputs in the <customresponse> problem.
-            sorted_inputs = sorted(used_inputs, key=lambda x: self.true_input_positions[x])
-            msg = ("Expected {expected} student inputs but found {found}. "
-                   "Inputs should  appear in order {order}.")
-            raise ConfigError(msg.format(expected=len(used_inputs),
-                                         found=len(student_input),
-                                         order=sorted_inputs)
-                              )
-
-        structured_input = transform_list_to_dict(student_input,
-                                                  self.config['answers'],
-                                                  self.true_input_positions)
-
-        return structured_input
-
-    def check(self, answers, student_input, **kwargs):
-        """Validates and cleans student_input, then checks response and handles errors"""
-        answers = self.config['answers'] if answers is None else answers
-
-        # If only a single input has been provided, wrap it in a list
-        # This is possible if only the integrand is required from the student
-        if not isinstance(student_input, list):
-            student_input = [student_input]
-
-        # Validate the input
-        structured_input = self.structure_and_validate_input(student_input)
-        for key in structured_input:
-            if structured_input[key] == '':
-                msg = "Please enter a value for {key}, it cannot be empty."
-                raise MissingInput(msg.format(key=key))
-        self.validate_user_integration_variable(structured_input['integration_variable'])
-
-        # Now perform the computations
-        try:
-            return self.check_math_response(answers, structured_input)
-        except IntegrationError as error:
-            msg = "There appears to be an error with the integral you entered: {}"
-            raise IntegrationError(msg.format(six.text_type(error)))
-
-    def raw_check(self, answer, student_input, **kwargs):
-        """Perform the numerical check of student_input vs answer"""
-        # This is a simpler version of the raw_check function from FormulaGrader,
-        # which is complicated by sibling variables and comparers
-
-        # Generate samples
-        var_samples, func_samples = self.gen_var_and_func_samples(answer, student_input)
-
-        # Evaluate integrals
-        (instructor_evals,
-         student_evals,
-         functions_used) = self.gen_evaluations(answer, student_input, var_samples, func_samples)
-
-        # Compare results
-        results = self.compare_evaluations(instructor_evals, student_evals,
-                                           equality_comparer, self.get_comparer_utils())
-
-        # Consolidate results across multiple samples
-        consolidated = self.consolidate_results(results, None, self.config['failable_evals'])
-
-        return consolidated, functions_used
 
     def gen_evaluations(self, answer, student_input, var_samples, func_samples, **kwargs):
         """
@@ -442,33 +495,6 @@ class IntegralGrader(AbstractGrader, MathMixin):
 
         return instructor_evals, student_evals, used_funcs
 
-    @staticmethod
-    def get_limits_and_funcs(integrand_str, lower_str, upper_str, integration_var,
-                             varscope, funcscope):
-        """Evals lower/upper limits and gets the functions used in lower/upper/integrand"""
-
-        lower, lower_used = evaluator(lower_str,
-                                      variables=varscope,
-                                      functions=funcscope,
-                                      suffixes={},
-                                      allow_inf=True)
-        upper, upper_used = evaluator(upper_str,
-                                      variables=varscope,
-                                      functions=funcscope,
-                                      suffixes={},
-                                      allow_inf=True)
-
-        varscope[integration_var] = (upper + lower)/2
-        _, integrand_used = evaluator(integrand_str,
-                                      variables=varscope,
-                                      functions=funcscope,
-                                      suffixes={},
-                                      allow_inf=True)
-
-        used_funcs = lower_used.functions_used.union(upper_used.functions_used, integrand_used.functions_used)
-
-        return lower, upper, used_funcs
-
     def evaluate_int(self, integrand_str, lower_str, upper_str, integration_var,
                      varscope=None, funcscope=None):
         varscope = {} if varscope is None else varscope
@@ -492,7 +518,7 @@ class IntegralGrader(AbstractGrader, MathMixin):
             value, _ = evaluator(integrand_str,
                                  variables=varscope,
                                  functions=funcscope,
-                                 suffixes={})
+                                 suffixes=self.suffixes)
             return value
 
         if self.config['complex_integrand']:
