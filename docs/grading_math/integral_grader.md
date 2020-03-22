@@ -156,9 +156,14 @@ The following options from `FormulaGrader` are available for use in `IntegralGra
 - `variables`
 - `sample_from`
 - `failable_evals`
+- `numbered_vars`
+- `instructor_vars`
+- `forbidden_strings`
+- `forbidden_message`
+- `required_functions`
+- `metric_suffixes`
 
 Unless otherwise specified, the defaults are the same as in `FormulaGrader`.
-
 
 ## Option Listing
 
@@ -180,5 +185,11 @@ grader = IntegralGrader(
     blacklist=list,  # default []
     whitelist=list,  # default []
     tolerance=(float | percentage),  # default '0.01%'
+    numbered_vars=list,  # default []
+    instructor_vars=list,  # default []
+    forbidden_strings=list,  # default []
+    forbidden_message=str,  # default 'Invalid Input: This particular answer is forbidden'
+    required_functions=list,  # default []
+    metric_suffixes=bool,  # default False
 )
 ```

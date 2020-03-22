@@ -6,6 +6,7 @@ from mitxgraders import CalcError
 from mitxgraders.formulagrader.integralgrader import IntegralGrader, IntegrationError
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.helpers.compatibility import UNICODE_PREFIX
+from mitxgraders.sampling import DependentSampler
 from tests.helpers import round_decimals_in_string
 
 # Configuration Error Test
@@ -810,3 +811,99 @@ def test_integral_with_complex_integrand():
     assert wrong_result0 == wrong_expected_result
     assert wrong_result1 == wrong_expected_result
     assert wrong_result2 == wrong_expected_result
+
+def test_numbered_vars():
+    grader = IntegralGrader(
+        answers={
+            'lower': '0',
+            'upper': '1',
+            'integrand': 'a_{2}*x',
+            'integration_variable': 'x'
+        },
+        numbered_vars=['a'],
+    )
+    # Correct answers
+    correct_input = ['0', '1', 't*a_{2}', 't']
+    # Incorrect answers
+    wrong_input = ['0', '1', 't*a_{3}', 't']
+
+    correct_result = grader(None, correct_input)
+    wrong_result = grader(None, wrong_input)
+
+    assert correct_result == {'ok': True, 'grade_decimal': 1, 'msg': ''}
+    assert wrong_result == {'ok': False, 'grade_decimal': 0, 'msg': ''}
+
+def test_suffixes():
+    grader = IntegralGrader(
+        answers={
+            'lower': '1m',
+            'upper': '1e9',
+            'integrand': '1%*x',
+            'integration_variable': 'x'
+        },
+        metric_suffixes=True
+    )
+    assert grader(None, ['1e-3', '1G', 't/100', 't']) == {'ok': True, 'grade_decimal': 1, 'msg': ''}
+
+def test_instructor_vars():
+    """Ensures that instructor variables are not available to students"""
+    grader = IntegralGrader(
+        answers={
+            'lower': '0',
+            'upper': '1',
+            'integrand': 'c*t',
+            'integration_variable': 't'
+        },
+        input_positions={
+            'integrand': 1
+        },
+        variables=['x', 'c'],
+        sample_from={
+            'x': [-3.14159, 3.14159],
+            'c': DependentSampler(depends=["x"], formula="cos(x)")
+        },
+        instructor_vars=['c', 'pi', 'nothere']  # nothere will be ignored
+    )
+
+    assert grader(None, 'cos(x)*t')['ok']
+    with raises(CalcError, match="'c' not permitted in answer as a variable"):
+        grader(None, 'c*t')
+    with raises(CalcError, match="'pi' not permitted in answer as a variable"):
+        grader(None, 'pi*t')
+
+def test_forbidden():
+    """Ensures that answers don't contain forbidden strings"""
+    grader = IntegralGrader(
+        answers={
+            'lower': '0',
+            'upper': '1',
+            'integrand': '2*t',
+            'integration_variable': 't'
+        },
+        forbidden_strings=['+'],
+        forbidden_message='No addition!'
+    )
+    assert grader(None, ['0', '1', '2*t', 't'])['ok']
+    with raises(InvalidInput, match="No addition!"):
+        grader(None, ['0', '1', 't+t', 't'])
+    with raises(InvalidInput, match="No addition!"):
+        grader(None, ['0', '0+1', '2*t', 't'])
+
+def test_required_funcs():
+    """Ensures that required functions must be used"""
+    grader = IntegralGrader(
+        answers={
+            'lower': '0',
+            'upper': '1',
+            'integrand': 'tan(x)',
+            'integration_variable': 'x'
+        },
+        input_positions={
+            'integrand': 1
+        },
+        required_functions=['tan']
+    )
+
+    assert grader(None, 'tan(x)')['ok']
+    with raises(InvalidInput, match="Answer must contain the function tan"):
+        grader(None, 'sin(x)/cos(x)')

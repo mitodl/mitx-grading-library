@@ -89,15 +89,14 @@ def check_output_is_real(func, error, message):
 
 class SummationGraderBase(AbstractGrader, MathMixin):
     """
-    Abstract base class that incorportates the common components of IntegralGrader and SumGrader.
+    Abstract base class that incorporates the common components of IntegralGrader and SumGrader.
     """
     default_variables = merge_dicts(DEFAULT_VARIABLES, {'infty': float('inf')})
 
     @abstractproperty
     @property
     def wording(self):
-        """Returns a dictionary..."""
-        pass
+        """Returns a dictionary with keys 'noun' and 'adjective' that describe the function of this class"""
     
     def __init__(self, config=None, **kwargs):
         super(SummationGraderBase, self).__init__(config, **kwargs)
@@ -132,30 +131,28 @@ class SummationGraderBase(AbstractGrader, MathMixin):
             for key in input_positions
         }
 
-    @staticmethod
-    def get_limits_and_funcs(integrand_str, lower_str, upper_str, dummy_var,
+    def get_limits_and_funcs(self, integrand_str, lower_str, upper_str, dummy_var,
                              varscope, funcscope):
         """
         Evals lower/upper limits and gets the functions used in limits and integrand/summand.
         Treats integrands and summands identically; we just call it integrand here.
         """
-        
         lower, lower_used = evaluator(lower_str,
                                       variables=varscope,
                                       functions=funcscope,
-                                      suffixes={},
+                                      suffixes=self.suffixes,
                                       allow_inf=True)
         upper, upper_used = evaluator(upper_str,
                                       variables=varscope,
                                       functions=funcscope,
-                                      suffixes={},
+                                      suffixes=self.suffixes,
                                       allow_inf=True)
         
         varscope[dummy_var] = (upper + lower) / 2
         _, integrand_used = evaluator(integrand_str,
                                       variables=varscope,
                                       functions=funcscope,
-                                      suffixes={},
+                                      suffixes=self.suffixes,
                                       allow_inf=True)
         
         used_funcs = lower_used.functions_used.union(upper_used.functions_used, integrand_used.functions_used)
@@ -326,6 +323,12 @@ class IntegralGrader(SummationGraderBase):
         variables
         sample_from
         failable_evals
+        numbered_vars
+        instructor_vars
+        forbidden_strings
+        forbidden_message
+        required_functions
+        metric_suffixes
     """
 
     @property
@@ -515,7 +518,7 @@ class IntegralGrader(SummationGraderBase):
             value, _ = evaluator(integrand_str,
                                  variables=varscope,
                                  functions=funcscope,
-                                 suffixes={})
+                                 suffixes=self.suffixes)
             return value
 
         if self.config['complex_integrand']:
