@@ -11,20 +11,21 @@ from functools import wraps
 from scipy import integrate
 from numpy import real, imag
 from abc import abstractproperty
+from numbers import Number
 
 from voluptuous import Required, Any, Extra
 
 from mitxgraders.baseclasses import AbstractGrader
 from mitxgraders.comparers import equality_comparer
 from mitxgraders.exceptions import (InvalidInput, ConfigError,
-                                    StudentFacingError, MissingInput)
-from mitxgraders.helpers.validatorfuncs import Positive, text_string
+                                    StudentFacingError, MissingInput, MITxError)
+from mitxgraders.helpers.validatorfuncs import Positive, text_string, NonNegative, PercentageString
 from mitxgraders.helpers.math_helpers import MathMixin
 from mitxgraders.helpers.calc import evaluator, DEFAULT_VARIABLES
 from mitxgraders.helpers.calc.mathfuncs import merge_dicts
 
 
-__all__ = ["IntegralGrader"]
+__all__ = ['IntegralGrader', 'SumGrader']
 
 def is_valid_variable_name(varname):
     """
@@ -73,6 +74,10 @@ def transform_list_to_dict(thelist, thedefaults, key_to_index_map):
 
 class IntegrationError(StudentFacingError):
     """Represents an error associated with integration"""
+    pass
+
+class SummationError(StudentFacingError):
+    """Represents an error associated with summation"""
     pass
 
 def check_output_is_real(func, error, message):
@@ -537,3 +542,326 @@ class IntegralGrader(SummationGraderBase):
             varscope[integration_var] = int_var_initial
 
         return result_re, result_im, used_funcs
+
+class SumGrader(SummationGraderBase):
+    """
+    Grades a student-entered summation by comparing numerically with
+    an author-specified summation.
+
+    WARNINGS
+    ========
+    This grader performs numerical evaluation of the two sums for comparison.
+    This works fine for finite sums, but fails for infinite sums. When asked to
+    do an infinite sum, it treats infinity as "some large number". It is up to
+    the author to ensure that the sums will converge sufficiently by this
+    large number (typically by ensuring that variables are sampled from a
+    sufficiently small domain). Because infinite sums can always be rewritten
+    by combining terms into different counting units, some tolerance must be
+    allowed for infinite sums, as it will be common for different numbers of
+    effective terms to be summed. Also beware of sums that may sum exactly to
+    zero; these may have significant numerical roundoff accumulation.
+    
+    When sums are performed over large numbers of terms, it's very easy for
+    numerical error to creep in. Make sure that your tolerance is sufficiently
+    large to satisfy such situations. When in doubt, use debug mode to view
+    what the sums are actually evaluating to.
+    
+    Configuration Options
+    =====================
+        answers (dict, required): Specifies author's answer. Has required keys lower,
+            upper, summand, summation_variable, which each take string values.
+
+        input_positions (dict): Specifies which integration parameters the student
+            is required to enter. The default value of input_positions is:
+
+                input_positions = {
+                    'lower': 1,
+                    'upper': 2,
+                    'summand': 3,
+                    'summation_variable': 4
+                }
+
+            and requires students to enter all four parameters in the indicated
+            order.
+
+            If the author overrides the default input_positions value, any subset
+            of the keys ('lower', 'upper', 'summand', 'summation_variable')
+            may be specified. Key values should be
+
+                - continuous integers starting at 1, or
+                - (default) None, indicating that the parameter is not entered by student
+
+            For example,
+
+                input_positions = {
+                    'lower': 1,
+                    'upper': 2,
+                    'summand': 3
+                }
+
+            indicates that the problem has 3 input boxes which represent the
+            lower limit, upper limit, and summand in that order. The
+            summation_variable is NOT entered by student and is instead the
+            value specified by author in 'answers'.
+
+        infty_val (int): Specifies a large number to be used in place of infinity in limits (default 1e3).
+                         Large values may cause timeouts.
+
+        infty_val_fact (int): Specifies a number to be used in place of infinity in limits when factorials
+                              are invovled (default 100). Note that 100! ~ 10^157, which should be enough
+                              for most purposes!
+
+        even_odd (int): Choose to sum every number (0), every odd number (1) or every even number (2).
+
+    Additional Configuration Options
+    ================================
+    The configuration keys below are the same as used by FormulaGrader and
+    have the same defaults, except where specified
+        user_constants: same as FormulaGrader, but with additional default 'infty'
+        whitelist
+        blacklist
+        tolerance (default changed to 1e-12)
+        samples (default changed to 2)
+        variables
+        sample_from
+        failable_evals
+        numbered_vars
+        instructor_vars
+        forbidden_strings
+        forbidden_message
+        required_functions
+        metric_suffixes
+    """
+
+    @property
+    def wording(self):
+        return {
+            'noun': 'sum',
+            'adjective': 'summation'
+        }
+
+    @property
+    def schema_config(self):
+        """Define the configuration options for SumGrader"""
+        # Construct the default AbstractGrader schema
+        schema = super(SumGrader, self).schema_config
+        # Apply the default math schema
+        schema = schema.extend(self.math_config_options)
+        # Append SumGrader-specific options
+        default_input_positions = {
+            'lower': 1,
+            'upper': 2,
+            'summand': 3,
+            'summation_variable': 4
+        }
+        return schema.extend({
+            Required('answers'): {
+                Required('lower'): text_string,
+                Required('upper'): text_string,
+                Required('summand'): text_string,
+                Required('summation_variable'): text_string
+            },
+            Required('input_positions', default=default_input_positions): {
+                Required('lower', default=None): Any(None, Positive(int)),
+                Required('upper', default=None): Any(None, Positive(int)),
+                Required('summand', default=None): Any(None, Positive(int)),
+                Required('summation_variable', default=None): Any(None, Positive(int)),
+            },
+            Required('infty_val', default=1e3): Positive(Number),
+            Required('infty_val_fact', default=100): Positive(Number),
+            Required('even_odd', default=0): Any(0, 1, 2),
+            Required('samples', default=2): Positive(int),  # default changed to 2
+            Required('tolerance', default=1e-12): Any(PercentageString, NonNegative(Number)),  # default changed to 1e-12
+        })
+
+    debug_appendix_eval_template = (
+        "\n"
+        "==============================================\n"
+        "Summation Data for Sample Number {sample_num} of {samples_total}\n"
+        "==============================================\n"
+        "Variables: {variables}\n"
+        "\n"
+        "Student Value: {student_eval}\n"
+        "Instructor Value: {instructor_eval}\n"
+        ""
+    )
+
+    def gen_evaluations(self, answer, student_input, var_samples, func_samples, **kwargs):
+        """
+        Evaluate the comparer parameters and student inputs for the given samples.
+
+        Returns:
+            A tuple (list, list, set). The first two lists are instructor_evals
+            and student_evals. These have length equal to number of samples specified
+            in config. The set is a record of mathematical functions used in the
+            student's input.
+        """
+        # Similar to FormulaGrader, but specialized to SumGrader
+        funclist = self.functions.copy()
+        varlist = {}
+
+        instructor_evals = []
+        student_evals = []
+
+        # Create a list of instructor variables to remove from student evaluation
+        var_blacklist = []
+        for var in self.config['instructor_vars']:
+            if var in var_samples[0]:
+                var_blacklist.append(var)
+
+        for i in range(self.config['samples']):
+            # Update the functions and variables listings with this sample
+            funclist.update(func_samples[i])
+            varlist.update(var_samples[i])
+
+            # Evaluate sums. Error handling here is to catch author errors.
+            try:
+                expected_eval, _ = self.evaluate_sum(
+                    answer['summand'],
+                    answer['lower'],
+                    answer['upper'],
+                    answer['summation_variable'],
+                    varscope=varlist,
+                    funcscope=funclist
+                )
+            except MITxError as error:
+                msg = "Summation Error with author's stored answer: {}"
+                raise ConfigError(msg.format(six.text_type(error)))
+
+            # Before performing student evaluation, scrub the instructor
+            # variables so that students can't use them
+            for key in var_blacklist:
+                del varlist[key]
+                
+            # Evaluate sums.
+            student_eval, used_funcs = self.evaluate_sum(
+                student_input['summand'],
+                student_input['lower'],
+                student_input['upper'],
+                student_input['summation_variable'],
+                varscope=varlist,
+                funcscope=funclist
+            )
+
+            # Save results
+            instructor_evals.append(expected_eval)
+            student_evals.append(student_eval)
+
+            # Put the instructor variables back in for the debug output
+            varlist.update(var_samples[i])
+            self.log_eval_info(i, varlist, funclist,
+                               student_eval=student_eval,
+                               instructor_eval=expected_eval)
+
+        return instructor_evals, student_evals, used_funcs
+
+    def evaluate_sum(self, summand_str, lower_str, upper_str, summation_var,
+                     varscope=None, funcscope=None):
+        varscope = {} if varscope is None else varscope
+        funcscope = {} if funcscope is None else funcscope
+
+        # Unlike integration, we do not allow the summation variable to appear in
+        # the limits of the sum. Make sure the summation variable is not defined
+        # in the varscope. Note that this means that i and j cannot be used as
+        # summation variables.
+        if summation_var in varscope:
+            msg = 'Summation variable {} conflicts with another previously-defined variable.'
+            raise SummationError(msg.format(summation_var))
+
+        # Evaluate the limits, and find the functions that will be used.
+        lower, upper, used_funcs = self.get_limits_and_funcs(summand_str, lower_str, upper_str,
+                                                             summation_var, varscope, funcscope)
+
+        # Check to ensure that sum limits are not complex.
+        if isinstance(lower, complex) or isinstance(upper, complex):
+            raise SummationError('Summation limits must be real but have evaluated '
+                                 'to complex numbers.')
+
+        # Check to ensure that sum limits are integers or infinite
+        if abs(lower) != float('inf') and int(lower) != lower:
+            raise SummationError('Lower summation limit does not evaluate to an integer.')
+        if abs(upper) != float('inf') and int(upper) != upper:
+            raise SummationError('Upper summation limit does not evaluate to an integer.')
+
+        def eval_summand(x):
+            """
+            Helper function to evaluate the summand at the given value of the
+            summation variable.
+            """
+            varscope[summation_var] = x
+            value, _ = evaluator(summand_str,
+                                 variables=varscope,
+                                 functions=funcscope,
+                                 suffixes=self.suffixes)
+            del varscope[summation_var]
+            return value
+
+        # Check if used_funcs includes a factorial function
+        if 'fact' in used_funcs or 'factorial' in used_funcs:
+            infty_val = self.config['infty_val_fact']
+        else:
+            infty_val = self.config['infty_val']
+
+        # Compute the sum
+        result = self.perform_summation(eval_summand, lower, upper, self.config['even_odd'], infty_val)
+        
+        # Return results
+        return result, used_funcs
+
+    @staticmethod
+    def perform_summation(eval_summand, lower, upper, even_odd, infty_val=1e3):
+        """
+        Compute the value of a summation. Note that unlike integration, exchanging lower and upper doesn't
+        change the value of a summation.
+        
+        Arguments:
+            eval_summand (function): Function of a single argument (summation
+                                     variable) to evaluate summand
+            lower (int or +-infty): Lower limit on summation
+            upper (int or +-infty): Upper limit on summation
+            even_odd (int): Sum over all integers in the range (0), all odd integers in
+                            the range (1) or all even integers in the range (2)
+            infty_val (int): Value to use for infinity in limits (default 1e4)
+            
+        Returns:
+            The result of the sum, in whatever format the eval_summand is provided. Note
+            that this may be an integer, float, complex, vector, matrix, or tensor.
+        """
+        # Sort the limits
+        if lower > upper:
+            lower, upper = upper, lower
+            
+        # Handle infinities
+        if lower == -float('inf'):
+            lower = -infty_val
+        if upper == float('inf'):
+            upper = infty_val
+        if upper == -float('inf'):
+            # Only occurs if both upper and lower are both -inf
+            raise SummationError('Cannot sum from -infty to -infty.')
+        if lower == float('inf'):
+            # Only occurs if both upper and lower are both inf
+            raise SummationError('Cannot sum from infty to infty.')
+            
+        # Handle even/odd numbers only
+        if even_odd == 1:
+            # Odd numbers only
+            delta = 2
+            if abs(lower % 2) != 1:
+                lower += 1
+        elif even_odd == 2:
+            # Even numbers only
+            delta = 2
+            if abs(lower % 2) != 0:
+                lower += 1
+        else:
+            delta = 1
+
+        # Because the summand can be a vector/matrix/tensor and can also contain
+        # user-defined functions, we can't just use numpy vector math here. Have
+        # to for-loop it the old-fashioned way, and hope it's not too slow...
+        # Note that we need to convert floats to integers for range.
+        evals = [eval_summand(n) for n in range(int(lower), int(upper + 1), delta)]
+        result = sum(evals)
+
+        return result
