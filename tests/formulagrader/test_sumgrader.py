@@ -529,6 +529,31 @@ def test_convergence():
     expect = np.cos(x)
     assert abs(result - expect) < 1e-14
 
+def test_vector_sums():
+    grader = SumGrader(
+        answers={
+            'lower': '0',
+            'upper': '10',
+            'summand': '[1, t, t^2]',
+            'summation_variable': 't'
+        }
+    )
+
+    assert grader(None, ['0', '10', '[1, 0, 0] + t*[0, 1, t]', 't'])['ok']
+
+def test_matrix_sums():
+    grader = SumGrader(
+        answers={
+            'lower': '0',
+            'upper': 'infty',
+            'summand': '[[0, 1], [1, 0]]^n/fact(n)',
+            'summation_variable': 'n'
+        }
+    )
+
+    assert grader(None, ['0', 'infty', '[[0, 1], [1, 0]]^n/fact(n)', 'n'])['ok']
+
+# Test errors
 def test_bad_answer():
     grader = SumGrader(
         answers={

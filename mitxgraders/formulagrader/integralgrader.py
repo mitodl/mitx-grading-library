@@ -154,6 +154,15 @@ class SummationGraderBase(AbstractGrader, MathMixin):
                                       allow_inf=True)
         
         varscope[dummy_var] = (upper + lower) / 2
+        if varscope[dummy_var] == float('inf') or varscope[dummy_var] == -float('inf'):
+            if -float('inf') < lower < float('inf'):
+                varscope[dummy_var] = lower
+            elif -float('inf') < upper < float('inf'):
+                varscope[dummy_var] = upper
+            else:
+                # Try this instead?
+                varscope[dummy_var] = 0
+
         _, integrand_used = evaluator(integrand_str,
                                       variables=varscope,
                                       functions=funcscope,
@@ -608,7 +617,7 @@ class SumGrader(SummationGraderBase):
                          Large values may cause timeouts.
 
         infty_val_fact (int): Specifies a number to be used in place of infinity in limits when factorials
-                              are invovled (default 100). Note that 100! ~ 10^157, which should be enough
+                              are involved (default 100). Note that 100! ~ 10^157, which should be enough
                               for most purposes!
 
         even_odd (int): Choose to sum every number (0), every odd number (1) or every even number (2).
