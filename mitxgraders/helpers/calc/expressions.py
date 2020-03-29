@@ -36,11 +36,11 @@ This file defines two main classes:
 and a function:
 
 and also:
- - PARSER: global MathParser instance that should be used throughout mitxgraders
+ - parse: a function that delegates to PARSER.parse
  - evaluator: a convenience function that parses and evaluates strings.
 
-
-
+Both `parse` and `evaluator` share a global MathParser instance for caching
+purposes.
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
@@ -1151,6 +1151,13 @@ class MathExpression(object):
         return result
 
 PARSER = MathParser()
+
+def parse(formula):
+    """
+    Parse a mathematical string into a MathExpression object. Useful for later
+    evaluation or for accessing variables the variables/functions/suffixes used.
+    """
+    return PARSER.parse(formula)
 
 def evaluator(formula,
               variables=DEFAULT_VARIABLES,
