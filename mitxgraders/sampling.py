@@ -36,7 +36,7 @@ from mitxgraders.helpers.validatorfuncs import (
     has_keys_of_type, text_string, Nullable)
 from mitxgraders.helpers.compatibility import coerce_string_keys_to_text_type
 from mitxgraders.helpers.calc import (
-    METRIC_SUFFIXES, CalcError, evaluator, PARSER, MathArray)
+    METRIC_SUFFIXES, CalcError, evaluator, parse, MathArray)
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -418,7 +418,7 @@ class DependentSampler(VariableSamplingSet):
 
         # Construct the 'depends' list (overwrites whatever was provided, as this does it better!)
         try:
-            parsed = PARSER.parse(self.config['formula'])
+            parsed = parse(self.config['formula'])
             self.config['depends'] = list(parsed.variables_used)
         except CalcError:
             raise ConfigError("Formula error in dependent sampling formula: " +

@@ -24,7 +24,7 @@ from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet
                                   schema_user_functions,
                                   validate_user_constants)
 from mitxgraders.helpers.calc import (DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
-                                      MathArray, PARSER, within_tolerance)
+                                      MathArray, parse, within_tolerance)
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, all_unique,
                                                 PercentageString, text_string)
 
@@ -504,7 +504,7 @@ class MathMixin(object):
         is_empty = lambda x: x is None or x.strip() == ''
         expressions = [expr for expr in expressions if not is_empty(expr)]
         # Pre-parse all expressions (these all get cached)
-        parsed_expressions = [PARSER.parse(expr) for expr in expressions]
+        parsed_expressions = [parse(expr) for expr in expressions]
         # Create a list of all variables used in the expressions
         vars_used = set().union(*[p.variables_used for p in parsed_expressions])
         return vars_used
