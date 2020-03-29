@@ -20,6 +20,7 @@ from mitxgraders.formulagrader.matrixgrader import (
 
 from mitxgraders.formulagrader.integralgrader import (
     IntegralGrader,
+    SumGrader,
 )
 
 from mitxgraders.formulagrader.intervalgrader import (
@@ -32,5 +33,6 @@ __all__ = [
     "FormulaGrader",
     "MatrixGrader",
     "IntegralGrader",
+    "SumGrader",
     "IntervalGrader"
 ]
