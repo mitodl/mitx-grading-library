@@ -21,7 +21,7 @@ from mitxgraders.exceptions import (InvalidInput, ConfigError,
                                     StudentFacingError, MissingInput, MITxError)
 from mitxgraders.helpers.validatorfuncs import Positive, text_string, NonNegative, PercentageString
 from mitxgraders.helpers.math_helpers import MathMixin
-from mitxgraders.helpers.calc import evaluator, DEFAULT_VARIABLES
+from mitxgraders.helpers.calc import evaluator, DEFAULT_VARIABLES, parse
 from mitxgraders.helpers.calc.mathfuncs import merge_dicts
 
 
@@ -136,11 +136,9 @@ class SummationGraderBase(AbstractGrader, MathMixin):
             for key in input_positions
         }
 
-    def get_limits_and_funcs(self, integrand_str, lower_str, upper_str, dummy_var,
-                             varscope, funcscope):
+    def get_limits_and_funcs(self, expression, lower_str, upper_str, varscope, funcscope):
         """
         Evals lower/upper limits and gets the functions used in limits and integrand/summand.
-        Treats integrands and summands identically; we just call it integrand here.
         """
         lower, lower_used = evaluator(lower_str,
                                       variables=varscope,
@@ -152,24 +150,9 @@ class SummationGraderBase(AbstractGrader, MathMixin):
                                       functions=funcscope,
                                       suffixes=self.suffixes,
                                       allow_inf=True)
+        expression_used = parse(expression)
         
-        varscope[dummy_var] = (upper + lower) / 2
-        if varscope[dummy_var] == float('inf') or varscope[dummy_var] == -float('inf'):
-            if -float('inf') < lower < float('inf'):
-                varscope[dummy_var] = lower
-            elif -float('inf') < upper < float('inf'):
-                varscope[dummy_var] = upper
-            else:
-                # Try this instead?
-                varscope[dummy_var] = 0
-
-        _, integrand_used = evaluator(integrand_str,
-                                      variables=varscope,
-                                      functions=funcscope,
-                                      suffixes=self.suffixes,
-                                      allow_inf=True)
-        
-        used_funcs = lower_used.functions_used.union(upper_used.functions_used, integrand_used.functions_used)
+        used_funcs = lower_used.functions_used.union(upper_used.functions_used, expression_used.functions_used)
         
         return lower, upper, used_funcs
 
@@ -520,8 +503,7 @@ class IntegralGrader(SummationGraderBase):
         # Let's store the integration variable's initial value in case it has one.
         int_var_initial = varscope[integration_var] if integration_var in varscope else None
 
-        lower, upper, used_funcs = self.get_limits_and_funcs(integrand_str, lower_str, upper_str,
-                                                             integration_var, varscope, funcscope)
+        lower, upper, used_funcs = self.get_limits_and_funcs(integrand_str, lower_str, upper_str, varscope, funcscope)
 
         if isinstance(lower, complex) or isinstance(upper, complex):
             raise IntegrationError('Integration limits must be real but have evaluated '
@@ -580,7 +562,7 @@ class SumGrader(SummationGraderBase):
         answers (dict, required): Specifies author's answer. Has required keys lower,
             upper, summand, summation_variable, which each take string values.
 
-        input_positions (dict): Specifies which integration parameters the student
+        input_positions (dict): Specifies which summation parameters the student
             is required to enter. The default value of input_positions is:
 
                 input_positions = {
@@ -778,8 +760,7 @@ class SumGrader(SummationGraderBase):
             raise SummationError(msg.format(summation_var))
 
         # Evaluate the limits, and find the functions that will be used.
-        lower, upper, used_funcs = self.get_limits_and_funcs(summand_str, lower_str, upper_str,
-                                                             summation_var, varscope, funcscope)
+        lower, upper, used_funcs = self.get_limits_and_funcs(summand_str, lower_str, upper_str, varscope, funcscope)
 
         # Check to ensure that sum limits are not complex.
         if isinstance(lower, complex) or isinstance(upper, complex):
