@@ -1234,7 +1234,7 @@ def evaluator(formula,
         # No need to go further.
         return float('nan'), empty_usage
 
-    parsed = PARSER.parse(formula)
+    parsed = parse(formula)
     result, eval_metadata = parsed.eval(variables, functions, suffixes, allow_inf=allow_inf)
 
     # Were vectors/matrices/tensors used when they shouldn't have been?
