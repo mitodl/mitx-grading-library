@@ -599,7 +599,7 @@ class SumGrader(SummationGraderBase):
                          Large values may cause timeouts.
 
         infty_val_fact (int): Specifies a number to be used in place of infinity in limits when factorials
-                              are involved (default 100). Note that 100! ~ 10^157, which should be enough
+                              are involved (default 80). Note that (2*80)! ~ 10^284, which should be enough
                               for most purposes!
 
         even_odd (int): Choose to sum every number (0), every odd number (1) or every even number (2).
@@ -659,7 +659,7 @@ class SumGrader(SummationGraderBase):
                 Required('summation_variable', default=None): Any(None, Positive(int)),
             },
             Required('infty_val', default=1e3): Positive(Number),
-            Required('infty_val_fact', default=100): Positive(Number),
+            Required('infty_val_fact', default=80): Positive(Number),
             Required('even_odd', default=0): Any(0, 1, 2),
             Required('samples', default=2): Positive(int),  # default changed to 2
             Required('tolerance', default=1e-12): Any(PercentageString, NonNegative(Number)),  # default changed to 1e-12

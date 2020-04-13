@@ -1,0 +1,60 @@
+<problem display_name="Infinite Sums" showanswer="always" weight="10" attempts="">
+
+<p>SumGrader is capable of handling infinite sums, such as the following.</p>
+
+<style>
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline input {
+    min-width: 0 !important;
+  }
+  .xmodule_display.xmodule_ProblemBlock div.problem section div span.MathJax {
+    display: inline-block !important;
+  }
+  .xmodule_display.xmodule_ProblemBlock div.problem section div span.MathJax_Preview {
+    display: inline-block !important;
+  }
+</style>
+
+<script type="text/python">
+from mitxgraders import *
+grader = SumGrader(
+    answers={
+        'lower':'0',
+        'upper':'infty',
+        'summand':'x^n/fact(n)',
+        'summation_variable':'n'
+    },
+    input_positions = {
+        'summand': 1
+    },
+    variables=['x'],
+    sample_from={'x':[0,0.5]}
+)
+</script>
+
+<p>What is the Taylor series expansion of [mathjaxinline]e^x[/mathjaxinline]?</p>
+
+<span>
+<customresponse cfn="grader">
+  <table>
+    <col style="width:20%"/>
+    <col style="width:80%"/>
+    <tbody>
+      <tr>
+        <td>
+          <p> \( \displaystyle e^x = \large{\sum}_{n=0}^{\infty} \) </p>
+        </td>
+        <td>
+          <br/>
+          <textline inline="1" size="10" correct_answer="x^n/fact(n)" math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</customresponse>
+</span>
+
+<p>Here, the expected answer is <code>x^n/fact(n)</code>. Note that we don't allow the student to input the limits in this example. In the underlying code, we sample \(x\) from \([0, 0.5]\), which ensures that the numerical evaluation of the sum rapidly converges.</p>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/sum2.xml" target="_blank">View source</a></p>
+
+</problem>

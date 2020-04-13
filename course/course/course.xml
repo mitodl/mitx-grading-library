@@ -129,6 +129,26 @@
         <problem url_name="integral4"/>
       </vertical>
     </sequential>
+    <sequential url_name="sumgrader" display_name="SumGrader">
+      <vertical url_name="v-sum" display_name="SumGrader">
+        <html url_name="suminfo"/>
+      </vertical>
+      <vertical url_name="v-sum1" display_name="Motivating Example">
+        <problem url_name="sum1"/>
+      </vertical>
+      <vertical url_name="v-sum2" display_name="Infinite Sums">
+        <problem url_name="sum2"/>
+      </vertical>
+      <vertical url_name="v-sum3" display_name="Student-Specified Dummy Variables">
+        <problem url_name="sum3"/>
+      </vertical>
+      <vertical url_name="v-sum4" display_name="Even and Odd Sums">
+        <problem url_name="sum4"/>
+      </vertical>
+      <vertical url_name="v-sum5" display_name="Matrix Sums">
+        <problem url_name="sum5"/>
+      </vertical>
+    </sequential>
     <sequential url_name="intervalgrader" display_name="IntervalGrader">
       <vertical url_name="v-interval" display_name="IntervalGrader">
         <html url_name="intervalinfo"/>

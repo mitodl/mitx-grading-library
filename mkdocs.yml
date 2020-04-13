@@ -20,6 +20,7 @@ pages:
     - Comparer Functions: 'grading_math/comparer_functions.md'
     - AsciiMath Renderer Definitions: 'grading_math/renderer.md'
     - IntegralGrader: 'grading_math/integral_grader.md'
+    - SumGrader: 'grading_math/sum_grader.md'
     - IntervalGrader: 'grading_math/interval_grader.md'
   - Grading Lists:
     - SingleListGrader: 'grading_lists/single_list_grader.md'

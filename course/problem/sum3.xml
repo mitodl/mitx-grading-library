@@ -1,0 +1,75 @@
+<problem display_name="Student-Specified Dummy Variables" showanswer="always" weight="10" attempts="">
+
+<p>Students can even specify their own dummy variable, as in the following example.</p>
+
+<p>Construct a summation that computes the \(n^{\rm th}\) triangular number.</p>
+
+<style>
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline input {
+    min-width: 0 !important;
+  }
+  .xmodule_display.xmodule_ProblemBlock div.problem section div span.MathJax {
+    display: inline-block !important;
+  }
+  .xmodule_display.xmodule_ProblemBlock div.problem section div span.MathJax_Preview {
+    display: inline-block !important;
+  }
+</style>
+
+<script type="text/python">
+from mitxgraders import *
+grader = SumGrader(
+    answers={
+        'lower':'1',
+        'upper':'n',
+        'summand':'t',
+        'summation_variable':'t'
+    },
+    input_positions = {
+        'upper': 1,
+        'summand': 2,
+        'summation_variable': 3,
+        'lower': 4
+    },
+    variables=['n'],
+    sample_from={'n': IntegerRange([10, 20])}
+)
+</script>
+
+<span>
+  <customresponse cfn="grader">
+    <table>
+      <col style="width:20%"/>
+      <col style="width:80%"/>
+      <tbody>
+        <tr>
+          <td colspan="2">
+            <textline size="5" correct_answer="n"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <p> \( \displaystyle \huge{ \sum }\)</p>
+          </td>
+          <td>
+            <br/>
+            <textline inline="1" size="10" correct_answer="t" math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <textline size="2" correct_answer="t" inline="1"/>
+            <p style="display: inline;"> [mathjaxinline]=[/mathjaxinline] </p>
+            <textline size="5" correct_answer="1" inline="1"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </customresponse>
+</span>
+
+<p>Here, the anticipated answer is <code>n</code>, <code>t</code>, <code>t</code> and <code>1</code>, though students can also swap <code>t</code> for other possible variables. Note that <code>i</code> and <code>j</code> are not available, as these are used for the imaginary unit.</p>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/sum3.xml" target="_blank">View source</a></p>
+
+</problem>

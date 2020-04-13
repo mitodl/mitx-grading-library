@@ -579,6 +579,30 @@ def test_bad_var():
     with raises(SummationError, match="Summation variable x conflicts with another previously-defined variable."):
         grader(None, ['0', '1', 'x', 'x'])
 
+    grader = SumGrader(
+        answers={
+            'lower': '0',
+            'upper': '1',
+            'summand': 'i',
+            'summation_variable': 'i'
+        }
+    )
+    with raises(ConfigError, match="Summation Error with author's stored answer: Summation variable i conflicts with another previously-defined variable."):
+        grader(None, ['0', '1', 'x', 'x'])
+
+def test_bad_numbered_var():
+    grader = SumGrader(
+        answers={
+            'lower': '0',
+            'upper': '10',
+            'summand': 'c_{n}*n',
+            'summation_variable': 'n'
+        },
+        numbered_vars=['c']
+    )
+    with raises(ConfigError, match="Summation Error with author's stored answer: Invalid Input: 'c_{n}' not permitted in answer as a variable"):
+        grader(None, ['0', '10', 'n', 'n'])
+
 def test_complex_limits():
     grader = SumGrader(
         answers={

@@ -1,0 +1,68 @@
+<problem display_name="Motivating Example" showanswer="always" weight="10" attempts="">
+
+    <p>Construct a sum that sums the integers from 1 to 10, using <code>n</code> as the dummy variable of summation.</p>
+
+<style>
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline input {
+    min-width: 0 !important;
+  }
+  .xmodule_display.xmodule_ProblemBlock div.problem section div span.MathJax {
+    display: inline-block !important;
+  }
+  .xmodule_display.xmodule_ProblemBlock div.problem section div span.MathJax_Preview {
+    display: inline-block !important;
+  }
+</style>
+
+<script type="text/python">
+from mitxgraders import *
+grader = SumGrader(
+    answers={
+        'lower':'0',
+        'upper':'10',
+        'summand':'n',
+        'summation_variable':'n'
+    },
+    input_positions = {
+        'upper': 1,
+        'summand': 2,
+        'lower': 3
+    }
+)
+</script>
+
+<span>
+<customresponse cfn="grader">
+  <table>
+    <col style="width:10%"/>
+    <col style="width:90%"/>
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <textline size="5" correct_answer="10"/>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p> \( \displaystyle \huge{ \sum }\)</p>
+        </td>
+        <td>
+          <br/>
+          <textline inline="1" size="10" correct_answer="n" math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+            <p style="display: inline;">[mathjaxinline]n = [/mathjaxinline] </p><textline size="5" correct_answer="0" inline="1"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</customresponse>
+</span>
+
+<p>While the expected answer is <code>10</code>, <code>n</code> and <code>1</code> (top to bottom), the student could also use <code>0</code> as the bottom limit, which is equally correct. The student could also enter <code>9</code>, <code>n+1</code> and <code>0</code> and also receive full credit. Unlike integrals, the order of the limits is unimportant in summations, so you can also switch the limits and still be graded correctly.</p>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/sum1.xml" target="_blank">View source</a></p>
+
+</problem>
