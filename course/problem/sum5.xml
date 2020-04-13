@@ -1,0 +1,59 @@
+<problem display_name="Matrix Sums" showanswer="always" weight="10" attempts="">
+
+<p>SumGrader can even sum vectors and matrices.</p>
+
+<p>Here, we compute the exponential of a matrix. If you have no idea what that means, that's perfectly ok - just follow the answers below!</p>
+
+<style>
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline input {
+    min-width: 0 !important;
+  }
+  .xmodule_display.xmodule_ProblemBlock div.problem section div span.MathJax {
+    display: inline-block !important;
+  }
+  .xmodule_display.xmodule_ProblemBlock div.problem section div span.MathJax_Preview {
+    display: inline-block !important;
+  }
+</style>
+
+<script type="text/python">
+from mitxgraders import *
+grader = SumGrader(
+    answers={
+        'lower':'0',
+        'upper':'infty',
+        'summand':'(i*theta)^n/fact(n)*[[0,1],[1,0]]^n',
+        'summation_variable':'n'
+    },
+    input_positions = {
+        'summand': 1
+    },
+    variables=['theta'],
+    sample_from={'theta': [0, 0.01]},   # Ensure rapid convergence!
+    infty_val_fact=15   # Keep this small to avoid timeout errors
+)
+</script>
+
+<span>
+<customresponse cfn="grader">
+  <table>
+    <tbody>
+      <tr>
+        <td>
+          <p>\( \displaystyle \exp \left( i \theta \begin{bmatrix}0 &amp; 1 \\ 1 &amp; 0\end{bmatrix} \right) = \large{\sum}_{n=0}^{\infty}\)</p>
+        </td>
+        <td>
+          <br/>
+          <textline inline="1" size="50" correct_answer="n" math="1" preprocessorClassName="MJxPrep" preprocessorSrc="/static/MJxPrep.js"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</customresponse>
+</span>
+
+<p>The expected answer here is <code>(i*theta)^n/fact(n)*[[0,1],[1,0]]^n</code>. It turns out that you can evaluate this analytically, giving the result of \(\cos(\theta) \mathbf{I}\), where \(\mathbf{I}\) is the 2x2 identity matrix. To test that the grader correctly evaluates the sum, try entering <code>(cos(theta)*[[1,0],[0,1]]+i*sin(theta)*[[0,1],[1,0]])*kronecker(n,0)</code>, which will also be graded as correct (the Kronecker detla essentially kills all but one term in the sum, allowing us to put in the analytic result of the infinite sum).</p>
+
+<p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/sum5.xml" target="_blank">View source</a></p>
+
+</problem>

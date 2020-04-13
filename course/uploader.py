@@ -24,7 +24,7 @@ class edxStudio(object):
         self.site = site
 
     def login(self, username, password):
-        url = '{}/signin'.format(self.site)
+        url = '{}/login'.format(self.site)
         self.session.get(url)
         csrf = self.session.cookies['csrftoken']
         url = '{}/login_post'.format(self.site)
