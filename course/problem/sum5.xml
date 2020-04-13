@@ -29,8 +29,8 @@ grader = SumGrader(
         'summand': 1
     },
     variables=['theta'],
-    sample_from={'theta': [0, 0.1]},   # Ensure rapid convergence!
-    infty_val_fact=20   # Don't want to stress the matrix math too much!
+    sample_from={'theta': [0, 0.01]},   # Ensure rapid convergence!
+    infty_val_fact=15   # Keep this small to avoid timeout errors
 )
 </script>
 
