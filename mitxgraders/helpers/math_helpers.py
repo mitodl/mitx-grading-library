@@ -578,12 +578,13 @@ class MathMixin(object):
     
     def log_comparison_info(self, comparer, comparer_results):
         """Add sample comparison information to debug log"""
-        
-        self.log(self.debug_appendix_comparison_template.format(
+        msg = self.debug_appendix_comparison_template.format(
             samples_total=self.config['samples'],
             comparer=re.sub(r"0x[0-9a-fA-F]+", "0x...", six.text_type(comparer)),
             comparer_results=pprint.pformat(comparer_results)
-        ))
+        )
+        msg = msg.replace("<", "&lt;").replace(">", "&gt;")
+        self.log(msg)
     
     @staticmethod
     def consolidate_results(results, answer, failable_evals):
@@ -647,10 +648,13 @@ class MathMixin(object):
             )
             header = re.sub(r"0x[0-9a-fA-F]+", "0x...", header)
             header = header.replace('RandomFunction.gen_sample.<locals>.', '')
+            header = header.replace("<", "&lt;").replace(">", "&gt;")
             self.log(header)
-        self.log(self.debug_appendix_eval_template.format(
+        msg = self.debug_appendix_eval_template.format(
             sample_num=index + 1,  # to account for 0 index
             samples_total=self.config['samples'],
             variables=pprint.pformat(varlist),
             **kwargs
-        ))
+        )
+        msg = msg.replace("<", "&lt;").replace(">", "&gt;")
+        self.log(msg)
