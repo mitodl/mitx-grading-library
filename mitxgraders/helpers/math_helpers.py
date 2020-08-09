@@ -646,9 +646,9 @@ class MathMixin(object):
                 functions_disallowed=pprint.pformat({f: funclist[f] for f in funclist
                                                      if f not in self.permitted_functions}),
             )
-            header = header.replace("<", "&lt;").replace(">", "&gt;")
             header = re.sub(r"0x[0-9a-fA-F]+", "0x...", header)
             header = header.replace('RandomFunction.gen_sample.<locals>.', '')
+            header = header.replace("<", "&lt;").replace(">", "&gt;")
             self.log(header)
         msg = self.debug_appendix_eval_template.format(
             sample_num=index + 1,  # to account for 0 index

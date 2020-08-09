@@ -486,6 +486,9 @@ def test_fg_config_expect():
     with raises(Error, match=expect):
         FormulaGrader(answers=5)
 
+def squareit(x):
+    return x**2
+
 def test_fg_debug_log():
     set_seed(0)
     grader = FormulaGrader(
@@ -497,7 +500,7 @@ def test_fg_debug_log():
         blacklist=['sin', 'cos', 'tan'],
         user_functions={
             'f': RandomFunction(),
-            'square': lambda x: x**2
+            'square': squareit
             },
         samples=2,
         debug=True
@@ -552,7 +555,7 @@ def test_fg_debug_log():
     " {u}'sech': <function sech at 0x...>,<br/>\n"
     " {u}'sinh': <function sinh at 0x...>,<br/>\n"
     " {u}'sqrt': <function sqrt at 0x...>,<br/>\n"
-    " {u}'square': <function &lt;lambda&gt; at 0x...>,<br/>\n"
+    " {u}'square': <function squareit at 0x...>,<br/>\n"
     " {u}'tanh': <function tanh at 0x...>}}<br/>\n"
     "Functions available during evaluation and disallowed in answer:<br/>\n"
     "{{{u}'cos': <function cos at 0x...>,<br/>\n"
