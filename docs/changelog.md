@@ -11,7 +11,8 @@ This is a major new version with many new features added. We have been very care
 * Updated unit tests to use python and library versions consistent with edx.org.
 * Updated documentation to reflect edX usage of python 3.
 * Added python version to debug output.
-* Fixed a bug in `LinearComparer` when a student provided a constant answer.
+* Fixed a bug in `LinearComparer` that caused a crash when a student provided a constant answer.
+* Fixed a bug in debug output for math graders that caused output not to show.
 
 ## Version 2.2
 
