@@ -14,6 +14,18 @@ matrix:
 
   - language: python
     python:
+      - "3.5.2"
+    dist: xenial
+    install:
+      - pip install -r requirements3.txt
+      - pip install codecov
+    script:
+      - pytest --cov=mitxgraders --cov-report=term-missing
+    after_success:
+      - codecov
+
+  - language: python
+    python:
       - "3.6"
     dist: xenial
     install:
