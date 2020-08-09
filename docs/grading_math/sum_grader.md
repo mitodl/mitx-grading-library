@@ -143,6 +143,8 @@ To aid in grading infinite sums, the default tolerance on a `SumGrader` has been
 
 So long as infinite summations converge sufficiently rapidly, `SumGrader` does a good job at evaluating them. As examples, we have tested that Taylor series expansions for `exp`, `sin` and `cos` converge to numerical precision for small arguments. We advise against using `SumGrader` for slowly-converging series, such as the typical expansion for `tan^-1(1)`.
 
+Note that if you are using vectors or matrices in your sums, we strongly suggest that you use a small value for both `infty_val` and `infty_val_fact`, probably in the 15-20 range. Otherwise, you may see timeout errors from the python grader on edX.
+
 
 ## Even and Odd Sums
 
