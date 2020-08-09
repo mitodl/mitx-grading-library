@@ -30,7 +30,8 @@ grader = SumGrader(
     },
     variables=['theta'],
     sample_from={'theta': [0, 0.01]},   # Ensure rapid convergence!
-    infty_val_fact=15   # Keep this small to avoid timeout errors
+    infty_val_fact=15,   # Keep this small to avoid timeout errors
+    infty_val=15         # Keep this small to avoid timeout errors
 )
 </script>
 
@@ -52,7 +53,7 @@ grader = SumGrader(
 </customresponse>
 </span>
 
-<p>The expected answer here is <code>(i*theta)^n/fact(n)*[[0,1],[1,0]]^n</code>. It turns out that you can evaluate this analytically, giving the result of \(\cos(\theta) \mathbf{I}\), where \(\mathbf{I}\) is the 2x2 identity matrix. To test that the grader correctly evaluates the sum, try entering <code>(cos(theta)*[[1,0],[0,1]]+i*sin(theta)*[[0,1],[1,0]])*kronecker(n,0)</code>, which will also be graded as correct (the Kronecker detla essentially kills all but one term in the sum, allowing us to put in the analytic result of the infinite sum).</p>
+<p>The expected answer here is <code>(i*theta)^n/fact(n)*[[0,1],[1,0]]^n</code>. It turns out that you can evaluate this analytically. To test that the grader correctly evaluates the sum, try entering <code>(cos(theta)*[[1,0],[0,1]]+i*sin(theta)*[[0,1],[1,0]])*kronecker(n,0)</code>, which is the analytic solution (the Kronecker delta is zero unless n=0, so essentially collapses to the sum to a single term).</p>
 
 <p><a href="https://github.com/mitodl/mitx-grading-library/tree/master/course/problem/sum5.xml" target="_blank">View source</a></p>
 
