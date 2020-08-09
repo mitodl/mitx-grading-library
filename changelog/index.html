@@ -256,6 +256,9 @@
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#change-log">Change Log</a></li>
         <li class="first-level "><a href="#version-2">Version 2</a></li>
+            <li class="second-level"><a href="#version-23">Version 2.3</a></li>
+                
+                <li class="third-level"><a href="#version-230">Version 2.3.0</a></li>
             <li class="second-level"><a href="#version-22">Version 2.2</a></li>
                 
                 <li class="third-level"><a href="#version-220">Version 2.2.0</a></li>
@@ -294,6 +297,15 @@
 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link"> # </a></h1>
 <h1 id="version-2">Version 2<a class="headerlink" href="#version-2" title="Permanent link"> # </a></h1>
 <p>This is a major new version with many new features added. We have been very careful to preserve backwards compatibility of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2. However, we do warn that we broke internal backwards compatibility in a number of locations in order to accommodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.</p>
+<h2 id="version-23">Version 2.3<a class="headerlink" href="#version-23" title="Permanent link"> # </a></h2>
+<h3 id="version-230">Version 2.3.0<a class="headerlink" href="#version-230" title="Permanent link"> # </a></h3>
+<ul>
+<li>Updated unit tests to use python and library versions consistent with edx.org.</li>
+<li>Updated documentation to reflect edX usage of python 3.</li>
+<li>Added python version to debug output.</li>
+<li>Fixed a bug in <code>LinearComparer</code> that caused a crash when a student provided a constant answer.</li>
+<li>Fixed a bug in debug output for math graders that caused output not to show.</li>
+</ul>
 <h2 id="version-22">Version 2.2<a class="headerlink" href="#version-22" title="Permanent link"> # </a></h2>
 <h3 id="version-220">Version 2.2.0<a class="headerlink" href="#version-220" title="Permanent link"> # </a></h3>
 <ul>
