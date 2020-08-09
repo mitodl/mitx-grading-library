@@ -1,6 +1,7 @@
 from __future__ import print_function, division, absolute_import
 
 from pytest import raises
+import platform
 from mitxgraders.version import __version__
 from mitxgraders import CalcError
 from mitxgraders.formulagrader.integralgrader import IntegralGrader, IntegrationError
@@ -510,6 +511,7 @@ def test_debug_message():
     student_input = ['1', '8', 'sin(x)', 'x']
     expected_message = (
         "<pre>MITx Grading Library Version {version}<br/>\n"
+        "Running on edX using python {python_version}<br/>\n"
         "Student Responses:<br/>\n"
         "1<br/>\n"
         "8<br/>\n"
@@ -633,7 +635,7 @@ def test_debug_message():
         "[{{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}},<br/>\n"
         " {{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}}]<br/>\n"
         "</pre>"
-    ).format(version=__version__, u=UNICODE_PREFIX)
+    ).format(version=__version__, python_version=platform.python_version(), u=UNICODE_PREFIX)
     expected_message = round_decimals_in_string(expected_message)
     result = grader(None, student_input)
     assert result['ok'] is True
@@ -654,6 +656,7 @@ def test_debug_message_complex_integrand():
     student_input = ['-1', '5', 'sqrt(x)', 'x']
     expected_message = (
         "<pre>MITx Grading Library Version {version}<br/>\n"
+        "Running on edX using python {python_version}<br/>\n"
         "Student Responses:<br/>\n"
         "-1<br/>\n"
         "5<br/>\n"
@@ -746,7 +749,7 @@ def test_debug_message_complex_integrand():
         "Comparison Results:<br/>\n"
         "[{{{u}'grade_decimal': 0, {u}'msg': {u}'', {u}'ok': False}}]<br/>\n"
         "</pre>"
-    ).format(version=__version__, u=UNICODE_PREFIX)
+    ).format(version=__version__, python_version=platform.python_version(), u=UNICODE_PREFIX)
     expected_message = round_decimals_in_string(expected_message)
     result = grader(None, student_input)
     assert result['ok'] is False

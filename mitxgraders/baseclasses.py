@@ -13,6 +13,7 @@ import abc
 import pprint
 import six
 import json
+import platform
 from decimal import Decimal
 from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
@@ -230,6 +231,7 @@ class AbstractGrader(ObjectWithSchema):
         self.debuglog = []
         # Add the version to the debug log
         self.log("MITx Grading Library Version " + __version__)
+        self.log("Running on edX using python " + platform.python_version())
         # Add the student inputs to the debug log
         if isinstance(student_input, list):
             self.log("Student Responses:\n" + "\n".join(map(six.text_type, student_input)))

@@ -4,6 +4,7 @@ Tests of base class functionality
 from __future__ import print_function, division, absolute_import
 
 import sys
+import platform
 import six
 from imp import reload
 from pytest import raises, approx
@@ -25,12 +26,14 @@ def test_debug_with_author_message():
     template = ("{author_message}\n\n"
                 "<pre>"
                 "MITx Grading Library Version {version}\n"
+                "Running on edX using python {python_version}\n"
                 "{debug_content}"
                 "</pre>")
     author_message = "nope!"
     debug_content = "Student Response:\nhorse"
     msg = template.format(author_message=author_message,
                           version=__version__,
+                          python_version=platform.python_version(),
                           debug_content=debug_content
                           ).replace("\n", "<br/>\n")
     expected_result = {'msg': msg, 'grade_decimal': 0, 'ok': False}
@@ -44,10 +47,12 @@ def test_debug_without_author_message():
     student_response = "horse"
     template = ("<pre>"
                 "MITx Grading Library Version {version}\n"
+                "Running on edX using python {python_version}\n"
                 "{debug_content}"
                 "</pre>")
     debug_content = "Student Response:\nhorse"
     msg = template.format(version=__version__,
+                          python_version=platform.python_version(),
                           debug_content=debug_content
                           ).replace("\n", "<br/>\n")
     expected_result = {'msg': msg, 'grade_decimal': 0, 'ok': False}
@@ -62,10 +67,12 @@ def test_debug_with_input_list():
     student_response = ["cat", "fish", "dog"]
     template = ("<pre>"
                 "MITx Grading Library Version {version}\n"
+                "Running on edX using python {python_version}\n"
                 "{debug_content}"
                 "</pre>")
     debug_content = "Student Responses:\ncat\nfish\ndog"
     msg = template.format(version=__version__,
+                          python_version=platform.python_version(),
                           debug_content=debug_content
                           ).replace("\n", "<br/>\n")
     expected_result = {
@@ -491,12 +498,14 @@ def test_attempt_based_grading_single():
 
     template = ("<pre>"
                 "MITx Grading Library Version {version}\n"
+                "Running on edX using python {python_version}\n"
                 "{debug_content}\n"
                 "{attempt_msg}"
                 "</pre>")
     debug_content = "Student Response:\ncat"
     attempt_msg = 'Attempt number 1'
     msg = template.format(version=__version__,
+                          python_version=platform.python_version(),
                           debug_content=debug_content,
                           attempt_msg=attempt_msg).replace("\n", "<br/>\n")
     expected_result = {'msg': msg, 'grade_decimal': 1, 'ok': True}
@@ -504,11 +513,13 @@ def test_attempt_based_grading_single():
 
     template = ("Maximum credit for attempt #3 is 60%.\n\n<pre>"
                 "MITx Grading Library Version {version}\n"
+                "Running on edX using python {python_version}\n"
                 "{debug_content}\n"
                 "{attempt_msg}"
                 "</pre>")
     attempt_msg = 'Attempt number 3\nMaximum credit is 0.6'
     msg = template.format(version=__version__,
+                          python_version=platform.python_version(),
                           debug_content=debug_content,
                           attempt_msg=attempt_msg).replace("\n", "<br/>\n")
     expected_result = {'msg': msg, 'grade_decimal': 0.6, 'ok': 'partial'}
@@ -617,10 +628,11 @@ def test_registered_defaults():
     grader = StringGrader()
     result = grader('cat', 'cat')
     expect = """<pre>MITx Grading Library Version {}<br/>
+Running on edX using python {}<br/>
 Student Response:<br/>
 cat<br/>
 Using modified defaults: {{"debug": true}}<br/>
-Expect value inferred to be "cat"</pre>""".format(__version__)
+Expect value inferred to be "cat"</pre>""".format(__version__, platform.python_version())
     assert result['msg'] == expect
     StringGrader.clear_registered_defaults()
 

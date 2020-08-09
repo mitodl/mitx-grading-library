@@ -198,7 +198,7 @@ True
 ```
 
 !!! Note
-    - Orthogonal matrix sampling relies on features of newer versions of numpy and scipy than are currently available in edX. We expect this feature to be available by the end of 2019.
+    - Orthogonal matrix sampling only works on versions of edX running python 3.5, which went live on edx.org around July 2020. You can see which version of python your edX server is running by turning on `debug=True` in any grader and submitting a response. 
 
 
 ### UnitaryMatrices
@@ -215,7 +215,7 @@ True
 ```
 
 !!! Note
-    - Unitary matrix sampling relies on features of newer versions of numpy and scipy than are currently available in edX. We expect this feature to be available by the end of 2019.
+    - Unitary matrix sampling only works on versions of edX running python 3.5, which went live on edx.org around July 2020. You can see which version of python your edX server is running by turning on `debug=True` in any grader and submitting a response. 
 
 
 ## Variable Sampling: Generic
