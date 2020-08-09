@@ -34,7 +34,7 @@ def get_linear_fit_error(x, y):
     >>> x = np.array([1, 1, 1])
     >>> y = np.array([0, 1, 2])
     >>> result = get_linear_fit_error(x, y)
-    >>> round(result, 6) == np.sqrt(2)
+    >>> result == np.sqrt(2)
     True
     """
     A = np.vstack([x, np.ones(len(x))]).T
@@ -75,7 +75,7 @@ def get_proportional_fit_error(x, y):
     >>> x = np.array([1, 1, 1])
     >>> y = np.array([0, 1, 2])
     >>> result = get_proportional_fit_error(x, y)
-    >>> round(result, 6) == np.sqrt(2)
+    >>> result == np.sqrt(2)
     True
     """
     A = np.vstack(x)
