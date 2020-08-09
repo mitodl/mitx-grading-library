@@ -10,6 +10,8 @@ from mitxgraders.exceptions import ConfigError
 def get_linear_fit_error(x, y):
     """
     Get total error in a linear regression y = ax + b between samples x and y.
+    
+    If x is constant, returns the result of get_offset_fit_error(x, y).
 
     Arguments:
         x, y: flat numpy array
@@ -21,9 +23,25 @@ def get_linear_fit_error(x, y):
     >>> result = get_linear_fit_error(x, 2*x + 1)
     >>> round(result, 6)
     0.0
+
+    If x is constant and y is constant, they are considered linearly related
+    >>> x = np.array([1, 1, 1])
+    >>> result = get_linear_fit_error(x, 2*x + 1)
+    >>> round(result, 6)
+    0.0
+
+    If x is constant but y is not, the error associated with the best fit of a constant is computed
+    >>> x = np.array([1, 1, 1])
+    >>> y = np.array([0, 1, 2])
+    >>> result = get_linear_fit_error(x, y)
+    >>> result == np.sqrt(2)
+    True
     """
     A = np.vstack([x, np.ones(len(x))]).T
-    _, residuals, _, _ = np.linalg.lstsq(A, y, rcond=-1)
+    coeffs, residuals, rank, singular_vals = np.linalg.lstsq(A, y, rcond=-1)
+    if rank == 1:
+        # The input values x are constant. Return the linear offset error.
+        return get_offset_fit_error(x, y)
     return np.sqrt(residuals.item())
 
 def get_proportional_fit_error(x, y):
@@ -46,9 +64,22 @@ def get_proportional_fit_error(x, y):
     >>> result = get_proportional_fit_error(x, 2*x)
     >>> round(result, 6)
     0.0
+
+    If x is constant and y is constant, they are considered proportional
+    >>> x = np.array([1, 1, 1])
+    >>> result = get_proportional_fit_error(x, 2*x)
+    >>> round(result, 6)
+    0.0
+
+    If x is constant but y is not, the error associated with the best fit of a constant is computed
+    >>> x = np.array([1, 1, 1])
+    >>> y = np.array([0, 1, 2])
+    >>> result = get_proportional_fit_error(x, y)
+    >>> result == np.sqrt(2)
+    True
     """
     A = np.vstack(x)
-    _, residuals, _, _ = np.linalg.lstsq(A, y, rcond=-1)
+    coeffs, residuals, rank, singular_vals = np.linalg.lstsq(A, y, rcond=-1)
     return np.sqrt(residuals.item())
 
 def get_offset_fit_error(x, y):
