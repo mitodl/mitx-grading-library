@@ -537,7 +537,7 @@ def test_debug_message():
         " {u}'arctan2': <function arctan2 at 0x...>,<br/>\n"
         " {u}'arctanh': <function arctanh at 0x...>,<br/>\n"
         " {u}'ceil': <function ceil at 0x...>,<br/>\n"
-        " {u}'conj': <ufunc 'conjugate'>,<br/>\n"
+        " {u}'conj': &lt;ufunc 'conjugate'&gt;,<br/>\n"
         " {u}'cos': <function cos at 0x...>,<br/>\n"
         " {u}'cosh': <function cosh at 0x...>,<br/>\n"
         " {u}'cot': <function cot at 0x...>,<br/>\n"
@@ -636,6 +636,7 @@ def test_debug_message():
         " {{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}}]<br/>\n"
         "</pre>"
     ).format(version=__version__, python_version=platform.python_version(), u=UNICODE_PREFIX)
+    expected_message = expected_message.replace("<func", "&lt;func").replace("...>", "...&gt;")
     expected_message = round_decimals_in_string(expected_message)
     result = grader(None, student_input)
     assert result['ok'] is True
@@ -682,7 +683,7 @@ def test_debug_message_complex_integrand():
         " {u}'arctan2': <function arctan2 at 0x...>,<br/>\n"
         " {u}'arctanh': <function arctanh at 0x...>,<br/>\n"
         " {u}'ceil': <function ceil at 0x...>,<br/>\n"
-        " {u}'conj': <ufunc 'conjugate'>,<br/>\n"
+        " {u}'conj': &lt;ufunc 'conjugate'&gt;,<br/>\n"
         " {u}'cos': <function cos at 0x...>,<br/>\n"
         " {u}'cosh': <function cosh at 0x...>,<br/>\n"
         " {u}'cot': <function cot at 0x...>,<br/>\n"
@@ -750,6 +751,7 @@ def test_debug_message_complex_integrand():
         "[{{{u}'grade_decimal': 0, {u}'msg': {u}'', {u}'ok': False}}]<br/>\n"
         "</pre>"
     ).format(version=__version__, python_version=platform.python_version(), u=UNICODE_PREFIX)
+    expected_message = expected_message.replace("<func", "&lt;func").replace("...>", "...&gt;")
     expected_message = round_decimals_in_string(expected_message)
     result = grader(None, student_input)
     assert result['ok'] is False

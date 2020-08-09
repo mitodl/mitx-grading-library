@@ -529,7 +529,7 @@ def test_fg_debug_log():
     " {u}'arctan2': <function arctan2 at 0x...>,<br/>\n"
     " {u}'arctanh': <function arctanh at 0x...>,<br/>\n"
     " {u}'ceil': <function ceil at 0x...>,<br/>\n"
-    " {u}'conj': <ufunc 'conjugate'>,<br/>\n"
+    " {u}'conj': &lt;ufunc 'conjugate'&gt;,<br/>\n"
     " {u}'cosh': <function cosh at 0x...>,<br/>\n"
     " {u}'cot': <function cot at 0x...>,<br/>\n"
     " {u}'coth': <function coth at 0x...>,<br/>\n"
@@ -552,7 +552,7 @@ def test_fg_debug_log():
     " {u}'sech': <function sech at 0x...>,<br/>\n"
     " {u}'sinh': <function sinh at 0x...>,<br/>\n"
     " {u}'sqrt': <function sqrt at 0x...>,<br/>\n"
-    " {u}'square': <function <lambda> at 0x...>,<br/>\n"
+    " {u}'square': <function &lt;lambda&gt; at 0x...>,<br/>\n"
     " {u}'tanh': <function tanh at 0x...>}}<br/>\n"
     "Functions available during evaluation and disallowed in answer:<br/>\n"
     "{{{u}'cos': <function cos at 0x...>,<br/>\n"
@@ -599,6 +599,7 @@ def test_fg_debug_log():
     " {{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}}]<br/>\n"
     "</pre>"
     ).format(version=VERSION, python_version=platform.python_version(), u=UNICODE_PREFIX)
+    message = message.replace("<func", "&lt;func").replace("...>", "...&gt;")
     expected = round_decimals_in_string(message)
     result_msg = round_decimals_in_string(result['msg']).replace(
         'test_fg_debug_log.<locals>.', '')
