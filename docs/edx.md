@@ -116,3 +116,8 @@ from mitxgraders import *
 ```
 
 We want to stress the simplicity of this example compared to implementing the same problem using standard edX problem types! This method of defining a grader is very handy for simple grader constructions such as this one. For more complex graders, we recommend the previous style. One must be careful to make sure that quotation marks `'` and `"` do not conflict if using the in-line method.
+
+
+## Note on Python Version
+
+Older versions of edX used python 2.7 in custom graders, while newer versions use python 3.5. The library works seamlessly with both versions, although some matrix math functionality requires python 3.5. The python version is automatically selected by the edX server. No changes to the XML code are required to work with either version of python.

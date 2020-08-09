@@ -4,6 +4,7 @@ Tests for FormulaGrader and NumericalGrader
 from __future__ import print_function, division, absolute_import
 
 from pytest import raises
+import platform
 import numpy as np
 from voluptuous import Error, MultipleInvalid
 from mitxgraders import (
@@ -505,6 +506,7 @@ def test_fg_debug_log():
 
     message = (
     "<pre>MITx Grading Library Version {version}<br/>\n"
+    "Running on edX using python {python_version}<br/>\n"
     "Student Response:<br/>\n"
     "z + x*x + f(y)<br/>\n"
     "<br/>\n"
@@ -596,7 +598,7 @@ def test_fg_debug_log():
     "[{{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}},<br/>\n"
     " {{{u}'grade_decimal': 1.0, {u}'msg': {u}'', {u}'ok': True}}]<br/>\n"
     "</pre>"
-    ).format(version=VERSION, u=UNICODE_PREFIX)
+    ).format(version=VERSION, python_version=platform.python_version(), u=UNICODE_PREFIX)
     expected = round_decimals_in_string(message)
     result_msg = round_decimals_in_string(result['msg']).replace(
         'test_fg_debug_log.<locals>.', '')

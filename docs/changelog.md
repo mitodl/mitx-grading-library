@@ -4,6 +4,15 @@
 
 This is a major new version with many new features added. We have been very careful to preserve backwards compatibility of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2. However, we do warn that we broke internal backwards compatibility in a number of locations in order to accommodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.
 
+## Version 2.3
+
+### Version 2.3.0
+
+* Updated unit tests to use python and library versions consistent with edx.org.
+* Updated documentation to reflect edX usage of python 3.
+* Added python version to debug output.
+* Fixed a bug in `LinearComparer` when a student provided a constant answer.
+
 ## Version 2.2
 
 ### Version 2.2.0
