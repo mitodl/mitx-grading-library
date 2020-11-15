@@ -387,7 +387,12 @@ class MathParser(object):
 
         # Define + and -
         plus = Literal("+")
-        minus = Literal("-")
+
+        # Also accept unicode emdash
+        emdash = Literal("\u2014") 
+        emdash.setParseAction(lambda: "-")
+        
+        minus = Literal("-") | emdash
         plus_minus = plus | minus
 
         # 1 or 1.0 or .1
