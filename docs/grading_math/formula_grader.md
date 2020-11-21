@@ -121,6 +121,19 @@ By default, four constants are defined: `e`, `pi`, and `i=j=sqrt(-1)`. You can d
 
 Constants are treated as variables that only ever have one value.
 
+If you want to remove a default constant, you can do so by setting it to `None`:
+
+```pycon
+>>> grader = FormulaGrader(
+...     answers='sqrt(-1)',
+...     user_constants={
+...         'i': None,
+...         'j': None
+...     }
+... )
+
+```
+
 
 ### Infinities
 
