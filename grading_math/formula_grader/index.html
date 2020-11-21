@@ -379,6 +379,16 @@
 
 
 <p>Constants are treated as variables that only ever have one value.</p>
+<p>If you want to remove a default constant, you can do so by setting it to <code>None</code>:</p>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
+...     answers='sqrt(-1)',
+...     user_constants={
+...         'i': None,
+...         'j': None
+...     }
+... )</code></pre>
+
+
 <h3 id="infinities">Infinities<a class="headerlink" href="#infinities" title="Permanent link"> # </a></h3>
 <p>When an expression results in an infinity, students are presented with an error message asking them to check for overflow. If you actually want infinity to be an acceptable answer, then you can specify <code>allow_inf=True</code>. This allows expressions to evaluate to infinity (or negative infinity), and also makes the constant <code>infty</code> available for students to use.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Without allow_inf turned on:
