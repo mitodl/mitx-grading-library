@@ -440,6 +440,16 @@ class MathMixin(object):
                                             self.config['blacklist'],
                                             self.config['whitelist'])
         
+        # Make a copy of self.default_variables, so we don't change the base version
+        self.default_variables = self.default_variables.copy()
+        
+        # Remove any deleted user constants from self.default_variables
+        remove_keys = [key for key in self.config['user_constants'] if self.config['user_constants'][key] is None]
+        for entry in remove_keys:
+            if entry in self.default_variables:
+                del self.default_variables[entry]
+            del self.config['user_constants'][entry]
+        
         warn_if_override(self.config, 'variables', self.default_variables)
         warn_if_override(self.config, 'numbered_vars', self.default_variables)
         warn_if_override(self.config, 'user_constants', self.default_variables)

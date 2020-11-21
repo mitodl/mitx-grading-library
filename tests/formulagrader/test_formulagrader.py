@@ -251,6 +251,32 @@ def test_fg_userconstants():
             answers="1",
             user_constants={1: 5}
         )
+        
+    # Test collisions
+    with raises(ConfigError, match='will override default values'):
+        grader = FormulaGrader(
+            answers="5",
+            user_constants={"i": 5}
+        )
+    
+    # Test removals
+    grader = FormulaGrader(
+        answers="5",
+        user_constants={"i": None}
+    )
+    with raises(UndefinedVariable, match="'i' not permitted"):
+        grader(None, 'i')
+
+    grader = FormulaGrader(
+        answers="-1"
+    )
+    assert grader(None, "i^2")['ok']
+    grader = FormulaGrader(
+        answers="-1",
+        user_constants={"i": None},
+        variables=['i']
+    )
+    assert not grader(None, "i^2")['ok']
 
 def test_fg_blacklist_grading():
     """Test FormulaGrader with blacklists and whitelists"""

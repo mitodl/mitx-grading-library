@@ -602,9 +602,9 @@ def construct_functions(default_functions, user_funcs):
 
 def validate_user_constants(*allow_types):
     return All(
-        has_keys_of_type(six.string_types),
-        coerce_string_keys_to_text_type,
-        {Extra: Any(*allow_types)},
+            has_keys_of_type(six.string_types),
+            coerce_string_keys_to_text_type,
+            {Extra: Any(Any(*allow_types), None)}
     )
 
 def construct_constants(default_variables, user_consts):
