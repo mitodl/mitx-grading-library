@@ -6,7 +6,7 @@ six==1.11.0
 
 # For testing
 mock
-pytest==4.6.4
+pytest==4.6.11
 pytest-cov==2.7.1
 
 # For documentation
