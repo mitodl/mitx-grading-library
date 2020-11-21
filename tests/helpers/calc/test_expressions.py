@@ -1,7 +1,7 @@
 """
 Tests of expressions.py that aren't covered elsewhere
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import, unicode_literals
 
 import re
 import numpy as np
@@ -147,6 +147,35 @@ def test_negation():
         with raises(UnableToParse, match=re.escape(msg.format(formula))):
             evaluator(formula)
 
+
+def test_negation_with_emdash():
+    """Test that appropriate numbers of +/emdash signs are accepted"""
+    assert evaluator(u"1+\u20141")[0] == 0
+    assert evaluator("1\u2014\u20141")[0] == 2
+    assert evaluator("2*\u20141")[0] == -2
+    assert evaluator("2/\u20144")[0] == -0.5
+    assert evaluator("\u20141+\u20141")[0] == -2
+    assert evaluator("+1+\u20141")[0] == 0
+    assert evaluator("2^\u20142")[0] == 0.25
+    assert evaluator("+\u20141")[0] == -1
+
+    badformulas = [
+        "1\u2014\u2014\u20141",
+        "2^\u2014\u20142",
+        "1\u2014+2",
+        "1++2",
+        "1+++2",
+        "\u2014\u20142",
+        "\u2014\u2014\u20142",
+        "\u2014+2",
+        "\u2014\u2014+2",
+    ]
+
+    msg = "Invalid Input: Could not parse '{}' as a formula"
+    for formula in badformulas:
+        with raises(UnableToParse, match=re.escape(msg.format(formula))):
+            evaluator(formula)
+            
 def test_evaluation_does_not_mutate_variables():
     """
     This test should not be considered as related to vector/matrix/tensor algebra.
