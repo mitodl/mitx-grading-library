@@ -6,6 +6,12 @@ This is a major new version with many new features added. We have been very care
 
 ## Version 2.3
 
+### Version 2.3.1
+
+* Added a feature to math graders to remove default constants such as `pi` or `i`.
+* Updated math parser to treat emdash unicode characters as minus signs (thanks Derek Rhodes!).
+* Updated pytest version to last version supporting python 2.
+
 ### Version 2.3.0
 
 * Updated unit tests to use python and library versions consistent with edx.org.

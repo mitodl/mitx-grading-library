@@ -13,11 +13,11 @@ mkdocs gh-deploy
 echo Making zip file...
 ./makezip.sh
 
-# Update course
-echo Updating course...
-cd course
-./upload.sh
-cd ..
+# Update course - no longer works, because edX changed their login process
+#echo Updating course...
+#cd course
+#./upload.sh
+#cd ..
 
 # Done!
 echo Done!
