@@ -275,3 +275,6 @@ def test_min_max():
            r"Expected at least 2 inputs, but received 1.")
     with raises(ArgumentError, match=msg):
         evaluator('max(1.5)')
+
+def test_large_numbers():
+    assert evaluator('x', variables={'x': 10 ** 30})[0] == 1e30

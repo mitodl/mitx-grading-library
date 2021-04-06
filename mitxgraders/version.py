@@ -4,4 +4,4 @@ Version number
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-__version__ = "2.3.1"
+__version__ = "2.3.2"

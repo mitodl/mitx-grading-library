@@ -230,6 +230,8 @@ Sample from any discrete set of values that are specified in a tuple. A single v
 >>> sampler = DiscreteSet((1, 3, 5, 7, 9))
 >>> # Always select 3.5
 >>> sampler = DiscreteSet(3.5)
+>>> # This is equivalent to the above:
+>>> sampler = 3.5
 >>> # A tuple can also be used to specify a discrete set
 >>> sampler = (1, 3, 5, 7, 9)
 >>> # Select randomly between two matrices

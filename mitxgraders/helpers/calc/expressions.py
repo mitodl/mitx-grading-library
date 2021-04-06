@@ -389,7 +389,7 @@ class MathParser(object):
         plus = Literal("+")
 
         # Also accept unicode emdash
-        emdash = Literal("\u2014") 
+        emdash = Literal("\u2014")
         emdash.setParseAction(lambda: "-")
         
         minus = Literal("-") | emdash
@@ -776,12 +776,17 @@ class MathExpression(object):
         Returns a copy of the variable in self.vars
 
         We return a copy so that nothing in self.vars is mutated.
+        
+        If the variable is a long integer, we convert it to a float so that numpy methods work on it.
 
         NOTE: The variable's value's class must implement a __copy__ method.
             (numpy ndarrays do implement this method)
         """
         value = variables[parse_result[0]]
-        return copy.copy(value)
+        value = copy.copy(value)
+        if isinstance(value, long):
+            value = float(value)
+        return value
 
     @staticmethod
     def eval_function(parse_result, functions):
