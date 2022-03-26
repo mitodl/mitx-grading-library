@@ -588,6 +588,7 @@ def test_siblings_passed_to_subgrader_check_if_ordered_and_subgrader_list():
                 for _, kwargs in check2.call_args_list:
                     assert kwargs['siblings'] == siblings
 
+
 def test_grouping_unordered_different_lengths():
     """Test that an error is raised if unordered groupings use different numbers of inputs"""
     msg = "Groups must all be the same length when unordered"

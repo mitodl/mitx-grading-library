@@ -8,7 +8,7 @@ import numpy as np
 import six
 from voluptuous import Schema, Required, Any, All, Invalid, Length
 from mitxgraders.comparers import equality_comparer
-from mitxgraders.sampling import schema_user_functions_no_random
+from mitxgraders.sampling import schema_user_functions_no_random, DependentSampler
 from mitxgraders.exceptions import MissingInput
 from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.helpers.calc import evaluator, DEFAULT_VARIABLES
@@ -131,7 +131,7 @@ class FormulaGrader(ItemGrader, MathMixin):
         cls.set_default_comparer(equality_comparer)
 
     @staticmethod
-    def eval_and_validate_comparer_params(scoped_eval, comparer_params, siblings_eval):
+    def eval_and_validate_comparer_params(scoped_eval, comparer_params):
         """
         Evaluate the comparer_params, and make sure they contain no references
         to empty siblings.
@@ -149,11 +149,6 @@ class FormulaGrader(ItemGrader, MathMixin):
                    for param in comparer_params]
         # results is a list of (value, EvalMetaData) pairs
         comparer_params_eval = [value for value, _ in results]
-        used_variables = set().union(*[used.variables_used for _, used in results])
-
-        for variable in used_variables:
-            if variable in siblings_eval and np.isnan(siblings_eval[variable]):
-                raise MissingInput('Cannot grade answer, a required input is missing.')
 
         return comparer_params_eval
 
@@ -290,11 +285,13 @@ class FormulaGrader(ItemGrader, MathMixin):
         comparer_params_evals = []
         student_evals = []
 
-        # Create a list of instructor variables to remove from student evaluation
+        # Create a list of instructor and sibling variables to remove from student evaluation
+        sibling_vars = [key for key in sibling_formulas]
         var_blacklist = []
         for var in self.config['instructor_vars']:
             if var in var_samples[0]:
                 var_blacklist.append(var)
+        var_blacklist += sibling_vars
 
         for i in range(self.config['samples']):
             # Update the functions and variables listings with this sample
@@ -309,33 +306,21 @@ class FormulaGrader(ItemGrader, MathMixin):
                 return evaluator(expression, variables, functions, suffixes, max_array_dim,
                                  allow_inf=self.config['allow_inf'])
 
-            # Compute the sibling values, and add them to varlist
-            siblings_eval = {
-                key: scoped_eval(sibling_formulas[key])[0]
-                for key in sibling_formulas
-            }
-            varlist.update(siblings_eval)
-
             # Compute expressions
-            comparer_params_eval = self.eval_and_validate_comparer_params(
-                scoped_eval, comparer_params, siblings_eval)
+            comparer_params_eval = self.eval_and_validate_comparer_params(scoped_eval, comparer_params)
             comparer_params_evals.append(comparer_params_eval)
 
             # Before performing student evaluation, scrub the sibling and instructor
             # variables so that students can't use them
-            for key in siblings_eval:
-                del varlist[key]
             for key in var_blacklist:
                 del varlist[key]
 
             student_eval, meta = scoped_eval(student_input)
             student_evals.append(student_eval)
 
-            # TODO: Remove this if statement
             if self.config['debug']:
                 # Put the siblings and instructor variables back in for the debug output
                 varlist.update(var_samples[i])
-                varlist.update(siblings_eval)
                 self.log_eval_info(i, varlist, funclist,
                                    comparer_params_eval=comparer_params_eval,
                                    student_eval=student_eval)
@@ -347,8 +332,15 @@ class FormulaGrader(ItemGrader, MathMixin):
 
         # Extract sibling formulas to allow for sampling
         siblings = kwargs.get('siblings', None)
+        # Find sibling variables used in comparer parameters
         comparer_params = answer['expect']['comparer_params']
         required_siblings = self.get_used_vars(comparer_params)
+        # Add in any sibling variables used in DependentSamplers
+        samplers = [self.config['sample_from'][x]
+                    for x in self.config['sample_from']
+                    if isinstance(self.config['sample_from'][x], DependentSampler)]
+        sampler_vars = sum((x.config['depends'] for x in samplers), [])
+        required_siblings = list(set(required_siblings).union(set(sampler_vars)))
         # required_siblings might include some extra variable names, but no matter
         sibling_formulas = self.get_sibling_formulas(siblings, required_siblings)
 
