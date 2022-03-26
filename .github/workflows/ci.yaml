@@ -73,4 +73,6 @@ jobs:
           npm install
 
       - name: Run test cases
-        run: npm test
+        run: |
+          cd mitxgraders-js
+          npm test
