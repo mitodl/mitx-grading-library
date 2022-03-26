@@ -278,3 +278,6 @@ def test_min_max():
 
 def test_large_numbers():
     assert evaluator('x', variables={'x': 10 ** 30})[0] == 1e30
+
+def test_nan():
+    assert np.isnan(evaluator("x^2", {'x': float('nan')}, {}, {})[0])
