@@ -306,11 +306,6 @@ class FormulaGrader(ItemGrader, MathMixin):
                 return evaluator(expression, variables, functions, suffixes, max_array_dim,
                                  allow_inf=self.config['allow_inf'])
 
-            # Check on the status of the sibling variables
-            for variable in sibling_vars:
-                if np.isnan(varlist[variable]):
-                    raise MissingInput('Cannot grade answer, a required input is missing.')
-
             # Compute expressions
             comparer_params_eval = self.eval_and_validate_comparer_params(scoped_eval, comparer_params)
             comparer_params_evals.append(comparer_params_eval)
