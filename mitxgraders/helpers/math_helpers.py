@@ -18,7 +18,7 @@ from voluptuous import Schema, Required, Any, All, Length, Coerce
 from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.exceptions import InvalidInput, ConfigError
 from mitxgraders.comparers import CorrelatedComparer
-from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet,
+from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet, DependentSampler,
                                   gen_symbols_samples, construct_functions,
                                   construct_constants, construct_suffixes,
                                   schema_user_functions,
@@ -537,6 +537,16 @@ class MathMixin(object):
         
         # Generate the variable list
         variables, sample_from_dict = self.generate_variable_list(expressions)
+
+        # Check if a dictionary of sibling variables has been provided, and sample those too
+        for entry in args:
+            if isinstance(entry, dict):
+                if all([k.startswith('sibling_') for k in entry]):
+                    # This is a sibling dictionary. Add it to the list of variables to sample.
+                    for k in entry:
+                        variables.append(k)
+                        sample_from_dict[k] = DependentSampler(formula=entry[k])
+                    break
         
         # Generate the samples
         var_samples = gen_symbols_samples(variables,
@@ -583,7 +593,7 @@ class MathMixin(object):
                 (full_string, head) = match.groups()
                 variable_list.append(full_string)
                 sample_from_dict[full_string] = sample_from_dict[head]
-        
+
         return variable_list, sample_from_dict
     
     def log_comparison_info(self, comparer, comparer_results):
