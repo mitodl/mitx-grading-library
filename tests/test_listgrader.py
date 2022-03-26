@@ -9,6 +9,7 @@ from mitxgraders import (ListGrader, ConfigError, StringGrader, FormulaGrader,
                          NumericalGrader, SingleListGrader)
 from mitxgraders import CalcError
 from tests.helpers import mock
+from mitxgraders.sampling import DependentSampler
 
 pp = pprint.PrettyPrinter(indent=4)
 printit = pp.pprint
@@ -587,6 +588,36 @@ def test_siblings_passed_to_subgrader_check_if_ordered_and_subgrader_list():
                     assert kwargs['siblings'] == siblings
                 for _, kwargs in check2.call_args_list:
                     assert kwargs['siblings'] == siblings
+
+def test_siblings_in_dependent_samplers():
+    grader = ListGrader(
+        answers=['1', 'x'],
+        subgraders=[
+            FormulaGrader(),
+            FormulaGrader(variables=['x'], sample_from={'x': DependentSampler(formula='sibling_1+1')})
+        ]
+    )
+
+    submission = ['1', '2']
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+        ]
+    }
+    assert grader(None, submission) == expected_result
+
+    submission = ['2', '3']
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+        ]
+    }
+    assert grader(None, submission) == expected_result
+
 
 def test_grouping_unordered_different_lengths():
     """Test that an error is raised if unordered groupings use different numbers of inputs"""
