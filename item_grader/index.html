@@ -269,15 +269,15 @@
 &gt;&gt;&gt; grader = StringGrader(
 ...     answers='cat',
 ...     wrong_msg='Try again!'
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>The grader is set up to grade an answer of <code>cat</code> as correct, and includes a message that is presented to students if they get the answer wrong. One could pass <code>grader</code> in as the <code>cfn</code> key for a <code>customresponse</code> tag. The following code demonstrates what happens when the grader is called using python (for example, inside a python console). Note that this is only for demonstrating the behavior of the grader, and is not required in order to use the library in edX.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>You will often see this type of demonstration in this documentation. It serves both to demonstrate how the grader works and to ensure that our examples are always syntactically correct, as these code blocks form part of our documentation testing.</p>
 <p>Note that <code>grader</code> accepts two arguments. This is because edX passes two arguments to all graders. The first argument is the <code>expect</code> or <code>answer</code> value associated with the <code>customresponse</code> tag. Here, we supply <code>None</code>, as the grader already has its answer specified. The second argument is the student input. If the <code>customresponse</code> problem has multiple inputs, the second argument is a list of the student inputs.</p>
@@ -300,8 +300,8 @@ True</code></pre>
 &gt;&gt;&gt; grader(None, 'zebra') == {'grade_decimal': 1, 'msg': 'Yay!', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <ul>
 <li>A single <code>'expect'</code> value: can be used to specify the correct answer. For example,</li>
@@ -315,8 +315,8 @@ True</code></pre>
 &gt;&gt;&gt; grader(None, 'zebra') == {'grade_decimal': 1, 'msg': '', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Again, most <code>ItemGrader</code>s use strings to store <code>'expect'</code> values.</p>
 <ul>
@@ -344,8 +344,8 @@ True
 &gt;&gt;&gt; grader(None, 'unicorn') == {'grade_decimal': 0, 'msg': 'No, not unicorn!', 'ok': False}
 True
 &gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Internally, the <code>ItemGrader</code> converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.</p>
 <p>The <code>wrong_msg</code> is only displayed if the score is zero and there are no other messages.</p>
@@ -355,7 +355,8 @@ True</code></pre>
 <pre class="codehilite"><code class="language-python">grader = ItemGrader(
     answers=(str, dict, (str, dict)),
     wrong_msg=str,  # default ''
-)</code></pre></div>
+)
+</code></pre></div>
         
     </div>
 

@@ -287,8 +287,8 @@ True
 &gt;&gt;&gt; grader(None, 'dog, cat') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, 'cat, octopus') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>To receive full points for this problem, a student would enter <code>cat, dog</code> or <code>dog, cat</code> into the input box. Entering <code>cat, octopus</code> or just <code>cat</code> will receive half points.</p>
 <p>The <code>answers</code> key follows the usual <code>ItemGrader</code> specification, with one change: instead of specifying individual strings or dictionaries, you need to specify lists of strings or dictionaries. Otherwise, the full scope of <code>ItemGrader</code> configuration is available to you, such as using tuples to specify multiple lists of answers.</p>
@@ -304,8 +304,8 @@ True
 &gt;&gt;&gt; grader(None, 'dog, feline') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, 'cat, vole') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Now, <code>cat, dog</code> and <code>goat, vole</code> will get full grades. But mixes won't: <code>cat, vole</code> will score half credit, as <code>cat</code> and <code>dog</code> are in the same answer list, while <code>vole</code> belongs with <code>goat</code>.</p>
 <p>Below is an example that uses literally all possible answer input styles.</p>
@@ -325,8 +325,8 @@ True
 &gt;&gt;&gt; grader(None, 'hippo, unicorn') == {'grade_decimal': 0.25, 'msg': '', 'ok': 'partial'}
 True
 &gt;&gt;&gt; grader(None, 'lumberjack, unicorn') == {'grade_decimal': 0.5, 'msg': &quot;Well, you just had to do something strange, didn't you?&quot;, 'ok': 'partial'}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Note that the list of answers can itself occur inside a dictionary that has a grade and message associated with it. In this case, the answers are evaluated as normal, and the overall grade is multiplied by <code>grade_decimal</code>. The message is only shown if all of the inputs received credit. So, note that <code>feline, anything</code> will get the "Good enough!" message, while the "something strange" message only appears if the student enters both <code>unicorn</code> and <code>lumberjack</code>.</p>
 <p>As a convenience, you can also provide an answer that is just a string, corresponding to what students would enter. Beware that spaces included after delimiters will be included in the following entry.</p>
@@ -340,8 +340,8 @@ True
 &gt;&gt;&gt; grader(None, 'dog, cat') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, 'cat, octopus') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>This means that <code>SingleListGrader</code>s are capable of inferring answers from the <code>expect</code> keyword of a <code>customresponse</code> tag.</p>
 <h2 id="messages">Messages<a class="headerlink" href="#messages" title="Permanent link"> # </a></h2>
@@ -352,8 +352,8 @@ True</code></pre>
 ...     wrong_msg='Try again!'
 ... )
 &gt;&gt;&gt; grader(None, 'wolf, feline') == {'grade_decimal': 0.0, 'msg': 'Try again!', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <h2 id="ordered-input">Ordered Input<a class="headerlink" href="#ordered-input" title="Permanent link"> # </a></h2>
 <p>By default, a <code>SingleListGrader</code> doesn't care which order the input is given in. If you want the answers and the student input to be compared in order, set <code>ordered=True</code>.</p>
@@ -365,8 +365,8 @@ True</code></pre>
 &gt;&gt;&gt; grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, 'dog, cat') == {'grade_decimal': 0.0, 'msg': '', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Now <code>cat, dog</code> will receive full grades, but <code>dog, cat</code> will be marked wrong. Note that <code>cat</code> will receive half credit, but <code>dog</code> will receive zero, as dog is incorrect in the first position. Ordered is <code>False</code> by default.</p>
 <h2 id="length-checking">Length Checking<a class="headerlink" href="#length-checking" title="Permanent link"> # </a></h2>
@@ -386,8 +386,8 @@ True
 ...     grader(None, 'cat')
 ... except MissingInput as error:
 ...     print(error)
-List length error: Expected 2 terms in the list, but received 1. Separate items with character &quot;,&quot;</code></pre>
-
+List length error: Expected 2 terms in the list, but received 1. Separate items with character &quot;,&quot;
+</code></pre>
 
 <p>If you give this <code>cat</code>, it will tell you that you've got the wrong length, and won't use up an attempt.</p>
 <p>By default, <code>length_error</code> is set to <code>False</code>. If you set <code>length_error</code> to <code>True</code>, then all answers in a tuple of lists (rather than a single answer list) must have the same length.</p>
@@ -408,8 +408,8 @@ List error: Empty entry detected in position 3
 ...     missing_error=False
 ... )
 &gt;&gt;&gt; grader(None, 'cat, dog,') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True</code></pre>
-
+True
+</code></pre>
 
 <h2 id="choosing-delimiters">Choosing Delimiters<a class="headerlink" href="#choosing-delimiters" title="Permanent link"> # </a></h2>
 <p>You can use whatever delimiter you like. The default is a comma (<code>,</code>). The following uses a semicolon as a delimiter. We recommend not using multi-character delimiters, but do not disallow it.</p>
@@ -419,8 +419,8 @@ True</code></pre>
 ...     delimiter=';'
 ... )
 &gt;&gt;&gt; grader(None, 'cat; dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>By using different delimiters, it is possible to nest <code>SingleListGrader</code>s:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
@@ -433,8 +433,8 @@ True</code></pre>
 &gt;&gt;&gt; grader(None, 'd, c; a, b') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, 'a, c; d, b') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Here the expected student input is <code>a, b; c, d</code>. It will also take <code>b, a; d, c</code> or <code>c, d; a, b</code> due to the unordered nature of both lists. However, <code>a, c; d, b</code> is only worth half points.</p>
 <h2 id="partial-credit">Partial Credit<a class="headerlink" href="#partial-credit" title="Permanent link"> # </a></h2>
@@ -445,8 +445,8 @@ True</code></pre>
 ...     partial_credit=False
 ... )
 &gt;&gt;&gt; grader(None, 'cat, octopus') == {'grade_decimal': 0.0, 'msg': '', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Now <code>cat, octopus</code> will receive a grade of zero.</p>
 <h2 id="inferred-answers">Inferred Answers<a class="headerlink" href="#inferred-answers" title="Permanent link"> # </a></h2>
@@ -462,8 +462,8 @@ from mitxgraders import *
   &lt;textline /&gt;
 &lt;/customresponse&gt;
 
-&lt;/problem&gt;</code></pre>
-
+&lt;/problem&gt;
+</code></pre>
 
 <p>Here, the grader is a <code>SingleListGrader</code> using <code>StringGrader</code> as a subgrader, and uses default values for all other options. The <code>answers</code> key is missing, so it is inferred to be <code>['a', 'b', 'c', 'd']</code> from the <code>expect</code> parameter of the <code>customresponse</code> tag. Answer inference will even work with nested <code>SingleListGrader</code>s.</p>
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
@@ -476,7 +476,8 @@ from mitxgraders import *
     length_error=bool,  # default False
     missing_error=bool,  # default True
     delimiter=str,  # default ','
-)</code></pre></div>
+)
+</code></pre></div>
         
     </div>
 

@@ -272,8 +272,8 @@
 <p>Library defaults for any grading class can be specified by constructing the desired dictionary of defaults, and calling <code>register_defaults(dict)</code> on the class. For example, to specify that all <code>StringGrader</code>s should be case-insensitive by default, you can do the following.</p>
 <pre class="codehilite"><code class="language-pycon">StringGrader.register_defaults({
     'case_sensitive': False
-})</code></pre>
-
+})
+</code></pre>
 
 <p>When this code is included in a file in the plugins folder, it automatically runs every time the library is loaded, leading to course-wide defaults. If for some reason you need to reset to the library defaults for a specific problem, you can call <code>clear_registered_defaults()</code> on the class in that problem.</p>
 <p>An example plugin has been provided for you in <code>defaults_sample.py</code>. The code in this plugin is commented out so that it doesn't change anything by default. If you are interested in overriding library defaults on a course-wide basis, we recommend copying this file to <code>defaults.py</code> and setting the desired defaults using the code templates provided. This is particularly useful if you wish to use attempt-based partial credit throughout your course.</p>

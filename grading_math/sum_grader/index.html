@@ -318,8 +318,8 @@
       &lt;/tbody&gt;
     &lt;/table&gt;
   &lt;/customresponse&gt;
-&lt;/span&gt;</code></pre>
-
+&lt;/span&gt;
+</code></pre>
 
 <p>This sets up a summation where students can input the limits of summation and the summand (the variable of summation has been fixed to be <code>n</code> in this case).</p>
 <p>Further examples of formatting summations are shown in the example course.</p>
@@ -330,8 +330,8 @@
     'upper': 2,
     'summand': 3,
     'summation_variable': 4
-}</code></pre>
-
+}
+</code></pre>
 
 <p>This requires students to enter all four parameters in the indicated order.</p>
 <p>If the author overrides the default <code>input_positions</code> value, any subset of the keys ('lower', 'upper', 'summand', 'summation_variable') may be specified. Key values should be</p>
@@ -344,8 +344,8 @@
     'lower': 1,
     'upper': 2,
     'summand': 3
-}</code></pre>
-
+}
+</code></pre>
 
 <p>indicates that the problem has 3 input boxes which represent the lower limit, upper limit, and summand in that order. The <code>summation_variable</code> is NOT entered by student and is instead given by the value specified by author in 'answers'.</p>
 <p>Here is a sample grader for the above XML:</p>
@@ -362,8 +362,8 @@
 ...         'summand': 2,
 ...         'lower': 3
 ...     }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>Note that when students specify their own variable of summation, it must not conflict with a variable already present in the problem. Note that this means that <code>i</code> and <code>j</code> are not available as variables of summation (as they are used to indicate the imaginary unit).</p>
 <h2 id="specifying-the-answer">Specifying the Answer<a class="headerlink" href="#specifying-the-answer" title="Permanent link"> # </a></h2>
@@ -373,8 +373,8 @@
     'upper': 'upper_limit',
     'summand': 'summand',
     'summation_variable': 'variable_of_summation'
-}</code></pre>
-
+}
+</code></pre>
 
 <p>Note that each entry is a string value. <code>SumGrader</code> can handle numerical, complex, vector and even matrix summands. However, it cannot handle numbered variables where the index of the numbered variable is given by the summation variable. This is due to a limitation in the way that numbered variables are sampled.</p>
 <p>Unlike integrals, the order of the limits is unimportant.</p>
@@ -402,8 +402,8 @@
 ...         'lower': 3
 ...     },
 ...     even_odd=1
-... )</code></pre>
-
+... )
+</code></pre>
 
 <h2 id="other-options">Other Options<a class="headerlink" href="#other-options" title="Permanent link"> # </a></h2>
 <p>The following options from <code>FormulaGrader</code> are available for use in <code>SumGrader</code>:</p>
@@ -449,7 +449,8 @@
     forbidden_message=str,  # default 'Invalid Input: This particular answer is forbidden'
     required_functions=list,  # default []
     metric_suffixes=bool,  # default False
-)</code></pre></div>
+)
+</code></pre></div>
         
     </div>
 

@@ -273,21 +273,21 @@
 <h1 id="introduction-to-graders">Introduction to Graders<a class="headerlink" href="#introduction-to-graders" title="Permanent link"> # </a></h1>
 <p>Graders are implemented as python classes. All grading classes are instantiated by calling them. Options can be provided using keyword arguments as</p>
 <pre class="codehilite"><code class="language-python">grader = FakeGradingClass(option_1=value_1, option_2=value2)
-# FakeGradingClass is not real! It's just a placeholder.</code></pre>
-
+# FakeGradingClass is not real! It's just a placeholder.
+</code></pre>
 
 <p>or with a configuration dictionary:</p>
 <pre class="codehilite"><code class="language-python">config = {'option_1': value_1, 'option_2': value_2}
-grader = FakeGradingClass(config)</code></pre>
-
+grader = FakeGradingClass(config)
+</code></pre>
 
 <p>Passing the configuration as a dictionary can be useful if you are using the same configuration for multiple problems. However, you cannot 'mix and match' these two options: if a configuration dictionary is supplied, any keyword arguments are ignored.</p>
 <p>Most configuration options are specific to their grading classes. For example, <code>FormulaGrader</code> has a <code>variables</code> configuration key, but <code>NumericalGrader</code> does not.</p>
 <p>A few configuration options are available to all grading classes.</p>
 <h2 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Permanent link"> # </a></h2>
 <p>Every grading class has a debug option. By default, <code>debug=False</code>. To receive debug information from a given grader, specify <code>debug=True</code>. Some graders will provide more debug information than others. Debug information can be used by authors to check to make sure that the graders are behaving as expected, but shouldn't be made available to students.</p>
-<pre class="codehilite"><code class="language-python">grader = FakeGradingClass(debug=True)</code></pre>
-
+<pre class="codehilite"><code class="language-python">grader = FakeGradingClass(debug=True)
+</code></pre>
 
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link"> # </a></h2>
 <p>Every grading class has a <code>suppress_warnings</code> key.</p>
@@ -298,25 +298,25 @@ grader = FakeGradingClass(config)</code></pre>
 ...     grader = FormulaGrader(variables=['pi'])
 ... except ConfigError as error:
 ...     print(error)
-Warning: 'variables' contains entries 'pi' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</code></pre>
-
+Warning: 'variables' contains entries 'pi' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
+</code></pre>
 
 <p>As the warning message says, if you really want to override the default value of <code>pi</code> (not recommended!) then you can suppress this warning by setting <code>suppress_warnings=True</code>.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = FormulaGrader(variables=['pi'], suppress_warnings=True)</code></pre>
-
+&gt;&gt;&gt; grader = FormulaGrader(variables=['pi'], suppress_warnings=True)
+</code></pre>
 
 <h2 id="attempt-based-partial-credit">Attempt-Based Partial Credit<a class="headerlink" href="#attempt-based-partial-credit" title="Permanent link"> # </a></h2>
 <p>It is possible to pass a student's attempt number to a grader by explicitly requesting that edX do so in a <code>customresponse</code> tag as follows.</p>
-<pre class="codehilite"><code class="language-XML">&lt;customresponse cfn=&quot;grader&quot; expect=&quot;answer&quot; cfn_extra_args=&quot;attempt&quot;&gt;</code></pre>
-
+<pre class="codehilite"><code class="language-XML">&lt;customresponse cfn=&quot;grader&quot; expect=&quot;answer&quot; cfn_extra_args=&quot;attempt&quot;&gt;
+</code></pre>
 
 <p>Once this is done, you can enable attempt-based partial credit for your graders. The syntax is as follows.</p>
 <pre class="codehilite"><code class="language-python">grader = FakeGradingClass(
     attempt_based_credit=(None | function),  # default None
     attempt_based_credit_msg=True  # default True
-)</code></pre>
-
+)
+</code></pre>
 
 <p>Attempt-based partial credit is turned on by specifying a function to convert an attempt number into an amount of credit. We provide three functions to do this, but you can of course write your own.</p>
 <p>If a student's credit has been decreased from the maximum by attempt-based partial credit, the student can be provided with a message informing them of the maximum possible credit at that attempt number. This is controlled by the <code>attempt_based_credit_msg</code> setting. We recommend that this setting be left on, as it will likely lead to confusion otherwise.</p>
@@ -333,8 +333,8 @@ True
 &gt;&gt;&gt; grader('cat', 'cat', attempt=3) == {'grade_decimal': 0.3333, 'msg': 'Maximum credit for attempt #3 is 33.3%.', 'ok': 'partial'}
 True
 &gt;&gt;&gt; grader('cat', 'cat', attempt=4) == {'grade_decimal': 0.25, 'msg': 'Maximum credit for attempt #4 is 25%.', 'ok': 'partial'}
-True</code></pre>
-
+True
+</code></pre>
 
 <h3 id="geometriccredit">GeometricCredit<a class="headerlink" href="#geometriccredit" title="Permanent link"> # </a></h3>
 <p>This function decreases the possible credit by a factor for each attempt, forming a geometric progression. You may choose the factor, which defaults to 0.5.</p>
@@ -346,8 +346,8 @@ True
 &gt;&gt;&gt; grader('cat', 'cat', attempt=3) == {'grade_decimal': 0.25, 'msg': 'Maximum credit for attempt #3 is 25%.', 'ok': 'partial'}
 True
 &gt;&gt;&gt; grader('cat', 'cat', attempt=4) == {'grade_decimal': 0.125, 'msg': 'Maximum credit for attempt #4 is 12.5%.', 'ok': 'partial'}
-True</code></pre>
-
+True
+</code></pre>
 
 <h3 id="linearcredit">LinearCredit<a class="headerlink" href="#linearcredit" title="Permanent link"> # </a></h3>
 <p>This function allows the first few attempts to have maximum credit, then linearly decreases credit until a minimum threshold is reached.</p>
@@ -382,8 +382,8 @@ True
 &gt;&gt;&gt; grader('cat', 'cat', attempt=5) == {'grade_decimal': 0.2, 'msg': 'Maximum credit for attempt #5 is 20%.', 'ok': 'partial'}
 True
 &gt;&gt;&gt; grader('cat', 'cat', attempt=6) == {'grade_decimal': 0.2, 'msg': 'Maximum credit for attempt #6 is 20%.', 'ok': 'partial'}
-True</code></pre>
-
+True
+</code></pre>
 
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to all graders.</p>
@@ -392,7 +392,8 @@ True</code></pre>
     wrong_msg=str,  # default ''
     attempt_based_credit=(None | function),  # default None
     attempt_based_credit_msg=bool,  # default True
-)</code></pre></div>
+)
+</code></pre></div>
         
     </div>
 

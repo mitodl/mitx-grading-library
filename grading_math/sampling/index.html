@@ -298,8 +298,8 @@
 &gt;&gt;&gt; RealInterval() == RealInterval([1, 5])
 True
 &gt;&gt;&gt; # A list can also be used to specify an interval
-&gt;&gt;&gt; sampler = [3, 7]</code></pre>
-
+&gt;&gt;&gt; sampler = [3, 7]
+</code></pre>
 
 <h3 id="integerrange">IntegerRange<a class="headerlink" href="#integerrange" title="Permanent link"> # </a></h3>
 <p>Sample from an integer defined by a <code>start</code> and a <code>stop</code> value (both start and stop are included in the range). <code>IntegerRange</code> can be initialized using explicit values, or an interval.</p>
@@ -309,8 +309,8 @@ True
 &gt;&gt;&gt; sampler = IntegerRange([3, 7])
 &gt;&gt;&gt; # The default is [1, 5]
 &gt;&gt;&gt; IntegerRange() == IntegerRange([1, 5])
-True</code></pre>
-
+True
+</code></pre>
 
 <h3 id="complexrectangle">ComplexRectangle<a class="headerlink" href="#complexrectangle" title="Permanent link"> # </a></h3>
 <p>Sample complex numbers from a rectangle in the complex plane, specified by a real range and an imaginary range.</p>
@@ -318,8 +318,8 @@ True</code></pre>
 &gt;&gt;&gt; sampler = ComplexRectangle(re=[0, 1], im=[0, 1])
 &gt;&gt;&gt; # The default is re=[1, 3], im=[1, 3]
 &gt;&gt;&gt; ComplexRectangle() == ComplexRectangle(re=[1, 3], im=[1, 3])
-True</code></pre>
-
+True
+</code></pre>
 
 <h3 id="complexsector">ComplexSector<a class="headerlink" href="#complexsector" title="Permanent link"> # </a></h3>
 <p>Sample complex numbers from an annular sector in the complex plane, specified by a modulus range and an argument range.</p>
@@ -328,8 +328,8 @@ True</code></pre>
 &gt;&gt;&gt; sampler = ComplexSector(modulus=[0, 1], argument=[-np.pi, np.pi])
 &gt;&gt;&gt; # The default is modulus=[1, 3], argument=[0, pi/2]
 &gt;&gt;&gt; ComplexSector() == ComplexSector(modulus=[1, 3], argument=[0, np.pi/2])
-True</code></pre>
-
+True
+</code></pre>
 
 <h2 id="variable-sampling-vectors-matrices-and-tensors">Variable Sampling: Vectors, Matrices and Tensors<a class="headerlink" href="#variable-sampling-vectors-matrices-and-tensors" title="Permanent link"> # </a></h2>
 <p>We have a broad range of sampling sets for vectors, matrices and tensors. The following options are common to many of these sets:</p>
@@ -347,8 +347,8 @@ True</code></pre>
 True
 &gt;&gt;&gt; # Similarly for complex vectors
 &gt;&gt;&gt; ComplexVectors() == ComplexVectors(shape=3, norm=[1, 5])
-True</code></pre>
-
+True
+</code></pre>
 
 <h3 id="realmatrices-and-complexmatrices">RealMatrices and ComplexMatrices<a class="headerlink" href="#realmatrices-and-complexmatrices" title="Permanent link"> # </a></h3>
 <p>Sample real/complex matrices of a specific shape and norm. An extra option exists to specify that the matrix be upper or lower triangular. The given shape must be a list or tuple of two numbers.</p>
@@ -363,16 +363,16 @@ True
 &gt;&gt;&gt; # Sample an upper triangular real 2x2 matrix.
 &gt;&gt;&gt; sampler = RealMatrices(triangular='upper')
 &gt;&gt;&gt; # Sample a lower triangular complex 2x2 matrix.
-&gt;&gt;&gt; sampler = ComplexMatrices(triangular='lower')</code></pre>
-
+&gt;&gt;&gt; sampler = ComplexMatrices(triangular='lower')
+</code></pre>
 
 <h3 id="realtensors-and-complextensors">RealTensors and ComplexTensors<a class="headerlink" href="#realtensors-and-complextensors" title="Permanent link"> # </a></h3>
 <p>Sample real/complex tensors of a specific shape and norm. A shape must be provided as a list or tuple of three or more numbers (there is no default).</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3x2x4 real tensors with norm between 5 and 10
 &gt;&gt;&gt; sampler = RealTensors(shape=[3, 2, 4], norm=[5, 10])
 &gt;&gt;&gt; # Sample 2x2x2x2 complex tensors with unit norm
-&gt;&gt;&gt; sampler = ComplexTensors(shape=[2, 2, 2, 2], norm=[1, 1])</code></pre>
-
+&gt;&gt;&gt; sampler = ComplexTensors(shape=[2, 2, 2, 2], norm=[1, 1])
+</code></pre>
 
 <h3 id="identitymatrixmultiples">IdentityMatrixMultiples<a class="headerlink" href="#identitymatrixmultiples" title="Permanent link"> # </a></h3>
 <p>Sample square matrices of a given dimension consisting of the identity matrix multiplied by a scalar. The <code>sampler</code> parameter can be any scalar sampling set listed above. This sampling set is useful when you want a variable that will commute with other matrices, but can also be added to them.</p>
@@ -380,8 +380,8 @@ True
 &gt;&gt;&gt; sampler = IdentityMatrixMultiples(dimension=3, sampler=[1, 3])
 &gt;&gt;&gt; # The default is dimension=2 and sampler=[1, 5]
 &gt;&gt;&gt; IdentityMatrixMultiples() == IdentityMatrixMultiples(dimension=2, sampler=[1, 5])
-True</code></pre>
-
+True
+</code></pre>
 
 <h3 id="squarematrices">SquareMatrices<a class="headerlink" href="#squarematrices" title="Permanent link"> # </a></h3>
 <p>This is a general sampling set for square matrices. A large number of options for specifying properties of square matrices are included:</p>
@@ -408,8 +408,8 @@ True
 &gt;&gt;&gt; matrices = SquareMatrices(symmetry='symmetric', determinant=0)
 
 &gt;&gt;&gt; # Hermitian (enforces complex)
-&gt;&gt;&gt; matrices = SquareMatrices(symmetry='hermitian')</code></pre>
-
+&gt;&gt;&gt; matrices = SquareMatrices(symmetry='hermitian')
+</code></pre>
 
 <h3 id="orthogonalmatrices">OrthogonalMatrices<a class="headerlink" href="#orthogonalmatrices" title="Permanent link"> # </a></h3>
 <p>Sample from orthogonal matrices of a given dimension. To sample special orthogonal matrices (unit determinant), use the <code>unitdet=True</code> option.</p>
@@ -417,8 +417,8 @@ True
 &gt;&gt;&gt; sampler = OrthogonalMatrices(dimension=3, unitdet=True)
 &gt;&gt;&gt; # The default is dimension=2 and unitdet=False
 &gt;&gt;&gt; OrthogonalMatrices() == OrthogonalMatrices(dimension=2, unitdet=False)
-True</code></pre>
-
+True
+</code></pre>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -432,8 +432,8 @@ True</code></pre>
 &gt;&gt;&gt; sampler = UnitaryMatrices(dimension=3, unitdet=True)
 &gt;&gt;&gt; # The default is dimension=2 and unitdet=False
 &gt;&gt;&gt; UnitaryMatrices() == UnitaryMatrices(dimension=2, unitdet=False)
-True</code></pre>
-
+True
+</code></pre>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -453,16 +453,16 @@ True</code></pre>
 &gt;&gt;&gt; # A tuple can also be used to specify a discrete set
 &gt;&gt;&gt; sampler = (1, 3, 5, 7, 9)
 &gt;&gt;&gt; # Select randomly between two matrices
-&gt;&gt;&gt; sampler = DiscreteSet((MathArray([[1, 0], [0, 1]]), MathArray([[0, 1], [1, 0]])))</code></pre>
-
+&gt;&gt;&gt; sampler = DiscreteSet((MathArray([[1, 0], [0, 1]]), MathArray([[0, 1], [1, 0]])))
+</code></pre>
 
 <h3 id="dependentsampler">DependentSampler<a class="headerlink" href="#dependentsampler" title="Permanent link"> # </a></h3>
-<p>Compute a value for a variable based on the values of other constants/variables. The sampler is simply initialized with the desired formula, which can use any base or user-defined functions (except for randomly sampled functions, see below). <code>DependentSampler</code>s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that <code>DependentSampler</code> can depend on vector/matrix quantities as well as scalars.</p>
+<p>Compute a value for a variable based on the values of other constants/variables. The sampler is simply initialized with the desired formula, which can use any base or user-defined functions (except for randomly sampled functions, see below). <code>DependentSampler</code>s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that <code>DependentSampler</code> can depend on vector/matrix quantities as well as scalars. You can even use sibling variables in a <code>DependentSampler</code>.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Set radius based on the random values of x, y and z
 &gt;&gt;&gt; sampler = DependentSampler(formula=&quot;sqrt(x^2+y^2+z^2)&quot;)
 &gt;&gt;&gt; # Construct a matrix that depends on a variable
-&gt;&gt;&gt; sampler = DependentSampler(formula=&quot;[[x,0],[0,-x^2]]&quot;)</code></pre>
-
+&gt;&gt;&gt; sampler = DependentSampler(formula=&quot;[[x,0],[0,-x^2]]&quot;)
+</code></pre>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -479,29 +479,37 @@ True</code></pre>
 &gt;&gt;&gt; # Equivalent sampling set specified as a list
 &gt;&gt;&gt; functionsampler = [np.cos, np.sin]
 &gt;&gt;&gt; # Always select a single lambda function
-&gt;&gt;&gt; functionsampler = SpecificFunctions(lambda x: x*x)</code></pre>
-
+&gt;&gt;&gt; functionsampler = SpecificFunctions(lambda x: x*x)
+</code></pre>
 
 <h3 id="randomfunction">RandomFunction<a class="headerlink" href="#randomfunction" title="Permanent link"> # </a></h3>
 <p>Generate a random well-behaved function. The function is constructed from the sum of sinusoids with random amplitudes, frequencies and phases. It oscillates about a specified center value with up to a specified amplitude.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Generate a random function
 &gt;&gt;&gt; functionsampler = RandomFunction(center=1, amplitude=2)
 &gt;&gt;&gt; # The default is center=0, amplitude=10
-&gt;&gt;&gt; functionsampler = RandomFunction()</code></pre>
-
+&gt;&gt;&gt; functionsampler = RandomFunction()
+</code></pre>
 
 <p>You can control how many random sinusoids are added together by specifying <code>num_terms</code>.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Generate a random sinusoid
-&gt;&gt;&gt; functionsampler = RandomFunction(num_terms=1)</code></pre>
-
+&gt;&gt;&gt; functionsampler = RandomFunction(num_terms=1)
+</code></pre>
 
 <p>You can also generate a non-unary function by specifying the input dimension, and generate vector output by specifying the output dimension.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Generate a function that takes in two scalar values and outputs a 3D vector
-&gt;&gt;&gt; functionsampler = RandomFunction(input_dim=2, output_dim=3)</code></pre>
-
+&gt;&gt;&gt; functionsampler = RandomFunction(input_dim=2, output_dim=3)
+</code></pre>
 
 <p>Finally, if you want to generate a complex random function, set <code>complex=True</code>. In this situation, the randomly generated function works as previously, but the sinusoid coefficients are complex numbers.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; functionsampler = RandomFunction(complex=True)</code></pre></div>
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; functionsampler = RandomFunction(complex=True)
+</code></pre>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul>
+<li>You cannot invoke a random functions within a <code>DependentSampler</code>. This is a limitation of the way that we have implemented random functions.</li>
+</ul>
+</div></div>
         
     </div>
 

@@ -297,15 +297,15 @@ something else.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
 &gt;&gt;&gt; grader = IntervalGrader(answers='[0, 1]')
 &gt;&gt;&gt; grader(None, '[0, 1]') == {'ok': True, 'grade_decimal': 1, 'msg': ''}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Answers may be specified by supplying the relevant answer as a string, as in the above example, either through the <code>answers</code> key or through the <code>expect</code> keyword of the <code>customresponse</code> tag. You can also break out the answer into four constituent parts in a list as follows:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
 &gt;&gt;&gt; grader = IntervalGrader(answers=['[', '0', '1', ']'])
 &gt;&gt;&gt; grader(None, '[0, 1]') == {'ok': True, 'grade_decimal': 1, 'msg': ''}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Each individual answer component conforms to the <code>ItemGrader</code> answers specification, so you can do things like the following:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
@@ -317,8 +317,8 @@ True</code></pre>
 ...     ]
 ... )
 &gt;&gt;&gt; grader(None, '[0, 1)') == {'ok': 'partial', 'grade_decimal': 0.75, 'msg': 'Your closing bracket is wrong.'}
-True</code></pre>
-
+True
+</code></pre>
 
 <h2 id="brackets">Brackets<a class="headerlink" href="#brackets" title="Permanent link"> # </a></h2>
 <p>You can specify the opening and closing brackets that students may use. Specify each separately as a list of acceptable characters. Entries that do not use these brackets will receive an error message.</p>
@@ -326,8 +326,8 @@ True</code></pre>
 ...     answers='[0,1]',
 ...     opening_brackets='([{',
 ...     closing_brackets=')]}'
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>The default for <code>opening_brackets</code> is <code>'[('</code>, while the default for <code>closing_brackets</code> is <code>'])'</code>.</p>
 <h2 id="subgrader">Subgrader<a class="headerlink" href="#subgrader" title="Permanent link"> # </a></h2>
@@ -335,16 +335,16 @@ True</code></pre>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
 ...     answers='[a,b^2]',
 ...     subgrader=FormulaGrader(variables=['a', 'b'])
-... )</code></pre>
-
+... )
+</code></pre>
 
 <h2 id="delimiter">Delimiter<a class="headerlink" href="#delimiter" title="Permanent link"> # </a></h2>
 <p>The default delimiter is a comma. However, due to the way expressions are parsed, if your expressions include commas in any location, the answer will not parse correctly. We suggest changing the delimiter to another character, as follows.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
 ...     answers='[0:1]',
 ...     delimiter=':'
-... )</code></pre>
-
+... )
+</code></pre>
 
 <h2 id="partial-credit-and-how-credit-is-assigned-in-general">Partial Credit (and how credit is assigned in general)<a class="headerlink" href="#partial-credit-and-how-credit-is-assigned-in-general" title="Permanent link"> # </a></h2>
 <p>Grading works by first using the subgrader to obtain the decimal grade for each expression the student submitted. For each correct expression, the bracket is then inspected. If the bracket is correct, then the score for that expression is kept (or if <code>grade_decimal</code> is set for the bracket, then the score for the expression is multiplied by that entry). If the bracket is incorrect, zero is awarded for that expression. The two resulting scores are then combined to obtain the overall score. If <code>partial_credit</code> is set to <code>False</code>, then the overall score must be 1 for any credit to be awarded. By default, <code>partial_credit</code> is <code>True</code>. When partial credit is turned on, each half of the interval is worth 50% of the overall credit.</p>
@@ -357,7 +357,8 @@ True</code></pre>
     closing_brackets=str,  # default '])'
     delimiter=str,  # default ',', must be one character
     partial_credit=bool  # default True
-)</code></pre></div>
+)
+</code></pre></div>
         
     </div>
 

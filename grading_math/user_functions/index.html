@@ -299,8 +299,8 @@
 ...    user_functions={
 ...        'rot': rot
 ...    }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <h3 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link"> # </a></h3>
 <p>Our <code>rot(vec, axis, angle)</code> function works, but if students supply the function above with arguments of incorrect type, they receive unhelpful error messages:</p>
@@ -308,8 +308,8 @@
 ...     grader_1(None, 'rot(v, theta, [0, 0, 1])')
 ... except StudentFacingError as error:
 ...     print(error)
-There was an error evaluating rot(...). Its input does not seem to be in its domain.</code></pre>
-
+There was an error evaluating rot(...). Its input does not seem to be in its domain.
+</code></pre>
 
 <h3 id="the-solution">The Solution<a class="headerlink" href="#the-solution" title="Permanent link"> # </a></h3>
 <p>To provide students with more useful error messages, we can use <code>specify_domain</code>, a decorator function imported from <code>mitxgraders</code>. <a href="https://dbader.org/blog/python-decorators">Decorator Functions</a> are "higher-order functions" that take functions as input and produce functions as output, usually modifying the input function's behavior. In our case, <code>specify_domain</code> will modify the behavior of <code>rot</code> so as to provide more helpful <code>StudentFacingError</code>s.</p>
@@ -329,8 +329,8 @@ There was an error evaluating rot(...). Its input does not seem to be in its dom
 ...    user_functions={
 ...        'rot': rot_with_error_messages
 ...    }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>Now if a student calls <code>rot</code> with incorrect inputs, they receive a more helpful message:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; try:
@@ -340,8 +340,8 @@ There was an error evaluating rot(...). Its input does not seem to be in its dom
 There was an error evaluating function rot(...)
 1st input is ok: received a vector of length 3 as expected
 2nd input has an error: received a scalar, expected a vector of length 3
-3rd input has an error: received a vector of length 3, expected a scalar</code></pre>
-
+3rd input has an error: received a vector of length 3, expected a scalar
+</code></pre>
 
 <h3 id="configuring-specify_domain">Configuring specify_domain<a class="headerlink" href="#configuring-specify_domain" title="Permanent link"> # </a></h3>
 <p>The decorator <code>specify_domain</code> accepts optional keyword arguments and should be called in either of two equivalent ways:</p>
@@ -351,8 +351,8 @@ There was an error evaluating function rot(...)
 &gt;&gt;&gt; # or, equivalently:
 &gt;&gt;&gt; def target_function(x, y ,z):
 ...     pass # do whatever you want
-&gt;&gt;&gt; decorated_function = specify_domain(keyword_arguments)(target_function) # doctest: +SKIP</code></pre>
-
+&gt;&gt;&gt; decorated_function = specify_domain(keyword_arguments)(target_function) # doctest: +SKIP
+</code></pre>
 
 <p>The keyword arguments are:</p>
 <ul>
@@ -370,8 +370,8 @@ There was an error evaluating function rot(...)
 <p>So, for example,</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; @specify_domain(input_shapes=[1, [3, 2], 4], display_name='myfunc')
 ... def some_function(x, A, v):
-...     pass</code></pre>
-
+...     pass
+</code></pre>
 
 <p>specifies that the function <code>some_func</code> must be called with three arguments:</p>
 <ul>
@@ -382,8 +382,8 @@ There was an error evaluating function rot(...)
 <h3 id="arbitrary-same-shape-arguments">Arbitrary Same-Shape Arguments<a class="headerlink" href="#arbitrary-same-shape-arguments" title="Permanent link"> # </a></h3>
 <p>Some functions may allow an arbitrary number of arguments to be passed in. For example, consider a user-defined minimum function:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; def my_min(*args):
-...     return min(*args)</code></pre>
-
+...     return min(*args)
+</code></pre>
 
 <p>To inform <code>specify_domain</code> that a function should accept arbitrarily many arguments of a certain shape, supply a single shape to <code>input_shapes</code>, and also pass in a <code>min_length</code> parameter, to specify the minimum number of arguments required. (If you specify <code>min_length</code> and have more than one shape in <code>input_shapes</code>, a <code>ConfigError</code> will result.) So, our <code>my_min</code> function can be decorated as follows:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; @specify_domain(input_shapes=[1], display_name='min', min_length=2)
@@ -402,7 +402,8 @@ Wrong number of arguments passed to min(...): Expected at least 2 inputs, but re
 ...     print(error)
 There was an error evaluating function min(...)
 1st input has an error: received a vector of length 2, expected a scalar
-2nd input has an error: received a vector of length 2, expected a scalar</code></pre></div>
+2nd input has an error: received a vector of length 2, expected a scalar
+</code></pre></div>
         
     </div>
 

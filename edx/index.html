@@ -293,8 +293,8 @@ grader = FormulaGrader(variables=[&quot;x&quot;])
     &lt;textline math=&quot;true&quot; /&gt;
   &lt;/customresponse&gt;
 
-&lt;/problem&gt;</code></pre>
-
+&lt;/problem&gt;
+</code></pre>
 
 <p>Note that the <code>customresponse</code> tag contains the answer that is passed to the grader. You can also use <code>expect="2*x"</code> instead of <code>answer="2*x"</code>; edX treats these parameters indistinguishably (although we strongly suggest not using both!). Also note that a grader can be used multiple times if desired.</p>
 <h2 id="using-an-answers-key-to-a-grader">Using an answers key to a grader<a class="headerlink" href="#using-an-answers-key-to-a-grader" title="Permanent link"> # </a></h2>
@@ -315,8 +315,8 @@ mygrader = FormulaGrader(
     &lt;textline math=&quot;true&quot; /&gt;
   &lt;/customresponse&gt;
 
-&lt;/problem&gt;</code></pre>
-
+&lt;/problem&gt;
+</code></pre>
 
 <p>The <code>answers</code> key is provided to the grader explicitly, and so it ignores whatever is in the <code>customresponse</code> tag. However, the <code>answer</code> key in the <code>customresponse</code> tag is still important, because it is what the students see when they click on "Show Answer".</p>
 <p>Also worth noting is that the grader is stored in a python variable, which in this example, we've called <code>mygrader</code> (the previous example just called it <code>grader</code>). The <code>cfn</code> key in the <code>customresponse</code> tag needs to tell edX which variable stores the grader you want to use for that problem. If you have multiple <code>customresponse</code> tags, you can provide a different grader to each one.</p>
@@ -341,8 +341,8 @@ grader = ListGrader(
     &lt;textline math=&quot;true&quot; correct_answer=&quot;x + 2&quot; /&gt;
   &lt;/customresponse&gt;
 
-&lt;/problem&gt;</code></pre>
-
+&lt;/problem&gt;
+</code></pre>
 
 <p>Note that the <code>correct_answer</code> parameters are never sent to the grader, which is why you must provide them independently.</p>
 <p>When using lists, such as with a <code>ListGrader</code> or a <code>SingleListGrader</code>, you only need to provide an <code>answers</code> key to the top-level grader (the one that is specified in the <code>cfn</code> key).</p>
@@ -361,8 +361,8 @@ from mitxgraders import *
     &lt;textline math=&quot;true&quot; /&gt;
   &lt;/customresponse&gt;
 
-&lt;/problem&gt;</code></pre>
-
+&lt;/problem&gt;
+</code></pre>
 
 <p>We want to stress the simplicity of this example compared to implementing the same problem using standard edX problem types! This method of defining a grader is very handy for simple grader constructions such as this one. For more complex graders, we recommend the previous style. One must be careful to make sure that quotation marks <code>'</code> and <code>"</code> do not conflict if using the in-line method.</p>
 <h2 id="note-on-python-version">Note on Python Version<a class="headerlink" href="#note-on-python-version" title="Permanent link"> # </a></h2>

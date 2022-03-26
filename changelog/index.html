@@ -258,6 +258,7 @@
         <li class="first-level "><a href="#version-2">Version 2</a></li>
             <li class="second-level"><a href="#version-23">Version 2.3</a></li>
                 
+                <li class="third-level"><a href="#version-233">Version 2.3.3</a></li>
                 <li class="third-level"><a href="#version-232">Version 2.3.2</a></li>
                 <li class="third-level"><a href="#version-231">Version 2.3.1</a></li>
                 <li class="third-level"><a href="#version-230">Version 2.3.0</a></li>
@@ -300,6 +301,10 @@
 <h1 id="version-2">Version 2<a class="headerlink" href="#version-2" title="Permanent link"> # </a></h1>
 <p>This is a major new version with many new features added. We have been very careful to preserve backwards compatibility of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2. However, we do warn that we broke internal backwards compatibility in a number of locations in order to accommodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.</p>
 <h2 id="version-23">Version 2.3<a class="headerlink" href="#version-23" title="Permanent link"> # </a></h2>
+<h3 id="version-233">Version 2.3.3<a class="headerlink" href="#version-233" title="Permanent link"> # </a></h3>
+<ul>
+<li>Refactored sampling to allow sibling variables to be used in <code>DependentSampler</code>s.</li>
+</ul>
 <h3 id="version-232">Version 2.3.2<a class="headerlink" href="#version-232" title="Permanent link"> # </a></h3>
 <ul>
 <li>Fixed a bug where long integers passed in as a variable (via <code>DiscreteSet</code>) or user-defined constant would cause an error in evaluation (such numbers are now cast as floats).</li>

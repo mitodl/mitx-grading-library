@@ -308,8 +308,8 @@
 &gt;&gt;&gt; grader = FormulaGrader(
 ...     answers='1+x^2+y',
 ...     variables=['x', 'y']
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>Note that the <code>answers</code> parameter follows all of the usual allowances from <code>ItemGrader</code>.</p>
 <p>The variables need to have numbers randomly assigned to them. Each is sampled from a <a href="../sampling/">sampling set</a>, which is <code>RealInterval()</code> by default (random numbers between 1 and 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the <code>sample_from</code> key.</p>
@@ -321,8 +321,8 @@
 ...         'y': [2, 6],
 ...         'z': (1, 3, 4, 8)
 ...     }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>The <code>sample_from</code> key must be a dictionary of <code>'variable_name': sampling_set</code> pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.</p>
 <h3 id="variable-names">Variable Names<a class="headerlink" href="#variable-names" title="Permanent link"> # </a></h3>
@@ -344,8 +344,8 @@
 ...         'x': [-5, 5],
 ...         'a': [-10, 10]
 ...     }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>If you have a variable name that would clash with a numbered variable (say, you defined <code>a_{0}</code> and also a numbered variable <code>a</code>), then the specific variable has precedence.</p>
 <h2 id="samples-and-failable-evaluations">Samples and Failable Evaluations<a class="headerlink" href="#samples-and-failable-evaluations" title="Permanent link"> # </a></h2>
@@ -354,8 +354,8 @@
 ...     answers='1+x^2',
 ...     variables=['x'],
 ...     samples=10
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>The default for <code>samples</code> is 5.</p>
 <p>You may want to allow for a certain number of comparisons to fail before the student is marked incorrect. To do this, set <code>failable_evals</code>. This should be used very sparingly!</p>
@@ -364,8 +364,8 @@
 ...     variables=['x'],
 ...     samples=10,
 ...     failable_evals=1
-... )</code></pre>
-
+... )
+</code></pre>
 
 <h2 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link"> # </a></h2>
 <p>By default, four constants are defined: <code>e</code>, <code>pi</code>, and <code>i=j=sqrt(-1)</code>. You can define new constants by passing in a dictionary to <code>user_constants</code> as follows.</p>
@@ -375,8 +375,8 @@
 ...     user_constants={
 ...         'c': 3e8
 ...     }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>Constants are treated as variables that only ever have one value.</p>
 <p>If you want to remove a default constant, you can do so by setting it to <code>None</code>:</p>
@@ -386,8 +386,8 @@
 ...         'i': None,
 ...         'j': None
 ...     }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <h3 id="infinities">Infinities<a class="headerlink" href="#infinities" title="Permanent link"> # </a></h3>
 <p>When an expression results in an infinity, students are presented with an error message asking them to check for overflow. If you actually want infinity to be an acceptable answer, then you can specify <code>allow_inf=True</code>. This allows expressions to evaluate to infinity (or negative infinity), and also makes the constant <code>infty</code> available for students to use.</p>
@@ -409,8 +409,8 @@ Numerical overflow occurred. Does your expression generate very large numbers?
 ...     allow_inf=True
 ... )
 &gt;&gt;&gt; grader(None, 'infty') == {'ok': True, 'msg': '', 'grade_decimal': 1}
-True</code></pre>
-
+True
+</code></pre>
 
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link"> # </a></h2>
 <p>By default, a large array of mathematical functions are available for use. See the full list <a href="../functions_and_constants/">here</a>. Note that all functions are capable of handling complex expressions unless otherwise stated. In the following example, <code>z*z</code> is recognized to be different from <code>abs(z)^2</code>.</p>
@@ -424,8 +424,8 @@ True</code></pre>
 &gt;&gt;&gt; grader(None, 'z*z')['ok']
 False
 &gt;&gt;&gt; grader(None, 'z*conj(z)')['ok']
-True</code></pre>
-
+True
+</code></pre>
 
 <h3 id="user-functions">User Functions<a class="headerlink" href="#user-functions" title="Permanent link"> # </a></h3>
 <p>You can make user-defined functions available for students to use in their answers. To add user-defined functions, pass in a dictionary to the <code>user_functions</code> key as follows.</p>
@@ -433,16 +433,16 @@ True</code></pre>
 ...     answers='x*x',
 ...     variables=['x'],
 ...     user_functions={'f': lambda x: x*x}
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>This defines a function <code>f(x) = x^2</code> that students may use. User-defined function names must start with a letter, and can use numbers and underscores, such as <code>my_func2</code>. They are also allowed to have apostrophes (primes) at the end of the name, such as to indicate derivatives. Eg, <code>f''</code>. Be careful about using quotation marks appropriately when using primes in function names, as in the following example.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
 ...     answers=&quot;f''(x)&quot;,
 ...     variables=['x'],
 ...     user_functions={&quot;f''&quot;: lambda x: x*x}
-... )</code></pre>
-
+... )
+</code></pre>
 
 <h3 id="choosing-a-function-randomly">Choosing a Function Randomly<a class="headerlink" href="#choosing-a-function-randomly" title="Permanent link"> # </a></h3>
 <p>You can also specify random functions by specifying a sampling set for a function. You can provide a list of functions to randomly choose from as follows.</p>
@@ -451,8 +451,8 @@ True</code></pre>
 ...     answers=&quot;f(x)&quot;,
 ...     variables=['x'],
 ...     user_functions={&quot;f&quot;: [np.sin, np.cos]}
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>Each time this formula is checked, the function <code>f</code> will be sampled from the list of available functions.</p>
 <p>You can also specify a random well-behaved function by using the <code>RandomFunction()</code> sampling set.</p>
@@ -463,8 +463,8 @@ True</code></pre>
 ...         &quot;f&quot;: RandomFunction(),
 ...         &quot;f''&quot;: RandomFunction()
 ...     }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>This allows you to grade mathematical expressions that involve unknown functions, such as the differential equation described in this example. See <a href="../sampling/#randomfunction">Sampling</a> for further options associated with <code>RandomFunction</code>.</p>
 <h2 id="overriding-default-functions-and-constants">Overriding Default Functions and Constants<a class="headerlink" href="#overriding-default-functions-and-constants" title="Permanent link"> # </a></h2>
@@ -477,8 +477,8 @@ True</code></pre>
 ...     )
 ... except ConfigError as error:
 ...     print(error)
-Warning: 'user_functions' contains entries 'sin' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</code></pre>
-
+Warning: 'user_functions' contains entries 'sin' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
+</code></pre>
 
 <p>The error can be suppressed by setting <code>suppress_warnings=True</code>.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
@@ -486,8 +486,8 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 ...     variables=['x'],
 ...     user_functions={'sin': lambda x: x*x},
 ...     suppress_warnings=True
-... )</code></pre>
-
+... )
+</code></pre>
 
 <h2 id="restricting-student-input">Restricting Student Input<a class="headerlink" href="#restricting-student-input" title="Permanent link"> # </a></h2>
 <p>For some questions, you will want to restrict the sorts of input that are marked correct. For example, if you want students to expand <code>sin(2*theta)</code>, then you don't want students to be able to just write <code>sin(2*theta)</code> and be graded correct.</p>
@@ -502,8 +502,8 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 ...         'c': DependentSampler(depends=['phi'], formula='cos(phi)')
 ...     },
 ...     instructor_vars=['phi']
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>Here, students can use <code>s</code> and <code>c</code>, but not <code>phi</code> in their answer. The <code>instructor_vars</code> key accepts a list of the variables/constants you wish to make unavailable to students.</p>
 <h3 id="forbidden-strings">Forbidden Strings<a class="headerlink" href="#forbidden-strings" title="Permanent link"> # </a></h3>
@@ -513,8 +513,8 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 ...     variables=['theta'],
 ...     forbidden_strings=['*theta', 'theta*', 'theta/', '+theta', 'theta+', '-theta', 'theta-'],
 ...     forbidden_message=&quot;Your answer should only use trigonometric functions acting on theta, not multiples of theta&quot;
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>If a student tries to use one of these strings, then they receive the <code>forbidden_message</code>, without giving away what the forbidden string is. We recommend using this sparingly, as students may find it confusing. The default <code>forbidden_message</code> is "Invalid Input: This particular answer is forbidden".</p>
 <p>Forbidden strings and student answers are stripped of whitespace before being compared. Thus, if <code>x + y</code> is forbidden, then answers containing <code>x+y</code> or <code>x   +   y</code> will be rejected.</p>
@@ -525,24 +525,24 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 ...     variables=['x'],
 ...     sample_from={'x': [0, np.pi]},
 ...     blacklist=['sin']
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>If you want to exclude everything except for a specific set of functions, instead use a whitelist. In the following example, the only allowed functions in correct answers are <code>sin</code> and <code>cos</code>.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
 ...     answers='sin(x)/cos(x)',
 ...     variables=['x'],
 ...     whitelist=['sin', 'cos']
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>If you want to exclude all functions, use <code>whitelist=[None]</code>:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
 ...     answers='pi/2-x',
 ...     variables=['x'],
 ...     whitelist=[None]  # no functions are allowed
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>You cannot use a whitelist and a blacklist at the same time.</p>
 <h3 id="required-functions">Required Functions<a class="headerlink" href="#required-functions" title="Permanent link"> # </a></h3>
@@ -551,8 +551,8 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 ...     answers='2*sin(theta)*cos(theta)',
 ...     variables=['theta'],
 ...     required_functions=['sin', 'cos']
-... )</code></pre>
-
+... )
+</code></pre>
 
 <h2 id="tolerance">Tolerance<a class="headerlink" href="#tolerance" title="Permanent link"> # </a></h2>
 <p>Student inputs are compared to answers with a numerical tolerance. You can set this as an absolute number (eg, <code>0.1</code>) or a percentage (eg, <code>'0.01%'</code>, which is the default tolerance). Tolerances must be nonnegative numbers or percentages.</p>
@@ -560,8 +560,8 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 ...     answers='2*sin(theta)*cos(theta)',
 ...     variables=['theta'],
 ...     tolerance=0.00001
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>Tolerances are necessary because of numerical roundoff error that lead to small differences in evaluations of algebraically equivalent expressions. Zero tolerance should be used sparingly, perhaps only with integer sampling and answers.</p>
 <p>Note that if the answer is exactly <code>0</code> (or can be sampled to be exactly <code>0</code>, such as when using integer sampling), percentage tolerances don't work (as any percentage of zero is still zero). This means that the student-supplied answer must also evaluate to exactly zero to be graded correctly. Note that answers like <code>cos(pi/2)</code> evaluate to approximately <code>10^(-16)</code> due to numerical roundoff error. If you want such answers to be graded correctly, make sure to use an absolute tolerance instead of a relative tolerance on such questions.</p>
@@ -571,8 +571,8 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 ...     answers='2m*a',  # Equivalent to '0.002*a'
 ...     variables=['a'],
 ...     metric_suffixes=True
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>The included suffixes are:</p>
 <ul>
@@ -597,8 +597,8 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 ...     ],
 ...     ordered=True,
 ...     subgraders=FormulaGrader(variables=['x'])
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>Note that in this example, the sequence of inputs <code>['2*x', 4*x^2, 16*x^4]</code> is correct, and so is <code>['3*x', 9*x^2, 81*x^4]</code>, but <code>['3*x', 4*x^2, 16*x^4]</code> receives only two-thirds credit (from the first entry matching a given answer, and the last entry being the square of the second entry).</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; student_inputs = ['2*x','4*x^2', '16*x^4']
@@ -614,8 +614,8 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 &gt;&gt;&gt; student_inputs = ['3*x','4*x^2', '16*x^4']
 &gt;&gt;&gt; result1, result2, result3 = grader(None, student_inputs)['input_list']
 &gt;&gt;&gt; result1['ok'], result2['ok'], result3['ok']
-(True, False, True)</code></pre>
-
+(True, False, True)
+</code></pre>
 
 <p>Notes:</p>
 <ul>
@@ -656,7 +656,8 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
     required_functions=list,  # default []
     metric_suffixes=bool,  # default False
     tolerance=(float | percentage),  # default '0.01%'
-)</code></pre></div>
+)
+</code></pre></div>
         
     </div>
 

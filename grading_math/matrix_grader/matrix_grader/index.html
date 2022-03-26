@@ -302,8 +302,8 @@
 ...      'B': RealMatrices(),
 ...      'v': RealVectors(shape=2), # sample 2-component vectors
 ...   }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>The next few lines call the grader as a check function. The inputs <code>'4*A*B^2*v'</code> and <code>'4*A*B*B*v'</code> are correct:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; result = grader1(None, '4*A*B^2*v')
@@ -311,14 +311,14 @@
 True
 &gt;&gt;&gt; result = grader1(None, '4*A*B*B*v')
 &gt;&gt;&gt; result == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>while the input <code>'4*B*A*B*v'</code> is incorrect because the matrix-sampled variables are non-commutative:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; result = grader1(None, '4*B*A*B*v')
 &gt;&gt;&gt; result == {'msg': '', 'grade_decimal': 0, 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <h2 id="matrix-sampling">Matrix Sampling<a class="headerlink" href="#matrix-sampling" title="Permanent link"> # </a></h2>
 <p>In the MatrixGrader example above, the variables <code>A</code> and <code>B</code> were sampled from <code>RealMatrices()</code>. The <code>RealMatrices</code> sampling class samples from 2 by 2 matrices by default but can be configured to sample matrices of different shapes. See <a href="../../sampling/#variable-sampling-vectors-and-matrices">Sampling</a> for more information about matrix and vector sampling.</p>
@@ -373,15 +373,15 @@ True</code></pre>
 ...     sample_from={
 ...       'v': RealVectors(shape=2) # samples a random 2-component vector
 ...     }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p>When a student inputs <code>v + A*2*[1, 2, 3]</code> to the grader above, a calculation similar to</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; v = MathArray([2, -1]) # Really, random samples would be chosen.
 &gt;&gt;&gt; A = MathArray([[1, 2, 3], [4, 5, 6]])
 &gt;&gt;&gt; v + A*2*MathArray([1, 2, 3])  # below is the result of evaluating student input, which would next be compared to author's answer
-MathArray([30, 63])</code></pre>
-
+MathArray([30, 63])
+</code></pre>
 
 <p>is performed (but repeated multiple times with different values for the random variables).</p>
 <h3 id="dimension-and-shape">Dimension and Shape<a class="headerlink" href="#dimension-and-shape" title="Permanent link"> # </a></h3>
@@ -586,16 +586,16 @@ Cannot add/subtract a vector of length 3 with a matrix of shape (rows: 1, cols: 
 MathArray([14, 32])
 &gt;&gt;&gt; other_vec = MathArray([1, 2])
 &gt;&gt;&gt; other_vec * A # vector * matrix
-MathArray([ 9, 12, 15])</code></pre>
-
+MathArray([ 9, 12, 15])
+</code></pre>
 
 <p>We suggest avoiding single-column and single-row matrices.</p>
 <h3 id="shape-errors">Shape Errors<a class="headerlink" href="#shape-errors" title="Permanent link"> # </a></h3>
 <p>When operations cannot be performed because of shape-mismatch, MathArray raises readable <code>StudentFacingError</code>s. These error messages are intended to be presented directly to students. For example:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; A = MathArray([[1, 2], [3, 4], [5, 6]]) # matrix, shape (3, 2)
 &gt;&gt;&gt; B = MathArray([[1, 2], [3, 4]])         # matrix, shape (2, 2)
-&gt;&gt;&gt; v = MathArray([1, 2])                   # vector, shape (2,  )</code></pre>
-
+&gt;&gt;&gt; v = MathArray([1, 2])                   # vector, shape (2,  )
+</code></pre>
 
 <p>Some sample error messages:</p>
 <table>
@@ -635,7 +635,6 @@ MathArray([ 9, 12, 15])</code></pre>
 </tbody>
 </table>
 <!-- Test the messages (internal verification, not shown in docs) -->
-
 <!-- ```pycon
 >>> from mitxgraders.helpers.calc.exceptions import MathArrayShapeError
 >>> try:
@@ -676,8 +675,8 @@ Cannot raise a non-square matrix to powers.
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
 ...     print(error) # students see this error message
-Unable to parse vector/matrix. If you're trying to enter a matrix, this is most likely caused by an unequal number of elements in each row.</code></pre>
-
+Unable to parse vector/matrix. If you're trying to enter a matrix, this is most likely caused by an unequal number of elements in each row.
+</code></pre>
 
 <p>Such parse errors are <strong>always</strong> displayed to students.</p>
 <h3 id="shape-mismatch-errors-during-evaluation">Shape-Mismatch Errors During Evaluation<a class="headerlink" href="#shape-mismatch-errors-during-evaluation" title="Permanent link"> # </a></h3>
@@ -690,8 +689,8 @@ Unable to parse vector/matrix. If you're trying to enter a matrix, this is most 
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
 ...     print(error) # students see this error message
-Cannot add/subtract a vector of length 3 with a vector of length 2.</code></pre>
-
+Cannot add/subtract a vector of length 3 with a vector of length 2.
+</code></pre>
 
 <p>If you would rather mark the student incorrect when shape errors occur (and also consume an attempt), set <code>shape_errors=False</code>.</p>
 <h3 id="shape-mismatch-errors-during-comparison">Shape-Mismatch Errors During Comparison<a class="headerlink" href="#shape-mismatch-errors-during-comparison" title="Permanent link"> # </a></h3>
@@ -716,8 +715,8 @@ Expected answer to be a vector, but input is a vector of incorrect shape
 ...     grader(None, student_input) # grade the input like edX would
 ... except StudentFacingError as error:
 ...     print(error) # students see this error message
-Expected answer to be a vector, but input is a scalar</code></pre>
-
+Expected answer to be a vector, but input is a scalar
+</code></pre>
 
 <p>The default handling of shape errors that arise when comparing student input to author's answer is:</p>
 <ul>
@@ -744,8 +743,8 @@ Expected answer to be a vector, but input is a scalar</code></pre>
 ...   'msg': 'Expected answer to be a vector of length 3, but input is a scalar',
 ...   'ok': False
 ... }
-True</code></pre>
-
+True
+</code></pre>
 
 <h3 id="hiding-all-error-messages">Hiding All Error Messages<a class="headerlink" href="#hiding-all-error-messages" title="Permanent link"> # </a></h3>
 <p><code>MatrixGrader</code>s can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting <code>suppress_matrix_messages=True</code>, which overrides <code>answer_shape_mismatch={'is_raised'}</code> and <code>shape_errors</code>. In the following example, <code>A</code> and <code>B</code> are secretly matrices that don't commute, but students will never see a matrix error message from typing something like <code>1+A</code>.</p>
@@ -764,8 +763,8 @@ True
 &gt;&gt;&gt; grader(None, 'B*A')['ok']
 False
 &gt;&gt;&gt; grader(None, 'A+1')['ok']
-False</code></pre>
-
+False
+</code></pre>
 
 <p>Note that this will also suppress error messages from trying to do things like <code>sin([1, 2])</code> or <code>[1, 2]^2</code>. If your answer needs to take functions of the non-commuting variables, then this option is insufficient.</p>
 <h2 id="matrix-functions">Matrix Functions<a class="headerlink" href="#matrix-functions" title="Permanent link"> # </a></h2>
@@ -780,8 +779,8 @@ False</code></pre>
 ...         'I_2': identity(2),  # the 2 by 2 identity
 ...         'I_3': identity(3)  # the 3 by 3 identity
 ...     }
-... )</code></pre>
-
+... )
+</code></pre>
 
 <h2 id="partial-credit">Partial Credit<a class="headerlink" href="#partial-credit" title="Permanent link"> # </a></h2>
 <p>A special <a href="../../comparer_functions/">comparer</a> called <a href="../../comparer_functions/#matrixentrycomparer"><code>MatrixEntryComparer</code></a> has been built to cater for partial credit in <code>MatrixGrader</code> problems. In order to facilitate the use of <code>MatrixEntryComparer</code>, if either of the following two configuration options are present, <code>MatrixGrader</code> will use <code>MatrixEntryComparer</code> as the default comparer instead of <code>equality_comparer</code>.</p>

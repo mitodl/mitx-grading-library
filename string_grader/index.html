@@ -281,8 +281,8 @@ True
 &gt;&gt;&gt; grader(None, 'CAT') == {'grade_decimal': 0, 'msg': '', 'ok': False}
 True
 &gt;&gt;&gt; grader(None, 'Cat') == {'grade_decimal': 0, 'msg': '', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>This example will accept the answer of <code>cat</code>, but not <code>CAT</code> or <code>Cat</code>, as grading is case-sensitive by default.</p>
 <h2 id="cleaning-input">Cleaning Input<a class="headerlink" href="#cleaning-input" title="Permanent link"> # </a></h2>
@@ -294,8 +294,8 @@ True</code></pre>
 &gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, ' cat') == {'grade_decimal': 0, 'msg': '', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>This will accept <code>cat</code>, but will reject answers with leading or trailing spaces. By default, <code>strip=True</code>.</p>
 <p>Similarly, if a student uses two (or more) spaces instead of one, that rarely changes the meaning. By default, we convert consecutive spaces into a single space before comparison (this applies to both the instructor-provided answer and the student-provided response). If you want to disable this behavior, you can set <code>clean_spaces=False</code> as follows.</p>
@@ -306,8 +306,8 @@ True</code></pre>
 &gt;&gt;&gt; grader(None, 'two  spaces') == {'grade_decimal': 1, 'msg': '', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, 'two spaces') == {'grade_decimal': 0, 'msg': '', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Here, the answer is <code>two  spaces</code>, complete with two spaces (which may not render on a webpage). A student's answer of <code>two spaces</code> (with a single space) would be graded incorrect.</p>
 <p>Finally, you may have a situation where spaces are completely irrelevant (e.g., when grading a mathematical expression). To instruct the grader to completely ignore all spaces, set <code>strip_all=True</code>.</p>
@@ -316,8 +316,8 @@ True</code></pre>
 ...     strip_all=True
 ... )
 &gt;&gt;&gt; grader(None, '(1 2) (3 4)') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>This grader will accept <code>(1 2) (3 4)</code>, ignoring all spaces in the provided answer.</p>
 <h2 id="case-sensitive">Case Sensitive<a class="headerlink" href="#case-sensitive" title="Permanent link"> # </a></h2>
@@ -331,8 +331,8 @@ True
 &gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, 'CAT') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>This will accept <code>Cat</code>, <code>cat</code> and <code>CAT</code>. By default, <code>case_sensitive=True</code>.</p>
 <h2 id="accepting-anything">Accepting Anything<a class="headerlink" href="#accepting-anything" title="Permanent link"> # </a></h2>
@@ -346,8 +346,8 @@ True
 &gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
 True
 &gt;&gt;&gt; grader(None, '') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Note that this will even accept a blank (empty) response. To reject empty responses, you can instead use the <code>accept_nonempty</code> flag, which requires at least one character to be submitted (after input cleaning).</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
@@ -360,8 +360,8 @@ True</code></pre>
 ...                         'ok': True}
 True
 &gt;&gt;&gt; grader(None, '') == {'grade_decimal': 0, 'msg': '', 'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Note that when either <code>accept_any</code> or <code>accept_nonempty</code> are set to True, you do not need to provide any answer to check against.</p>
 <p>You may want students to have to write a certain amount of characters or words in order to get credit. Two flags are available to facilitate this: <code>min_length</code> and <code>min_words</code>, which set a minimum number of characters and words to be awarded credit, respectively (both default to zero). You can use both of these options together if desired.</p>
@@ -383,8 +383,8 @@ True
 &gt;&gt;&gt; grader(None, '  a  b  c  d  ') == {'grade_decimal': 0,
 ...                                    'msg': 'Your response is too short (7/10 characters)',
 ...                                    'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Note that punctuation doesn't break a word for the purpose of word counting, so <code>isn't word-counting fun?</code> will only count as three words. If <code>accept_nonempty</code> and <code>min_length</code> are both used, the longer requirement is the one that is used.</p>
 <p>When a student's answer is rejected because it doesn't meet the minimum requirements, there are three types of feedback that you can provide, controlled by the <code>explain_minimums</code> flag:</p>
@@ -419,8 +419,8 @@ True
 &gt;&gt;&gt; grader(None, 'KCl') == {'grade_decimal': 0,
 ...                          'msg': 'Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen',
 ...                          'ok': False}
-True</code></pre>
-
+True
+</code></pre>
 
 <p>Below, we use validation to ensure that the student input matches the desired format before comparing to the answer, and give the student an error message if their input doesn't match the specification.</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
@@ -442,8 +442,8 @@ Your input is not in the expected format
 ...     grader(None, '[1)(2)')
 ... except InvalidInput as error:
 ...     print(error)
-Your input is not in the expected format</code></pre>
-
+Your input is not in the expected format
+</code></pre>
 
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to a <code>StringGrader</code>.</p>
@@ -460,7 +460,8 @@ Your input is not in the expected format</code></pre>
     validation_pattern=str,  # default None
     explain_validation=('err', 'msg', None),  # default 'err'
     invalid_msg=str,  # default 'Your input is not in the expected format'
-)</code></pre></div>
+)
+</code></pre></div>
         
     </div>
 

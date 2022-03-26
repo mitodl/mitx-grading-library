@@ -280,8 +280,8 @@
 &gt;&gt;&gt; grader1 = FormulaGrader(
 ...     answers='a+b',
 ...     variables=['a', 'b']
-... )</code></pre>
-
+... )
+</code></pre>
 
 <p><code>FormulaGrader</code> automatically converts the <code>answers</code> key to the following:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader2 = FormulaGrader(
@@ -293,8 +293,8 @@
 ...     variables=['a', 'b']
 ... )
 &gt;&gt;&gt; grader1 == grader2
-True</code></pre>
-
+True
+</code></pre>
 
 <p>To specify an alternate comparer, you can simply change the relevant answer to a dictionary <code>{'comparer': comparer_func, 'comparer_params': [list, of, params]}</code>. Different comparers use <code>comparer_params</code> in different ways.</p>
 <p>For example, if grading angles in degrees, it may be useful to compare formulas modulo 2&#960;. You can write your own comparer functions, but for this we can use the pre-built <code>congruent_modulo</code> comparer. This grader will accept any input congruent to <code>'b^2/a'</code> modulo <code>2*pi</code>.</p>
@@ -309,19 +309,19 @@ True</code></pre>
 &gt;&gt;&gt; grader(None, 'b^2/a + 6*pi')['ok']
 True
 &gt;&gt;&gt; grader(None, 'b^2/a + 5.5*pi')['ok']
-False</code></pre>
-
+False
+</code></pre>
 
 <p>Here, the <code>comparer_params</code> (<code>['b^2/a', '2*pi']</code>) are evaluated just like the student input, and used by the comparer function during grading.</p>
 <h2 id="changing-defaults">Changing Defaults<a class="headerlink" href="#changing-defaults" title="Permanent link"> # </a></h2>
 <p>The default comparer function for each of <code>FormulaGrader</code>, <code>NumericalGrader</code> and <code>MatrixGrader</code> can be set by calling <code>set_default_comparer</code> as follows:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; FormulaGrader.set_default_comparer(LinearComparer())</code></pre>
-
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; FormulaGrader.set_default_comparer(LinearComparer())
+</code></pre>
 
 <p>This sets the default comparer to <code>LinearComparer()</code> (see below) for all <code>FormulaGrader</code>s in the given problem. Comparers set in this manner must only take a single comparer parameter. Using this default set approach is typically simpler than setting comparers explicitly, and allows answers to be inferred from <code>expect</code> values. However, comparers that require two or more <code>comparer_params</code> cannot use this method.</p>
 <p>If for some reason you need to reset the default comparer, you can use</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; FormulaGrader.reset_default_comparer()</code></pre>
-
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; FormulaGrader.reset_default_comparer()
+</code></pre>
 
 <p>which is equivalent to setting the default comparer to <code>equality_comparer</code>.</p>
 <h2 id="available-comparers">Available Comparers<a class="headerlink" href="#available-comparers" title="Permanent link"> # </a></h2>
@@ -381,8 +381,8 @@ False</code></pre>
 <p>The <code>EqualityComparer</code> class simply checks for equality up to tolerance. In fact, <code>equality_comparer = EqualityComparer()</code>. The reason this class exists, however, is to allow for an extra option to be used when desired.</p>
 <p>The <code>transform</code> option allows the author to specify a transforming function to be called on both the answer and the student input prior to comparison. Here is an example:</p>
 <pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; import numpy as np
-&gt;&gt;&gt; comparer = EqualityComparer(transform=np.real)</code></pre>
-
+&gt;&gt;&gt; comparer = EqualityComparer(transform=np.real)
+</code></pre>
 
 <p>This comparer will take the real part of the answer and the student input before comparing the results. This is useful if only the real part of the answers need to agree.</p>
 <h3 id="linearcomparer">LinearComparer<a class="headerlink" href="#linearcomparer" title="Permanent link"> # </a></h3>
@@ -396,18 +396,18 @@ False</code></pre>
     proportional_msg=(None | str),  # default 'The submitted answer differs from an expected answer by a constant factor.'
     offset_msg=(None | str),  # default None
     linear_msg=(None | str),  # default None
-)</code></pre>
-
+)
+</code></pre>
 
 <p>The first four settings specify how much credit to award the different situations, while the next four describe a message to display when that credit is awarded. Note that setting credit to <code>None</code> means that that type of credit will never be awarded, while setting credit to <code>0</code> means that it can be awarded (usually to display the relevant message). When the grading is performed, the largest credit of the available settings is awarded.</p>
 <p>Here is an example of a <code>LinearComparer</code> that can be used to award partial credit if students are off from the answer by a constant multiple.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; comparer = LinearComparer()</code></pre>
-
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; comparer = LinearComparer()
+</code></pre>
 
 <p>Easy, isn't it? You can combine this with <code>set_default_comparer</code> to enable partial credit of this sort with one line in each problem!</p>
 <p>Here is an example of setting up a <code>LinearComparer</code> that doesn't care about shift offsets (useful when describing indefinite integration).</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; comparer = LinearComparer(proportional=None, linear=1)</code></pre>
-
+<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; comparer = LinearComparer(proportional=None, linear=1)
+</code></pre>
 
 <p>Note that <code>LinearComparer</code> can only perform meaningful comparisons when random variables are used. If the answer is a numerical constant, then student answers will always be proportional to that constant, which probably isn't the desired behavior. Also note that when the answer is zero or the student supplies zero as their answer, partial credit cannot be assigned.</p>
 <h3 id="matrixentrycomparer">MatrixEntryComparer<a class="headerlink" href="#matrixentrycomparer" title="Permanent link"> # </a></h3>
@@ -416,8 +416,8 @@ False</code></pre>
     transform=(None | func),  # default None
     entry_partial_credit=('proportional' | float),  # default 0
     entry_partial_msg=str,  # default &quot;Some array entries are incorrect, marked below:\n{error_locations}&quot;
-)</code></pre>
-
+)
+</code></pre>
 
 <p>When <code>entry_partial_credit</code> is set to a number, if at least one entry in the array is correct (but not all of them), that amount of credit is assigned. When partial credit is assigned, the message <code>entry_partial_msg</code> is displayed to the student, with the text <code>{error_locations}</code> replaced by a graphic displaying which entries are correct/incorrect. To turn off the message, simply set <code>entry_partial_msg=''</code>. Setting <code>entry_partial_msg=''</code> and <code>entry_partial_credit=0</code> makes this grader equivalent to <code>EqualityComparer</code>.</p>
 <p>Because this ability to assign partial credit to array input is so useful, <code>MatrixEntryComparer</code> can be set as the grader for <code>MatrixGrader</code>s using configuration options.</p>
