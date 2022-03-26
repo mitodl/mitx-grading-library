@@ -688,6 +688,36 @@ def test_fg_evals_numbered_variables_in_siblings():
         # The second call should provide only the first sibling formula
         assert results[1] == {'sibling_1': 'x_{0}+1'}
 
+def test_siblings_in_dependent_samplers():
+    grader = ListGrader(
+        answers=['1', 'x'],
+        subgraders=[
+            FormulaGrader(),
+            FormulaGrader(variables=['x'], sample_from={'x': DependentSampler(formula='sibling_1+1')})
+        ],
+        ordered=True
+    )
+
+    submission = ['1', '2']
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+        ]
+    }
+    assert grader(None, submission) == expected_result
+
+    submission = ['2', '3']
+    expected_result = {
+        'overall_message': '',
+        'input_list': [
+            {'ok': False, 'grade_decimal': 0, 'msg': ''},
+            {'ok': True, 'grade_decimal': 1, 'msg': ''},
+        ]
+    }
+    assert grader(None, submission) == expected_result
+
 def test_ng_config():
     """Test that the NumericalGrader config bars unwanted entries"""
     expect = r"not a valid value for dictionary value @ data\[u?'failable_evals'\]. Got 1"

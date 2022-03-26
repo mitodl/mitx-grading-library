@@ -16,7 +16,7 @@ from collections import namedtuple
 from voluptuous import Schema, Required, Any, All, Length, Coerce
 
 from mitxgraders.baseclasses import ItemGrader
-from mitxgraders.exceptions import InvalidInput, ConfigError
+from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.comparers import CorrelatedComparer
 from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet, DependentSampler,
                                   gen_symbols_samples, construct_functions,
@@ -545,6 +545,8 @@ class MathMixin(object):
                     # This is a sibling dictionary. Add it to the list of variables to sample.
                     for k in entry:
                         variables.append(k)
+                        if entry[k] == '':
+                            raise MissingInput('Cannot grade answer, a required input is missing.')
                         sample_from_dict[k] = DependentSampler(formula=entry[k])
                     break
         
