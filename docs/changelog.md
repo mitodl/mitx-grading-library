@@ -6,6 +6,10 @@ This is a major new version with many new features added. We have been very care
 
 ## Version 2.3
 
+### Version 2.3.3
+
+* Refactored sampling to allow sibling variables to be used in `DependentSampler`s.
+
 ### Version 2.3.2
 
 * Fixed a bug where long integers passed in as a variable (via `DiscreteSet`) or user-defined constant would cause an error in evaluation (such numbers are now cast as floats).
