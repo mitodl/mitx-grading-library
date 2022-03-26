@@ -242,7 +242,7 @@ Sample from any discrete set of values that are specified in a tuple. A single v
 
 ### DependentSampler
 
-Compute a value for a variable based on the values of other constants/variables. The sampler is simply initialized with the desired formula, which can use any base or user-defined functions (except for randomly sampled functions, see below). `DependentSampler`s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that `DependentSampler` can depend on vector/matrix quantities as well as scalars. You can even use sibling variables in a `DependentSampler`.
+Compute a value for a variable based on the values of other constants/variables. The sampler is simply initialized with the desired formula, which can use any base or user-defined functions (except for randomly sampled functions, see below). `DependentSampler`s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that `DependentSampler` can depend on vector/matrix quantities as well as scalars. You can even use sibling variables in a `DependentSampler` (but if you do so, we strongly recommend making such variables instructor variables!).
 
 ```pycon
 >>> # Set radius based on the random values of x, y and z
