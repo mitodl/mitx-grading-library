@@ -1,6 +1,6 @@
 # MITx Grading Library
 
-[![Build Status](https://travis-ci.org/mitodl/mitx-grading-library.svg?branch=master)](https://travis-ci.org/mitodl/mitx-grading-library) [![Coverage Status](https://codecov.io/gh/mitodl/mitx-grading-library/branch/master/graphs/badge.svg)](https://codecov.io/gh/mitodl/mitx-grading-library)
+[![Build Status](https://github.com/mitodl/mitx-grading-library/actions/workflows/ci.yaml/badge.svg)](https://github.com/mitodl/mitx-grading-library/actions) [![Coverage Status](https://codecov.io/gh/mitodl/mitx-grading-library/branch/master/graphs/badge.svg)](https://codecov.io/gh/mitodl/mitx-grading-library)
 
 A library of graders for edX Custom Response problems.
 
