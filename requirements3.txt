@@ -10,7 +10,7 @@ pytest==4.6.11
 pytest-cov==2.7.1
 
 # For documentation
-mkdocs==0.17.5
+mkdocs==1.2.3
 mkdocs-cinder==0.11.0
 # Note that there are much newer versions of these. However, the pycon code highlighting
 # language no longer works in the newer versions, so we stick with these ones.
