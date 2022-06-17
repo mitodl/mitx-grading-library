@@ -1,5 +1,5 @@
 # Used by the library (versions set to mirror edX)
-numpy==1.6.2
+numpy==1.21.0
 pyparsing==2.0.7
 scipy==0.14.0
 six==1.11.0
