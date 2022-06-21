@@ -1,6 +1,6 @@
 # Used by the library (versions taken from edx.org August 9th 2020)
 # Python version is 3.5.2
-numpy==1.16.5
+numpy==1.22.0
 scipy==1.2.1
 pyparsing==2.2.0
 six==1.15.0
