@@ -4,6 +4,12 @@
 
 This is a major new version with many new features added. We have been very careful to preserve backwards compatibility of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2. However, we do warn that we broke internal backwards compatibility in a number of locations in order to accommodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.
 
+## Version 2.4
+
+### Version 2.4.0
+
+* Refactored loading of scipy to only occur when required. This should make the library load significantly faster, which will resolve a lot of codejail timeout errors (we hope!).
+
 ## Version 2.3
 
 ### Version 2.3.3
