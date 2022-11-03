@@ -17,7 +17,6 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 import six
 from numbers import Number
 import numpy as np
-import scipy.special as special
 from mitxgraders.helpers.calc.specify_domain import SpecifyDomain
 from mitxgraders.helpers.calc.exceptions import FunctionEvalError
 from mitxgraders.helpers.calc.math_array import MathArray
@@ -207,6 +206,9 @@ def factorial(z):
         msg = ("Error evaluating factorial() or fact() in input. These "
                "functions cannot be used at negative integer values.")
         raise FunctionEvalError(msg)
+
+    # lazy import this module for performance reasons
+    import scipy.special as special
 
     value = special.gamma(z+1)
     # value is a numpy array; If it's 0d, we can just get its item:

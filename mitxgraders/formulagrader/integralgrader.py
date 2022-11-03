@@ -8,7 +8,6 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 
 import six
 from functools import wraps
-from scipy import integrate
 from numpy import real, imag
 from abc import abstractproperty
 from numbers import Number
@@ -516,6 +515,9 @@ class IntegralGrader(SummationGraderBase):
                                  functions=funcscope,
                                  suffixes=self.suffixes)
             return value
+
+        # lazy load this module for performance reasons
+        from scipy import integrate
 
         if self.config['complex_integrand']:
             integrand_re = lambda x: real(raw_integrand(x))

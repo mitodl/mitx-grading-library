@@ -29,12 +29,6 @@ class Unavailable(object):
         raise NotImplementedError('This feature requires newer versions of numpy '
                                   'and scipy than are available.')
 
-try:
-    from scipy.stats import ortho_group, special_ortho_group, unitary_group
-except ImportError:
-    ortho_group = Unavailable()
-    special_ortho_group = Unavailable()
-    unitary_group = Unavailable()
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -825,6 +819,13 @@ class OrthogonalMatrices(SquareMatrixSamplingSet):
         """
         Generates an orthogonal matrix
         """
+        # lazy load this module for performance reasons
+        try:
+            from scipy.stats import ortho_group, special_ortho_group
+        except ImportError:
+            ortho_group = Unavailable()
+            special_ortho_group = Unavailable()
+
         # Generate the array
         if self.config['unitdet']:
             array = special_ortho_group.rvs(self.config['dimension'])
@@ -896,6 +897,12 @@ class UnitaryMatrices(SquareMatrixSamplingSet):
         """
         Generates an orthogonal matrix as appropriate
         """
+        # lazy load this module for performance reasons
+        try:
+            from scipy.stats import unitary_group
+        except ImportError:
+            unitary_group = Unavailable()
+
         # Generate the array
         array = unitary_group.rvs(self.config['dimension'])
         # Fix the determinant if need be
