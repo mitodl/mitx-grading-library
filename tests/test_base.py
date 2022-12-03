@@ -87,8 +87,8 @@ def test_debug_with_input_list():
 
 def test_config():
     """Test giving a class a config dict or arguments"""
-    assert StringGrader(answers="cat").config["answers"][0]['expect'] == "cat"
-    assert StringGrader({'answers': 'cat'}).config["answers"][0]['expect'] == "cat"
+    assert StringGrader(answers="cat").config["answers"][0]['expect'][0] == "cat"
+    assert StringGrader({'answers': 'cat'}).config["answers"][0]['expect'][0] == "cat"
 
 def test_itemgrader():
     """Various tests of ItemGrader. We use StringGrader as a standin for ItemGrader"""

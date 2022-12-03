@@ -486,10 +486,10 @@ def test_answer_validation():
     )
     assert grader.config['answers'] == (
         {
-            'expect': [
-                ({'expect': 'a', 'msg': '', 'grade_decimal': 1, 'ok': True}, ),
-                ({'expect': 'b', 'msg': '', 'grade_decimal': 1, 'ok': True}, )
-            ],
+            'expect': ([
+                ({'expect': ('a', ), 'msg': '', 'grade_decimal': 1, 'ok': True}, ),
+                ({'expect': ('b', ), 'msg': '', 'grade_decimal': 1, 'ok': True}, )
+            ], ),
             'grade_decimal': 1,
             'msg': '',
             'ok': True

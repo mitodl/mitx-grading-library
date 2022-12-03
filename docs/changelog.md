@@ -43,6 +43,10 @@ This is a major new version with many new features added. We have been very care
 
 ## Version 2.1
 
+### Version 2.1.1
+
+* Fixed a bug in LinearComparer when a student's answer was constant.
+
 ### Version 2.1.0
 
 * Added a new grader `IntervalGrader`, which grades expressions for mathematical intervals.
