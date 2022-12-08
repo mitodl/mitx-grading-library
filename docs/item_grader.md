@@ -98,6 +98,7 @@ True
 True
 >>> grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
 True
+
 ```
 
 Internally, the `ItemGrader` converts the answers entry into a tuple of dictionaries. When grading, it asks the specific grading class to grade the response against each possible answer, and selects the best outcome for the student.
