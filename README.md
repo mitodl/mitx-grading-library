@@ -4,7 +4,7 @@
 
 A library of graders for edX Custom Response problems.
 
-Version 2.4.0 ([changelog](docs/changelog.md))
+Version 2.4.1 ([changelog](docs/changelog.md))
 
 Copyright 2017-2022 Jolyon Bloomfield and Chris Chudzicki
 
@@ -35,7 +35,7 @@ This is not required but can be useful for testing configurations in python, rat
 
 To install:
 
-**Requirements:** An installation of Python 2.7 (since this is what edX currently uses) or Python 3.6 or 3.7 (since edX is in the process of upgrading).
+**Requirements:** An installation of Python 2.7 (for older edX versions) or Python 3.6 or 3.7 (current edX versions).
 
 0. (Optional) Create and activate a new python virtual environment.
 1. Clone this repository and `cd` into it.

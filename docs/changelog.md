@@ -6,6 +6,10 @@ This is a major new version with many new features added. We have been very care
 
 ## Version 2.4
 
+### Version 2.4.1
+
+* Implemented the option to specify a tuple of multiple possible answers in an `'expect'` keyword when supplying specific messages and grades.
+
 ### Version 2.4.0
 
 * Refactored loading of scipy to only occur when required. This should make the library load significantly faster, which will resolve a lot of codejail timeout errors (we hope!).
