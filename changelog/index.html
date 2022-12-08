@@ -256,6 +256,9 @@
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#change-log">Change Log</a></li>
         <li class="first-level "><a href="#version-2">Version 2</a></li>
+            <li class="second-level"><a href="#version-24">Version 2.4</a></li>
+                
+                <li class="third-level"><a href="#version-240">Version 2.4.0</a></li>
             <li class="second-level"><a href="#version-23">Version 2.3</a></li>
                 
                 <li class="third-level"><a href="#version-233">Version 2.3.3</a></li>
@@ -267,6 +270,7 @@
                 <li class="third-level"><a href="#version-220">Version 2.2.0</a></li>
             <li class="second-level"><a href="#version-21">Version 2.1</a></li>
                 
+                <li class="third-level"><a href="#version-211">Version 2.1.1</a></li>
                 <li class="third-level"><a href="#version-210">Version 2.1.0</a></li>
             <li class="second-level"><a href="#version-20">Version 2.0</a></li>
                 
@@ -300,6 +304,11 @@
 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link"> # </a></h1>
 <h1 id="version-2">Version 2<a class="headerlink" href="#version-2" title="Permanent link"> # </a></h1>
 <p>This is a major new version with many new features added. We have been very careful to preserve backwards compatibility of the outward-facing API of the library while adding new features. The biggest change (and the reason for the major version number) is that we are now fully compatible with python versions 2.7, 3.6 and 3.7. All typical applications of version 1.2 should be compatible with version 2. However, we do warn that we broke internal backwards compatibility in a number of locations in order to accommodate python 3. If you previously wrote custom plugins for version 1.2, we cannot guarantee that they will continue to work in version 2.</p>
+<h2 id="version-24">Version 2.4<a class="headerlink" href="#version-24" title="Permanent link"> # </a></h2>
+<h3 id="version-240">Version 2.4.0<a class="headerlink" href="#version-240" title="Permanent link"> # </a></h3>
+<ul>
+<li>Refactored loading of scipy to only occur when required. This should make the library load significantly faster, which will resolve a lot of codejail timeout errors (we hope!).</li>
+</ul>
 <h2 id="version-23">Version 2.3<a class="headerlink" href="#version-23" title="Permanent link"> # </a></h2>
 <h3 id="version-233">Version 2.3.3<a class="headerlink" href="#version-233" title="Permanent link"> # </a></h3>
 <ul>
@@ -330,6 +339,10 @@
 <li>Constructed <code>SumGrader</code>, which operates like <code>IntegralGrader</code>, but grades sums instead of integrals.</li>
 </ul>
 <h2 id="version-21">Version 2.1<a class="headerlink" href="#version-21" title="Permanent link"> # </a></h2>
+<h3 id="version-211">Version 2.1.1<a class="headerlink" href="#version-211" title="Permanent link"> # </a></h3>
+<ul>
+<li>Fixed a bug in LinearComparer when a student's answer was constant.</li>
+</ul>
 <h3 id="version-210">Version 2.1.0<a class="headerlink" href="#version-210" title="Permanent link"> # </a></h3>
 <ul>
 <li>Added a new grader <code>IntervalGrader</code>, which grades expressions for mathematical intervals.</li>

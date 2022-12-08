@@ -2,107 +2,107 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
      <loc>/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/edx/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/graders/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/item_grader/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/string_grader/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/formula_grader/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/numerical_grader/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/matrix_grader/matrix_grader/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/sampling/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/functions_and_constants/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/user_functions/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/comparer_functions/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/renderer/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/integral_grader/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/sum_grader/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_math/interval_grader/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_lists/single_list_grader/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/grading_lists/list_grader/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/plugins/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/faq/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>/changelog/</loc>
-     <lastmod>2022-03-26</lastmod>
+     <lastmod>2022-12-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

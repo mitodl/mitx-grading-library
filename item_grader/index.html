@@ -287,7 +287,7 @@ True
 <li>
 <p>A single dictionary can be used to specify an answer, feedback, correctness, and partial credit. The dictionary keys are:</p>
 <ul>
-<li><code>'expect'</code> (required): compared against student answer. Most <code>ItemGrader</code>s use strings to specify the <code>'expect'</code> value.</li>
+<li><code>'expect'</code> (required): compared against student answer. Most <code>ItemGrader</code>s use strings to specify the <code>'expect'</code> value. You may also specify a tuple of values like <code>('option1', 'option2')</code> if you want the same grade and message applied to all these inputs.</li>
 <li><code>'grade_decimal'</code> (optional, a number between <code>0</code> and <code>1</code> inclusive): The credit associated with this answer (default <code>1</code>).</li>
 <li><code>'msg'</code> (optional, string): An optional feedback message associated with this answer (default <code>''</code>).</li>
 </ul>
@@ -331,7 +331,9 @@ True
 ...         # a partially correct answer
 ...         {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
 ...         # a wrong answer with specific feedback
-...         {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
+...         {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'},
+...         # multiple wrong answers with specific feedback
+...         {'expect': ('werewolf', 'vampire'), 'grade_decimal': 0, 'msg': 'Wrong universe!'}
 ...     ),
 ...     wrong_msg='Try again!'
 ... )
@@ -342,6 +344,10 @@ True
 &gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 0.5, 'msg': 'No, not dog!', 'ok': 'partial'}
 True
 &gt;&gt;&gt; grader(None, 'unicorn') == {'grade_decimal': 0, 'msg': 'No, not unicorn!', 'ok': False}
+True
+&gt;&gt;&gt; grader(None, 'werewolf') == {'grade_decimal': 0, 'msg': 'Wrong universe!', 'ok': False}
+True
+&gt;&gt;&gt; grader(None, 'vampire') == {'grade_decimal': 0, 'msg': 'Wrong universe!', 'ok': False}
 True
 &gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
 True
