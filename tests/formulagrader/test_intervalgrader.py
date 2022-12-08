@@ -87,6 +87,13 @@ def test_inferring_answers():
     assert grader("(1,2]", "(1,2]") == grader1("(1,2]", "(1,2]")
     assert grader("(1,2]", "(1,2)") == grader1("(1,2]", "(1,2)")
 
+def test_multiple_answers():
+    grader = IntervalGrader(answers={'expect': ("(1,2]", '(3,4]')})
+
+    expected_result = {'ok': True, 'grade_decimal': 1, 'msg': ''}
+    assert grader(None, "(1,2]") == expected_result
+    assert grader(None, "(3,4]") == expected_result
+
 def test_formulas():
     grader = IntervalGrader(
         answers="(x, y^2 + 1)",

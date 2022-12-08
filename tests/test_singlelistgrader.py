@@ -486,10 +486,10 @@ def test_answer_validation():
     )
     assert grader.config['answers'] == (
         {
-            'expect': [
-                ({'expect': 'a', 'msg': '', 'grade_decimal': 1, 'ok': True}, ),
-                ({'expect': 'b', 'msg': '', 'grade_decimal': 1, 'ok': True}, )
-            ],
+            'expect': ([
+                ({'expect': ('a', ), 'msg': '', 'grade_decimal': 1, 'ok': True}, ),
+                ({'expect': ('b', ), 'msg': '', 'grade_decimal': 1, 'ok': True}, )
+            ], ),
             'grade_decimal': 1,
             'msg': '',
             'ok': True
@@ -547,6 +547,30 @@ def test_overall_grade_msg():
     result = grader(None, 'y, z')
     assert result['grade_decimal'] == 0.25
     assert result['msg'] == ''
+
+def test_multiple_answers():
+    grader = SingleListGrader(
+        subgrader=StringGrader(),
+        answers={'expect': ['a', ('b', 'c')], 'msg': 'Yay', 'grade_decimal': 0.5}
+    )
+    assert grader(None, 'a, b')['grade_decimal'] == 0.5
+    assert grader(None, 'a, b')['msg'] == 'Yay'
+    assert grader(None, 'a, c')['grade_decimal'] == 0.5
+    assert grader(None, 'a, c')['msg'] == 'Yay'
+    assert grader(None, 'a, d')['grade_decimal'] == 0.25
+    assert grader(None, 'a, d')['msg'] == ''
+
+    grader = SingleListGrader(
+        subgrader=StringGrader(),
+        answers={'expect': (['a', 'b'], ['c', 'a']), 'msg': 'Yay', 'grade_decimal': 0.5},
+        ordered=True
+    )
+    assert grader(None, 'a, b')['grade_decimal'] == 0.5
+    assert grader(None, 'a, b')['msg'] == 'Yay'
+    assert grader(None, 'c, a')['grade_decimal'] == 0.5
+    assert grader(None, 'c, a')['msg'] == 'Yay'
+    assert grader(None, 'b, a')['grade_decimal'] == 0.25
+    assert grader(None, 'b, a')['msg'] == ''
 
 def test_overall_msg_nested():
     grader = SingleListGrader(

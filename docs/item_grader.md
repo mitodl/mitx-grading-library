@@ -32,7 +32,7 @@ For all `ItemGrader`s, the `answers` key can be used to specify correct answers,
 
 - A single dictionary can be used to specify an answer, feedback, correctness, and partial credit. The dictionary keys are:
 
-    - `'expect'` (required): compared against student answer. Most `ItemGrader`s use strings to specify the `'expect'` value.
+    - `'expect'` (required): compared against student answer. Most `ItemGrader`s use strings to specify the `'expect'` value. You may also specify a tuple of values like `('option1', 'option2')` if you want the same grade and message applied to all these inputs.
     - `'grade_decimal'` (optional, a number between `0` and `1` inclusive): The credit associated with this answer (default `1`).
     - `'msg'` (optional, string): An optional feedback message associated with this answer (default `''`).
 
@@ -78,7 +78,9 @@ True
 ...         # a partially correct answer
 ...         {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
 ...         # a wrong answer with specific feedback
-...         {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
+...         {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'},
+...         # multiple wrong answers with specific feedback
+...         {'expect': ('werewolf', 'vampire'), 'grade_decimal': 0, 'msg': 'Wrong universe!'}
 ...     ),
 ...     wrong_msg='Try again!'
 ... )
@@ -89,6 +91,10 @@ True
 >>> grader(None, 'dog') == {'grade_decimal': 0.5, 'msg': 'No, not dog!', 'ok': 'partial'}
 True
 >>> grader(None, 'unicorn') == {'grade_decimal': 0, 'msg': 'No, not unicorn!', 'ok': False}
+True
+>>> grader(None, 'werewolf') == {'grade_decimal': 0, 'msg': 'Wrong universe!', 'ok': False}
+True
+>>> grader(None, 'vampire') == {'grade_decimal': 0, 'msg': 'Wrong universe!', 'ok': False}
 True
 >>> grader(None, 'cat') == {'grade_decimal': 0, 'msg': 'Try again!', 'ok': False}
 True

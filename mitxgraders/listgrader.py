@@ -671,25 +671,25 @@ class SingleListGrader(ItemGrader):
 
     def post_schema_ans_val(self, answer_tuple):
         """
-        Used to validate the individual 'expect' lists in the 'answers' key.
+        Used to validate the individual 'expect' entries in the 'answers' key.
         This must be done after the schema has finished validation, as we need access
         to the 'subgraders' configuration key to perform this validation.
         """
         # The structure of answer_tuple at this stage is:
         # tuple(dict('expect', 'grade_decimal', 'ok', 'msg'))
-        # where 'expect' needs validation.
+        # where 'expect' is a tuple of entries that needs validation.
 
-        # Step 1: If 'expect' is a string, use infer_from_expect to convert it to a list.
+        # Step 1: If there is a string in the expect tuple, use infer_from_expect to convert it to a list.
         for entry in answer_tuple:
-            if isinstance(entry['expect'], six.string_types):
-                entry['expect'] = self.infer_from_expect(entry['expect'])
-        # Redo schema validation to validate any modified answers
-        answer_tuple = self.schema_answers(answer_tuple)
+            entry['expect'] = tuple(self.infer_from_expect(x) if isinstance(x, six.string_types) else x
+                                    for x in entry['expect'])
 
-        # Check that all lists in the tuple have the same length
+        # Check that all lists have the same length
         for answer_list in answer_tuple:
-            if len(answer_list['expect']) != len(answer_tuple[0]['expect']):
-                raise ConfigError("All possible list answers must have the same length")
+            expected_len = len(answer_tuple[0]['expect'][0])
+            for exp in answer_list['expect']:
+                if len(exp) != expected_len:
+                    raise ConfigError("All possible list answers must have the same length")
 
         # Check for empty entries anywhere in answers_tuple (which can be a nested mess!)
         # We do this before validating individual entries, as strings may be coerced into other
@@ -697,15 +697,16 @@ class SingleListGrader(ItemGrader):
         if self.config['missing_error']:
             demand_no_empty(answer_tuple)
 
-        # Validate each entry in 'expect' lists using the subgrader
+        # Validate each entry in 'expect' tuple lists using the subgrader
         for answer_list in answer_tuple:
-            expect = answer_list['expect']
-            for index, answer in enumerate(expect):
-                # Run the answers through the subgrader schema and the post-schema validation
-                expect[index] = self.config['subgrader'].schema_answers(answer)
-                expect[index] = self.config['subgrader'].post_schema_ans_val(expect[index])
-            if not expect:
-                raise ConfigError("Cannot have an empty list of answers")
+            expect_tuple = answer_list['expect']
+            for expect in expect_tuple:
+                if not expect:
+                    raise ConfigError("Cannot have an empty list of answers")
+                for index, answer in enumerate(expect):
+                    # Run the answers through the subgrader schema and the post-schema validation
+                    expect[index] = self.config['subgrader'].schema_answers(answer)
+                    expect[index] = self.config['subgrader'].post_schema_ans_val(expect[index])
 
         return answer_tuple
 
@@ -827,7 +828,7 @@ class SingleListGrader(ItemGrader):
 def demand_no_empty(obj):
     """
     Recursively search through all tuples, lists and dictionaries in obj,
-    ensuring that all expect strings are non-empty.
+    ensuring that all expect tuples are non-empty.
     """
     if isinstance(obj, list) or isinstance(obj, tuple):
         for item in obj:

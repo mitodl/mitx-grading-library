@@ -580,11 +580,20 @@ class ItemGrader(AbstractGrader):
     def schema_answer(self):
         """Defines the schema that a fully-specified answer should satisfy."""
         return Schema({
-            Required('expect'): self.validate_expect,
+            Required('expect'): self.validate_expect_tuple,
             Required('grade_decimal', default=1): All(numbers.Number, Range(0, 1)),
             Required('msg', default=''): text_string,
             Required('ok', default='computed'): Any('computed', True, False, 'partial')
         })
+
+    def validate_expect_tuple(self, expect):
+        """
+        Defines the schema that a fully-specified expect entry should satisfy.
+        Note that it coerces expect to a tuple if it isn't already.
+        """
+        if not isinstance(expect, tuple):
+            expect = (expect, )
+        return Schema((self.validate_expect,))(expect)
 
     @staticmethod
     def validate_expect(expect):
@@ -675,7 +684,14 @@ class ItemGrader(AbstractGrader):
             raise ConfigError(msg)
 
         # Compute the results for each answer
-        results = [self.check_response(answer, student_input, **kwargs) for answer in answers]
+        results = []
+        for answer in answers:
+            # Iterate through each entry in the expect tuple
+            answercopy = answer.copy()
+            for entry in answer['expect']:
+                answercopy['expect'] = entry
+                result = self.check_response(answercopy, student_input, **kwargs)
+                results.append(result)
 
         # Now find the best result for the student
         best_score = max([r['grade_decimal'] for r in results])

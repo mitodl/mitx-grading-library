@@ -101,24 +101,25 @@ class IntervalGrader(SingleListGrader):
 
     def post_schema_ans_val(self, answer_tuple):
         """
-        Used to validate the individual 'expect' lists in the 'answers' key.
+        Used to validate the individual 'expect' entries in the 'answers' key.
         This must be done after the schema has finished validation, as we need access
         to the 'subgraders' configuration key to perform this validation.
         """
         # The structure of answer_tuple at this stage is:
         # tuple(dict('expect', 'grade_decimal', 'ok', 'msg'))
-        # where 'expect' is a list that needs validation.
+        # where 'expect' is a tuple of lists that need validation.
 
         # If 'expect' is a string, use infer_from_expect to convert it to a list.
         for entry in answer_tuple:
-            if isinstance(entry['expect'], six.string_types):
-                entry['expect'] = self.infer_from_expect(entry['expect'])
+            entry['expect'] = tuple(self.infer_from_expect(x) if isinstance(x, six.string_types) else x
+                                    for x in entry['expect'])
 
         # Assert that all answers have length 4
         for answer_list in answer_tuple:
-            if len(answer_list['expect']) != 4:
-                raise ConfigError("Answer list must have 4 entries: opening bracket, lower bound, "
-                                  "upper bound, closing bracket.")
+            for exp in answer_list['expect']:
+                if len(exp) != 4:
+                    raise ConfigError("Answer list must have 4 entries: opening bracket, lower bound, "
+                                      "upper bound, closing bracket.")
 
         # Make sure that no entries are empty
         demand_no_empty(answer_tuple)
@@ -127,41 +128,47 @@ class IntervalGrader(SingleListGrader):
         # We use a StringGrader to run appropriate schema coercion
         grader = StringGrader()
         for answer_list in answer_tuple:
-            expect = answer_list['expect']
-            for index, answer in zip((0, 3), (expect[0], expect[3])):
-                # Run the answers through the generic schema and post-schema validation
-                expect[index] = grader.schema_answers(answer)
-                expect[index] = grader.post_schema_ans_val(expect[index])
+            expect_tuple = answer_list['expect']
+            for expect in expect_tuple:
+                for index, answer in zip((0, 3), (expect[0], expect[3])):
+                    # Run the answers through the generic schema and post-schema validation
+                    expect[index] = grader.schema_answers(answer)
+                    expect[index] = grader.post_schema_ans_val(expect[index])
 
         # Validate the second and third entries (lower and upper limits)
         grader = self.config['subgrader']
         for answer_list in answer_tuple:
-            expect = answer_list['expect']
-            for index, answer in zip((1, 2), expect[1:3]):
-                # Run the answers through the subgrader schema and the post-schema validation
-                expect[index] = grader.schema_answers(answer)
-                expect[index] = grader.post_schema_ans_val(expect[index])
+            expect_tuple = answer_list['expect']
+            for expect in expect_tuple:
+                for index, answer in zip((1, 2), expect[1:3]):
+                    # Run the answers through the subgrader schema and the post-schema validation
+                    expect[index] = grader.schema_answers(answer)
+                    expect[index] = grader.post_schema_ans_val(expect[index])
 
         # Assert that the first and last entries are single characters that
         # exist in the opening_brackets and closing_brackets configuration options
         for answer_list in answer_tuple:
-            # Opening brackets
-            for entry in answer_list['expect'][0]:
-                if len(entry['expect']) != 1:
-                    raise ConfigError("Opening bracket must be a single character.")
-                if entry['expect'] not in self.config['opening_brackets']:
-                    raise ConfigError("Invalid opening bracket. The opening_brackets configuration allows for '"
-                                      + "', '".join(char for char in self.config['opening_brackets'])
-                                      + "' as opening brackets.")
+            expect_tuple = answer_list['expect']
+            for expect in expect_tuple:
+                # Opening brackets
+                for entry in expect[0]:
+                    for final_exp in entry['expect']:
+                        if len(final_exp) != 1:
+                            raise ConfigError("Opening bracket must be a single character.")
+                        if final_exp not in self.config['opening_brackets']:
+                            raise ConfigError("Invalid opening bracket. The opening_brackets configuration allows for '"
+                                              + "', '".join(char for char in self.config['opening_brackets'])
+                                              + "' as opening brackets.")
 
-            # Closing brackets
-            for entry in answer_list['expect'][3]:
-                if len(entry['expect']) != 1:
-                    raise ConfigError("Closing bracket must be a single character.")
-                if entry['expect'] not in self.config['closing_brackets']:
-                    raise ConfigError("Invalid closing bracket. The closing_brackets configuration allows for '"
-                                      + "', '".join(char for char in self.config['closing_brackets'])
-                                      + "' as closing brackets.")
+                # Closing brackets
+                for entry in expect[3]:
+                    for final_exp in entry['expect']:
+                        if len(final_exp) != 1:
+                            raise ConfigError("Closing bracket must be a single character.")
+                        if final_exp not in self.config['closing_brackets']:
+                            raise ConfigError("Invalid closing bracket. The closing_brackets configuration allows for '"
+                                              + "', '".join(char for char in self.config['closing_brackets'])
+                                              + "' as closing brackets.")
 
         return answer_tuple
 
@@ -232,7 +239,7 @@ class IntervalGrader(SingleListGrader):
         # Find the bracket that awards the most credit (could be 0)
         best = None
         for bracket in answers:
-            if student_answer == bracket['expect']:
+            if student_answer in bracket['expect']:  # bracket['except'] is a normal expect tuple
                 if best is None or bracket['grade_decimal'] > best['grade_decimal']:
                     best = bracket
 

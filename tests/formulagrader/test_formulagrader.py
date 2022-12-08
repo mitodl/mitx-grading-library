@@ -497,7 +497,7 @@ def test_fg_config_expect():
 
     # If trying to use comparer, a detailed validation error is raised
     expect = ("to have 3 arguments, instead it has 2 for dictionary value @ "
-              r"data\[u?'answers'\]\[0\]\[u?'expect'\]\[u?'comparer'\]")
+              r"data\[u?'answers'\]\[0\]\[u?'expect'\]\[0\]\[u?'comparer'\]")
     with raises(Error, match=expect):
         FormulaGrader(
             answers={
@@ -987,9 +987,9 @@ def test_default_comparer():
     FormulaGrader.reset_default_comparer()
     grader = FormulaGrader(answers='pi')
 
-    silly_grader.config['answers'][0]['expect']['comparer'] is silly_comparer
+    silly_grader.config['answers'][0]['expect'][0]['comparer'] is silly_comparer
     assert silly_grader(None, '1')['ok']
-    grader.config['answers'][0]['expect']['comparer'] is equality_comparer
+    grader.config['answers'][0]['expect'][0]['comparer'] is equality_comparer
     assert not grader(None, '1')['ok']
     assert grader(None, '3.141592653')['ok']
 

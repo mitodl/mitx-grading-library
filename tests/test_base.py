@@ -87,8 +87,8 @@ def test_debug_with_input_list():
 
 def test_config():
     """Test giving a class a config dict or arguments"""
-    assert StringGrader(answers="cat").config["answers"][0]['expect'] == "cat"
-    assert StringGrader({'answers': 'cat'}).config["answers"][0]['expect'] == "cat"
+    assert StringGrader(answers="cat").config["answers"][0]['expect'][0] == "cat"
+    assert StringGrader({'answers': 'cat'}).config["answers"][0]['expect'][0] == "cat"
 
 def test_itemgrader():
     """Various tests of ItemGrader. We use StringGrader as a standin for ItemGrader"""
@@ -245,7 +245,9 @@ def test_docs():
             # a partially correct answer
             {'expect': 'dog', 'grade_decimal': 0.5, 'msg': 'No, not dog!'},
             # a wrong answer with specific feedback
-            {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'}
+            {'expect': 'unicorn', 'grade_decimal': 0, 'msg': 'No, not unicorn!'},
+            # multiple wrong answers with specific feedback
+            {'expect': ('werewolf', 'vampire'), 'grade_decimal': 0, 'msg': 'Wrong universe!'}
         ),
         wrong_msg='Try again!'
     )
@@ -256,6 +258,11 @@ def test_docs():
     assert grader(None, 'dog') == expected_result
     expected_result = {'msg': 'No, not unicorn!', 'grade_decimal': 0, 'ok': False}
     assert grader(None, 'unicorn') == expected_result
+    expected_result = {'msg': 'Wrong universe!', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'werewolf') == expected_result
+    assert grader(None, 'vampire') == expected_result
+    expected_result = {'msg': 'Try again!', 'grade_decimal': 0, 'ok': False}
+    assert grader(None, 'other') == expected_result
 
 def test_readme():
     """Tests that the README.md file examples work"""
