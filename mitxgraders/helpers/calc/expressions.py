@@ -46,6 +46,9 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 
 import copy
 from collections import namedtuple
+from xml.dom.minidom import parseString
+
+import dicttoxml
 import numpy as np
 import six
 from pyparsing import (
@@ -307,8 +310,8 @@ class MathParser(object):
     >>> isinstance(parsed, MathExpression)
     True
     >>> parsed
-    <BLANKLINE>
-    <sum>
+    <?xml version="1.0" ?>
+    <root>
       <product>
         <number>
           <num>2</num>
@@ -322,7 +325,8 @@ class MathParser(object):
       <number>
         <num>5</num>
       </number>
-    </sum>
+    </root>
+    <BLANKLINE>
     """
 
     def __init__(self):
@@ -586,7 +590,9 @@ class MathExpression(object):
         self.tree = tree
 
     def __str__(self):
-        return self.tree.asXML()
+        tree_dict = self.tree.as_dict()
+        tree_xml = dicttoxml.dicttoxml(tree_dict, attr_type=False)
+        return parseString(tree_xml).toprettyxml(indent='  ')
 
     def __repr__(self):
         return self.__str__()
