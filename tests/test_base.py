@@ -6,7 +6,7 @@ from __future__ import print_function, division, absolute_import
 import sys
 import platform
 import six
-from imp import reload
+from importlib import reload
 from pytest import raises, approx
 from voluptuous import Error, Schema, Required
 import mitxgraders
