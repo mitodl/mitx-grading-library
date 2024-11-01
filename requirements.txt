@@ -1,19 +1,16 @@
-# Used by the library (versions set to mirror edX)
-numpy==1.6.2
-pyparsing==2.0.7
-scipy==0.14.0
-six==1.11.0
+# Used by the library
+numpy
+scipy
+pyparsing
+six
 
 # For testing
-mock
-pytest==4.6.11
-pytest-cov==2.7.1
+pytest
+pytest-cov
 
 # For documentation
-mkdocs==0.17.5
-mkdocs-cinder==0.11.0
-# Note that there are much newer versions of these. However, the pycon code highlighting
-# language no longer works in the newer versions, so we stick with these ones.
+mkdocs
+mkdocs-cinder
 
 # For uploading to edge
 requests
