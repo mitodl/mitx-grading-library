@@ -3,7 +3,8 @@ repo_url: 'https://github.com/mitodl/mitx-grading-library'
 edit_uri: ''
 theme:
   name: 'cinder'
-pages:
+  colorscheme: vs-min
+nav:
   - Getting Started:
     - Overview: 'index.md'
     - edX Syntax: 'edx.md'

@@ -12,6 +12,7 @@ pytest-cov
 # For documentation
 mkdocs
 mkdocs-cinder
+pygments
 
 # For uploading to edge
 requests
