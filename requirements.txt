@@ -3,7 +3,6 @@ numpy
 scipy
 pyparsing
 six
-dicttoxml
 
 # For testing
 pytest

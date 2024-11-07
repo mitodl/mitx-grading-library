@@ -47,8 +47,8 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 import copy
 from collections import namedtuple
 from xml.dom.minidom import parseString
+import xml.etree.ElementTree as ET
 
-import dicttoxml
 import numpy as np
 import six
 from pyparsing import (
@@ -591,8 +591,21 @@ class MathExpression(object):
 
     def __str__(self):
         tree_dict = self.tree.as_dict()
-        tree_xml = dicttoxml.dicttoxml(tree_dict, attr_type=False)
-        return parseString(tree_xml).toprettyxml(indent='  ')
+        tree_xml = self._dict_to_xml("root", tree_dict)
+        xml_str = ET.tostring(tree_xml, encoding='unicode')
+        return parseString(xml_str).toprettyxml(indent='  ')
+    
+    def _dict_to_xml(self, tag, data):
+        """Converts a dictionary to XML format."""
+        elem = ET.Element(tag)
+        for key, val in data.items():
+            if isinstance(val, dict):  # If the value is a nested dictionary
+                child = self._dict_to_xml(key, val)  # Recurse to create a subelement
+                elem.append(child)
+            else:
+                child = ET.SubElement(elem, key)
+                child.text = str(val)
+        return elem
 
     def __repr__(self):
         return self.__str__()
