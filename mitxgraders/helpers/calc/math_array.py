@@ -329,7 +329,7 @@ class MathArray(np.ndarray):
             exponent = int(exponent)
             try:
                 return np.linalg.matrix_power(self, exponent)
-            except np.linalg.linalg.LinAlgError as error:
+            except np.linalg.LinAlgError as error:
                 if six.text_type(error).startswith('Singular'):
                     raise MathArrayError('Cannot raise singular matrix to negative powers.')
                 else:

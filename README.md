@@ -6,7 +6,7 @@ A library of graders for edX Custom Response problems.
 
 Version 2.4.1 ([changelog](docs/changelog.md))
 
-Copyright 2024
+Copyright 2024 Jolyon Bloomfield and Chris Chudzicki
 
 Licensed under the [BSD-3 License](LICENSE).
 

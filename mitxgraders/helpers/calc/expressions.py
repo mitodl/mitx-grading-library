@@ -46,8 +46,6 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 
 import copy
 from collections import namedtuple
-from xml.dom.minidom import parseString
-import xml.etree.ElementTree as ET
 
 import numpy as np
 import six
@@ -309,24 +307,6 @@ class MathParser(object):
     >>> parsed = new_parser.parse('2*x + 5')
     >>> isinstance(parsed, MathExpression)
     True
-    >>> parsed
-    <?xml version="1.0" ?>
-    <root>
-      <product>
-        <number>
-          <num>2</num>
-        </number>
-        <op>*</op>
-        <variable>
-          <varname>x</varname>
-        </variable>
-      </product>
-      <op>+</op>
-      <number>
-        <num>5</num>
-      </number>
-    </root>
-    <BLANKLINE>
     """
 
     def __init__(self):
@@ -589,23 +569,30 @@ class MathExpression(object):
         self.suffixes_used = suffixes_used
         self.tree = tree
 
-    def __str__(self):
-        tree_dict = self.tree.as_dict()
-        tree_xml = self._dict_to_xml("root", tree_dict)
-        xml_str = ET.tostring(tree_xml, encoding='unicode')
-        return parseString(xml_str).toprettyxml(indent='  ')
+    # def __str__(self):
+    #     """
+    #     This function is commented because the grader
+    #     is on a short timeout.
+    #     If we want to use it, we should:
+    #     from xml.dom.minidom import parseString
+    #     import xml.etree.ElementTree as ET.
+    #     """
+    #     tree_dict = self.tree.as_dict()
+    #     tree_xml = self._dict_to_xml("root", tree_dict)
+    #     xml_str = ET.tostring(tree_xml, encoding='unicode')
+    #     return parseString(xml_str).toprettyxml(indent='  ')
     
-    def _dict_to_xml(self, tag, data):
-        """Converts a dictionary to XML format."""
-        elem = ET.Element(tag)
-        for key, val in data.items():
-            if isinstance(val, dict):  # If the value is a nested dictionary
-                child = self._dict_to_xml(key, val)  # Recurse to create a subelement
-                elem.append(child)
-            else:
-                child = ET.SubElement(elem, key)
-                child.text = str(val)
-        return elem
+    # def _dict_to_xml(self, tag, data):
+    #     """Converts a dictionary to XML format."""
+    #     elem = ET.Element(tag)
+    #     for key, val in data.items():
+    #         if isinstance(val, dict):  # If the value is a nested dictionary
+    #             child = self._dict_to_xml(key, val)  # Recurse to create a subelement
+    #             elem.append(child)
+    #         else:
+    #             child = ET.SubElement(elem, key)
+    #             child.text = str(val)
+    #     return elem
 
     def __repr__(self):
         return self.__str__()
