@@ -5,6 +5,7 @@ from __future__ import print_function, division, absolute_import
 
 import sys
 import platform
+from unittest import mock
 import six
 from importlib import reload
 from pytest import raises, approx
@@ -14,7 +15,7 @@ from mitxgraders import ListGrader, StringGrader, ConfigError, FormulaGrader, __
 from mitxgraders.baseclasses import AbstractGrader, ItemGrader, ObjectWithSchema
 from mitxgraders.exceptions import MITxError, StudentFacingError
 from mitxgraders.attemptcredit import LinearCredit, GeometricCredit
-from tests.helpers import mock
+
 
 def test_debug_with_author_message():
     grader = StringGrader(

@@ -11,13 +11,10 @@ def wraps(wrapped,
           updated=functools.WRAPPER_UPDATES):
     """
     A light wrapper around functools.wraps to facilitate compatibility with
-    Python 2, Python 3, and numpy ufuncs.
+    Python 3, and numpy ufuncs.
 
-    Primary differences from Python 2's functools.wraps:
-        - uses try/accept for attribute reassignment (Python 3 functools.wraps
-          does this already)
-        - uses __name__ as __qualname__ if __qualname__ doesn't exist
-          (this helps with numpy ufuncs, which do not have a __qualname__)
+    Uses __name__ as __qualname__ if __qualname__ doesn't exist
+    (this helps with numpy ufuncs, which do not have a __qualname__)
 
     References:
         functools source:

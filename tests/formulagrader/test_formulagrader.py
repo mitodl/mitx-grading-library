@@ -5,6 +5,7 @@ from __future__ import print_function, division, absolute_import
 
 from pytest import raises
 import platform
+from unittest import mock
 import numpy as np
 from voluptuous import Error, MultipleInvalid
 from mitxgraders import (
@@ -29,7 +30,7 @@ from mitxgraders.helpers.calc.exceptions import (
 )
 from mitxgraders import ListGrader
 from mitxgraders.comparers import equality_comparer
-from tests.helpers import log_results, mock, round_decimals_in_string
+from tests.helpers import log_results, round_decimals_in_string
 
 def test_square_root_of_negative_number():
     grader = FormulaGrader(

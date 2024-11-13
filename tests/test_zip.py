@@ -5,15 +5,10 @@ from __future__ import print_function, division, absolute_import
 
 
 import os
+from importlib import reload
 import pytest
 import mitxgraders
 
-try:
-    # for Python 3
-    from importlib import reload
-except ImportError:
-    # reload is builtin in Python 2
-    pass
 
 @pytest.fixture()
 def loadzip():

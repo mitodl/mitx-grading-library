@@ -33,13 +33,6 @@ def test_coerce_string_keys_to_text_type():
         0: 'digit'
     }
 
-    # In Python 2, our dictionary contains some string keys that are not text
-    # (unicode) strings
-    if six.PY2:
-        string_but_not_text = lambda x: (isinstance(x, six.string_types) and
-                                         not isinstance(x, six.text_type))
-        assert any(string_but_not_text(key) for key in a_dict)
-
     result = coerce_string_keys_to_text_type(a_dict)
     string_keys = [key for key in result if isinstance(key, six.string_types)]
 
