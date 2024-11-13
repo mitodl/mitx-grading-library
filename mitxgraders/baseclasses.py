@@ -20,7 +20,6 @@ from voluptuous.humanize import validate_with_humanized_errors as voluptuous_val
 from mitxgraders.version import __version__
 from mitxgraders.exceptions import ConfigError, MITxError, StudentFacingError
 from mitxgraders.helpers.validatorfuncs import is_callable
-from mitxgraders.helpers.compatibility import ensure_text
 
 class DefaultValuesMeta(abc.ABCMeta):
     """
@@ -97,7 +96,7 @@ class ObjectWithSchema(object):
         with other references remaining intact.
         """
         if isinstance(obj, six.string_types):
-            return ensure_text(obj)
+            return str(obj)
         elif isinstance(obj, tuple):
             return tuple(ObjectWithSchema.coerce2unicode(item) for item in obj)
         elif isinstance(obj, list):

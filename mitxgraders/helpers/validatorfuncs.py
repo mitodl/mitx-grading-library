@@ -9,7 +9,6 @@ from collections import defaultdict
 from numbers import Number
 import six
 from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth, Coerce
-from mitxgraders.helpers.compatibility import ensure_text
 from mitxgraders.helpers.get_number_of_args import get_number_of_args
 
 def Positive(thetype):
