@@ -9,7 +9,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from numbers import Number
 from voluptuous import Schema, Invalid, Required, Any
 from mitxgraders.helpers.compatibility import wraps
-from mitxgraders.helpers.validatorfuncs import is_shape_specification, Nullable, text_string, Positive
+from mitxgraders.helpers.validatorfuncs import is_shape_specification, Nullable, Positive
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.helpers.calc.exceptions import ArgumentShapeError, ArgumentError
 from mitxgraders.exceptions import ConfigError
@@ -240,7 +240,7 @@ class SpecifyDomain(ObjectWithSchema):
         Required('input_shapes'): [Schema(
             Any(is_shape_specification(), 'square')
         )],
-        Required('display_name', default=None): Nullable(text_string),
+        Required('display_name', default=None): Nullable(str),
         Required('min_length', default=None): Nullable(Positive(int))
     })
 

@@ -12,7 +12,7 @@ from mitxgraders.sampling import schema_user_functions_no_random, DependentSampl
 from mitxgraders.exceptions import MissingInput
 from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.helpers.calc import evaluator, DEFAULT_VARIABLES
-from mitxgraders.helpers.validatorfuncs import NonNegative, PercentageString, is_callable_with_args, text_string
+from mitxgraders.helpers.validatorfuncs import NonNegative, PercentageString, is_callable_with_args
 from mitxgraders.helpers.math_helpers import MathMixin
 from mitxgraders.helpers.calc.mathfuncs import merge_dicts
 
@@ -168,7 +168,7 @@ class FormulaGrader(ItemGrader, MathMixin):
         })
 
     schema_expect = Schema({
-        Required('comparer_params'): [text_string],
+        Required('comparer_params'): [str],
         # Functions seem not to be usable as default values, so the default comparer is added later.
         # https://github.com/alecthomas/voluptuous/issues/340
         Required('comparer'): is_callable_with_args(3)

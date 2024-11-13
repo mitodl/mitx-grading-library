@@ -18,7 +18,7 @@ from mitxgraders.baseclasses import AbstractGrader
 from mitxgraders.comparers import equality_comparer
 from mitxgraders.exceptions import (InvalidInput, ConfigError,
                                     StudentFacingError, MissingInput, MITxError)
-from mitxgraders.helpers.validatorfuncs import Positive, text_string, NonNegative, PercentageString
+from mitxgraders.helpers.validatorfuncs import Positive, NonNegative, PercentageString
 from mitxgraders.helpers.math_helpers import MathMixin
 from mitxgraders.helpers.calc import evaluator, DEFAULT_VARIABLES, parse
 from mitxgraders.helpers.calc.mathfuncs import merge_dicts
@@ -350,10 +350,10 @@ class IntegralGrader(SummationGraderBase):
         }
         return schema.extend({
             Required('answers'): {
-                Required('lower'): text_string,
-                Required('upper'): text_string,
-                Required('integrand'): text_string,
-                Required('integration_variable'): text_string
+                Required('lower'): str,
+                Required('upper'): str,
+                Required('integrand'): str,
+                Required('integration_variable'): str
             },
             Required('input_positions', default=default_input_positions): {
                 Required('lower', default=None): Any(None, Positive(int)),
@@ -649,10 +649,10 @@ class SumGrader(SummationGraderBase):
         }
         return schema.extend({
             Required('answers'): {
-                Required('lower'): text_string,
-                Required('upper'): text_string,
-                Required('summand'): text_string,
-                Required('summation_variable'): text_string
+                Required('lower'): str,
+                Required('upper'): str,
+                Required('summand'): str,
+                Required('summation_variable'): str
             },
             Required('input_positions', default=default_input_positions): {
                 Required('lower', default=None): Any(None, Positive(int)),

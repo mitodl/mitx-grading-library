@@ -31,10 +31,3 @@ def test_argument_number_of_RandomFunction():
     """Tests to make sure we can extract the number of inputs expected for a random function"""
     func = RandomFunction(input_dim=3).gen_sample()
     assert validatorfuncs.get_number_of_args(func) == 3
-
-def test_text_string():
-    assert isinstance(validatorfuncs.text_string('Leo'), six.text_type)
-    assert isinstance(validatorfuncs.text_string(six.u('Leo')), six.text_type)
-
-    with raises(Invalid, match=r"expected str \(or unicode\)"):
-        validatorfuncs.text_string([1, 2, 3])

@@ -56,7 +56,7 @@ import six
 from voluptuous import Schema, Required, Any, Range, All
 
 from mitxgraders.exceptions import InputTypeError, StudentFacingError
-from mitxgraders.helpers.validatorfuncs import is_callable, Nullable, text_string
+from mitxgraders.helpers.validatorfuncs import is_callable, Nullable
 from mitxgraders.helpers.calc.mathfuncs import is_nearly_zero
 from mitxgraders.helpers.calc.math_array import are_same_length_vectors, is_vector
 from mitxgraders.comparers.baseclasses import Comparer, CorrelatedComparer
@@ -186,7 +186,7 @@ class MatrixEntryComparer(CorrelatedComparer):
     default_msg = "Some array entries are incorrect, marked below:\n{error_locations}"
     schema_config = EqualityComparer.schema_config.extend({
         Required('entry_partial_credit', default=0): Any(All(float, Range(0, 1)), 0, 1, 'proportional'),
-        Required('entry_partial_msg', default=default_msg): text_string
+        Required('entry_partial_msg', default=default_msg): str
     })
 
     @staticmethod
