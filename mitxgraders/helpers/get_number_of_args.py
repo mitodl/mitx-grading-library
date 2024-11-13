@@ -1,41 +1,5 @@
 import inspect
-import six
 
-def get_builtin_positional_args_py2(obj):
-    """
-    Get the number of position arguments on a built-in function by inspecting
-    its docstring. (Built-in functions cannot be inspected by inspect.inspect.getargspec.)
-
-    NOTES:
-        - Only works in Python 2: depends on structure of builtin docstrings,
-          which changed from py2 to py3
-    """
-    # Built-in functions cannot be inspected by
-    # inspect.inspect.getargspec. We have to try and parse
-    # the __doc__ attribute of the function.
-    # In Python 2, builtin docstrings begin with a line that reveals
-    # the signature, for example, pow.__doc__ looks like:
-    # """
-    # pow(...)
-    # pow(x, y[, z]) -> number
-    #
-    # With two arguments, equivalent to x**y...
-    # """
-    docstr = obj.__doc__
-    if docstr:
-        items = docstr.split('\n')
-        if items:
-            func_descr = items[0]
-            s = func_descr.replace(obj.__name__, '')
-            idx1 = s.find('(')
-            idx_default = s.find('[')
-            idx2 = s.find(')') if idx_default == -1 else idx_default
-            if idx1 != -1 and idx2 != -1 and (idx2 > idx1+1):
-                argstring = s[idx1+1:idx2]
-                # This gets the argument string
-                # Count the number of commas!
-                return argstring.count(",") + 1
-    return 0  # pragma: no cover
 
 def get_number_of_args(callable_obj):
     """
