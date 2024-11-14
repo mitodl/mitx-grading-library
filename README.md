@@ -6,7 +6,7 @@ A library of graders for edX Custom Response problems.
 
 Version 2.4.1 ([changelog](docs/changelog.md))
 
-Copyright 2024 Jolyon Bloomfield and Chris Chudzicki
+Copyright 2017-2024 Jolyon Bloomfield and Chris Chudzicki
 
 Licensed under the [BSD-3 License](LICENSE).
 
@@ -39,7 +39,7 @@ To install:
 
 0. (Optional) Create and activate a new Python Virtual Environment.
 1. Clone this repository and `cd` into it.
-2. Run `pip install -r requirements.txt` to install the requirements specified in `requirements.txt`.
+2. Run `pip install -r requirements-python38.txt` or `pip install -r requirements-python311.txt` to install the requirements based on the Python version you want to test.
 3. Run `pytest` to check that tests are passing. (To invoke tests of just the documentation, you can run the following command: `python -m pytest --no-cov --disable-warnings docs/*`)
 
 

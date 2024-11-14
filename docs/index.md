@@ -20,7 +20,7 @@ Use MITxGraders because it:
 - is reliable (extensively tested)
 - is open source (BSD-3 license, [our Github repo](https://github.com/mitodl/mitx-grading-library))
 - has an [excellent example edX course](https://edge.edx.org/courses/course-v1:MITx+grading-library+examples/)
-- is ready for the future of edX by being compatible with python 2 and 3
+- is ready for the future of edX by being compatible with Python 3.8 and 3.11
 - is actively maintained
 
 

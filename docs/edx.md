@@ -120,4 +120,4 @@ We want to stress the simplicity of this example compared to implementing the sa
 
 ## Note on Python Version
 
-Older versions of edX used python 2.7 in custom graders, while newer versions use python 3.5. The library works seamlessly with both versions, although some matrix math functionality requires python 3.5. The python version is automatically selected by the edX server. No changes to the XML code are required to work with either version of python.
+The Python version is automatically selected by the edX server. No changes to the XML code are required.
