@@ -199,16 +199,17 @@ class MatrixEntryComparer(CorrelatedComparer):
             format_string: a string that may contain {error_locations} formatting key.
             locs: a boolean array with False values indicating incorrect entries
         """
-        # Not the most elegant way to do these replacements, but this was what
-        # I came up with to minimize the amount of extra u prefixes in Python 2
-
         # These are the edX colors, at least as of July 2019
         bad_str = '<span style="color:#b20610">\u2717</span>'
         good_str = '<span style="color:#008100">\u2713</span>'
-        matrix_as_text = six.text_type(locs).replace("  ", " ").replace("[ ", "[")
-        matrix_as_text = matrix_as_text.replace("True", good_str).replace("False", bad_str)
+
+        # Replace True/False with corresponding colored symbols
+        matrix_as_text = str(locs).replace("  ", " ").replace("[ ", "[").replace("True", good_str).replace("False", bad_str)
         matrix_as_text = matrix_as_text.replace('\n', '<br/>')
-        formatted_locs = '<pre>{mat}</pre>'.format(mat=matrix_as_text)
+        
+        # Format the message with the error locations diagram
+        formatted_locs = f'<pre>{matrix_as_text}</pre>'
+        
         return format_string.format(error_locations=formatted_locs)
 
     @staticmethod
