@@ -158,9 +158,9 @@ def test_unitary():
                 m = matrices.gen_sample()
                 assert m.shape == (shape, shape)
                 assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(shape)), 1e-14)
-                assert approx(np.abs(np.linalg.det(m)), 1)
+                assert np.abs(np.linalg.det(m)) == approx(1)
                 if det:
-                    assert approx(np.linalg.det(m), 1)
+                    assert np.linalg.det(m) == approx(1)
                 assert isinstance(m, MathArray)
 
 def test_orthogonal():
@@ -209,10 +209,10 @@ def test_orthogonal():
                 assert m.shape == (shape, shape)
                 assert np.array_equal(np.conj(m), m)
                 assert within_tolerance(m * np.transpose(m), MathArray(np.eye(shape)), 1e-14)
-                assert (approx(np.abs(np.linalg.det(m)), 1)
-                        or approx(np.abs(np.linalg.det(m)), -1))
+                assert (np.abs(np.linalg.det(m)) == approx(1)
+                        or np.abs(np.linalg.det(m)) == approx(-1))
                 if det:
-                    assert approx(np.linalg.det(m), 1)
+                    assert np.linalg.det(m) == approx(1)
                 assert isinstance(m, MathArray)
 
 def test_square_matrices():

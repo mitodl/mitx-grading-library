@@ -1,0 +1,19 @@
+# Used by the library
+# (taken from Redwood Open edX version)
+numpy==1.24.4
+scipy==1.10.1
+pyparsing==3.1.2
+six==1.16.0
+
+# For testing
+pytest
+pytest-cov
+codecov
+
+# For documentation
+mkdocs
+mkdocs-cinder
+pygments
+
+# For uploading to edge
+requests

@@ -6,4 +6,4 @@ Unfortunately, no. Those problem types cannot be used in a `customresponse` prob
 
 - Does the grader work with python 2 or python 3?
 
-It works with both! Older versions of edX ran python graders in python 2.7; newer versions use python 3.5. The library works seamlessly with both. No changes to any code are required to switch between versions. Some functionality requires python 3.5 however.
+It works with both! Older versions of edX ran python graders in python 2.7; newer versions use python 3.8. The library works seamlessly with both. No changes to any code are required to switch between versions. Some functionality requires python 3.5 however.
