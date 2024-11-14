@@ -42,5 +42,3 @@ def coerce_string_keys_to_text_type(thedict):
             result[key] = thedict[key]
 
     return result
-
-UNICODE_PREFIX = 'u' if six.PY2 else ''
