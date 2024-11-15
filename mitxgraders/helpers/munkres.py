@@ -70,14 +70,14 @@ and calculate the smallest cost of the combinations:
     print minval
 
 While this approach works fine for small matrices, it does not scale. It
-executes in O(*n*!) time: Calculating the permutations for an *n*\ x\ *n*
+executes in O(*n*!) time: Calculating the permutations for an *n*\\ x\\ *n*
 matrix requires *n*! operations. For a 12x12 matrix, that's 479,001,600
 traversals. Even if you could manage to perform each traversal in just one
 millisecond, it would still take more than 133 hours to perform the entire
 traversal. A 20x20 matrix would take 2,432,902,008,176,640,000 operations. At
 an optimistic millisecond per operation, that's more than 77 million years.
 
-The Munkres algorithm runs in O(*n*\ ^3) time, rather than O(*n*!). This
+The Munkres algorithm runs in O(*n*\\ ^3) time, rather than O(*n*!). This
 package provides an implementation of that algorithm.
 
 This version is based on
