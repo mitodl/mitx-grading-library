@@ -24,7 +24,6 @@ __all__ = [
 
 class _AutomaticFailure(object):  # pylint: disable=too-few-public-methods
     """Used as padding when grading unknown number of inputs on a single input line"""
-    pass
 
 def find_optimal_order(check, answers, student_list):
     """

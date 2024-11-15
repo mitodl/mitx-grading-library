@@ -146,7 +146,6 @@ class ObjectWithSchema(metaclass=DefaultValuesMeta):
         Allows an ObjectWithSchema to save any modified defaults for later use.
         This function is intended to be shadowed as necessary.
         """
-        pass
 
     def __repr__(self):
         """Printable representation of the object"""

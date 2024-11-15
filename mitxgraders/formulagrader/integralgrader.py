@@ -72,11 +72,9 @@ def transform_list_to_dict(thelist, thedefaults, key_to_index_map):
 
 class IntegrationError(StudentFacingError):
     """Represents an error associated with integration"""
-    pass
 
 class SummationError(StudentFacingError):
     """Represents an error associated with summation"""
-    pass
 
 def check_output_is_real(func, error, message):
     """Decorate a function to check that its output is real or raise error with specifed message."""
