@@ -110,7 +110,7 @@ class IntervalGrader(SingleListGrader):
 
         # If 'expect' is a string, use infer_from_expect to convert it to a list.
         for entry in answer_tuple:
-            entry['expect'] = tuple(self.infer_from_expect(x) if isinstance(x, six.string_types) else x
+            entry['expect'] = tuple(self.infer_from_expect(x) if isinstance(x, str) else x
                                     for x in entry['expect'])
 
         # Assert that all answers have length 4

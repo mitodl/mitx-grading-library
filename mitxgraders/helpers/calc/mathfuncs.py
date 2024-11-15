@@ -449,7 +449,7 @@ def within_tolerance(x, y, tolerance):
 
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
-    if isinstance(tolerance, six.text_type):
+    if isinstance(tolerance, str):
         tolerance = np.linalg.norm(x) * percentage_as_number(tolerance)
 
     difference = x - y
@@ -496,7 +496,7 @@ def is_nearly_zero(x, tolerance, reference=None):
     """
     # When used within graders, tolerance has already been
     # validated as a Number or PercentageString
-    if isinstance(tolerance, six.text_type):
+    if isinstance(tolerance, str):
         if reference is None:
             raise ValueError('When tolerance is a percentage, reference must '
                 'not be None.')

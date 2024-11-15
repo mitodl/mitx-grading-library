@@ -1017,7 +1017,7 @@ class MathExpression(object):
         while data:
             # Result contains the current exponent
             working = data.pop()
-            if isinstance(working, six.text_type) and working == "-":
+            if isinstance(working, str) and working == "-":
                 result = -result
             else:
                 # working is base, result is exponent
@@ -1154,7 +1154,7 @@ class MathExpression(object):
         """
         data = parse_result[:]
         result = data.pop(0)
-        if isinstance(result, six.text_type) and result == "+":
+        if isinstance(result, str) and result == "+":
             result = data.pop(0)
         while data:
             op = data.pop(0)

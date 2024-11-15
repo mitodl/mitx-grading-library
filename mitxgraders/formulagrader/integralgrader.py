@@ -211,7 +211,7 @@ class SummationGraderBase(AbstractGrader, MathMixin):
             return self.check_math_response(answers, structured_input)
         except IntegrationError as error:
             msg = "There appears to be an error with the {} you entered: {}"
-            raise IntegrationError(msg.format(self.wording['noun'], six.text_type(error)))
+            raise IntegrationError(msg.format(self.wording['noun'], str(error)))
 
     def raw_check(self, answer, student_input, **kwargs):
         """Perform the numerical check of student_input vs answer"""
@@ -438,7 +438,7 @@ class IntegralGrader(SummationGraderBase):
                 )
             except IntegrationError as error:
                 msg = "Integration Error with author's stored answer: {}"
-                raise ConfigError(msg.format(six.text_type(error)))
+                raise ConfigError(msg.format(str(error)))
 
             # Before performing student evaluation, scrub the instructor
             # variables so that students can't use them
@@ -719,7 +719,7 @@ class SumGrader(SummationGraderBase):
                 )
             except MITxError as error:
                 msg = "Summation Error with author's stored answer: {}"
-                raise ConfigError(msg.format(six.text_type(error)))
+                raise ConfigError(msg.format(str(error)))
 
             # Before performing student evaluation, scrub the instructor
             # variables so that students can't use them

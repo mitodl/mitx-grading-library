@@ -681,7 +681,7 @@ class SingleListGrader(ItemGrader):
 
         # Step 1: If there is a string in the expect tuple, use infer_from_expect to convert it to a list.
         for entry in answer_tuple:
-            entry['expect'] = tuple(self.infer_from_expect(x) if isinstance(x, six.string_types) else x
+            entry['expect'] = tuple(self.infer_from_expect(x) if isinstance(x, str) else x
                                     for x in entry['expect'])
 
         # Check that all lists have the same length
@@ -835,7 +835,7 @@ def demand_no_empty(obj):
             demand_no_empty(item)
     elif isinstance(obj, dict) and 'expect' in obj:
         demand_no_empty(obj['expect'])
-    elif isinstance(obj, six.string_types):
+    elif isinstance(obj, str):
         msg = ("There is a problem with the author's problem configuration: "
                "Empty entry detected in answer list. Students receive an error "
                "when supplying an empty entry. Set 'missing_error' to False in "

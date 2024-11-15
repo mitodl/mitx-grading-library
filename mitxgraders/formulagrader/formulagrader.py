@@ -186,7 +186,7 @@ class FormulaGrader(ItemGrader, MathMixin):
         >>> result == expected
         True
         """
-        if isinstance(expect, six.string_types):
+        if isinstance(expect, str):
             return self.schema_expect({
                 'comparer': self.default_comparer,
                 'comparer_params': [expect]

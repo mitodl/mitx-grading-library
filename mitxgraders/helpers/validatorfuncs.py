@@ -24,7 +24,7 @@ def NonNegative(thetype):
 
 def PercentageString(value):
     """Validate that a string can be interpreted as a positive percentage."""
-    if isinstance(value, six.string_types):
+    if isinstance(value, str):
         work = value.strip()
         if work.endswith("%"):
             try:
@@ -128,7 +128,7 @@ def has_keys_of_type(thetype):
 
     Returns argument if valid:
     >>> valid = {'0': 'a', '1': 'b', 'cat': [1, 2]}
-    >>> validator = has_keys_of_type(six.text_type)
+    >>> validator = has_keys_of_type(str)
     >>> validator(valid) == valid
     True
 
@@ -149,10 +149,10 @@ def has_keys_of_type(thetype):
     ...     print(error)
     expected a dictionary with keys of <... 'int'>
     """
-    if thetype == six.string_types:
+    if thetype == str:
         formatted_thetype = 'type string'
     else:
-        formatted_thetype = six.text_type(thetype)
+        formatted_thetype = str(thetype)
 
     def validator(thedict):
         if not isinstance(thedict, dict):

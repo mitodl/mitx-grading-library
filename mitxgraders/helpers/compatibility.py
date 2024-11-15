@@ -35,7 +35,7 @@ def coerce_string_keys_to_text_type(thedict):
     """
     result = {}
     for key in thedict:
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             new_key = str(key)
             result[new_key] = thedict[key]
         else:
