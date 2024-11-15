@@ -325,7 +325,7 @@ def test_ensure_text_inputs():
     ensure_text_inputs = AbstractGrader.ensure_text_inputs
 
     # Lists are ok
-    valid_inputs = ['cat', six.u('dog')]
+    valid_inputs = ['cat', 'dog']
     if six.PY2:
         assert not isinstance(valid_inputs[0], str)
         assert isinstance(valid_inputs[1], str)
@@ -334,7 +334,7 @@ def test_ensure_text_inputs():
 
     # single text is ok
     assert isinstance(ensure_text_inputs('cat'), str)
-    assert isinstance(ensure_text_inputs(six.u('cat')), str)
+    assert isinstance(ensure_text_inputs('cat'), str)
 
     # empty lists are ok:
     assert ensure_text_inputs([]) == []
