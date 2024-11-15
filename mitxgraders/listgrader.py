@@ -15,7 +15,7 @@ from voluptuous import Required, Any, Schema
 from mitxgraders.helpers import munkres
 from mitxgraders.baseclasses import AbstractGrader, ItemGrader
 from mitxgraders.exceptions import ConfigError, MissingInput
-from mitxgraders.helpers.validatorfuncs import Positive, text_string
+from mitxgraders.helpers.validatorfuncs import Positive
 
 # Set the objects to be imported from this grader
 __all__ = [
@@ -645,7 +645,7 @@ class SingleListGrader(ItemGrader):
             Required('ordered', default=False): bool,
             Required('length_error', default=False): bool,
             Required('missing_error', default=True): bool,
-            Required('delimiter', default=','): text_string,
+            Required('delimiter', default=','): str,
             Required('partial_credit', default=True): bool,
             Required('subgrader'): ItemGrader
         })
@@ -718,7 +718,7 @@ class SingleListGrader(ItemGrader):
         This should be either a list or a string. If a string is provided,
         it will be split into a list by post_schema_ans_val.
         """
-        return Schema(Any(list, text_string))(expect)
+        return Schema(Any(list, str))(expect)
 
     def check_response(self, answer, student_input, **kwargs):
         """Check student_input against a given answer list"""

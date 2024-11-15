@@ -56,8 +56,3 @@ def round_decimals_in_string(string, round_to=6):
         return formatter.format(number)
 
     return re.sub(pattern, replacer, string)
-
-try:
-    import unittest.mock as mock # Python 3
-except ImportError:
-    import mock # Python 2

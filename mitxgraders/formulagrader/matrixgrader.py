@@ -12,7 +12,7 @@ from voluptuous import Required, Any, Range, All, Optional
 from mitxgraders.exceptions import InputTypeError
 from mitxgraders.comparers import MatrixEntryComparer, equality_comparer
 from mitxgraders.formulagrader.formulagrader import FormulaGrader
-from mitxgraders.helpers.validatorfuncs import NonNegative, Nullable, text_string
+from mitxgraders.helpers.validatorfuncs import NonNegative, Nullable
 from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
 from mitxgraders.helpers.calc.exceptions import (
     MathArrayShapeError as ShapeError, MathArrayError, DomainError, ArgumentShapeError)
@@ -97,7 +97,7 @@ class MatrixGrader(FormulaGrader):
                 Required('msg_detail', default='type'): Any(None, 'type', 'shape')
             },
             Optional('entry_partial_credit'): Any(All(Number, Range(0, 1)), 'proportional'),
-            Optional('entry_partial_msg'): text_string,
+            Optional('entry_partial_msg'): str,
             Required('allow_inf', default=False): False,  # Ensure that this is turned off
         })
 

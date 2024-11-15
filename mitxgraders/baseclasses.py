@@ -19,8 +19,7 @@ from voluptuous import Schema, Required, All, Any, Range, MultipleInvalid
 from voluptuous.humanize import validate_with_humanized_errors as voluptuous_validate
 from mitxgraders.version import __version__
 from mitxgraders.exceptions import ConfigError, MITxError, StudentFacingError
-from mitxgraders.helpers.validatorfuncs import text_string, Positive, is_callable
-from mitxgraders.helpers.compatibility import ensure_text
+from mitxgraders.helpers.validatorfuncs import is_callable
 
 class DefaultValuesMeta(abc.ABCMeta):
     """
@@ -97,7 +96,7 @@ class ObjectWithSchema(object):
         with other references remaining intact.
         """
         if isinstance(obj, six.string_types):
-            return ensure_text(obj)
+            return str(obj)
         elif isinstance(obj, tuple):
             return tuple(ObjectWithSchema.coerce2unicode(item) for item in obj)
         elif isinstance(obj, list):
@@ -433,9 +432,9 @@ class AbstractGrader(ObjectWithSchema):
         # Try to perform validation
         try:
             if allow_lists and isinstance(student_input, list):
-                return Schema([text_string])(student_input)
+                return Schema([str])(student_input)
             elif allow_single and not isinstance(student_input, list):
-                return Schema(text_string)(student_input)
+                return Schema(str)(student_input)
         except MultipleInvalid as error:
             if allow_lists:
                 pos = error.path[0] if error.path else None
@@ -513,7 +512,7 @@ class ItemGrader(AbstractGrader):
         schema = super(ItemGrader, self).schema_config
         return schema.extend({
             Required('answers', default=tuple()): self.schema_answers,
-            Required('wrong_msg', default=""): text_string
+            Required('wrong_msg', default=""): str
         })
 
     def schema_answers(self, answer_tuple):
@@ -582,7 +581,7 @@ class ItemGrader(AbstractGrader):
         return Schema({
             Required('expect'): self.validate_expect_tuple,
             Required('grade_decimal', default=1): All(numbers.Number, Range(0, 1)),
-            Required('msg', default=''): text_string,
+            Required('msg', default=''): str,
             Required('ok', default='computed'): Any('computed', True, False, 'partial')
         })
 
@@ -602,7 +601,7 @@ class ItemGrader(AbstractGrader):
 
         Usually this is a just a string.
         """
-        return Schema(text_string)(expect)
+        return Schema(str)(expect)
 
     @staticmethod
     def standardize_cfn_return(value):

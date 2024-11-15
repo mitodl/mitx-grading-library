@@ -11,13 +11,10 @@ def wraps(wrapped,
           updated=functools.WRAPPER_UPDATES):
     """
     A light wrapper around functools.wraps to facilitate compatibility with
-    Python 2, Python 3, and numpy ufuncs.
+    Python 3, and numpy ufuncs.
 
-    Primary differences from Python 2's functools.wraps:
-        - uses try/accept for attribute reassignment (Python 3 functools.wraps
-          does this already)
-        - uses __name__ as __qualname__ if __qualname__ doesn't exist
-          (this helps with numpy ufuncs, which do not have a __qualname__)
+    Uses __name__ as __qualname__ if __qualname__ doesn't exist
+    (this helps with numpy ufuncs, which do not have a __qualname__)
 
     References:
         functools source:
@@ -32,23 +29,6 @@ def wraps(wrapped,
         return _f
     return _wrapper
 
-# This is copied from six repo; was added in version 1.12.0, but edX uses 1.11.0
-def ensure_text(s, encoding='utf-8', errors='strict'):
-    """Coerce *s* to six.text_type.
-    For Python 2:
-      - `unicode` -> `unicode`
-      - `str` -> `unicode`
-    For Python 3:
-      - `str` -> `str`
-      - `bytes` -> decoded to `str`
-    """
-    if isinstance(s, six.binary_type):
-        return s.decode(encoding, errors)
-    elif isinstance(s, six.text_type):
-        return s
-    else:
-        raise TypeError("not expecting type '%s'" % type(s))
-
 def coerce_string_keys_to_text_type(thedict):
     """
     Ensures that dictionary string keys are text strings.
@@ -56,11 +36,9 @@ def coerce_string_keys_to_text_type(thedict):
     result = {}
     for key in thedict:
         if isinstance(key, six.string_types):
-            new_key = ensure_text(key)
+            new_key = str(key)
             result[new_key] = thedict[key]
         else:
             result[key] = thedict[key]
 
     return result
-
-UNICODE_PREFIX = 'u' if six.PY2 else ''

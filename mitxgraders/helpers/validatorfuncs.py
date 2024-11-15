@@ -9,7 +9,6 @@ from collections import defaultdict
 from numbers import Number
 import six
 from voluptuous import All, Range, NotIn, Invalid, Schema, Any, Required, Length, truth, Coerce
-from mitxgraders.helpers.compatibility import ensure_text
 from mitxgraders.helpers.get_number_of_args import get_number_of_args
 
 def Positive(thetype):
@@ -268,13 +267,3 @@ def Nullable(schema):
     Indicates that a value could be None or satisfy schema.
     """
     return Any(None, schema)
-
-def text_string(obj):
-    """
-    Voluptuous validator that expects text strings and coerces Python 2 string
-    literals to unicode.
-    """
-    if isinstance(obj, six.string_types):
-        return ensure_text(obj)
-
-    raise Invalid('expected str (or unicode)')

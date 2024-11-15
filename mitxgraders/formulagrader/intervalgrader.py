@@ -15,7 +15,6 @@ from mitxgraders.stringgrader import StringGrader
 from mitxgraders.listgrader import SingleListGrader, demand_no_empty
 from mitxgraders.formulagrader.formulagrader import FormulaGrader, NumericalGrader
 from mitxgraders.exceptions import ConfigError, InvalidInput, MissingInput
-from mitxgraders.helpers.validatorfuncs import text_string
 
 class IntervalGrader(SingleListGrader):
     """
@@ -83,8 +82,8 @@ class IntervalGrader(SingleListGrader):
             # Subgrader default is set to NumericalGrader(tolerance=1e-13, allow_inf=True)
             # in initialization
             Required('subgrader', default=None): Any(FormulaGrader, None),
-            Required('opening_brackets', default='[('): All(text_string, Length(min=1)),
-            Required('closing_brackets', default='])'): All(text_string, Length(min=1))
+            Required('opening_brackets', default='[('): All(str, Length(min=1)),
+            Required('closing_brackets', default='])'): All(str, Length(min=1))
         })
 
     def __init__(self, config=None, **kwargs):

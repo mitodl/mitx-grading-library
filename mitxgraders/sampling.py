@@ -33,7 +33,7 @@ from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
-    has_keys_of_type, text_string, Nullable)
+    has_keys_of_type, Nullable)
 from mitxgraders.helpers.compatibility import coerce_string_keys_to_text_type
 from mitxgraders.helpers.calc import (
     METRIC_SUFFIXES, CalcError, evaluator, parse, MathArray)
@@ -408,8 +408,8 @@ class DependentSampler(VariableSamplingSet):
 
     # Take in an individual or tuple of numbers
     schema_config = Schema({
-        Required('depends', default=None): Nullable([text_string]),
-        Required('formula'): text_string
+        Required('depends', default=None): Nullable([str]),
+        Required('formula'): str
     })
 
     def __init__(self, config=None, **kwargs):

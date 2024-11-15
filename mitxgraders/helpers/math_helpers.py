@@ -26,7 +26,7 @@ from mitxgraders.sampling import (VariableSamplingSet, RealInterval, DiscreteSet
 from mitxgraders.helpers.calc import (DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, DEFAULT_SUFFIXES,
                                       MathArray, parse, within_tolerance)
 from mitxgraders.helpers.validatorfuncs import (Positive, NonNegative, all_unique,
-                                                PercentageString, text_string)
+                                                PercentageString)
 
 
 def validate_blacklist_whitelist_config(default_funcs, blacklist, whitelist):
@@ -416,22 +416,22 @@ class MathMixin(object):
         Required('user_constants', default={}): validate_user_constants(Number, MathArray),
         # Blacklist/Whitelist have additional validation that can't happen here, because
         # their validation is correlated with each other
-        Required('blacklist', default=[]): [text_string],
+        Required('blacklist', default=[]): [str],
         Required('whitelist', default=[]): Any(
             All([None], Length(min=1, max=1)),
-            [text_string]
+            [str]
         ),
         Required('tolerance', default='0.01%'): Any(PercentageString, NonNegative(Number)),
         Required('samples', default=5): Positive(int),
-        Required('variables', default=[]): All([text_string], all_unique),
-        Required('numbered_vars', default=[]): All([text_string], all_unique),
+        Required('variables', default=[]): All([str], all_unique),
+        Required('numbered_vars', default=[]): All([str], all_unique),
         Required('sample_from', default={}): dict,
         Required('failable_evals', default=0): NonNegative(int),
-        Required('forbidden_strings', default=[]): [text_string],
-        Required('forbidden_message', default="Invalid Input: This particular answer is forbidden"): text_string,
+        Required('forbidden_strings', default=[]): [str],
+        Required('forbidden_message', default="Invalid Input: This particular answer is forbidden"): str,
         Required('metric_suffixes', default=False): bool,
-        Required('required_functions', default=[]): [text_string],
-        Required('instructor_vars', default=[]): [text_string],
+        Required('required_functions', default=[]): [str],
+        Required('instructor_vars', default=[]): [str],
     }
     
     def validate_math_config(self):

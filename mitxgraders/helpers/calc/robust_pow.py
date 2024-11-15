@@ -23,9 +23,4 @@ def robust_pow(base, exponent):
     >>> np.allclose(almost_j, 1j)
     True
     """
-    try:
-        return base ** exponent
-    except ValueError:
-        # In Python 2, (-1)**0.5 raises a ValueError
-        # In Python 3, (-1)**0.5 returns the correct value
-        return np.lib.scimath.power(base, exponent)
+    return base ** exponent
