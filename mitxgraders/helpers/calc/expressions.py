@@ -791,7 +791,7 @@ class MathExpression(object):
         value = variables[parse_result[0]]
         value = copy.copy(value)
         # Convert python long integers to floats
-        if isinstance(value, six.integer_types):
+        if isinstance(value, int):
             value = float(value)
         return value
 
