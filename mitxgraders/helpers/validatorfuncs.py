@@ -3,7 +3,7 @@ validatorfuncs.py
 
 Stand-alone validator functions for use in voluptuous Schema
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 from collections import defaultdict
 from numbers import Number

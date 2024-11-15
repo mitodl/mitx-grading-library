@@ -3,7 +3,7 @@ matrixgrader.py
 
 Defines a FormulaGrader subtype that handles matrices, too.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 from numbers import Number
 from collections import namedtuple

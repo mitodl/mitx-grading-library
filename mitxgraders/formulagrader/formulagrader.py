@@ -1,8 +1,6 @@
 """
 formulagrader.py
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
-
 from numbers import Number
 from voluptuous import Schema, Required, Any, All, Invalid, Length
 from mitxgraders.comparers import equality_comparer

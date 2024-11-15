@@ -1,7 +1,7 @@
 """
 Tests of base class functionality
 """
-from __future__ import print_function, division, absolute_import
+
 
 import sys
 import platform

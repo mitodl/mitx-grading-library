@@ -4,8 +4,6 @@ integralgrader.py
 Contains IntegralGrader, a class for grading an integral problem, consisting of lower
 and upper limits, and integration variable, and an integrand.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
-
 from functools import wraps
 from numpy import real, imag
 from abc import abstractproperty

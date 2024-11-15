@@ -2,7 +2,7 @@
 This is a template file that also is used to test that the plugin loading
 mechanism is working.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 # Make sure that imports are working
 

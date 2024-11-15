@@ -7,7 +7,6 @@ Classes for grading inputs that look like lists:
 
 Both work by farming out the individual objects to other graders.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 
 import numpy as np
 from voluptuous import Required, Any, Schema

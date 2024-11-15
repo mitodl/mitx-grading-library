@@ -6,7 +6,6 @@ Contains base classes for the library:
 * AbstractGrader
 * ItemGrader
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 
 import numbers
 import abc

@@ -1,7 +1,7 @@
 """
 Tests for the various sampling classes
 """
-from __future__ import print_function, division, absolute_import
+
 
 from itertools import product
 import numpy as np

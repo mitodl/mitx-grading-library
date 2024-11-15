@@ -14,7 +14,6 @@ Contains classes for sampling vector/matrix/tensor values:
 * UnitaryMatrices
 All of these classes perform random sampling. To obtain a sample, use class.gen_sample()
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 import numpy as np
 
 from voluptuous import Schema, Required, All, Coerce, Any, Range

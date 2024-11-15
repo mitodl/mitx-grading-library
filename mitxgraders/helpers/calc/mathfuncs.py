@@ -12,7 +12,7 @@ Defines:
 * DEFAULT_SUFFIXES
 * METRIC_SUFFIXES
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 from numbers import Number
 import numpy as np

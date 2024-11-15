@@ -1,7 +1,7 @@
 """
 Tests of validatorfuncs.py
 """
-from __future__ import print_function, division, absolute_import
+
 
 from pytest import raises
 from voluptuous import Invalid, truth

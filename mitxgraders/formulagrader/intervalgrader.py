@@ -4,7 +4,7 @@ intervalgrader.py
 Grader for intervals consisting of two formula entries, as well
 as enclosing brackets.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 from voluptuous import Required, Any, All, Length
 

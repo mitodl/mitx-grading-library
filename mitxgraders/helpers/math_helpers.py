@@ -4,7 +4,7 @@ math_helpers.py
 Various helper routines for math graders.
 Also includes MathMixin, a mixin class for math graders.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 import itertools
 import re

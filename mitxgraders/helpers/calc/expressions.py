@@ -42,7 +42,7 @@ and also:
 Both `parse` and `evaluator` share a global MathParser instance for caching
 purposes.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 import copy
 from collections import namedtuple

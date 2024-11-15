@@ -9,7 +9,7 @@ renaming it to defaults.py, and modifying it according to your needs.
 This plug-in works by registering a dictionary with the appropriate grading class (note,
 not class instance).
 """
-# from __future__ import print_function, division, absolute_import, unicode_literals
+# 
 
 # # Here are all of the graders that you can specify defaults for
 # from mitxgraders.stringgrader import StringGrader

@@ -1,7 +1,7 @@
 """
 Tests for StringGrader
 """
-from __future__ import print_function, division, absolute_import
+
 from pytest import raises
 from mitxgraders import StringGrader
 from mitxgraders.exceptions import ConfigError, InvalidInput
