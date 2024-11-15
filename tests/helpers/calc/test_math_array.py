@@ -1,7 +1,6 @@
 from __future__ import print_function, division, absolute_import
 
 from pytest import raises
-import random
 import numpy as np
 from numbers import Number
 from mitxgraders.helpers.calc.math_array import (

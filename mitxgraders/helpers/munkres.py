@@ -781,7 +781,6 @@ def print_matrix(matrix, msg=None):
         msg : str
             Optional message to print before displaying the matrix
     """
-    import math
 
     if msg is not None:
         print(msg)

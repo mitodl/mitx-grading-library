@@ -6,13 +6,13 @@ as enclosing brackets.
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-from voluptuous import Required, Schema, Any, All, Length
+from voluptuous import Required, Any, All, Length
 
 from mitxgraders.baseclasses import AbstractGrader
 from mitxgraders.stringgrader import StringGrader
 from mitxgraders.listgrader import SingleListGrader, demand_no_empty
 from mitxgraders.formulagrader.formulagrader import FormulaGrader, NumericalGrader
-from mitxgraders.exceptions import ConfigError, InvalidInput, MissingInput
+from mitxgraders.exceptions import ConfigError, InvalidInput
 
 class IntervalGrader(SingleListGrader):
     """

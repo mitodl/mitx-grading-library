@@ -14,7 +14,7 @@ from mitxgraders.formulagrader.formulagrader import FormulaGrader
 from mitxgraders.helpers.validatorfuncs import NonNegative, Nullable
 from mitxgraders.helpers.calc import MathArray, within_tolerance, identity
 from mitxgraders.helpers.calc.exceptions import (
-    MathArrayShapeError as ShapeError, MathArrayError, DomainError, ArgumentShapeError)
+    MathArrayShapeError as ShapeError, MathArrayError, ArgumentShapeError)
 from mitxgraders.helpers.calc.mathfuncs import (
     merge_dicts, ARRAY_ONLY_FUNCTIONS)
 

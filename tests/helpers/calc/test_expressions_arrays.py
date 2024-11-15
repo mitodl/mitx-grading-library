@@ -4,7 +4,6 @@ tests of expression.py with arrays
 from __future__ import print_function, division, absolute_import
 
 from pytest import raises
-import numpy as np
 from mitxgraders import evaluator, MathArray
 from mitxgraders.helpers.calc.math_array import equal_as_arrays
 from mitxgraders.helpers.calc.exceptions import UnableToParse, CalcError

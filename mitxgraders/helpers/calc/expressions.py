@@ -54,7 +54,6 @@ from pyparsing import (
     Forward,
     Group,
     Literal,
-    MatchFirst,
     Optional,
     ParseResults,
     Suppress,
