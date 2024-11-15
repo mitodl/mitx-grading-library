@@ -326,9 +326,6 @@ def test_ensure_text_inputs():
 
     # Lists are ok
     valid_inputs = ['cat', 'dog']
-    if six.PY2:
-        assert not isinstance(valid_inputs[0], str)
-        assert isinstance(valid_inputs[1], str)
     result = ensure_text_inputs(valid_inputs)
     assert all(map(str, result))
 

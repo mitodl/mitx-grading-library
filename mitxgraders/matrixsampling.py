@@ -777,9 +777,7 @@ class OrthogonalMatrices(SquareMatrixSamplingSet):
 
     Usage:
     ======
-    >>> import six, pytest
-    >>> if six.PY2:
-    ...     pytest.skip('These doctests only work in python 3')
+    >>> import pytest
 
     By default, we generate 2x2 matrices:
     >>> matrices = OrthogonalMatrices()
@@ -852,9 +850,7 @@ class UnitaryMatrices(SquareMatrixSamplingSet):
 
     Usage:
     ======
-    >>> import six, pytest
-    >>> if six.PY2:
-    ...     pytest.skip('These doctests only work in python 3')
+    >>> import pytest
 
     By default, we generate 2x2 matrices:
     >>> matrices = UnitaryMatrices()
