@@ -32,7 +32,8 @@ class DefaultValuesMeta(abc.ABCMeta):
 class ObjectWithSchema(metaclass=DefaultValuesMeta):
     """Represents an author-facing object whose configuration needs validation."""
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def schema_config(self):
         """
         The schema that defines the configuration of this object.
@@ -183,7 +184,8 @@ class AbstractGrader(ObjectWithSchema):
             attempt number, present the student with a message explaining so (default True)
     """
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def schema_config(self):
         """
         Defines the default config schema for abstract graders.
