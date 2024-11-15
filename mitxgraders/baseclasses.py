@@ -11,7 +11,6 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 import numbers
 import abc
 import pprint
-import six
 import json
 import platform
 from decimal import Decimal

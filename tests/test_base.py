@@ -6,7 +6,6 @@ from __future__ import print_function, division, absolute_import
 import sys
 import platform
 from unittest import mock
-import six
 from importlib import reload
 from pytest import raises, approx
 from voluptuous import Error, Schema, Required

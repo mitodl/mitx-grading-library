@@ -6,7 +6,6 @@ from __future__ import print_function, division, absolute_import
 from itertools import product
 import numpy as np
 from pytest import raises, approx
-import six
 
 from mitxgraders import (
     RealVectors,

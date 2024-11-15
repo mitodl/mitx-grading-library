@@ -1,7 +1,6 @@
 from __future__ import print_function, division, absolute_import
 
 import re
-import six
 from pytest import raises
 from mitxgraders import (MatrixGrader, RealMatrices, RealVectors, ComplexRectangle)
 from mitxgraders.formulagrader.matrixgrader import InputTypeError

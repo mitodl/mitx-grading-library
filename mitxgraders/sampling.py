@@ -26,7 +26,6 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from numbers import Number
 import abc
 import random
-import six
 import numpy as np
 from voluptuous import Schema, Required, All, Coerce, Any, Extra
 from mitxgraders.baseclasses import ObjectWithSchema

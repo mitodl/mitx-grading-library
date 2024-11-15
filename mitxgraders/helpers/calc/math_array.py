@@ -7,7 +7,6 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from contextlib import contextmanager
 from numbers import Number
 import numpy as np
-import six
 from mitxgraders.helpers.calc.exceptions import (
     MathArrayError, MathArrayShapeError as ShapeError)
 from mitxgraders.helpers.calc.robust_pow import robust_pow

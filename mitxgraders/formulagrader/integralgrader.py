@@ -6,7 +6,6 @@ and upper limits, and integration variable, and an integrand.
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-import six
 from functools import wraps
 from numpy import real, imag
 from abc import abstractproperty

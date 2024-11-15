@@ -3,7 +3,6 @@ Helper functions to facilitate python2-python3 compatibility
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-import six
 import functools
 
 def wraps(wrapped,

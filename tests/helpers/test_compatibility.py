@@ -1,5 +1,4 @@
 from pytest import raises
-import six
 from mitxgraders.helpers.compatibility import coerce_string_keys_to_text_type
 
 def test_coerce_string_keys_to_text_type():

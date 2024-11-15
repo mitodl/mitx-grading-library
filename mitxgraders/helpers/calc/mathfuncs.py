@@ -14,7 +14,6 @@ Defines:
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-import six
 from numbers import Number
 import numpy as np
 from mitxgraders.helpers.calc.specify_domain import SpecifyDomain

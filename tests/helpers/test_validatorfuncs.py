@@ -3,7 +3,6 @@ Tests of validatorfuncs.py
 """
 from __future__ import print_function, division, absolute_import
 
-import six
 from pytest import raises
 from voluptuous import Invalid, truth, Schema
 from mitxgraders import RandomFunction

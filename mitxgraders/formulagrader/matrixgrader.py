@@ -7,7 +7,6 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 
 from numbers import Number
 from collections import namedtuple
-import six
 from voluptuous import Required, Any, Range, All, Optional
 from mitxgraders.exceptions import InputTypeError
 from mitxgraders.comparers import MatrixEntryComparer, equality_comparer

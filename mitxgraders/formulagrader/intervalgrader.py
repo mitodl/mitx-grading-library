@@ -6,8 +6,6 @@ as enclosing brackets.
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-import six
-
 from voluptuous import Required, Schema, Any, All, Length
 
 from mitxgraders.baseclasses import AbstractGrader

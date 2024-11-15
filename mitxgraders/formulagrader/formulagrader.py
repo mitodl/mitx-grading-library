@@ -5,7 +5,6 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 
 from numbers import Number
 import numpy as np
-import six
 from voluptuous import Schema, Required, Any, All, Invalid, Length
 from mitxgraders.comparers import equality_comparer
 from mitxgraders.sampling import schema_user_functions_no_random, DependentSampler

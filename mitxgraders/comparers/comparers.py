@@ -52,7 +52,6 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from numbers import Number
 import numpy as np
 
-import six
 from voluptuous import Schema, Required, Any, Range, All
 
 from mitxgraders.exceptions import InputTypeError, StudentFacingError

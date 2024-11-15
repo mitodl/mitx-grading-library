@@ -7,7 +7,6 @@ Also includes MathMixin, a mixin class for math graders.
 from __future__ import print_function, division, absolute_import, unicode_literals
 
 import itertools
-import six
 import re
 import pprint
 from numbers import Number

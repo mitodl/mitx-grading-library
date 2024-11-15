@@ -48,7 +48,6 @@ import copy
 from collections import namedtuple
 
 import numpy as np
-import six
 from pyparsing import (
     CaselessLiteral,
     Combine,
