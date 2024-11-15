@@ -30,8 +30,7 @@ class DefaultValuesMeta(abc.ABCMeta):
         self.default_values = None
         super(DefaultValuesMeta, self).__init__(name, bases, attrs)
 
-@six.add_metaclass(DefaultValuesMeta)  # This is an abstract base class with default_values
-class ObjectWithSchema(object):
+class ObjectWithSchema(metaclass=DefaultValuesMeta):
     """Represents an author-facing object whose configuration needs validation."""
 
     @abc.abstractproperty
