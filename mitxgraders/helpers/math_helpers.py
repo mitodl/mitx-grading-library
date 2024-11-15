@@ -4,10 +4,9 @@ math_helpers.py
 Various helper routines for math graders.
 Also includes MathMixin, a mixin class for math graders.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 import itertools
-import six
 import re
 import pprint
 from numbers import Number
@@ -528,7 +527,7 @@ class MathMixin(object):
         # Make a list of all expressions to check for variables
         expressions = []
         for entry in args:
-            if isinstance(entry, six.text_type):
+            if isinstance(entry, str):
                 expressions.append(entry)
             elif isinstance(entry, list):
                 expressions += entry
@@ -602,7 +601,7 @@ class MathMixin(object):
         """Add sample comparison information to debug log"""
         msg = self.debug_appendix_comparison_template.format(
             samples_total=self.config['samples'],
-            comparer=re.sub(r"0x[0-9a-fA-F]+", "0x...", six.text_type(comparer)),
+            comparer=re.sub(r"0x[0-9a-fA-F]+", "0x...", str(comparer)),
             comparer_results=pprint.pformat(comparer_results)
         )
         msg = msg.replace("<", "&lt;").replace(">", "&gt;")

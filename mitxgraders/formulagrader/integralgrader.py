@@ -4,9 +4,6 @@ integralgrader.py
 Contains IntegralGrader, a class for grading an integral problem, consisting of lower
 and upper limits, and integration variable, and an integrand.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
-
-import six
 from functools import wraps
 from numpy import real, imag
 from abc import abstractproperty
@@ -73,11 +70,9 @@ def transform_list_to_dict(thelist, thedefaults, key_to_index_map):
 
 class IntegrationError(StudentFacingError):
     """Represents an error associated with integration"""
-    pass
 
 class SummationError(StudentFacingError):
     """Represents an error associated with summation"""
-    pass
 
 def check_output_is_real(func, error, message):
     """Decorate a function to check that its output is real or raise error with specifed message."""
@@ -211,7 +206,7 @@ class SummationGraderBase(AbstractGrader, MathMixin):
             return self.check_math_response(answers, structured_input)
         except IntegrationError as error:
             msg = "There appears to be an error with the {} you entered: {}"
-            raise IntegrationError(msg.format(self.wording['noun'], six.text_type(error)))
+            raise IntegrationError(msg.format(self.wording['noun'], str(error)))
 
     def raw_check(self, answer, student_input, **kwargs):
         """Perform the numerical check of student_input vs answer"""
@@ -438,7 +433,7 @@ class IntegralGrader(SummationGraderBase):
                 )
             except IntegrationError as error:
                 msg = "Integration Error with author's stored answer: {}"
-                raise ConfigError(msg.format(six.text_type(error)))
+                raise ConfigError(msg.format(str(error)))
 
             # Before performing student evaluation, scrub the instructor
             # variables so that students can't use them
@@ -719,7 +714,7 @@ class SumGrader(SummationGraderBase):
                 )
             except MITxError as error:
                 msg = "Summation Error with author's stored answer: {}"
-                raise ConfigError(msg.format(six.text_type(error)))
+                raise ConfigError(msg.format(str(error)))
 
             # Before performing student evaluation, scrub the instructor
             # variables so that students can't use them

@@ -70,14 +70,14 @@ and calculate the smallest cost of the combinations:
     print minval
 
 While this approach works fine for small matrices, it does not scale. It
-executes in O(*n*!) time: Calculating the permutations for an *n*\ x\ *n*
+executes in O(*n*!) time: Calculating the permutations for an *n*\\ x\\ *n*
 matrix requires *n*! operations. For a 12x12 matrix, that's 479,001,600
 traversals. Even if you could manage to perform each traversal in just one
 millisecond, it would still take more than 133 hours to perform the entire
 traversal. A 20x20 matrix would take 2,432,902,008,176,640,000 operations. At
 an optimistic millisecond per operation, that's more than 77 million years.
 
-The Munkres algorithm runs in O(*n*\ ^3) time, rather than O(*n*!). This
+The Munkres algorithm runs in O(*n*\\ ^3) time, rather than O(*n*!). This
 package provides an implementation of that algorithm.
 
 This version is based on
@@ -289,7 +289,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from __future__ import print_function, division, absolute_import
+
 
 
 __docformat__ = 'restructuredtext'
@@ -332,7 +332,6 @@ class UnsolvableMatrix(Exception):
     """
     Exception raised for unsolvable matrices
     """
-    pass
 
 # ---------------------------------------------------------------------------
 # Classes
@@ -781,7 +780,6 @@ def print_matrix(matrix, msg=None):
         msg : str
             Optional message to print before displaying the matrix
     """
-    import math
 
     if msg is not None:
         print(msg)

@@ -6,9 +6,6 @@ Contains classes for numerical and formula graders
 * IntegralGrader
 * IntervalGrader
 """
-from __future__ import print_function, division, absolute_import
-
-
 from mitxgraders.formulagrader.formulagrader import (
     FormulaGrader,
     NumericalGrader,

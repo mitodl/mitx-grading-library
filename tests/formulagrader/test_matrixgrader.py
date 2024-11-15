@@ -1,7 +1,6 @@
-from __future__ import print_function, division, absolute_import
+
 
 import re
-import six
 from pytest import raises
 from mitxgraders import (MatrixGrader, RealMatrices, RealVectors, ComplexRectangle)
 from mitxgraders.formulagrader.matrixgrader import InputTypeError
@@ -278,8 +277,8 @@ def test_default_grader_instance_override():
     # but grader_1 should use an instance-specific default_comparer
     assert grader_0.default_comparer is not grader_1.default_comparer
 
-BAD = six.u('<span style="color:#b20610">\u2717</span>')
-GOOD = six.u('<span style="color:#008100">\u2713</span>')
+BAD = ('<span style="color:#b20610">\u2717</span>')
+GOOD = ('<span style="color:#008100">\u2713</span>')
 
 def test_entry_partial_proportional_credit_grading():
     grader = MatrixGrader(
@@ -290,7 +289,7 @@ def test_entry_partial_proportional_credit_grading():
     )
     expected = {
         'ok': 'partial',
-        'msg': six.u(
+        'msg': (
             'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[[{g} {b} {b}]<br/>'
@@ -307,7 +306,7 @@ def test_entry_partial_proportional_credit_grading():
     }
     assert grader(None, '[[10, 20, 30], [40, 50, 60]]') == {
         'ok': False,
-        'msg': six.u(
+        'msg': (
             'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[[{b} {b} {b}]<br/>'
@@ -326,7 +325,7 @@ def test_entry_partial_flat_rate_credit_grading():
     )
     expected = {
         'ok': 'partial',
-        'msg': six.u(
+        'msg': (
             'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[[{g} {b} {b}]<br/>'
@@ -343,7 +342,7 @@ def test_entry_partial_flat_rate_credit_grading():
     }
     assert grader(None, '[[10, 20, 30], [40, 50, 60]]') == {
         'ok': False,
-        'msg': six.u(
+        'msg': (
             'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[[{b} {b} {b}]<br/>'
@@ -364,12 +363,12 @@ def test_entry_partial_custom_message():
         max_array_dim=2,
         answers='[[1, 2], [3, 4]]',
         entry_partial_credit='proportional',
-        entry_partial_msg=six.u('Partly correct, errors at\n{error_locations}')
+        entry_partial_msg=('Partly correct, errors at\n{error_locations}')
     )
 
     assert grader(None, '[[1, 20], [30, 4]]')['msg'] == 'Partly correct'
 
-    formatted_msg = six.u(
+    formatted_msg = (
         'Partly correct, errors at<br/>\n'
         '<pre>'
         '[[{g} {b}]<br/>'
@@ -388,7 +387,7 @@ def test_entry_partial_message_with_vectors():
     expected = {
         'ok': 'partial',
         'grade_decimal': 0.6,
-        'msg': six.u(
+        'msg': (
             'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[{g} {b} {g} {g} {b}]'
@@ -408,7 +407,7 @@ def test_entry_partial_message_with_tensors():
     expected = {
         'ok': 'partial',
         'grade_decimal': 7/8,
-        'msg': six.u(
+        'msg': (
             'Some array entries are incorrect, marked below:<br/>\n'
             '<pre>'
             '[[[{g} {g}]<br/>'

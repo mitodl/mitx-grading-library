@@ -4,7 +4,7 @@ specify_domain.py
 Defines class SpecifyDomain, an author-facing decorator for specifying the domain
 of a function. Currently only supports specifying the shape of inputs.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 from numbers import Number
 from voluptuous import Schema, Invalid, Required, Any

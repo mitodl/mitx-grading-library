@@ -3,11 +3,10 @@ math_array.py
 
 Contains a subclass of numpy.ndarray with matrix-like operations.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 from contextlib import contextmanager
 from numbers import Number
 import numpy as np
-import six
 from mitxgraders.helpers.calc.exceptions import (
     MathArrayError, MathArrayShapeError as ShapeError)
 from mitxgraders.helpers.calc.robust_pow import robust_pow
@@ -330,7 +329,7 @@ class MathArray(np.ndarray):
             try:
                 return np.linalg.matrix_power(self, exponent)
             except np.linalg.LinAlgError as error:
-                if six.text_type(error).startswith('Singular'):
+                if str(error).startswith('Singular'):
                     raise MathArrayError('Cannot raise singular matrix to negative powers.')
                 else:
                     # Not sure what could cause this...

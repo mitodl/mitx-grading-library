@@ -7,9 +7,7 @@ Classes for grading inputs that look like lists:
 
 Both work by farming out the individual objects to other graders.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 
-import six
 import numpy as np
 from voluptuous import Required, Any, Schema
 from mitxgraders.helpers import munkres
@@ -25,7 +23,6 @@ __all__ = [
 
 class _AutomaticFailure(object):  # pylint: disable=too-few-public-methods
     """Used as padding when grading unknown number of inputs on a single input line"""
-    pass
 
 def find_optimal_order(check, answers, student_list):
     """
@@ -681,7 +678,7 @@ class SingleListGrader(ItemGrader):
 
         # Step 1: If there is a string in the expect tuple, use infer_from_expect to convert it to a list.
         for entry in answer_tuple:
-            entry['expect'] = tuple(self.infer_from_expect(x) if isinstance(x, six.string_types) else x
+            entry['expect'] = tuple(self.infer_from_expect(x) if isinstance(x, str) else x
                                     for x in entry['expect'])
 
         # Check that all lists have the same length
@@ -835,7 +832,7 @@ def demand_no_empty(obj):
             demand_no_empty(item)
     elif isinstance(obj, dict) and 'expect' in obj:
         demand_no_empty(obj['expect'])
-    elif isinstance(obj, six.string_types):
+    elif isinstance(obj, str):
         msg = ("There is a problem with the author's problem configuration: "
                "Empty entry detected in answer list. Students receive an error "
                "when supplying an empty entry. Set 'missing_error' to False in "

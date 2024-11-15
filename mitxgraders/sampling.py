@@ -21,12 +21,10 @@ Contains some helper functions used in grading formulae:
 
 All of these classes perform random sampling. To obtain a sample, use class.gen_sample()
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 
 from numbers import Number
 import abc
 import random
-import six
 import numpy as np
 from voluptuous import Schema, Required, All, Coerce, Any, Extra
 from mitxgraders.baseclasses import ObjectWithSchema
@@ -34,7 +32,6 @@ from mitxgraders.exceptions import ConfigError
 from mitxgraders.helpers.validatorfuncs import (
     Positive, NumberRange, ListOfType, TupleOfType, is_callable,
     has_keys_of_type, Nullable)
-from mitxgraders.helpers.compatibility import coerce_string_keys_to_text_type
 from mitxgraders.helpers.calc import (
     METRIC_SUFFIXES, CalcError, evaluator, parse, MathArray)
 
@@ -540,14 +537,12 @@ def gen_symbols_samples(symbols, samples, sample_from, functions, suffixes, cons
 
 # Used by NumericalGrader
 schema_user_functions_no_random = All(
-    has_keys_of_type(six.string_types),
-    coerce_string_keys_to_text_type,
+    has_keys_of_type(str),
     {Extra: is_callable}
 )
 # Used by FormulaGrader and friends
 schema_user_functions = All(
-    has_keys_of_type(six.string_types),
-    coerce_string_keys_to_text_type,
+    has_keys_of_type(str),
     {Extra: Any(is_callable,
                 All([is_callable], Coerce(SpecificFunctions)),
                 FunctionSamplingSet)},
@@ -602,8 +597,7 @@ def construct_functions(default_functions, user_funcs):
 
 def validate_user_constants(*allow_types):
     return All(
-            has_keys_of_type(six.string_types),
-            coerce_string_keys_to_text_type,
+            has_keys_of_type(str),
             {Extra: Any(Any(*allow_types), None)}
     )
 

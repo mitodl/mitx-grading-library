@@ -1,15 +1,10 @@
 """
 formulagrader.py
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
-
 from numbers import Number
-import numpy as np
-import six
 from voluptuous import Schema, Required, Any, All, Invalid, Length
 from mitxgraders.comparers import equality_comparer
 from mitxgraders.sampling import schema_user_functions_no_random, DependentSampler
-from mitxgraders.exceptions import MissingInput
 from mitxgraders.baseclasses import ItemGrader
 from mitxgraders.helpers.calc import evaluator, DEFAULT_VARIABLES
 from mitxgraders.helpers.validatorfuncs import NonNegative, PercentageString, is_callable_with_args
@@ -186,7 +181,7 @@ class FormulaGrader(ItemGrader, MathMixin):
         >>> result == expected
         True
         """
-        if isinstance(expect, six.string_types):
+        if isinstance(expect, str):
             return self.schema_expect({
                 'comparer': self.default_comparer,
                 'comparer_params': [expect]
