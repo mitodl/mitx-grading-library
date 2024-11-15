@@ -1,5 +1,5 @@
 """
-Helper functions to facilitate python2-python3 compatibility
+Helper functions to facilitate numpy ufuncs compatibility
 """
 from __future__ import print_function, division, absolute_import, unicode_literals
 
@@ -27,17 +27,3 @@ def wraps(wrapped,
             _f.__qualname__ = _f.__name__
         return _f
     return _wrapper
-
-def coerce_string_keys_to_text_type(thedict):
-    """
-    Ensures that dictionary string keys are text strings.
-    """
-    result = {}
-    for key in thedict:
-        if isinstance(key, str):
-            new_key = str(key)
-            result[new_key] = thedict[key]
-        else:
-            result[key] = thedict[key]
-
-    return result
