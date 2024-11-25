@@ -42,20 +42,18 @@ and also:
 Both `parse` and `evaluator` share a global MathParser instance for caching
 purposes.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 import copy
 from collections import namedtuple
 
 import numpy as np
-import six
 from pyparsing import (
     CaselessLiteral,
     Combine,
     Forward,
     Group,
     Literal,
-    MatchFirst,
     Optional,
     ParseResults,
     Suppress,
@@ -791,7 +789,7 @@ class MathExpression(object):
         value = variables[parse_result[0]]
         value = copy.copy(value)
         # Convert python long integers to floats
-        if isinstance(value, six.integer_types):
+        if isinstance(value, int):
             value = float(value)
         return value
 
@@ -1017,7 +1015,7 @@ class MathExpression(object):
         while data:
             # Result contains the current exponent
             working = data.pop()
-            if isinstance(working, six.text_type) and working == "-":
+            if isinstance(working, str) and working == "-":
                 result = -result
             else:
                 # working is base, result is exponent
@@ -1154,7 +1152,7 @@ class MathExpression(object):
         """
         data = parse_result[:]
         result = data.pop(0)
-        if isinstance(result, six.text_type) and result == "+":
+        if isinstance(result, str) and result == "+":
             result = data.pop(0)
         while data:
             op = data.pop(0)

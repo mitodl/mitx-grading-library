@@ -4,17 +4,15 @@ intervalgrader.py
 Grader for intervals consisting of two formula entries, as well
 as enclosing brackets.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 
-import six
 
-from voluptuous import Required, Schema, Any, All, Length
+from voluptuous import Required, Any, All, Length
 
 from mitxgraders.baseclasses import AbstractGrader
 from mitxgraders.stringgrader import StringGrader
 from mitxgraders.listgrader import SingleListGrader, demand_no_empty
 from mitxgraders.formulagrader.formulagrader import FormulaGrader, NumericalGrader
-from mitxgraders.exceptions import ConfigError, InvalidInput, MissingInput
+from mitxgraders.exceptions import ConfigError, InvalidInput
 
 class IntervalGrader(SingleListGrader):
     """
@@ -110,7 +108,7 @@ class IntervalGrader(SingleListGrader):
 
         # If 'expect' is a string, use infer_from_expect to convert it to a list.
         for entry in answer_tuple:
-            entry['expect'] = tuple(self.infer_from_expect(x) if isinstance(x, six.string_types) else x
+            entry['expect'] = tuple(self.infer_from_expect(x) if isinstance(x, str) else x
                                     for x in entry['expect'])
 
         # Assert that all answers have length 4

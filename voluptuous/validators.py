@@ -5,7 +5,7 @@ import sys
 from functools import wraps
 from decimal import Decimal, InvalidOperation
 
-from voluptuous.schema_builder import Schema, raises, message
+from voluptuous.schema_builder import Schema, message
 from voluptuous.error import (MultipleInvalid, CoerceInvalid, TrueInvalid, FalseInvalid, BooleanInvalid, Invalid,
                               AnyInvalid, AllInvalid, MatchInvalid, UrlInvalid, EmailInvalid, FileInvalid, DirInvalid,
                               RangeInvalid, PathInvalid, ExactSequenceInvalid, LengthInvalid, DatetimeInvalid,

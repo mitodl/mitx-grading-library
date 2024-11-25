@@ -3,7 +3,6 @@ attemptcredit.py
 
 This file contains various routines for assigning attempt-based partial credit.
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 from voluptuous import Schema, Required, Any, Range, All
 from mitxgraders.baseclasses import ObjectWithSchema
 from mitxgraders.helpers.validatorfuncs import Positive

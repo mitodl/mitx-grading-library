@@ -1,6 +1,6 @@
-from __future__ import print_function, division, absolute_import
 
-import sys, re
+
+import re
 from functools import wraps
 
 def log_results(results):

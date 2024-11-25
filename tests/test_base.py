@@ -1,12 +1,11 @@
 """
 Tests of base class functionality
 """
-from __future__ import print_function, division, absolute_import
+
 
 import sys
 import platform
 from unittest import mock
-import six
 from importlib import reload
 from pytest import raises, approx
 from voluptuous import Error, Schema, Required
@@ -325,16 +324,13 @@ def test_ensure_text_inputs():
     ensure_text_inputs = AbstractGrader.ensure_text_inputs
 
     # Lists are ok
-    valid_inputs = ['cat', six.u('dog')]
-    if six.PY2:
-        assert not isinstance(valid_inputs[0], six.text_type)
-        assert isinstance(valid_inputs[1], six.text_type)
+    valid_inputs = ['cat', 'dog']
     result = ensure_text_inputs(valid_inputs)
-    assert all(map(six.text_type, result))
+    assert all(map(str, result))
 
     # single text is ok
-    assert isinstance(ensure_text_inputs('cat'), six.text_type)
-    assert isinstance(ensure_text_inputs(six.u('cat')), six.text_type)
+    assert isinstance(ensure_text_inputs('cat'), str)
+    assert isinstance(ensure_text_inputs('cat'), str)
 
     # empty lists are ok:
     assert ensure_text_inputs([]) == []
@@ -671,10 +667,10 @@ def test_coerce2unicode():
     )
 
     config = foo.config
-    assert all([isinstance(x, six.text_type) for x in config])
+    assert all([isinstance(x, str) for x in config])
 
-    assert isinstance(foo.config['a'], six.text_type)
-    assert all([isinstance(x, six.text_type) for x in config['b']])
-    assert all([isinstance(x, six.text_type) for x in config['c']])
-    assert all([isinstance(x, six.text_type) for x in config['d']])
-    assert all([isinstance(x, six.text_type) for x in config['d']['moose']])
+    assert isinstance(foo.config['a'], str)
+    assert all([isinstance(x, str) for x in config['b']])
+    assert all([isinstance(x, str) for x in config['c']])
+    assert all([isinstance(x, str) for x in config['d']])
+    assert all([isinstance(x, str) for x in config['d']['moose']])

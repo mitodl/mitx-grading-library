@@ -1,4 +1,4 @@
-from __future__ import print_function, division, absolute_import
+
 
 from pytest import raises
 import platform
@@ -8,7 +8,7 @@ from mitxgraders import CalcError
 from mitxgraders.formulagrader.integralgrader import SumGrader, SummationError
 from mitxgraders.exceptions import InvalidInput, ConfigError, MissingInput
 from mitxgraders.sampling import DependentSampler
-from mitxgraders.helpers.calc import evaluator, DEFAULT_VARIABLES
+from mitxgraders.helpers.calc import evaluator
 from tests.helpers import round_decimals_in_string
 
 # Configuration Error Test

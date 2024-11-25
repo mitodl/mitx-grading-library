@@ -1,7 +1,7 @@
 """
 Tests of expressions.py that aren't covered elsewhere
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
+
 
 import re
 import numpy as np

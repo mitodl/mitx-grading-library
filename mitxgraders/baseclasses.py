@@ -6,12 +6,10 @@ Contains base classes for the library:
 * AbstractGrader
 * ItemGrader
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 
 import numbers
 import abc
 import pprint
-import six
 import json
 import platform
 from decimal import Decimal
@@ -30,11 +28,11 @@ class DefaultValuesMeta(abc.ABCMeta):
         self.default_values = None
         super(DefaultValuesMeta, self).__init__(name, bases, attrs)
 
-@six.add_metaclass(DefaultValuesMeta)  # This is an abstract base class with default_values
-class ObjectWithSchema(object):
+class ObjectWithSchema(metaclass=DefaultValuesMeta):
     """Represents an author-facing object whose configuration needs validation."""
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def schema_config(self):
         """
         The schema that defines the configuration of this object.
@@ -95,7 +93,7 @@ class ObjectWithSchema(object):
         only tuples, lists, dicts and string types are recreated,
         with other references remaining intact.
         """
-        if isinstance(obj, six.string_types):
+        if isinstance(obj, str):
             return str(obj)
         elif isinstance(obj, tuple):
             return tuple(ObjectWithSchema.coerce2unicode(item) for item in obj)
@@ -148,7 +146,6 @@ class ObjectWithSchema(object):
         Allows an ObjectWithSchema to save any modified defaults for later use.
         This function is intended to be shadowed as necessary.
         """
-        pass
 
     def __repr__(self):
         """Printable representation of the object"""
@@ -186,7 +183,8 @@ class AbstractGrader(ObjectWithSchema):
             attempt number, present the student with a message explaining so (default True)
     """
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def schema_config(self):
         """
         Defines the default config schema for abstract graders.
@@ -233,9 +231,9 @@ class AbstractGrader(ObjectWithSchema):
         self.log("Running on edX using python " + platform.python_version())
         # Add the student inputs to the debug log
         if isinstance(student_input, list):
-            self.log("Student Responses:\n" + "\n".join(map(six.text_type, student_input)))
+            self.log("Student Responses:\n" + "\n".join(map(str, student_input)))
         else:
-            self.log("Student Response:\n" + six.text_type(student_input))
+            self.log("Student Response:\n" + str(student_input))
         # Add in the modified defaults
         if self.modified_defaults:
             output = json.dumps(self.modified_defaults)
@@ -290,7 +288,7 @@ class AbstractGrader(ObjectWithSchema):
             elif isinstance(error, MITxError):
                 # we want to re-raise the error with a modified message but the
                 # same class type, hence calling __class__
-                raise error.__class__(six.text_type(error).replace('\n', '<br/>'))
+                raise error.__class__(str(error).replace('\n', '<br/>'))
             else:
                 # Otherwise, give a generic error message
                 if isinstance(student_input, list):
@@ -646,7 +644,7 @@ class ItemGrader(AbstractGrader):
         """
         if value == True:
             return {'ok': True, 'msg': '', 'grade_decimal': 1.0}
-        elif isinstance(value, six.text_type) and value.lower() == 'partial':
+        elif isinstance(value, str) and value.lower() == 'partial':
             return {'ok': 'partial', 'msg': '', 'grade_decimal': 0.5}
         elif value == False:
             return {'ok': False, 'msg': '', 'grade_decimal': 0}

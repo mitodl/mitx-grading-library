@@ -1,12 +1,11 @@
 """
 Tests for the various sampling classes
 """
-from __future__ import print_function, division, absolute_import
+
 
 from itertools import product
 import numpy as np
 from pytest import raises, approx
-import six
 
 from mitxgraders import (
     RealVectors,
@@ -119,101 +118,85 @@ def test_identity_multiples():
             assert isinstance(m, MathArray)
 
 def test_unitary():
-    # Test shape, unitarity, determinant, python2 error, MathArray
-    if six.PY2:
-        with raises(NotImplementedError, match='This feature requires newer versions of '
-                                               'numpy and scipy than are available.'):
-            matrices = UnitaryMatrices()
-            matrices.gen_sample()
-    else:
-        # These are the doctests
-        matrices = UnitaryMatrices()
-        assert matrices.gen_sample().shape == (2, 2)
+    # Test shape, unitarity, determinant, MathArray
+    # These are the doctests
+    matrices = UnitaryMatrices()
+    assert matrices.gen_sample().shape == (2, 2)
 
-        matrices = UnitaryMatrices(dimension=4)
-        assert matrices.gen_sample().shape == (4, 4)
+    matrices = UnitaryMatrices(dimension=4)
+    assert matrices.gen_sample().shape == (4, 4)
 
-        matrices = UnitaryMatrices(unitdet=True)
-        assert within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)
+    matrices = UnitaryMatrices(unitdet=True)
+    assert within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)
 
-        matrices = UnitaryMatrices(unitdet=False)
-        assert not within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)
-        assert within_tolerance(np.abs(np.linalg.det(matrices.gen_sample())), 1, 1e-14)
+    matrices = UnitaryMatrices(unitdet=False)
+    assert not within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)
+    assert within_tolerance(np.abs(np.linalg.det(matrices.gen_sample())), 1, 1e-14)
 
-        matrices = UnitaryMatrices(unitdet=True)
-        m = matrices.gen_sample()
-        assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)
+    matrices = UnitaryMatrices(unitdet=True)
+    m = matrices.gen_sample()
+    assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)
 
-        matrices = UnitaryMatrices(unitdet=False)
-        m = matrices.gen_sample()
-        assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)
+    matrices = UnitaryMatrices(unitdet=False)
+    m = matrices.gen_sample()
+    assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)
 
-        shapes = tuple(range(2, 5))
-        dets = (True, False)
+    shapes = tuple(range(2, 5))
+    dets = (True, False)
 
-        # More general testing
-        for shape in shapes:
-            for det in dets:
-                matrices = matrices = UnitaryMatrices(dimension=shape, unitdet=det)
-                m = matrices.gen_sample()
-                assert m.shape == (shape, shape)
-                assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(shape)), 1e-14)
-                assert np.abs(np.linalg.det(m)) == approx(1)
-                if det:
-                    assert np.linalg.det(m) == approx(1)
-                assert isinstance(m, MathArray)
+    # More general testing
+    for shape in shapes:
+        for det in dets:
+            matrices = matrices = UnitaryMatrices(dimension=shape, unitdet=det)
+            m = matrices.gen_sample()
+            assert m.shape == (shape, shape)
+            assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(shape)), 1e-14)
+            assert np.abs(np.linalg.det(m)) == approx(1)
+            if det:
+                assert np.linalg.det(m) == approx(1)
+            assert isinstance(m, MathArray)
 
 def test_orthogonal():
-    # Test shape, orthogonality, determinant, python2 error, MathArray
-    if six.PY2:
-        with raises(NotImplementedError, match='This feature requires newer versions of '
-                                               'numpy and scipy than are available.'):
-            matrices = OrthogonalMatrices(unitdet=False)
-            matrices.gen_sample()
-        with raises(NotImplementedError, match='This feature requires newer versions of '
-                                               'numpy and scipy than are available.'):
-            matrices = OrthogonalMatrices(unitdet=True)
-            matrices.gen_sample()
-    else:
-        # These are the doctests
-        matrices = OrthogonalMatrices()
-        assert matrices.gen_sample().shape == (2, 2)
+    # Test shape, orthogonality, determinant, MathArray
+    # These are the doctests
+    matrices = OrthogonalMatrices()
+    assert matrices.gen_sample().shape == (2, 2)
 
-        matrices = OrthogonalMatrices(dimension=4)
-        assert matrices.gen_sample().shape == (4, 4)
+    matrices = OrthogonalMatrices(dimension=4)
+    assert matrices.gen_sample().shape == (4, 4)
 
-        matrices = OrthogonalMatrices(unitdet=True)
-        assert within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)
+    matrices = OrthogonalMatrices(unitdet=True)
+    assert within_tolerance(np.linalg.det(matrices.gen_sample()), 1, 1e-14)
 
-        matrices = OrthogonalMatrices(unitdet=False)
-        m = matrices.gen_sample()
-        assert (within_tolerance(np.linalg.det(m), 1, 1e-14)
-                or within_tolerance(np.linalg.det(m), -1, 1e-14))
+    matrices = OrthogonalMatrices(unitdet=False)
+    m = matrices.gen_sample()
+    assert (within_tolerance(np.linalg.det(m), 1, 1e-14)
+            or within_tolerance(np.linalg.det(m), -1, 1e-14))
 
-        matrices = OrthogonalMatrices(unitdet=True)
-        m = matrices.gen_sample()
-        assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)
+    matrices = OrthogonalMatrices(unitdet=True)
+    m = matrices.gen_sample()
+    assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)
 
-        matrices = OrthogonalMatrices(unitdet=False)
-        m = matrices.gen_sample()
-        assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)
+    matrices = OrthogonalMatrices(unitdet=False)
+    m = matrices.gen_sample()
+    assert within_tolerance(m * np.conjugate(np.transpose(m)), MathArray(np.eye(2)), 1e-14)
 
-        shapes = tuple(range(2, 5))
-        dets = (True, False)
+    shapes = tuple(range(2, 5))
+    dets = (True, False)
 
-        # More general testing
-        for shape in shapes:
-            for det in dets:
-                matrices = matrices = OrthogonalMatrices(dimension=shape, unitdet=det)
-                m = matrices.gen_sample()
-                assert m.shape == (shape, shape)
-                assert np.array_equal(np.conj(m), m)
-                assert within_tolerance(m * np.transpose(m), MathArray(np.eye(shape)), 1e-14)
-                assert (np.abs(np.linalg.det(m)) == approx(1)
-                        or np.abs(np.linalg.det(m)) == approx(-1))
-                if det:
-                    assert np.linalg.det(m) == approx(1)
-                assert isinstance(m, MathArray)
+    # More general testing
+    for shape in shapes:
+        for det in dets:
+            matrices = matrices = OrthogonalMatrices(dimension=shape, unitdet=det)
+            m = matrices.gen_sample()
+            assert m.shape == (shape, shape)
+            assert np.array_equal(np.conj(m), m)
+            assert within_tolerance(m * np.transpose(m), MathArray(np.eye(shape)), 1e-14)
+            assert (np.abs(np.linalg.det(m)) == approx(1)
+                    or np.abs(np.linalg.det(m)) == approx(-1))
+            if det:
+                assert np.linalg.det(m) == approx(1)
+            assert isinstance(m, MathArray)
 
 def test_square_matrices():
     # Test shape, real/complex, norm, symmetry, traceless, det, MathArray

@@ -14,7 +14,6 @@ Contains classes for sampling vector/matrix/tensor values:
 * UnitaryMatrices
 All of these classes perform random sampling. To obtain a sample, use class.gen_sample()
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 import numpy as np
 
 from voluptuous import Schema, Required, All, Coerce, Any, Range
@@ -777,9 +776,7 @@ class OrthogonalMatrices(SquareMatrixSamplingSet):
 
     Usage:
     ======
-    >>> import six, pytest
-    >>> if six.PY2:
-    ...     pytest.skip('These doctests only work in python 3')
+    >>> import pytest
 
     By default, we generate 2x2 matrices:
     >>> matrices = OrthogonalMatrices()
@@ -852,9 +849,7 @@ class UnitaryMatrices(SquareMatrixSamplingSet):
 
     Usage:
     ======
-    >>> import six, pytest
-    >>> if six.PY2:
-    ...     pytest.skip('These doctests only work in python 3')
+    >>> import pytest
 
     By default, we generate 2x2 matrices:
     >>> matrices = UnitaryMatrices()

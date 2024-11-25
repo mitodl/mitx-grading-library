@@ -3,7 +3,6 @@
 numpy==1.26.4
 scipy==1.14.1
 pyparsing==3.2.0
-six==1.16.0
 
 # For testing
 pytest
