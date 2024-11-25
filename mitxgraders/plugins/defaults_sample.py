@@ -9,18 +9,17 @@ renaming it to defaults.py, and modifying it according to your needs.
 This plug-in works by registering a dictionary with the appropriate grading class (note,
 not class instance).
 """
-# 
 
-# # Here are all of the graders that you can specify defaults for
-# from mitxgraders.stringgrader import StringGrader
-# from mitxgraders.baseclasses import AbstractGrader, ItemGrader
-# from mitxgraders.listgrader import ListGrader, SingleListGrader
-# from mitxgraders.formulagrader.integralgrader import IntegralGrader
-# from mitxgraders.formulagrader.formulagrader import FormulaGrader, NumericalGrader
-# from mitxgraders.formulagrader.matrixgrader import MatrixGrader
+# Here are all of the graders that you can specify defaults for
+from mitxgraders.stringgrader import StringGrader
+from mitxgraders.baseclasses import AbstractGrader, ItemGrader
+from mitxgraders.listgrader import ListGrader, SingleListGrader
+from mitxgraders.formulagrader.integralgrader import IntegralGrader
+from mitxgraders.formulagrader.formulagrader import FormulaGrader, NumericalGrader
+from mitxgraders.formulagrader.matrixgrader import MatrixGrader
 
-# # These will be needed to set attempt-based credit course-wide
-# from mitxgraders.attemptcredit import LinearCredit, GeometricCredit, ReciprocalCredit
+# These will be needed to set attempt-based credit course-wide
+from mitxgraders.attemptcredit import LinearCredit, GeometricCredit, ReciprocalCredit
 
 # These modifications are commented out so that they don't override the normal defaults.
 # To use them, you need to uncomment them.
