@@ -1,0 +1,53 @@
+name: Integration Test
+
+on: [push, pull_request]
+
+jobs:
+  edx-platform-integration-test:
+    name: Integration with Tutor
+    strategy:
+      matrix:
+        # Open edX Version: Sumac
+        tutor_version: ["<20.0.0"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: mitx-grading-library
+
+      - name: Adjust permissions to execute Tutor commands
+        run: |
+          chmod 777 . -R
+        shell: bash
+
+      - name: Set Tutor environment variables
+        run: |
+          cat <<EOF >> "$GITHUB_ENV"
+          LMS_HOST=local.edly.io
+          CMS_HOST=studio.local.edly.io
+          TUTOR_ROOT=$(pwd)
+          EOF
+        shell: bash
+
+      - name: Install and prepare Tutor, Codejail and tests
+        run: |
+          pip install "tutor${{ matrix.tutor_version }}"
+          pip install git+https://github.com/edunext/tutor-contrib-codejail
+          tutor config save
+          tutor plugins enable codejail
+          tutor local do init --limit codejail
+          tutor mounts add cms:mitx-grading-library/integration_tests/integration_test.py:/openedx/edx-platform/integration_test.py
+          tutor local launch -I
+        shell: bash
+
+      - name: Import MITx Demo Course
+        run: |
+          REPO_URL="https://github.com/${{ github.repository }}"
+          tutor local do importdemocourse -r $REPO_URL -d course -v ${{ github.ref_name }}
+        shell: bash
+
+      - name: Run integration tests
+        run: |
+          tutor local run cms python3 integration_test.py
+        shell: bash
