@@ -1,6 +1,6 @@
 name: Integration Test
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   edx-platform-integration-test:
@@ -43,8 +43,7 @@ jobs:
 
       - name: Import MITx Demo Course
         run: |
-          REPO_URL="https://github.com/${{ github.repository }}"
-          tutor local do importdemocourse -r $REPO_URL -d course -v ${{ github.ref_name }}
+          tutor local do importdemocourse -r ${{ github.event.pull_request.head.repo.clone_url }} -d course -v ${{ github.event.pull_request.head.ref }}
         shell: bash
 
       - name: Run integration tests
