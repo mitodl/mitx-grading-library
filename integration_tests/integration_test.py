@@ -46,7 +46,7 @@ IntegralGrader(
     variables=['a', 'b']
 )
 
-IntervalGrader(answers=['(','1','2',']'])
+IntervalGrader(answers=['{','1','2',']'])
 
 MatrixGrader(
     answers='x*A*B*u + z*C^3*v/(u*C*v)',
