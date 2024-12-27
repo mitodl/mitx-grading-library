@@ -22,14 +22,39 @@ log = logging.getLogger(__name__)
 all_code = """
 from mitxgraders import *
 
+# Grading Classes
+
+## Single-input graders
+
 StringGrader(answers="cat")
+FormulaGrader(answers='0')
+NumericalGrader()
+MatrixGrader(
+    answers='x*A*B*u + z*C^3*v/(u*C*v)',
+    variables=['A', 'B', 'C', 'u', 'v', 'z', 'x'],
+    sample_from={
+        'A': RealMatrices(shape=[2, 3]),
+        'B': RealMatrices(shape=[3, 2]),
+        'C': RealMatrices(shape=[2, 2]),
+        'u': RealVectors(shape=[2]),
+        'v': RealVectors(shape=[2]),
+        'z': ComplexRectangle()
+    },
+    identity_dim=2
+)
+SingleListGrader(
+    answers=['cat', 'dog', 'unicorn'],
+    subgrader=StringGrader()
+)
+
+## Multi-input graders
 
 ListGrader(
     answers=['cat', 'dog', 'unicorn'],
     subgraders=StringGrader()
 )
 
-FormulaGrader(answers='0')
+## Specialized graders
 
 IntegralGrader(
     answers={
@@ -47,20 +72,6 @@ IntegralGrader(
 )
 
 IntervalGrader(answers=['(','1','2',']'])
-
-MatrixGrader(
-    answers='x*A*B*u + z*C^3*v/(u*C*v)',
-    variables=['A', 'B', 'C', 'u', 'v', 'z', 'x'],
-    sample_from={
-        'A': RealMatrices(shape=[2, 3]),
-        'B': RealMatrices(shape=[3, 2]),
-        'C': RealMatrices(shape=[2, 2]),
-        'u': RealVectors(shape=[2]),
-        'v': RealVectors(shape=[2]),
-        'z': ComplexRectangle()
-    },
-    identity_dim=2
-)
 
 SumGrader(
     answers={
