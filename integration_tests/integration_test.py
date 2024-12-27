@@ -81,6 +81,16 @@ SumGrader(
 
 
 def execute_code(all_code, course_key_str):
+    """
+    Executes the provided code in a sandboxed environment with the specified course context.
+
+    Args:
+        all_code (str): The code to be executed.
+        course_key_str (str): The string representation of the course key.
+
+    Returns:
+        None
+    """
     course_key = CourseKey.from_string(course_key_str)
     sandbox_service = SandboxService(
         course_id=course_key,
@@ -94,18 +104,15 @@ def execute_code(all_code, course_key_str):
         extra_files.append(("python_lib.zip", zip_lib))
         python_path.append("python_lib.zip")
 
-    try:
-        safe_exec(
-            all_code,
-            globals_dict={},
-            python_path=python_path,
-            extra_files=extra_files,
-            slug="integration-test",
-            limit_overrides_context=course_key_str,
-            unsafely=False,
-        )
-    except Exception as err:
-        log.error("Error executing code: %s", err)
+    safe_exec(
+        all_code,
+        globals_dict={},
+        python_path=python_path,
+        extra_files=extra_files,
+        slug="integration-test",
+        limit_overrides_context=course_key_str,
+        unsafely=False,
+    )
 
 
 if __name__ == "__main__":
