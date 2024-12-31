@@ -34,13 +34,6 @@ jobs:
       - name: Install Tutor
         run: pip install "tutor${{ matrix.tutor_version }}"
         shell: bash
-      
-      - name: Install, enable and initialize Tutor Codejail Plugin
-        run: |
-          pip install git+https://github.com/edunext/tutor-contrib-codejail
-          tutor plugins enable codejail
-          tutor local do init --limit codejail
-        shell: bash
 
       - name: Mount Integration Test
         run: tutor mounts add cms:mitx-grading-library/integration_tests/integration_test.py:/openedx/edx-platform/integration_test.py
