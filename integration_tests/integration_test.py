@@ -22,72 +22,16 @@ log = logging.getLogger(__name__)
 
 # Define the code to be executed
 GRADING_CLASSES_CODE = """
-from mitxgraders import *
-
-# Grading Classes
-
-## Single-input graders
-
-StringGrader(answers="cat")
-FormulaGrader(answers='0')
-NumericalGrader()
-MatrixGrader(
-    answers='x*A*B*u + z*C^3*v/(u*C*v)',
-    variables=['A', 'B', 'C', 'u', 'v', 'z', 'x'],
-    sample_from={
-        'A': RealMatrices(shape=[2, 3]),
-        'B': RealMatrices(shape=[3, 2]),
-        'C': RealMatrices(shape=[2, 2]),
-        'u': RealVectors(shape=[2]),
-        'v': RealVectors(shape=[2]),
-        'z': ComplexRectangle()
-    },
-    identity_dim=2
-)
-SingleListGrader(
-    answers=['cat', 'dog', 'unicorn'],
-    subgrader=StringGrader()
-)
-
-## Multi-input graders
-
-ListGrader(
-    answers=['cat', 'dog', 'unicorn'],
-    subgraders=StringGrader()
-)
-
-## Specialized graders
-
-IntegralGrader(
-    answers={
-        'lower': 'a',
-        'upper': 'b',
-        'integrand': 'x^2',
-        'integration_variable': 'x'
-    },
-    input_positions={
-        'integrand': 1,
-        'lower': 2,
-        'upper': 3
-    },
-    variables=['a', 'b']
-)
-
-IntervalGrader(answers=['(','1','2',']'])
-
-SumGrader(
-    answers={
-        'lower': 'a',
-        'upper': 'b',
-        'summand': 'x^2',
-        'summation_variable': 'x'
-    },
-    input_positions={
-        'summand': 1,
-        'lower': 2,
-        'upper': 3
-    },
-    variables=['a', 'b']
+from mitxgraders import (
+    StringGrader,
+    FormulaGrader,
+    NumericalGrader,
+    MatrixGrader,
+    SingleListGrader,
+    ListGrader,
+    IntegralGrader,
+    IntervalGrader,
+    SumGrader,
 )
 
 """
