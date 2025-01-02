@@ -1,6 +1,9 @@
 name: Integration Test
 
-on: [pull_request]
+on:
+  schedule:
+    # Montlhy at 00:00
+    - cron: '0 0 1 * *'
 
 jobs:
   edx-platform-integration-test:
