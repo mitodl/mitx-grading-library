@@ -22,6 +22,7 @@ log = logging.getLogger(__name__)
 
 # Define the code to be executed
 GRADING_CLASSES_CODE = """
+# To test, we can use the custom graders
 from mitxgraders import (
     StringGrader,
     FormulaGrader,
@@ -32,6 +33,24 @@ from mitxgraders import (
     IntegralGrader,
     IntervalGrader,
     SumGrader,
+    RealMatrices,
+    RealVectors,
+    ComplexRectangle,
+)
+
+# Test the MatrixGrader, the class that uses the most external dependencies
+MatrixGrader(
+    answers='x*A*B*u + z*C^3*v/(u*C*v)',
+    variables=['A', 'B', 'C', 'u', 'v', 'z', 'x'],
+    sample_from={
+        'A': RealMatrices(shape=[2, 3]),
+        'B': RealMatrices(shape=[3, 2]),
+        'C': RealMatrices(shape=[2, 2]),
+        'u': RealVectors(shape=[2]),
+        'v': RealVectors(shape=[2]),
+        'z': ComplexRectangle()
+    },
+    identity_dim=2
 )
 
 """
