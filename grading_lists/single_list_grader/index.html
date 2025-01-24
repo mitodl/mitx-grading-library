@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
+    
     <title>SingleListGrader - MITxGraders</title>
+    
 
-    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../../css/base.css" rel="stylesheet">
-    <link href="../../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/base.min.css" rel="stylesheet">
+    <link href="../../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../../css/extra.css" rel="stylesheet">
-
-
     <link href="../../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="../..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="../..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../../grading_math/interval_grader/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../../grading_math/interval_grader/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../list_grader/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../list_grader/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -277,255 +278,305 @@
 
 <h1 id="singlelistgrader">SingleListGrader<a class="headerlink" href="#singlelistgrader" title="Permanent link"> # </a></h1>
 <p>If you want a response to be a delimiter-separated list of items, you can use a special <code>ItemGrader</code> called <code>SingleListGrader</code> to perform the grading. You need to specify a subgrader (which must be an <code>ItemGrader</code>, and could even be another <code>SingleListGrader</code>) to evaluate each individual item. The basic usage is as follows.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=['cat', 'dog'],
-...     subgrader=StringGrader()
-... )
-&gt;&gt;&gt; grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog, cat') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'cat, octopus') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">()</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, dog&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;dog, cat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, octopus&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>To receive full points for this problem, a student would enter <code>cat, dog</code> or <code>dog, cat</code> into the input box. Entering <code>cat, octopus</code> or just <code>cat</code> will receive half points.</p>
 <p>The <code>answers</code> key follows the usual <code>ItemGrader</code> specification, with one change: instead of specifying individual strings or dictionaries, you need to specify lists of strings or dictionaries. Otherwise, the full scope of <code>ItemGrader</code> configuration is available to you, such as using tuples to specify multiple lists of answers.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=(
-...         [('cat', 'feline'), 'dog'],
-...         ['goat', 'vole'],
-...     ),
-...     subgrader=StringGrader()
-... )
-&gt;&gt;&gt; grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog, feline') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'cat, vole') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="p">[(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;feline&#39;</span><span class="p">),</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="p">[</span><span class="s1">&#39;goat&#39;</span><span class="p">,</span> <span class="s1">&#39;vole&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">),</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">()</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, dog&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;dog, feline&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, vole&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Now, <code>cat, dog</code> and <code>goat, vole</code> will get full grades. But mixes won't: <code>cat, vole</code> will score half credit, as <code>cat</code> and <code>dog</code> are in the same answer list, while <code>vole</code> belongs with <code>goat</code>.</p>
 <p>Below is an example that uses literally all possible answer input styles.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=(
-...         [('cat', {'expect': 'feline', 'msg': 'Good enough!'}), 'dog'],
-...         {
-...             'expect': ['unicorn', 'lumberjack'],
-...             'msg': &quot;Well, you just had to do something strange, didn't you?&quot;,
-...             'grade_decimal': 0.5
-...         },
-...     ),
-...     subgrader=StringGrader()
-... )
-&gt;&gt;&gt; grader(None, 'feline, unicorn') == {'grade_decimal': 0.5, 'msg': 'Good enough!', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader(None, 'hippo, unicorn') == {'grade_decimal': 0.25, 'msg': '', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader(None, 'lumberjack, unicorn') == {'grade_decimal': 0.5, 'msg': &quot;Well, you just had to do something strange, didn't you?&quot;, 'ok': 'partial'}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="p">[(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="s1">&#39;feline&#39;</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Good enough!&#39;</span><span class="p">}),</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="p">{</span>
+<span class="gp">... </span>            <span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;unicorn&#39;</span><span class="p">,</span> <span class="s1">&#39;lumberjack&#39;</span><span class="p">],</span>
+<span class="gp">... </span>            <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s2">&quot;Well, you just had to do something strange, didn&#39;t you?&quot;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span>
+<span class="gp">... </span>        <span class="p">},</span>
+<span class="gp">... </span>    <span class="p">),</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">()</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;feline, unicorn&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Good enough!&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;hippo, unicorn&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;lumberjack, unicorn&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s2">&quot;Well, you just had to do something strange, didn&#39;t you?&quot;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Note that the list of answers can itself occur inside a dictionary that has a grade and message associated with it. In this case, the answers are evaluated as normal, and the overall grade is multiplied by <code>grade_decimal</code>. The message is only shown if all of the inputs received credit. So, note that <code>feline, anything</code> will get the "Good enough!" message, while the "something strange" message only appears if the student enters both <code>unicorn</code> and <code>lumberjack</code>.</p>
 <p>As a convenience, you can also provide an answer that is just a string, corresponding to what students would enter. Beware that spaces included after delimiters will be included in the following entry.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = SingleListGrader(
-...     answers='cat, dog',
-...     subgrader=StringGrader()
-... )
-&gt;&gt;&gt; grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog, cat') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'cat, octopus') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;cat, dog&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">()</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, dog&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;dog, cat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, octopus&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>This means that <code>SingleListGrader</code>s are capable of inferring answers from the <code>expect</code> keyword of a <code>customresponse</code> tag.</p>
 <h2 id="messages">Messages<a class="headerlink" href="#messages" title="Permanent link"> # </a></h2>
 <p>Messages from the individual items are all concatenated together and presented to the student. Overall messages associated with a list are included at the bottom. It is also possible to have a <code>wrong_msg</code> on the <code>SingleListGrader</code>, which is presented to the student if the score is zero and there are no other messages, just like on an <code>ItemGrader</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=['cat', 'dog'],
-...     subgrader=StringGrader(),
-...     wrong_msg='Try again!'
-... )
-&gt;&gt;&gt; grader(None, 'wolf, feline') == {'grade_decimal': 0.0, 'msg': 'Try again!', 'ok': False}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">(),</span>
+<span class="gp">... </span>    <span class="n">wrong_msg</span><span class="o">=</span><span class="s1">&#39;Try again!&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;wolf, feline&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Try again!&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h2 id="ordered-input">Ordered Input<a class="headerlink" href="#ordered-input" title="Permanent link"> # </a></h2>
 <p>By default, a <code>SingleListGrader</code> doesn't care which order the input is given in. If you want the answers and the student input to be compared in order, set <code>ordered=True</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=['cat', 'dog'],
-...     subgrader=StringGrader(),
-...     ordered=True
-... )
-&gt;&gt;&gt; grader(None, 'cat, dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog, cat') == {'grade_decimal': 0.0, 'msg': '', 'ok': False}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">(),</span>
+<span class="gp">... </span>    <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, dog&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;dog, cat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Now <code>cat, dog</code> will receive full grades, but <code>dog, cat</code> will be marked wrong. Note that <code>cat</code> will receive half credit, but <code>dog</code> will receive zero, as dog is incorrect in the first position. Ordered is <code>False</code> by default.</p>
 <h2 id="length-checking">Length Checking<a class="headerlink" href="#length-checking" title="Permanent link"> # </a></h2>
 <p>If students are asked to enter a list of three items but only enter two, should this use up an attempt, or present an error message? If you want to present an error message, turn on length checking.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=['cat', 'dog'],
-...     subgrader=StringGrader(),
-... )
-&gt;&gt;&gt; grader(None, 'cat, dog, unicorn') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=['cat', 'dog'],
-...     subgrader=StringGrader(),
-...     length_error=True
-... )
-&gt;&gt;&gt; try:
-...     grader(None, 'cat')
-... except MissingInput as error:
-...     print(error)
-List length error: Expected 2 terms in the list, but received 1. Separate items with character &quot;,&quot;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">(),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, dog, unicorn&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">(),</span>
+<span class="gp">... </span>    <span class="n">length_error</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">MissingInput</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">List length error: Expected 2 terms in the list, but received 1. Separate items with character &quot;,&quot;</span>
+</code></pre></div>
 
 <p>If you give this <code>cat</code>, it will tell you that you've got the wrong length, and won't use up an attempt.</p>
 <p>By default, <code>length_error</code> is set to <code>False</code>. If you set <code>length_error</code> to <code>True</code>, then all answers in a tuple of lists (rather than a single answer list) must have the same length.</p>
 <h2 id="empty-entries">Empty Entries<a class="headerlink" href="#empty-entries" title="Permanent link"> # </a></h2>
 <p>In order to protect students from typos, the grader returns an error if a student's response has an empty entry (or an entry that just contains spaces). If you want students to be able to enter a list with an empty entry, you need to disable this behavior by setting <code>missing_error=False</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=['cat', 'dog'],
-...     subgrader=StringGrader()
-... )
-&gt;&gt;&gt; try:
-...     grader(None, 'cat, dog,')
-... except MissingInput as error:
-...     print(error)
-List error: Empty entry detected in position 3
-&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=['cat', 'dog'],
-...     subgrader=StringGrader(),
-...     missing_error=False
-... )
-&gt;&gt;&gt; grader(None, 'cat, dog,') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">()</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, dog,&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">MissingInput</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">List error: Empty entry detected in position 3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">(),</span>
+<span class="gp">... </span>    <span class="n">missing_error</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, dog,&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h2 id="choosing-delimiters">Choosing Delimiters<a class="headerlink" href="#choosing-delimiters" title="Permanent link"> # </a></h2>
 <p>You can use whatever delimiter you like. The default is a comma (<code>,</code>). The following uses a semicolon as a delimiter. We recommend not using multi-character delimiters, but do not disallow it.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=['cat', 'dog'],
-...     subgrader=StringGrader(),
-...     delimiter=';'
-... )
-&gt;&gt;&gt; grader(None, 'cat; dog') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">(),</span>
+<span class="gp">... </span>    <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat; dog&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>By using different delimiters, it is possible to nest <code>SingleListGrader</code>s:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=[['a', 'b'], ['c', 'd']],
-...     subgrader=SingleListGrader(
-...         subgrader=StringGrader()
-...     ),
-...     delimiter=';'
-... )
-&gt;&gt;&gt; grader(None, 'd, c; a, b') == {'grade_decimal': 1.0, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'a, c; d, b') == {'grade_decimal': 0.5, 'msg': '', 'ok': 'partial'}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">]],</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="p">),</span>
+<span class="gp">... </span>    <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;d, c; a, b&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;a, c; d, b&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Here the expected student input is <code>a, b; c, d</code>. It will also take <code>b, a; d, c</code> or <code>c, d; a, b</code> due to the unordered nature of both lists. However, <code>a, c; d, b</code> is only worth half points.</p>
 <h2 id="partial-credit">Partial Credit<a class="headerlink" href="#partial-credit" title="Permanent link"> # </a></h2>
 <p>By default, partial credit is awarded to partially correct answers. Answers that have insufficient items lose points, as do answers that have too many items. To turn off partial credit, set <code>partial_credit=False</code>. It is <code>True</code> by default.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = SingleListGrader(
-...     answers=['cat', 'dog'],
-...     subgrader=StringGrader(),
-...     partial_credit=False
-... )
-&gt;&gt;&gt; grader(None, 'cat, octopus') == {'grade_decimal': 0.0, 'msg': '', 'ok': False}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">StringGrader</span><span class="p">(),</span>
+<span class="gp">... </span>    <span class="n">partial_credit</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat, octopus&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Now <code>cat, octopus</code> will receive a grade of zero.</p>
 <h2 id="inferred-answers">Inferred Answers<a class="headerlink" href="#inferred-answers" title="Permanent link"> # </a></h2>
 <p>Just as for normal <code>ItemGrader</code>s, the <code>answers</code> key can be inferred from the <code>expect</code> or <code>answer</code> parameter in a <code>customresponse</code> tag. Here is an example.</p>
-<pre class="codehilite"><code class="language-XML">&lt;problem&gt;
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
 
-&lt;script type=&quot;text/python&quot;&gt;
-from mitxgraders import *
-&lt;/script&gt;
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
+<span class="nt">&lt;/script&gt;</span>
 
-&lt;!-- Define the problem --&gt;
-&lt;customresponse cfn=&quot;SingleListGrader(subgrader=StringGrader())&quot; expect=&quot;a, b, c, d&quot;&gt;
-  &lt;textline /&gt;
-&lt;/customresponse&gt;
+<span class="cm">&lt;!-- Define the problem --&gt;</span>
+<span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;SingleListGrader(subgrader=StringGrader())&quot;</span><span class="w"> </span><span class="na">expect=</span><span class="s">&quot;a, b, c, d&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/customresponse&gt;</span>
 
-&lt;/problem&gt;
-</code></pre>
+<span class="nt">&lt;/problem&gt;</span>
+</code></pre></div>
 
 <p>Here, the grader is a <code>SingleListGrader</code> using <code>StringGrader</code> as a subgrader, and uses default values for all other options. The <code>answers</code> key is missing, so it is inferred to be <code>['a', 'b', 'c', 'd']</code> from the <code>expect</code> parameter of the <code>customresponse</code> tag. Answer inference will even work with nested <code>SingleListGrader</code>s.</p>
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to a <code>SingleListGrader</code>.</p>
-<pre class="codehilite"><code class="language-python">grader = SingleListGrader(
-    answers=(list, {'expect': list}, (list, {'expect': list}, )),
-    subgrader=ItemGrader(),
-    partial_credit=bool,  # default True
-    ordered=bool,  # default False
-    length_error=bool,  # default False
-    missing_error=bool,  # default True
-    delimiter=str,  # default ','
-)
-</code></pre></div>
+<div class="codehilite"><pre><span></span><code><span class="n">grader</span> <span class="o">=</span> <span class="n">SingleListGrader</span><span class="p">(</span>
+    <span class="n">answers</span><span class="o">=</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">},</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">},</span> <span class="p">)),</span>
+    <span class="n">subgrader</span><span class="o">=</span><span class="n">ItemGrader</span><span class="p">(),</span>
+    <span class="n">partial_credit</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default True</span>
+    <span class="n">ordered</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default False</span>
+    <span class="n">length_error</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default False</span>
+    <span class="n">missing_error</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default True</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &#39;,&#39;</span>
+<span class="p">)</span>
+</code></pre></div></div>
+        
         
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '../..';
-    </script>
-    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-    <script src="../../js/base.js"></script>
-    <script src="../../search/require.js"></script>
-    <script src="../../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../.."</script>
+    
+    <script src="../../js/base.js"></script>
+    <script src="../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

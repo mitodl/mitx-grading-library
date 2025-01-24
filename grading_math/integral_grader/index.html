@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
+    
     <title>IntegralGrader - MITxGraders</title>
+    
 
-    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../../css/base.css" rel="stylesheet">
-    <link href="../../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/base.min.css" rel="stylesheet">
+    <link href="../../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../../css/extra.css" rel="stylesheet">
-
-
     <link href="../../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="../..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="../..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../renderer/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../renderer/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../sum_grader/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../sum_grader/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -281,60 +282,60 @@ the following:</p>
 <p>In some cases, problems might be avoided by using the integrator_options configuration key to provide extra instructions to <code>scipy.integrate.quad</code>, as documented below.</p>
 <h2 id="xml-setup">XML Setup<a class="headerlink" href="#xml-setup" title="Permanent link"> # </a></h2>
 <p>We recommend copying the following XML to set up a problem using <code>IntegralGrader</code>:</p>
-<pre class="codehilite"><code class="language-XML">&lt;style&gt;
-  .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline input {
-    min-width: 0 !important;
-  }
-  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax {
-    display: inline-block !important;
-  }
-  .xmodule_display.xmodule_CapaModule div.problem section div span.MathJax_Preview {
-    display: inline-block !important;
-  }
-&lt;/style&gt;
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;style&gt;</span>
+<span class="w">  </span>.xmodule_display.xmodule_CapaModule<span class="w"> </span>.problem<span class="w"> </span>.capa_inputtype.textline<span class="w"> </span>input<span class="w"> </span>{
+<span class="w">    </span>min-width:<span class="w"> </span>0<span class="w"> </span>!important;
+<span class="w">  </span>}
+<span class="w">  </span>.xmodule_display.xmodule_CapaModule<span class="w"> </span>div.problem<span class="w"> </span>section<span class="w"> </span>div<span class="w"> </span>span.MathJax<span class="w"> </span>{
+<span class="w">    </span>display:<span class="w"> </span>inline-block<span class="w"> </span>!important;
+<span class="w">  </span>}
+<span class="w">  </span>.xmodule_display.xmodule_CapaModule<span class="w"> </span>div.problem<span class="w"> </span>section<span class="w"> </span>div<span class="w"> </span>span.MathJax_Preview<span class="w"> </span>{
+<span class="w">    </span>display:<span class="w"> </span>inline-block<span class="w"> </span>!important;
+<span class="w">  </span>}
+<span class="nt">&lt;/style&gt;</span>
 
-&lt;span&gt;
-  &lt;customresponse cfn=&quot;grader&quot;&gt;
-    &lt;table&gt;
-      &lt;col style=&quot;width:10%&quot;/&gt;
-      &lt;col style=&quot;width:90%&quot;/&gt;
-      &lt;tbody&gt;
-        &lt;tr&gt;
-          &lt;td colspan=&quot;2&quot;&gt;
-            &lt;textline size=&quot;5&quot; correct_answer=&quot;1&quot;/&gt;
-          &lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-          &lt;td&gt;
-            &lt;p&gt; \( \displaystyle \huge{ \int }\)&lt;/p&gt;
-          &lt;/td&gt;
-          &lt;td&gt;
-            &lt;br/&gt;
-            &lt;textline inline=&quot;1&quot; size=&quot;10&quot; correct_answer=&quot;e^x&quot; trailing_text=&quot;  [mathjaxinline] dx [/mathjaxinline]&quot;/&gt;
-          &lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-          &lt;td colspan=&quot;2&quot;&gt;
-            &lt;textline size=&quot;5&quot; correct_answer=&quot;0&quot;/&gt;
-          &lt;/td&gt;
-        &lt;/tr&gt;
-      &lt;/tbody&gt;
-    &lt;/table&gt;
-  &lt;/customresponse&gt;
-&lt;/span&gt;
-</code></pre>
+<span class="nt">&lt;span&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;table&gt;</span>
+<span class="w">      </span><span class="nt">&lt;col</span><span class="w"> </span><span class="na">style=</span><span class="s">&quot;width:10%&quot;</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;col</span><span class="w"> </span><span class="na">style=</span><span class="s">&quot;width:90%&quot;</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;tbody&gt;</span>
+<span class="w">        </span><span class="nt">&lt;tr&gt;</span>
+<span class="w">          </span><span class="nt">&lt;td</span><span class="w"> </span><span class="na">colspan=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">size=</span><span class="s">&quot;5&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/td&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/tr&gt;</span>
+<span class="w">        </span><span class="nt">&lt;tr&gt;</span>
+<span class="w">          </span><span class="nt">&lt;td&gt;</span>
+<span class="w">            </span><span class="nt">&lt;p&gt;</span><span class="w"> </span>\(<span class="w"> </span>\displaystyle<span class="w"> </span>\huge{<span class="w"> </span>\int<span class="w"> </span>}\)<span class="nt">&lt;/p&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/td&gt;</span>
+<span class="w">          </span><span class="nt">&lt;td&gt;</span>
+<span class="w">            </span><span class="nt">&lt;br/&gt;</span>
+<span class="w">            </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">inline=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">size=</span><span class="s">&quot;10&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;e^x&quot;</span><span class="w"> </span><span class="na">trailing_text=</span><span class="s">&quot;  [mathjaxinline] dx [/mathjaxinline]&quot;</span><span class="nt">/&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/td&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/tr&gt;</span>
+<span class="w">        </span><span class="nt">&lt;tr&gt;</span>
+<span class="w">          </span><span class="nt">&lt;td</span><span class="w"> </span><span class="na">colspan=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">size=</span><span class="s">&quot;5&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;0&quot;</span><span class="nt">/&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/td&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/tr&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/tbody&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/table&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
+<span class="nt">&lt;/span&gt;</span>
+</code></pre></div>
 
 <p>This sets up an integral where students can input the limits of integration and the integrand (the variable of integration has been fixed to be <code>x</code> in this case).</p>
 <p>Further examples of formatting integrals are shown in the example course.</p>
 <h2 id="specifying-the-input-format">Specifying the Input Format<a class="headerlink" href="#specifying-the-input-format" title="Permanent link"> # </a></h2>
 <p>The grader must be told which input is what, based on the order that the inputs appear in the XML. This is done through the <code>input_positions</code> dictionary. If not specified, it is assumed that the following positions are used:</p>
-<pre class="codehilite"><code class="language-python">input_positions = {
-    'lower': 1,
-    'upper': 2,
-    'integrand': 3,
-    'integration_variable': 4
-}
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">input_positions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lower&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;upper&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;integrand&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;integration_variable&#39;</span><span class="p">:</span> <span class="mi">4</span>
+<span class="p">}</span>
+</code></pre></div>
 
 <p>This requires students to enter all four parameters in the indicated order.</p>
 <p>If the author overrides the default <code>input_positions</code> value, any subset of the keys ('lower', 'upper', 'integrand', 'integration_variable') may be specified. Key values should be</p>
@@ -343,41 +344,41 @@ the following:</p>
 <li>(default) None, indicating that the parameter is not entered by student</li>
 </ul>
 <p>For example,</p>
-<pre class="codehilite"><code class="language-python">input_positions = {
-    'lower': 1,
-    'upper': 2,
-    'integrand': 3
-}
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">input_positions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lower&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;upper&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;integrand&#39;</span><span class="p">:</span> <span class="mi">3</span>
+<span class="p">}</span>
+</code></pre></div>
 
 <p>indicates that the problem has 3 input boxes which represent the lower limit, upper limit, and integrand in that order. The <code>integration_variable</code> is NOT entered by student and is instead given by the value specified by author in 'answers'.</p>
 <p>Here is a sample grader for the above XML:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = IntegralGrader(
-...     answers={
-...         'lower':'0',
-...         'upper':'1',
-...         'integrand':'e^x',
-...         'integration_variable':'x'
-...     },
-...     input_positions = {
-...         'upper': 1,
-...         'integrand': 2,
-...         'lower': 3
-...     }
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntegralGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;lower&#39;</span><span class="p">:</span><span class="s1">&#39;0&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">&#39;upper&#39;</span><span class="p">:</span><span class="s1">&#39;1&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">&#39;integrand&#39;</span><span class="p">:</span><span class="s1">&#39;e^x&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">&#39;integration_variable&#39;</span><span class="p">:</span><span class="s1">&#39;x&#39;</span>
+<span class="gp">... </span>    <span class="p">},</span>
+<span class="gp">... </span>    <span class="n">input_positions</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;upper&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">&#39;integrand&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">&#39;lower&#39;</span><span class="p">:</span> <span class="mi">3</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>Note that when students specify their own variable of integration, it must not conflict with a variable already present in the problem.</p>
 <h2 id="specifying-the-answer">Specifying the Answer<a class="headerlink" href="#specifying-the-answer" title="Permanent link"> # </a></h2>
 <p>The author's answer should be specified as a dictionary with the following keys:</p>
-<pre class="codehilite"><code class="language-python">answers = {
-    'lower': 'lower_limit',
-    'upper': 'upper_limit',
-    'integrand': 'integrand',
-    'integration_variable': 'variable_of_integration'
-}
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">answers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;lower&#39;</span><span class="p">:</span> <span class="s1">&#39;lower_limit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;upper&#39;</span><span class="p">:</span> <span class="s1">&#39;upper_limit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;integrand&#39;</span><span class="p">:</span> <span class="s1">&#39;integrand&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;integration_variable&#39;</span><span class="p">:</span> <span class="s1">&#39;variable_of_integration&#39;</span>
+<span class="p">}</span>
+</code></pre></div>
 
 <p>Note that each entry is a string value.</p>
 <p><code>IntegralGrader</code> can handle integrals over both finite and infinite domains. A special constant <code>'infty'</code> is recognized to cater for the infinite case (and takes on the special value <code>float('inf')</code>).</p>
@@ -405,77 +406,127 @@ the following:</p>
 <p>Unless otherwise specified, the defaults are the same as in <code>FormulaGrader</code>.</p>
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to an <code>IntegralGrader</code>.</p>
-<pre class="codehilite"><code class="language-python">grader = IntegralGrader(
-    input_positions=dict,
-    answers=dict,
-    integrator_options=dict,  # default {'full_output': 1}
-    complex_integrand=bool,  # default False
-    # The below options are the same as in FormulaGrader
-    variables=list,  # default []
-    sample_from=dict,  # default {}
-    samples=int,  # default 1
-    user_functions=dict,  # default {}
-    user_constants=dict,  # default {}
-    failable_evals=int,  # default 0
-    blacklist=list,  # default []
-    whitelist=list,  # default []
-    tolerance=(float | percentage),  # default '0.01%'
-    numbered_vars=list,  # default []
-    instructor_vars=list,  # default []
-    forbidden_strings=list,  # default []
-    forbidden_message=str,  # default 'Invalid Input: This particular answer is forbidden'
-    required_functions=list,  # default []
-    metric_suffixes=bool,  # default False
-)
-</code></pre></div>
+<div class="codehilite"><pre><span></span><code><span class="n">grader</span> <span class="o">=</span> <span class="n">IntegralGrader</span><span class="p">(</span>
+    <span class="n">input_positions</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>
+    <span class="n">answers</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>
+    <span class="n">integrator_options</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>  <span class="c1"># default {&#39;full_output&#39;: 1}</span>
+    <span class="n">complex_integrand</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default False</span>
+    <span class="c1"># The below options are the same as in FormulaGrader</span>
+    <span class="n">variables</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">sample_from</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>  <span class="c1"># default {}</span>
+    <span class="n">samples</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>  <span class="c1"># default 1</span>
+    <span class="n">user_functions</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>  <span class="c1"># default {}</span>
+    <span class="n">user_constants</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>  <span class="c1"># default {}</span>
+    <span class="n">failable_evals</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>  <span class="c1"># default 0</span>
+    <span class="n">blacklist</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">whitelist</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">tolerance</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">percentage</span><span class="p">),</span>  <span class="c1"># default &#39;0.01%&#39;</span>
+    <span class="n">numbered_vars</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">instructor_vars</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">forbidden_strings</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">forbidden_message</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &#39;Invalid Input: This particular answer is forbidden&#39;</span>
+    <span class="n">required_functions</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">metric_suffixes</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default False</span>
+<span class="p">)</span>
+</code></pre></div></div>
+        
         
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '../..';
-    </script>
-    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-    <script src="../../js/base.js"></script>
-    <script src="../../search/require.js"></script>
-    <script src="../../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../.."</script>
+    
+    <script src="../../js/base.js"></script>
+    <script src="../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

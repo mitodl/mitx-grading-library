@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
+    
     <title>IntervalGrader - MITxGraders</title>
+    
 
-    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../../css/base.css" rel="stylesheet">
-    <link href="../../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/base.min.css" rel="stylesheet">
+    <link href="../../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../../css/extra.css" rel="stylesheet">
-
-
     <link href="../../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="../..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="../..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../sum_grader/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../sum_grader/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../../grading_lists/single_list_grader/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../../grading_lists/single_list_grader/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -294,57 +295,57 @@ something else.</p>
 </div>
 <h2 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link"> # </a></h2>
 <p>To use an <code>IntervalGrader</code>, you can simply call invoke it like a typical grader:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = IntervalGrader(answers='[0, 1]')
-&gt;&gt;&gt; grader(None, '[0, 1]') == {'ok': True, 'grade_decimal': 1, 'msg': ''}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span><span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[0, 1]&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;[0, 1]&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Answers may be specified by supplying the relevant answer as a string, as in the above example, either through the <code>answers</code> key or through the <code>expect</code> keyword of the <code>customresponse</code> tag. You can also break out the answer into four constituent parts in a list as follows:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = IntervalGrader(answers=['[', '0', '1', ']'])
-&gt;&gt;&gt; grader(None, '[0, 1]') == {'ok': True, 'grade_decimal': 1, 'msg': ''}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span><span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;]&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;[0, 1]&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Each individual answer component conforms to the <code>ItemGrader</code> answers specification, so you can do things like the following:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
-...     answers=[
-...         ('[', {'expect': '(', 'msg': 'Your opening bracket is wrong.', 'grade_decimal': 0.5}),
-...         '0',
-...         '1',
-...         (']', {'expect': ')', 'msg': 'Your closing bracket is wrong.', 'grade_decimal': 0.5}),
-...     ]
-... )
-&gt;&gt;&gt; grader(None, '[0, 1)') == {'ok': 'partial', 'grade_decimal': 0.75, 'msg': 'Your closing bracket is wrong.'}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your opening bracket is wrong.&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}),</span>
+<span class="gp">... </span>        <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">&#39;1&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your closing bracket is wrong.&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}),</span>
+<span class="gp">... </span>    <span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;[0, 1)&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your closing bracket is wrong.&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h2 id="brackets">Brackets<a class="headerlink" href="#brackets" title="Permanent link"> # </a></h2>
 <p>You can specify the opening and closing brackets that students may use. Specify each separately as a list of acceptable characters. Entries that do not use these brackets will receive an error message.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
-...     answers='[0,1]',
-...     opening_brackets='([{',
-...     closing_brackets=')]}'
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[0,1]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">opening_brackets</span><span class="o">=</span><span class="s1">&#39;([{&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">closing_brackets</span><span class="o">=</span><span class="s1">&#39;)]}&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>The default for <code>opening_brackets</code> is <code>'[('</code>, while the default for <code>closing_brackets</code> is <code>'])'</code>.</p>
 <h2 id="subgrader">Subgrader<a class="headerlink" href="#subgrader" title="Permanent link"> # </a></h2>
 <p>Grading of the two math expressions is performed by a subgrader. The default subgrader is <code>NumericalGrader(tolerance=1e-13, allow_inf=True)</code>, which allows <code>infty</code> as an entry, and otherwise sets a tight absolute tolerance on the answers. If this default doesn't suit your requirements, you may specify your own <code>FormulaGrader</code> or <code>NumericalGrader</code> as the subgrader for the expressions. This is particularly useful if you want variables to be allowed to appear in the expressions.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
-...     answers='[a,b^2]',
-...     subgrader=FormulaGrader(variables=['a', 'b'])
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[a,b^2]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">FormulaGrader</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">])</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <h2 id="delimiter">Delimiter<a class="headerlink" href="#delimiter" title="Permanent link"> # </a></h2>
 <p>The default delimiter is a comma. However, due to the way expressions are parsed, if your expressions include commas in any location, the answer will not parse correctly. We suggest changing the delimiter to another character, as follows.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = IntervalGrader(
-...     answers='[0:1]',
-...     delimiter=':'
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[0:1]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;:&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <h2 id="partial-credit-and-how-credit-is-assigned-in-general">Partial Credit (and how credit is assigned in general)<a class="headerlink" href="#partial-credit-and-how-credit-is-assigned-in-general" title="Permanent link"> # </a></h2>
 <p>Grading works by first using the subgrader to obtain the decimal grade for each expression the student submitted. For each correct expression, the bracket is then inspected. If the bracket is correct, then the score for that expression is kept (or if <code>grade_decimal</code> is set for the bracket, then the score for the expression is multiplied by that entry). If the bracket is incorrect, zero is awarded for that expression. The two resulting scores are then combined to obtain the overall score. If <code>partial_credit</code> is set to <code>False</code>, then the overall score must be 1 for any credit to be awarded. By default, <code>partial_credit</code> is <code>True</code>. When partial credit is turned on, each half of the interval is worth 50% of the overall credit.</p>
@@ -352,61 +353,111 @@ True
 <p>Note that no credit is awarded for getting the entries backwards. If this should be graded correct, supply alternative answers to the grader using the <code>ItemGrader</code> answers specification.</p>
 <h2 id="options-listing">Options Listing<a class="headerlink" href="#options-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to an <code>IntervalGrader</code>.</p>
-<pre class="codehilite"><code class="language-python">grader = IntervalGrader(
-    opening_brackets=str,  # defaykt '[('
-    closing_brackets=str,  # default '])'
-    delimiter=str,  # default ',', must be one character
-    partial_credit=bool  # default True
-)
-</code></pre></div>
+<div class="codehilite"><pre><span></span><code><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span>
+    <span class="n">opening_brackets</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># defaykt &#39;[(&#39;</span>
+    <span class="n">closing_brackets</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &#39;])&#39;</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &#39;,&#39;, must be one character</span>
+    <span class="n">partial_credit</span><span class="o">=</span><span class="nb">bool</span>  <span class="c1"># default True</span>
+<span class="p">)</span>
+</code></pre></div></div>
+        
         
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '../..';
-    </script>
-    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-    <script src="../../js/base.js"></script>
-    <script src="../../search/require.js"></script>
-    <script src="../../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../.."</script>
+    
+    <script src="../../js/base.js"></script>
+    <script src="../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

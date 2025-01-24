@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
+    
     <title>Comparer Functions - MITxGraders</title>
+    
 
-    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../../css/base.css" rel="stylesheet">
-    <link href="../../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/base.min.css" rel="stylesheet">
+    <link href="../../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../../css/extra.css" rel="stylesheet">
-
-
     <link href="../../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="../..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="../..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../user_functions/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../user_functions/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../renderer/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../renderer/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -276,52 +277,52 @@
 <p>By default, <code>FormulaGrader</code>, <code>NumericalGrader</code>, and <code>MatrixGrader</code> compare the numerically-sampled author formula and student formula for equality (within bounds specified by tolerance). Occasionally, it can be useful to compare author and student formulas in some other way. Functions that perform the actual comparison are called "comparers", and there are a few ways to invoke them.</p>
 <h2 id="employing-comparer-functions">Employing Comparer Functions<a class="headerlink" href="#employing-comparer-functions" title="Permanent link"> # </a></h2>
 <p>When an answer is passed into <code>FormulaGrader</code>, <code>NumericalGrader</code> or <code>MatrixGrader</code>, it is automatically paired up with a comparer. For example, the default comparer is <code>equality_comparer</code>. When you construct a grader like the following,</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader1 = FormulaGrader(
-...     answers='a+b',
-...     variables=['a', 'b']
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader1</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;a+b&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p><code>FormulaGrader</code> automatically converts the <code>answers</code> key to the following:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader2 = FormulaGrader(
-...     answers={
-...         'expect': {'comparer': equality_comparer, 'comparer_params': ['a+b']},
-...         'grade_decimal': 1,
-...         'msg': ''
-...     },
-...     variables=['a', 'b']
-... )
-&gt;&gt;&gt; grader1 == grader2
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader2</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;comparer&#39;</span><span class="p">:</span> <span class="n">equality_comparer</span><span class="p">,</span> <span class="s1">&#39;comparer_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a+b&#39;</span><span class="p">]},</span>
+<span class="gp">... </span>        <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+<span class="gp">... </span>    <span class="p">},</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader1</span> <span class="o">==</span> <span class="n">grader2</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>To specify an alternate comparer, you can simply change the relevant answer to a dictionary <code>{'comparer': comparer_func, 'comparer_params': [list, of, params]}</code>. Different comparers use <code>comparer_params</code> in different ways.</p>
 <p>For example, if grading angles in degrees, it may be useful to compare formulas modulo 2&#960;. You can write your own comparer functions, but for this we can use the pre-built <code>congruent_modulo</code> comparer. This grader will accept any input congruent to <code>'b^2/a'</code> modulo <code>2*pi</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers={
-...         'comparer': congruence_comparer,
-...         # first parameter is expected value, second is the modulus
-...         'comparer_params': ['b^2/a', '2*pi']
-...     },
-...     variables=['a', 'b']
-... )
-&gt;&gt;&gt; grader(None, 'b^2/a + 6*pi')['ok']
-True
-&gt;&gt;&gt; grader(None, 'b^2/a + 5.5*pi')['ok']
-False
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;comparer&#39;</span><span class="p">:</span> <span class="n">congruence_comparer</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="c1"># first parameter is expected value, second is the modulus</span>
+<span class="gp">... </span>        <span class="s1">&#39;comparer_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;b^2/a&#39;</span><span class="p">,</span> <span class="s1">&#39;2*pi&#39;</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="p">},</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;b^2/a + 6*pi&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;b^2/a + 5.5*pi&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="go">False</span>
+</code></pre></div>
 
 <p>Here, the <code>comparer_params</code> (<code>['b^2/a', '2*pi']</code>) are evaluated just like the student input, and used by the comparer function during grading.</p>
 <h2 id="changing-defaults">Changing Defaults<a class="headerlink" href="#changing-defaults" title="Permanent link"> # </a></h2>
 <p>The default comparer function for each of <code>FormulaGrader</code>, <code>NumericalGrader</code> and <code>MatrixGrader</code> can be set by calling <code>set_default_comparer</code> as follows:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; FormulaGrader.set_default_comparer(LinearComparer())
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">FormulaGrader</span><span class="o">.</span><span class="n">set_default_comparer</span><span class="p">(</span><span class="n">LinearComparer</span><span class="p">())</span>
+</code></pre></div>
 
 <p>This sets the default comparer to <code>LinearComparer()</code> (see below) for all <code>FormulaGrader</code>s in the given problem. Comparers set in this manner must only take a single comparer parameter. Using this default set approach is typically simpler than setting comparers explicitly, and allows answers to be inferred from <code>expect</code> values. However, comparers that require two or more <code>comparer_params</code> cannot use this method.</p>
 <p>If for some reason you need to reset the default comparer, you can use</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; FormulaGrader.reset_default_comparer()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">FormulaGrader</span><span class="o">.</span><span class="n">reset_default_comparer</span><span class="p">()</span>
+</code></pre></div>
 
 <p>which is equivalent to setting the default comparer to <code>equality_comparer</code>.</p>
 <h2 id="available-comparers">Available Comparers<a class="headerlink" href="#available-comparers" title="Permanent link"> # </a></h2>
@@ -380,44 +381,44 @@ False
 <h3 id="equalitycomparer">EqualityComparer<a class="headerlink" href="#equalitycomparer" title="Permanent link"> # </a></h3>
 <p>The <code>EqualityComparer</code> class simply checks for equality up to tolerance. In fact, <code>equality_comparer = EqualityComparer()</code>. The reason this class exists, however, is to allow for an extra option to be used when desired.</p>
 <p>The <code>transform</code> option allows the author to specify a transforming function to be called on both the answer and the student input prior to comparison. Here is an example:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; import numpy as np
-&gt;&gt;&gt; comparer = EqualityComparer(transform=np.real)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparer</span> <span class="o">=</span> <span class="n">EqualityComparer</span><span class="p">(</span><span class="n">transform</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+</code></pre></div>
 
 <p>This comparer will take the real part of the answer and the student input before comparing the results. This is useful if only the real part of the answers need to agree.</p>
 <h3 id="linearcomparer">LinearComparer<a class="headerlink" href="#linearcomparer" title="Permanent link"> # </a></h3>
 <p>The <code>LinearComparer</code> checks if the student's answer is linearly related to the problem's answer, and can provide partial credit as appropriate. Here are all of the options:</p>
-<pre class="codehilite"><code class="language-python">comparer = LinearComparer(
-    equals=float,  # default 1
-    proportional=(None | float),  # default 0.5
-    offset=(None | float),  # default None
-    linear=(None | float),  # default None
-    equals_msg=(None | str),  # default None
-    proportional_msg=(None | str),  # default 'The submitted answer differs from an expected answer by a constant factor.'
-    offset_msg=(None | str),  # default None
-    linear_msg=(None | str),  # default None
-)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">comparer</span> <span class="o">=</span> <span class="n">LinearComparer</span><span class="p">(</span>
+    <span class="n">equals</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>  <span class="c1"># default 1</span>
+    <span class="n">proportional</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="o">|</span> <span class="nb">float</span><span class="p">),</span>  <span class="c1"># default 0.5</span>
+    <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="o">|</span> <span class="nb">float</span><span class="p">),</span>  <span class="c1"># default None</span>
+    <span class="n">linear</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="o">|</span> <span class="nb">float</span><span class="p">),</span>  <span class="c1"># default None</span>
+    <span class="n">equals_msg</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="o">|</span> <span class="nb">str</span><span class="p">),</span>  <span class="c1"># default None</span>
+    <span class="n">proportional_msg</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="o">|</span> <span class="nb">str</span><span class="p">),</span>  <span class="c1"># default &#39;The submitted answer differs from an expected answer by a constant factor.&#39;</span>
+    <span class="n">offset_msg</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="o">|</span> <span class="nb">str</span><span class="p">),</span>  <span class="c1"># default None</span>
+    <span class="n">linear_msg</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="o">|</span> <span class="nb">str</span><span class="p">),</span>  <span class="c1"># default None</span>
+<span class="p">)</span>
+</code></pre></div>
 
 <p>The first four settings specify how much credit to award the different situations, while the next four describe a message to display when that credit is awarded. Note that setting credit to <code>None</code> means that that type of credit will never be awarded, while setting credit to <code>0</code> means that it can be awarded (usually to display the relevant message). When the grading is performed, the largest credit of the available settings is awarded.</p>
 <p>Here is an example of a <code>LinearComparer</code> that can be used to award partial credit if students are off from the answer by a constant multiple.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; comparer = LinearComparer()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">comparer</span> <span class="o">=</span> <span class="n">LinearComparer</span><span class="p">()</span>
+</code></pre></div>
 
 <p>Easy, isn't it? You can combine this with <code>set_default_comparer</code> to enable partial credit of this sort with one line in each problem!</p>
 <p>Here is an example of setting up a <code>LinearComparer</code> that doesn't care about shift offsets (useful when describing indefinite integration).</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; comparer = LinearComparer(proportional=None, linear=1)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">comparer</span> <span class="o">=</span> <span class="n">LinearComparer</span><span class="p">(</span><span class="n">proportional</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
 
 <p>Note that <code>LinearComparer</code> can only perform meaningful comparisons when random variables are used. If the answer is a numerical constant, then student answers will always be proportional to that constant, which probably isn't the desired behavior. Also note that when the answer is zero or the student supplies zero as their answer, partial credit cannot be assigned.</p>
 <h3 id="matrixentrycomparer">MatrixEntryComparer<a class="headerlink" href="#matrixentrycomparer" title="Permanent link"> # </a></h3>
 <p>This comparer is used only for <code>MatrixGrader</code>s. It has a <code>transform</code> option that is exactly equivalent to <code>EqualityComparer</code>, but it also has two options related to partial credit.</p>
-<pre class="codehilite"><code class="language-python">comparer = MatrixEntryComparer(
-    transform=(None | func),  # default None
-    entry_partial_credit=('proportional' | float),  # default 0
-    entry_partial_msg=str,  # default &quot;Some array entries are incorrect, marked below:\n{error_locations}&quot;
-)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">comparer</span> <span class="o">=</span> <span class="n">MatrixEntryComparer</span><span class="p">(</span>
+    <span class="n">transform</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="o">|</span> <span class="n">func</span><span class="p">),</span>  <span class="c1"># default None</span>
+    <span class="n">entry_partial_credit</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;proportional&#39;</span> <span class="o">|</span> <span class="nb">float</span><span class="p">),</span>  <span class="c1"># default 0</span>
+    <span class="n">entry_partial_msg</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &quot;Some array entries are incorrect, marked below:\n{error_locations}&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
 
 <p>When <code>entry_partial_credit</code> is set to a number, if at least one entry in the array is correct (but not all of them), that amount of credit is assigned. When partial credit is assigned, the message <code>entry_partial_msg</code> is displayed to the student, with the text <code>{error_locations}</code> replaced by a graphic displaying which entries are correct/incorrect. To turn off the message, simply set <code>entry_partial_msg=''</code>. Setting <code>entry_partial_msg=''</code> and <code>entry_partial_credit=0</code> makes this grader equivalent to <code>EqualityComparer</code>.</p>
 <p>Because this ability to assign partial credit to array input is so useful, <code>MatrixEntryComparer</code> can be set as the grader for <code>MatrixGrader</code>s using configuration options.</p>
@@ -425,53 +426,103 @@ False
 <p>In addition to using the built-in comparers, you can write your own.</p>
 <p>See <a href="https://github.com/mitodl/mitx-grading-library/tree/master/mitxgraders/comparers/comparers.py">comparers.py</a> for documentation and examples.</p></div>
         
+        
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '../..';
-    </script>
-    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-    <script src="../../js/base.js"></script>
-    <script src="../../search/require.js"></script>
-    <script src="../../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../.."</script>
+    
+    <script src="../../js/base.js"></script>
+    <script src="../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
+    
     <title>AsciiMath Renderer Definitions - MITxGraders</title>
+    
 
-    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../../css/base.css" rel="stylesheet">
-    <link href="../../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/base.min.css" rel="stylesheet">
+    <link href="../../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../../css/extra.css" rel="stylesheet">
-
-
     <link href="../../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="../..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="../..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../comparer_functions/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../comparer_functions/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../integral_grader/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../integral_grader/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -269,10 +270,10 @@
 
 <h1 id="asciimath-renderer-definitions">AsciiMath Renderer Definitions<a class="headerlink" href="#asciimath-renderer-definitions" title="Permanent link"> # </a></h1>
 <p>When math input is expected from students, edX offers a math preview that attempts to show their expression in normal mathematical notation. There are two ways to provide this preview:</p>
-<pre class="codehilite"><code class="language-XML">&lt;formulaequationinput/&gt;
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;formulaequationinput/&gt;</span>
 or
-&lt;textline math=&quot;1&quot;/&gt;
-</code></pre>
+<span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+</code></pre></div>
 
 <p>The <code>formulaequationinput</code> tag uses server-side parsing and rendering to display the preview to the student. By and large, the preview from <code>formulaequationinput</code> is better than that of <code>textline</code>, as it treats functions correctly, and displays a number of LaTeX symbols natively. The downsides to <code>formulaequationinput</code> are that it doesn't recognize vectors such as <code>vecx</code> or <code>hatx</code>, the factorial and conjugation functions just apply as <code>fact(x)</code> and <code>conj(x)</code>, and because the processing is done server-side, we are unable to enhance the display at all.</p>
 <p>The <code>textline</code> tag treats the student input as AsciiMath for the purpose of generating a preview, using MathJax to render it. While the preview does a reasonably good job, there are many situations where it falls down, even for standard edX functions (for example, try typing in <code>1/arctanh(x)</code> in a textline box!). Because this is done client-side through javascript, it's possible to supplement the AsciiMath definitions to handle new situations. We have constructed a series of renderer definitions to supplement the standard AsciiMath definitions in order to provide better previews.</p>
@@ -280,16 +281,16 @@ or
 <h2 id="how-it-works">How it Works<a class="headerlink" href="#how-it-works" title="Permanent link"> # </a></h2>
 <p>The renderer definitions are located in a javascript file, <code>MJxPrep.js</code>, which should be uploaded to the static assets folder for your course. This javascript file has two components: symbol definitions and a preprocessor.</p>
 <p>The symbol definitions are used to teach AsciiMath how to display various functions properly, such as <code>re</code>, <code>im</code>, <code>arctanh</code> etc. To load the symbol definitions in a problem, place the following HTML code somewhere in the problem.</p>
-<pre class="codehilite"><code class="language-XML">&lt;script type=&quot;text/javascript&quot; src=&quot;/static/MJxPrep.js&quot;&gt;&lt;/script&gt;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;/static/MJxPrep.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</code></pre></div>
 
 <p>Some functions are too complex for a symbol definition, and need the student's input to be preprocessed into AsciiMath before rendering. These functions include <code>log10</code>, <code>log2</code>, <code>fact</code>/<code>factorial</code>, <code>trans</code>, <code>adj</code>/<code>ctrans</code> and <code>cross</code>.</p>
 <p>It is quite common to have a variable name begin with <code>delta</code> or <code>Delta</code>, such as <code>Deltax</code>. Unfortunately, AsciiMath treats such variables as two separate entries, and can sometimes split them inopportunely, such as for the expression <code>1/Deltax</code>. The preprocessor detects such variable names and ensures that AsciiMath displays them correctly.</p>
 <p>To use these features, you need to add <code>preprocessorClassName</code> and <code>preprocessorSrc</code> properties to any <code>&lt;textline/&gt;</code> tags that use the preprocessor, such as in the following example.</p>
-<pre class="codehilite"><code class="language-XML">&lt;customresponse cfn=&quot;grader&quot;&gt;
-    &lt;textline correct_answer=&quot;1/fact(5)&quot; math=&quot;1&quot; preprocessorClassName=&quot;MJxPrep&quot; preprocessorSrc=&quot;/static/MJxPrep.js&quot;/&gt;
-&lt;/customresponse&gt;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;1/fact(5)&quot;</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">preprocessorClassName=</span><span class="s">&quot;MJxPrep&quot;</span><span class="w"> </span><span class="na">preprocessorSrc=</span><span class="s">&quot;/static/MJxPrep.js&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/customresponse&gt;</span>
+</code></pre></div>
 
 <p>If you use the preprocessor in your problem, you get the symbol definitions as well (you don't need to load them separately using a script tag).</p>
 <h2 id="options">Options<a class="headerlink" href="#options" title="Permanent link"> # </a></h2>
@@ -298,24 +299,24 @@ or
 <p>By default, vectors <code>[1, 2, 3]</code> display as a column vector when the preprocessor is loaded (without the preprocessor, it will display as a row). If you would instead like them to display as a row vector, you can set the option <code>vectors_as_columns: false</code> at the start of the file.</p>
 <h2 id="extending-definitions">Extending Definitions<a class="headerlink" href="#extending-definitions" title="Permanent link"> # </a></h2>
 <p>If you're building a course that uses math extensively, it's likely that you want to use some sort of symbol that can't be written in the form of an edX variable. In this situation, we have provided two functions to extend the preprocessor. At the bottom of <code>MJxPrep.js</code>, you will find the functions <code>customPreReplacements</code> and <code>customPostReplacements</code>, which are called before and after our preprocessing functions occur, respectively. You can perform whatever manipulations you desire in these functions. As an example of a pre-replacement, consider the following line which implements the double factorial:</p>
-<pre class="codehilite"><code class="language-javascript">working = replaceFunctionCalls(working, 'ffact', funcToPostfix('!!') )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="nx">working</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">replaceFunctionCalls</span><span class="p">(</span><span class="nx">working</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ffact&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">funcToPostfix</span><span class="p">(</span><span class="s1">&#39;!!&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">)</span>
+</code></pre></div>
 
 <p>This leverages our <code>replaceFunctionCalls</code> and <code>funcToPostfix</code> functions which detect function calls and perform replacements, respectively (a number of other useful functions are included in the javascript file).</p>
 <p>As an example of a post-replacement, the following line simply replaces a variable name with something that actually looks like a derivative:</p>
-<pre class="codehilite"><code class="language-javascript">working = working.replace(/dphidx/g, '{:(partial phi)/(partial x):}');
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="nx">working</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">working</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/dphidx/g</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{:(partial phi)/(partial x):}&#39;</span><span class="p">);</span>
+</code></pre></div>
 
 <p>This is a trivial example of using regex to make a replacement; of course, more complicated replacements are also possible.</p>
 <p>Finally, if you want to introduce new symbols to AsciiMath using unicode, it's simple to do so. Here's an example of how we introduce hbar to the system:</p>
-<pre class="codehilite"><code class="language-javascript">// This is hbar, often used in physics
-AM.newsymbol({
-  input:&quot;hbar&quot;,
-  tag:&quot;mo&quot;,
-  output:&quot;\u210F&quot;,
-  tex:null,
-  ttype:AM.TOKEN.CONST});
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1">// This is hbar, often used in physics</span>
+<span class="nx">AM</span><span class="p">.</span><span class="nx">newsymbol</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">input</span><span class="o">:</span><span class="s2">&quot;hbar&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">tag</span><span class="o">:</span><span class="s2">&quot;mo&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">output</span><span class="o">:</span><span class="s2">&quot;\u210F&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">tex</span><span class="o">:</span><span class="kc">null</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">ttype</span><span class="o">:</span><span class="nx">AM</span><span class="p">.</span><span class="nx">TOKEN</span><span class="p">.</span><span class="nx">CONST</span><span class="p">});</span>
+</code></pre></div>
 
 <h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link"> # </a></h2>
 <ul>
@@ -330,53 +331,103 @@ AM.newsymbol({
 </li>
 </ul></div>
         
+        
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '../..';
-    </script>
-    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-    <script src="../../js/base.js"></script>
-    <script src="../../search/require.js"></script>
-    <script src="../../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../.."</script>
+    
+    <script src="../../js/base.js"></script>
+    <script src="../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

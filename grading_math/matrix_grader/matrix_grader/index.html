@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../../../img/favicon.ico">
 
+    
     <title>MatrixGrader - MITxGraders</title>
+    
 
-    <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../../../css/base.css" rel="stylesheet">
-    <link href="../../../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../../css/highlight.css">
+    <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../../css/base.min.css" rel="stylesheet">
+    <link href="../../../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../../../css/extra.css" rel="stylesheet">
-
-
     <link href="../../../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../../../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="../../..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="../../..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../../numerical_grader/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../../numerical_grader/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../../sampling/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../../sampling/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -292,33 +293,33 @@
 <p>Do not let its name fool you: <code>MatrixGrader</code> is capable of handling vectors, matrices and tensors. We will sometimes refer to all of these possibilities as "arrays" (<code>MatrixGrader</code> just sounds cooler than <code>ArrayGrader</code> though, doesn't it?).</p>
 <h2 id="a-first-example">A First Example<a class="headerlink" href="#a-first-example" title="Permanent link"> # </a></h2>
 <p>A typical use of <code>MatrixGrader</code> might look like</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader1 = MatrixGrader(
-...   answers='4*A*B^2*v',
-...   variables=['A', 'B', 'v'],
-...   identity_dim=2, # makes 'I' available to students as the 2x2 identity matrix
-...   sample_from={
-...      'A': RealMatrices(), # samples from 2 by 2 matrices by default
-...      'B': RealMatrices(),
-...      'v': RealVectors(shape=2), # sample 2-component vectors
-...   }
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader1</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;4*A*B^2*v&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">],</span>
+<span class="gp">... </span>  <span class="n">identity_dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># makes &#39;I&#39; available to students as the 2x2 identity matrix</span>
+<span class="gp">... </span>  <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>     <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">(),</span> <span class="c1"># samples from 2 by 2 matrices by default</span>
+<span class="gp">... </span>     <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">(),</span>
+<span class="gp">... </span>     <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="c1"># sample 2-component vectors</span>
+<span class="gp">... </span>  <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>The next few lines call the grader as a check function. The inputs <code>'4*A*B^2*v'</code> and <code>'4*A*B*B*v'</code> are correct:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; result = grader1(None, '4*A*B^2*v')
-&gt;&gt;&gt; result == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; result = grader1(None, '4*A*B*B*v')
-&gt;&gt;&gt; result == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;4*A*B^2*v&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;4*A*B*B*v&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>while the input <code>'4*B*A*B*v'</code> is incorrect because the matrix-sampled variables are non-commutative:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; result = grader1(None, '4*B*A*B*v')
-&gt;&gt;&gt; result == {'msg': '', 'grade_decimal': 0, 'ok': False}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;4*B*A*B*v&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h2 id="matrix-sampling">Matrix Sampling<a class="headerlink" href="#matrix-sampling" title="Permanent link"> # </a></h2>
 <p>In the MatrixGrader example above, the variables <code>A</code> and <code>B</code> were sampled from <code>RealMatrices()</code>. The <code>RealMatrices</code> sampling class samples from 2 by 2 matrices by default but can be configured to sample matrices of different shapes. See <a href="../../sampling/#variable-sampling-vectors-and-matrices">Sampling</a> for more information about matrix and vector sampling.</p>
@@ -364,24 +365,24 @@ True
 <h3 id="how-matrixgrader-uses-matharrays">How MatrixGrader uses MathArrays<a class="headerlink" href="#how-matrixgrader-uses-matharrays" title="Permanent link"> # </a></h3>
 <p>Whether a matrix is input entry-by-entry or represented through variables, <code>MathArray</code>s are used to evaluate student expressions.</p>
 <p>For example, consider the grader below.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
-...     answers='2*A*[1, 2, 3] + v',
-...     user_constants={
-...       'A': MathArray([[1, 2, 3], [4, 5, 6]])
-...     },
-...     variables=['v'],
-...     sample_from={
-...       'v': RealVectors(shape=2) # samples a random 2-component vector
-...     }
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;2*A*[1, 2, 3] + v&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">user_constants</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>      <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="gp">... </span>    <span class="p">},</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>      <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># samples a random 2-component vector</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>When a student inputs <code>v + A*2*[1, 2, 3]</code> to the grader above, a calculation similar to</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; v = MathArray([2, -1]) # Really, random samples would be chosen.
-&gt;&gt;&gt; A = MathArray([[1, 2, 3], [4, 5, 6]])
-&gt;&gt;&gt; v + A*2*MathArray([1, 2, 3])  # below is the result of evaluating student input, which would next be compared to author's answer
-MathArray([30, 63])
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># Really, random samples would be chosen.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">+</span> <span class="n">A</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">MathArray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>  <span class="c1"># below is the result of evaluating student input, which would next be compared to author&#39;s answer</span>
+<span class="go">MathArray([30, 63])</span>
+</code></pre></div>
 
 <p>is performed (but repeated multiple times with different values for the random variables).</p>
 <h3 id="dimension-and-shape">Dimension and Shape<a class="headerlink" href="#dimension-and-shape" title="Permanent link"> # </a></h3>
@@ -572,30 +573,30 @@ MathArray([30, 63])
 </ul>
 <h3 id="a-note-about-vectors">A Note About Vectors<a class="headerlink" href="#a-note-about-vectors" title="Permanent link"> # </a></h3>
 <p>Vectors are distinct from single-row matrices and single-column matrices, and can be left- or right-multiplied by a matrix:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; vec = MathArray([1, 2, 3])
-&gt;&gt;&gt; row = MathArray([[1, 2, 3]])
-&gt;&gt;&gt; col = MathArray([[1], [2], [3]])
-&gt;&gt;&gt; try:
-...     vec + row # raises error
-... except StudentFacingError as error:
-...     print(error)
-Cannot add/subtract a vector of length 3 with a matrix of shape (rows: 1, cols: 3).
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">vec</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">row</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">col</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">vec</span> <span class="o">+</span> <span class="n">row</span> <span class="c1"># raises error</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">Cannot add/subtract a vector of length 3 with a matrix of shape (rows: 1, cols: 3).</span>
 
-&gt;&gt;&gt; A = MathArray([[1, 2, 3], [4, 5, 6]])
-&gt;&gt;&gt; A * vec # matrix * vector
-MathArray([14, 32])
-&gt;&gt;&gt; other_vec = MathArray([1, 2])
-&gt;&gt;&gt; other_vec * A # vector * matrix
-MathArray([ 9, 12, 15])
-</code></pre>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">*</span> <span class="n">vec</span> <span class="c1"># matrix * vector</span>
+<span class="go">MathArray([14, 32])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other_vec</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other_vec</span> <span class="o">*</span> <span class="n">A</span> <span class="c1"># vector * matrix</span>
+<span class="go">MathArray([ 9, 12, 15])</span>
+</code></pre></div>
 
 <p>We suggest avoiding single-column and single-row matrices.</p>
 <h3 id="shape-errors">Shape Errors<a class="headerlink" href="#shape-errors" title="Permanent link"> # </a></h3>
 <p>When operations cannot be performed because of shape-mismatch, MathArray raises readable <code>StudentFacingError</code>s. These error messages are intended to be presented directly to students. For example:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; A = MathArray([[1, 2], [3, 4], [5, 6]]) # matrix, shape (3, 2)
-&gt;&gt;&gt; B = MathArray([[1, 2], [3, 4]])         # matrix, shape (2, 2)
-&gt;&gt;&gt; v = MathArray([1, 2])                   # vector, shape (2,  )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span> <span class="c1"># matrix, shape (3, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>         <span class="c1"># matrix, shape (2, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>                   <span class="c1"># vector, shape (2,  )</span>
+</code></pre></div>
 
 <p>Some sample error messages:</p>
 <table>
@@ -666,57 +667,57 @@ Cannot raise a non-square matrix to powers.
 </ul>
 <h3 id="parse-errors">Parse Errors:<a class="headerlink" href="#parse-errors" title="Permanent link"> # </a></h3>
 <p>For example, if a student enters <code>'[[1, 2],[3] ]'</code>, a matrix missing an entry in second row:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
-...     answers='[[1, 2], [3, 4]]',
-...     max_array_dim=2, # allow students to enter matrices entry-by-entry
-... )
-&gt;&gt;&gt; student_input = '[[1, 2], [3]]'
-&gt;&gt;&gt; try:
-...     grader(None, student_input) # grade the input like edX would
-... except StudentFacingError as error:
-...     print(error) # students see this error message
-Unable to parse vector/matrix. If you're trying to enter a matrix, this is most likely caused by an unequal number of elements in each row.
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[[1, 2], [3, 4]]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">max_array_dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># allow students to enter matrices entry-by-entry</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;[[1, 2], [3]]&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grade the input like edX would</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="c1"># students see this error message</span>
+<span class="go">Unable to parse vector/matrix. If you&#39;re trying to enter a matrix, this is most likely caused by an unequal number of elements in each row.</span>
+</code></pre></div>
 
 <p>Such parse errors are <strong>always</strong> displayed to students.</p>
 <h3 id="shape-mismatch-errors-during-evaluation">Shape-Mismatch Errors During Evaluation<a class="headerlink" href="#shape-mismatch-errors-during-evaluation" title="Permanent link"> # </a></h3>
 <p>If a student submits an answer that will raise shape-mismatch errors then an error is raised with a helpful message. This avoids consuming one of the student's attempts. For example:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
-...     answers='[11, 22, 33]',
-... )
-&gt;&gt;&gt; student_input = '[10, 20, 30] + [1, 2]' # Error! Adding vectors with different shapes
-&gt;&gt;&gt; try:
-...     grader(None, student_input) # grade the input like edX would
-... except StudentFacingError as error:
-...     print(error) # students see this error message
-Cannot add/subtract a vector of length 3 with a vector of length 2.
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[11, 22, 33]&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;[10, 20, 30] + [1, 2]&#39;</span> <span class="c1"># Error! Adding vectors with different shapes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grade the input like edX would</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="c1"># students see this error message</span>
+<span class="go">Cannot add/subtract a vector of length 3 with a vector of length 2.</span>
+</code></pre></div>
 
 <p>If you would rather mark the student incorrect when shape errors occur (and also consume an attempt), set <code>shape_errors=False</code>.</p>
 <h3 id="shape-mismatch-errors-during-comparison">Shape-Mismatch Errors During Comparison<a class="headerlink" href="#shape-mismatch-errors-during-comparison" title="Permanent link"> # </a></h3>
 <p>If the author's answer is a 3-component vector, and the student submits a different 3-component vector, then they will be marked incorrect. However, if the student submits a 2-component vector or a number, they will receive an error message:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
-...     answers='[1, 2, 3]',
-... )
-&gt;&gt;&gt; student_input = '[1, 2, -3]' # wrong answer
-&gt;&gt;&gt; result = grader(None, student_input) # grade the input like edX would
-&gt;&gt;&gt; result == {'msg': '', 'grade_decimal': 0, 'ok': False}
-True
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[1, 2, 3]&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;[1, 2, -3]&#39;</span> <span class="c1"># wrong answer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grade the input like edX would</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
 
-&gt;&gt;&gt; student_input = '[1, 2, 3, 4]' # too many components
-&gt;&gt;&gt; try:
-...     grader(None, student_input) # grade the input like edX would
-... except StudentFacingError as error:
-...     print(error) # students see this error message
-Expected answer to be a vector, but input is a vector of incorrect shape
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;[1, 2, 3, 4]&#39;</span> <span class="c1"># too many components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grade the input like edX would</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="c1"># students see this error message</span>
+<span class="go">Expected answer to be a vector, but input is a vector of incorrect shape</span>
 
-&gt;&gt;&gt; student_input = '0' # scalar; should be a vector
-&gt;&gt;&gt; try:
-...     grader(None, student_input) # grade the input like edX would
-... except StudentFacingError as error:
-...     print(error) # students see this error message
-Expected answer to be a vector, but input is a scalar
-</code></pre>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span> <span class="c1"># scalar; should be a vector</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grade the input like edX would</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="c1"># students see this error message</span>
+<span class="go">Expected answer to be a vector, but input is a scalar</span>
+</code></pre></div>
 
 <p>The default handling of shape errors that arise when comparing student input to author's answer is:</p>
 <ul>
@@ -729,42 +730,42 @@ Expected answer to be a vector, but input is a scalar
 <li>reveal the shape and the type</li>
 </ul>
 <p>we can use:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
-...     answers='[1, 2, 3]',
-...     answer_shape_mismatch={
-...         'is_raised': False,
-...         'msg_detail': 'shape' # must be one of: None, 'type', 'shape'
-...     }
-... )
-&gt;&gt;&gt; student_input = '0' # wrong shape
-&gt;&gt;&gt; result = grader(None, student_input) # grades the input like edX would
-&gt;&gt;&gt; result == {
-...   'grade_decimal': 0,
-...   'msg': 'Expected answer to be a vector of length 3, but input is a scalar',
-...   'ok': False
-... }
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[1, 2, 3]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">answer_shape_mismatch</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;is_raised&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">&#39;msg_detail&#39;</span><span class="p">:</span> <span class="s1">&#39;shape&#39;</span> <span class="c1"># must be one of: None, &#39;type&#39;, &#39;shape&#39;</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span> <span class="c1"># wrong shape</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grades the input like edX would</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span>
+<span class="gp">... </span>  <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Expected answer to be a vector of length 3, but input is a scalar&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h3 id="hiding-all-error-messages">Hiding All Error Messages<a class="headerlink" href="#hiding-all-error-messages" title="Permanent link"> # </a></h3>
 <p><code>MatrixGrader</code>s can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting <code>suppress_matrix_messages=True</code>, which overrides <code>answer_shape_mismatch={'is_raised'}</code> and <code>shape_errors</code>. In the following example, <code>A</code> and <code>B</code> are secretly matrices that don't commute, but students will never see a matrix error message from typing something like <code>1+A</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
-...     answers='A*B',
-...     variables=['A', 'B'],
-...     sample_from={
-...         'A': RealMatrices(),
-...         'B': RealMatrices()
-...     },
-...     max_array_dim=0,
-...     suppress_matrix_messages=True
-... )
-&gt;&gt;&gt; grader(None, 'A*B')['ok']
-True
-&gt;&gt;&gt; grader(None, 'B*A')['ok']
-False
-&gt;&gt;&gt; grader(None, 'A+1')['ok']
-False
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;A*B&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">(),</span>
+<span class="gp">... </span>        <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="p">},</span>
+<span class="gp">... </span>    <span class="n">max_array_dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">suppress_matrix_messages</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;A*B&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;B*A&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;A+1&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="go">False</span>
+</code></pre></div>
 
 <p>Note that this will also suppress error messages from trying to do things like <code>sin([1, 2])</code> or <code>[1, 2]^2</code>. If your answer needs to take functions of the non-commuting variables, then this option is insufficient.</p>
 <h2 id="matrix-functions">Matrix Functions<a class="headerlink" href="#matrix-functions" title="Permanent link"> # </a></h2>
@@ -773,14 +774,14 @@ False
 <h2 id="identity-matrix">Identity Matrix<a class="headerlink" href="#identity-matrix" title="Permanent link"> # </a></h2>
 <p>To make an nxn identity matrix available to students, specify the configuration key <code>identity_dim=n</code>. That is, the grader <code>MatrixGrader(identity_dim=4, ...)</code> will automatically have a constant <code>I</code> whose value is the 4 by 4 identity matrix.</p>
 <p>If you want a different name (besides <code>I</code>) for the identity, or if you encounter situations where identity matrices of different sizes are required, you can use the <code>identity</code> function. For example:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = MatrixGrader(
-...     answers='[1, 2, 3]',
-...     user_constants={
-...         'I_2': identity(2),  # the 2 by 2 identity
-...         'I_3': identity(3)  # the 3 by 3 identity
-...     }
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[1, 2, 3]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">user_constants</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;I_2&#39;</span><span class="p">:</span> <span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>  <span class="c1"># the 2 by 2 identity</span>
+<span class="gp">... </span>        <span class="s1">&#39;I_3&#39;</span><span class="p">:</span> <span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># the 3 by 3 identity</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <h2 id="partial-credit">Partial Credit<a class="headerlink" href="#partial-credit" title="Permanent link"> # </a></h2>
 <p>A special <a href="../../comparer_functions/">comparer</a> called <a href="../../comparer_functions/#matrixentrycomparer"><code>MatrixEntryComparer</code></a> has been built to cater for partial credit in <code>MatrixGrader</code> problems. In order to facilitate the use of <code>MatrixEntryComparer</code>, if either of the following two configuration options are present, <code>MatrixGrader</code> will use <code>MatrixEntryComparer</code> as the default comparer instead of <code>equality_comparer</code>.</p>
@@ -814,53 +815,103 @@ False
 <li><code>allow_inf</code>: We are unable to handle infinities appearing in vectors/matrices.</li>
 </ul></div>
         
+        
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../../../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../../../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../../../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '../../..';
-    </script>
-    <script data-main="../../../mkdocs/js/search.js" src="../../../mkdocs/js/require.js"></script>
-    <script src="../../../js/base.js"></script>
-    <script src="../../../search/require.js"></script>
-    <script src="../../../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../../.."</script>
+    
+    <script src="../../../js/base.js"></script>
+    <script src="../../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

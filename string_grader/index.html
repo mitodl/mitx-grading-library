@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../img/favicon.ico">
 
+    
     <title>StringGrader - MITxGraders</title>
+    
 
-    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../css/base.css" rel="stylesheet">
-    <link href="../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/highlight.css">
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../css/base.min.css" rel="stylesheet">
+    <link href="../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../css/extra.css" rel="stylesheet">
-
-
     <link href="../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../item_grader/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../item_grader/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../grading_math/formula_grader/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../grading_math/formula_grader/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -272,119 +273,119 @@
 <h1 id="stringgrader">StringGrader<a class="headerlink" href="#stringgrader" title="Permanent link"> # </a></h1>
 <p>The <code>StringGrader</code> class is an <code>ItemGrader</code> that grades text inputs. It can perform comparisons to expected answers or patterns, and can also accept arbitrary input. It is the simplest grading class, both in code and in usage.</p>
 <p>To use a <code>StringGrader</code> in its simplest form, simply pass in the set of answers you want to grade, as described in the <a href="../item_grader/">ItemGrader documentation</a>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = StringGrader(
-...     answers='cat'
-... )
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'CAT') == {'grade_decimal': 0, 'msg': '', 'ok': False}
-True
-&gt;&gt;&gt; grader(None, 'Cat') == {'grade_decimal': 0, 'msg': '', 'ok': False}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;cat&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;CAT&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Cat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>This example will accept the answer of <code>cat</code>, but not <code>CAT</code> or <code>Cat</code>, as grading is case-sensitive by default.</p>
 <h2 id="cleaning-input">Cleaning Input<a class="headerlink" href="#cleaning-input" title="Permanent link"> # </a></h2>
 <p>Leading or trailing spaces in an answer rarely change the meaning of the answer. Hence, by default, we strip all leading and trailing spaces from the student input and author-specified answers before comparison. If you want to keep those spaces around for the comparison, you need to disable strip.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers='cat',
-...     strip=False
-... )
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, ' cat') == {'grade_decimal': 0, 'msg': '', 'ok': False}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">strip</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39; cat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>This will accept <code>cat</code>, but will reject answers with leading or trailing spaces. By default, <code>strip=True</code>.</p>
 <p>Similarly, if a student uses two (or more) spaces instead of one, that rarely changes the meaning. By default, we convert consecutive spaces into a single space before comparison (this applies to both the instructor-provided answer and the student-provided response). If you want to disable this behavior, you can set <code>clean_spaces=False</code> as follows.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers='two  spaces',
-...     clean_spaces=False
-... )
-&gt;&gt;&gt; grader(None, 'two  spaces') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'two spaces') == {'grade_decimal': 0, 'msg': '', 'ok': False}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;two  spaces&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">clean_spaces</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;two  spaces&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;two spaces&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Here, the answer is <code>two  spaces</code>, complete with two spaces (which may not render on a webpage). A student's answer of <code>two spaces</code> (with a single space) would be graded incorrect.</p>
 <p>Finally, you may have a situation where spaces are completely irrelevant (e.g., when grading a mathematical expression). To instruct the grader to completely ignore all spaces, set <code>strip_all=True</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers='(12)(34)',
-...     strip_all=True
-... )
-&gt;&gt;&gt; grader(None, '(1 2) (3 4)') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;(12)(34)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">strip_all</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;(1 2) (3 4)&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>This grader will accept <code>(1 2) (3 4)</code>, ignoring all spaces in the provided answer.</p>
 <h2 id="case-sensitive">Case Sensitive<a class="headerlink" href="#case-sensitive" title="Permanent link"> # </a></h2>
 <p>To perform case-insensitive grading, pass in the appropriate flag as follows.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers='Cat',
-...     case_sensitive=False
-... )
-&gt;&gt;&gt; grader(None, 'Cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'CAT') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;Cat&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Cat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;CAT&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>This will accept <code>Cat</code>, <code>cat</code> and <code>CAT</code>. By default, <code>case_sensitive=True</code>.</p>
 <h2 id="accepting-anything">Accepting Anything<a class="headerlink" href="#accepting-anything" title="Permanent link"> # </a></h2>
 <p>Sometimes you may just want to accept anything that a student provides (possibly subject to conditions). This can be useful, for example, when asking for a free response to a prompt, and can be used in conjunction with validation (see below) to accept a variety of answers that satisfy a given pattern. To do this, set the <code>accept_any</code> flag, which will cause the grader to literally accept anything that is entered into the textbox.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
-...     accept_any=True
-... )
-&gt;&gt;&gt; grader(None, 'cat') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, '') == {'grade_decimal': 1, 'msg': 'Your answer has been recorded.', 'ok': True}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your answer has been recorded.&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">accept_any</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your answer has been recorded.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your answer has been recorded.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your answer has been recorded.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Note that this will even accept a blank (empty) response. To reject empty responses, you can instead use the <code>accept_nonempty</code> flag, which requires at least one character to be submitted (after input cleaning).</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
-...     accept_nonempty=True,
-...     explain_minimums=None
-... )
-&gt;&gt;&gt; grader(None, 'dog') == {'grade_decimal': 1,
-...                         'msg': 'Your answer has been recorded.',
-...                         'ok': True}
-True
-&gt;&gt;&gt; grader(None, '') == {'grade_decimal': 0, 'msg': '', 'ok': False}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your answer has been recorded.&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">accept_nonempty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">explain_minimums</span><span class="o">=</span><span class="kc">None</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your answer has been recorded.&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Note that when either <code>accept_any</code> or <code>accept_nonempty</code> are set to True, you do not need to provide any answer to check against.</p>
 <p>You may want students to have to write a certain amount of characters or words in order to get credit. Two flags are available to facilitate this: <code>min_length</code> and <code>min_words</code>, which set a minimum number of characters and words to be awarded credit, respectively (both default to zero). You can use both of these options together if desired.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers={'expect': '', 'grade_decimal': 1, 'msg': 'Your answer has been recorded.'},
-...     accept_any=True,
-...     min_length=10,  # Require at least 10 characters (after cleaning input)
-...     min_words=3,    # Require at least 3 words
-...     explain_minimums='msg'
-... )
-&gt;&gt;&gt; grader(None, 'This is a long answer') == {'grade_decimal': 1,
-...                                           'msg': 'Your answer has been recorded.',
-...                                           'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'too short') == {'grade_decimal': 0,
-...                               'msg': 'Your response is too short (2/3 words)',
-...                               'ok': False}
-True
-&gt;&gt;&gt; grader(None, '  a  b  c  d  ') == {'grade_decimal': 0,
-...                                    'msg': 'Your response is too short (7/10 characters)',
-...                                    'ok': False}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your answer has been recorded.&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">accept_any</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">min_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>  <span class="c1"># Require at least 10 characters (after cleaning input)</span>
+<span class="gp">... </span>    <span class="n">min_words</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>    <span class="c1"># Require at least 3 words</span>
+<span class="gp">... </span>    <span class="n">explain_minimums</span><span class="o">=</span><span class="s1">&#39;msg&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;This is a long answer&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>                                          <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your answer has been recorded.&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                          <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;too short&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your response is too short (2/3 words)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;  a  b  c  d  &#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your response is too short (7/10 characters)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Note that punctuation doesn't break a word for the purpose of word counting, so <code>isn't word-counting fun?</code> will only count as three words. If <code>accept_nonempty</code> and <code>min_length</code> are both used, the longer requirement is the one that is used.</p>
 <p>When a student's answer is rejected because it doesn't meet the minimum requirements, there are three types of feedback that you can provide, controlled by the <code>explain_minimums</code> flag:</p>
@@ -405,111 +406,161 @@ True
 </ul>
 <p>In the first two cases, the message provided is given by the <code>invalid_msg</code> setting, which defaults to <code>Your input is not in the expected format</code>.</p>
 <p>Here is an example of using a validation pattern to accept inputs that look like chemical formulae for organic molecules. Note that anything that matches the pattern will be graded correct.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     validation_pattern=r'([CNOH](_[0-9])?)+',
-...     explain_validation='msg',
-...     invalid_msg='Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen',
-...     strip_all=True,   # Removes all spaces from the input
-...     accept_any=True
-... )
-&gt;&gt;&gt; grader(None, 'NH_3') == {'grade_decimal': 1,
-...                          'msg': '',
-...                          'ok': True}
-True
-&gt;&gt;&gt; grader(None, 'KCl') == {'grade_decimal': 0,
-...                          'msg': 'Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen',
-...                          'ok': False}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">validation_pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;([CNOH](_[0-9])?)+&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">explain_validation</span><span class="o">=</span><span class="s1">&#39;msg&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">invalid_msg</span><span class="o">=</span><span class="s1">&#39;Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">strip_all</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>   <span class="c1"># Removes all spaces from the input</span>
+<span class="gp">... </span>    <span class="n">accept_any</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;NH_3&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;KCl&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Write a chemical formula containing hydrogen, oxygen, carbon and/or nitrogen&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <p>Below, we use validation to ensure that the student input matches the desired format before comparing to the answer, and give the student an error message if their input doesn't match the specification.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(
-...     answers='(1)(2)',
-...     validation_pattern=r'\([0-9]\)\([0-9]\)',
-...     explain_validation='err',
-...     strip_all=True   # Removes all spaces from the input
-... )
-&gt;&gt;&gt; grader(None, '(1)(2)') == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader(None, '(2)(1)') == {'grade_decimal': 0, 'msg': '', 'ok': False}
-True
-&gt;&gt;&gt; try:
-...     grader(None, '(a)(2)')
-... except InvalidInput as error:
-...     print(error)
-Your input is not in the expected format
-&gt;&gt;&gt; try:
-...     grader(None, '[1)(2)')
-... except InvalidInput as error:
-...     print(error)
-Your input is not in the expected format
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;(1)(2)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">validation_pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;\([0-9]\)\([0-9]\)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">explain_validation</span><span class="o">=</span><span class="s1">&#39;err&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">strip_all</span><span class="o">=</span><span class="kc">True</span>   <span class="c1"># Removes all spaces from the input</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;(1)(2)&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;(2)(1)&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;(a)(2)&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">InvalidInput</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">Your input is not in the expected format</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;[1)(2)&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">InvalidInput</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">Your input is not in the expected format</span>
+</code></pre></div>
 
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to a <code>StringGrader</code>.</p>
-<pre class="codehilite"><code class="language-python">grader = StringGrader(
-    case_sensitive=bool,  # default True
-    strip=bool,  # default True
-    clean_spaces=bool,  # default True
-    strip_all=bool,  # default False
-    accept_any=bool,  # default False
-    accept_nonempty=bool,  # default False
-    min_words=int &gt;= 0,  # default 0
-    min_length=int &gt;= 0,  # default 0
-    explain_minimums=('err', 'msg', None),  # default 'err'
-    validation_pattern=str,  # default None
-    explain_validation=('err', 'msg', None),  # default 'err'
-    invalid_msg=str,  # default 'Your input is not in the expected format'
-)
-</code></pre></div>
+<div class="codehilite"><pre><span></span><code><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span>
+    <span class="n">case_sensitive</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default True</span>
+    <span class="n">strip</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default True</span>
+    <span class="n">clean_spaces</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default True</span>
+    <span class="n">strip_all</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default False</span>
+    <span class="n">accept_any</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default False</span>
+    <span class="n">accept_nonempty</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default False</span>
+    <span class="n">min_words</span><span class="o">=</span><span class="nb">int</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># default 0</span>
+    <span class="n">min_length</span><span class="o">=</span><span class="nb">int</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># default 0</span>
+    <span class="n">explain_minimums</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;err&#39;</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>  <span class="c1"># default &#39;err&#39;</span>
+    <span class="n">validation_pattern</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default None</span>
+    <span class="n">explain_validation</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;err&#39;</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>  <span class="c1"># default &#39;err&#39;</span>
+    <span class="n">invalid_msg</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &#39;Your input is not in the expected format&#39;</span>
+<span class="p">)</span>
+</code></pre></div></div>
+        
         
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '..';
-    </script>
-    <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
-    <script src="../js/base.js"></script>
-    <script src="../search/require.js"></script>
-    <script src="../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = ".."</script>
+    
+    <script src="../js/base.js"></script>
+    <script src="../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

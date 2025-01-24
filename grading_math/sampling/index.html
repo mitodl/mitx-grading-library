@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
+    
     <title>Sampling Sets - MITxGraders</title>
+    
 
-    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../../css/base.css" rel="stylesheet">
-    <link href="../../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/base.min.css" rel="stylesheet">
+    <link href="../../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../../css/extra.css" rel="stylesheet">
-
-
     <link href="../../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="../..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="../..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../matrix_grader/matrix_grader/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../matrix_grader/matrix_grader/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../functions_and_constants/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../functions_and_constants/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -289,47 +290,47 @@
 <p>These sampling sets generate a random number on demand. It may be real or complex.</p>
 <h3 id="realinterval">RealInterval<a class="headerlink" href="#realinterval" title="Permanent link"> # </a></h3>
 <p>Sample from a real interval defined by a <code>start</code> and a <code>stop</code> value. RealInterval can be initialized using explicit values, or an interval.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; # Generate random real numbers between 3 and 7
-&gt;&gt;&gt; sampler = RealInterval(start=3, stop=7)
-&gt;&gt;&gt; # This is equivalent to
-&gt;&gt;&gt; sampler = RealInterval([3, 7])
-&gt;&gt;&gt; # The default is [1, 5]
-&gt;&gt;&gt; RealInterval() == RealInterval([1, 5])
-True
-&gt;&gt;&gt; # A list can also be used to specify an interval
-&gt;&gt;&gt; sampler = [3, 7]
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate random real numbers between 3 and 7</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">RealInterval</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># This is equivalent to</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">RealInterval</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is [1, 5]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RealInterval</span><span class="p">()</span> <span class="o">==</span> <span class="n">RealInterval</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># A list can also be used to specify an interval</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+</code></pre></div>
 
 <h3 id="integerrange">IntegerRange<a class="headerlink" href="#integerrange" title="Permanent link"> # </a></h3>
 <p>Sample from an integer defined by a <code>start</code> and a <code>stop</code> value (both start and stop are included in the range). <code>IntegerRange</code> can be initialized using explicit values, or an interval.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Generate random integers between 3 and 7 inclusive
-&gt;&gt;&gt; sampler = IntegerRange(start=3, stop=7)
-&gt;&gt;&gt; # This is equivalent to
-&gt;&gt;&gt; sampler = IntegerRange([3, 7])
-&gt;&gt;&gt; # The default is [1, 5]
-&gt;&gt;&gt; IntegerRange() == IntegerRange([1, 5])
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate random integers between 3 and 7 inclusive</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">IntegerRange</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># This is equivalent to</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">IntegerRange</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is [1, 5]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IntegerRange</span><span class="p">()</span> <span class="o">==</span> <span class="n">IntegerRange</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h3 id="complexrectangle">ComplexRectangle<a class="headerlink" href="#complexrectangle" title="Permanent link"> # </a></h3>
 <p>Sample complex numbers from a rectangle in the complex plane, specified by a real range and an imaginary range.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Select random complex numbers in a rectangle from 0 to 1 + i
-&gt;&gt;&gt; sampler = ComplexRectangle(re=[0, 1], im=[0, 1])
-&gt;&gt;&gt; # The default is re=[1, 3], im=[1, 3]
-&gt;&gt;&gt; ComplexRectangle() == ComplexRectangle(re=[1, 3], im=[1, 3])
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Select random complex numbers in a rectangle from 0 to 1 + i</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">ComplexRectangle</span><span class="p">(</span><span class="n">re</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">im</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is re=[1, 3], im=[1, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ComplexRectangle</span><span class="p">()</span> <span class="o">==</span> <span class="n">ComplexRectangle</span><span class="p">(</span><span class="n">re</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">im</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h3 id="complexsector">ComplexSector<a class="headerlink" href="#complexsector" title="Permanent link"> # </a></h3>
 <p>Sample complex numbers from an annular sector in the complex plane, specified by a modulus range and an argument range.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; import numpy as np
-&gt;&gt;&gt; # Select random complex numbers from inside the unit circle
-&gt;&gt;&gt; sampler = ComplexSector(modulus=[0, 1], argument=[-np.pi, np.pi])
-&gt;&gt;&gt; # The default is modulus=[1, 3], argument=[0, pi/2]
-&gt;&gt;&gt; ComplexSector() == ComplexSector(modulus=[1, 3], argument=[0, np.pi/2])
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Select random complex numbers from inside the unit circle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">ComplexSector</span><span class="p">(</span><span class="n">modulus</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is modulus=[1, 3], argument=[0, pi/2]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ComplexSector</span><span class="p">()</span> <span class="o">==</span> <span class="n">ComplexSector</span><span class="p">(</span><span class="n">modulus</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">])</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h2 id="variable-sampling-vectors-matrices-and-tensors">Variable Sampling: Vectors, Matrices and Tensors<a class="headerlink" href="#variable-sampling-vectors-matrices-and-tensors" title="Permanent link"> # </a></h2>
 <p>We have a broad range of sampling sets for vectors, matrices and tensors. The following options are common to many of these sets:</p>
@@ -340,48 +341,48 @@ True
 <p>If you want to sample a vector/matrix/tensor in a way that depends on a scalar, see <a href="#dependentsampler"><code>DependentSampler</code></a> below.</p>
 <h3 id="realvectors-and-complexvectors">RealVectors and ComplexVectors<a class="headerlink" href="#realvectors-and-complexvectors" title="Permanent link"> # </a></h3>
 <p>Sample real/complex vectors with specified shape (number of components) and norm.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample real vectors with 4 components and unit norm
-&gt;&gt;&gt; sampler = RealVectors(shape=4, norm=[1, 1])
-&gt;&gt;&gt; # The default is 3 component vectors with norm from 1 to 5
-&gt;&gt;&gt; RealVectors() == RealVectors(shape=3, norm=[1, 5])
-True
-&gt;&gt;&gt; # Similarly for complex vectors
-&gt;&gt;&gt; ComplexVectors() == ComplexVectors(shape=3, norm=[1, 5])
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample real vectors with 4 components and unit norm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is 3 component vectors with norm from 1 to 5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RealVectors</span><span class="p">()</span> <span class="o">==</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Similarly for complex vectors</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ComplexVectors</span><span class="p">()</span> <span class="o">==</span> <span class="n">ComplexVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h3 id="realmatrices-and-complexmatrices">RealMatrices and ComplexMatrices<a class="headerlink" href="#realmatrices-and-complexmatrices" title="Permanent link"> # </a></h3>
 <p>Sample real/complex matrices of a specific shape and norm. An extra option exists to specify that the matrix be upper or lower triangular. The given shape must be a list or tuple of two numbers.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3 by 2 real matrices with norm between 5 and 10
-&gt;&gt;&gt; sampler = RealMatrices(shape=[3, 2], norm=[5, 10])
-&gt;&gt;&gt; # The default is shape=[2, 2] and norm=[1, 5]
-&gt;&gt;&gt; RealMatrices() == RealMatrices({'norm': [1, 5], 'shape': (2, 2)})
-True
-&gt;&gt;&gt; # Similarly for complex matrices
-&gt;&gt;&gt; ComplexMatrices() == ComplexMatrices({'norm': [1, 5], 'shape': (2, 2)})
-True
-&gt;&gt;&gt; # Sample an upper triangular real 2x2 matrix.
-&gt;&gt;&gt; sampler = RealMatrices(triangular='upper')
-&gt;&gt;&gt; # Sample a lower triangular complex 2x2 matrix.
-&gt;&gt;&gt; sampler = ComplexMatrices(triangular='lower')
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample 3 by 2 real matrices with norm between 5 and 10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">RealMatrices</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is shape=[2, 2] and norm=[1, 5]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RealMatrices</span><span class="p">()</span> <span class="o">==</span> <span class="n">RealMatrices</span><span class="p">({</span><span class="s1">&#39;norm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Similarly for complex matrices</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ComplexMatrices</span><span class="p">()</span> <span class="o">==</span> <span class="n">ComplexMatrices</span><span class="p">({</span><span class="s1">&#39;norm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample an upper triangular real 2x2 matrix.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">RealMatrices</span><span class="p">(</span><span class="n">triangular</span><span class="o">=</span><span class="s1">&#39;upper&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample a lower triangular complex 2x2 matrix.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">ComplexMatrices</span><span class="p">(</span><span class="n">triangular</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+</code></pre></div>
 
 <h3 id="realtensors-and-complextensors">RealTensors and ComplexTensors<a class="headerlink" href="#realtensors-and-complextensors" title="Permanent link"> # </a></h3>
 <p>Sample real/complex tensors of a specific shape and norm. A shape must be provided as a list or tuple of three or more numbers (there is no default).</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3x2x4 real tensors with norm between 5 and 10
-&gt;&gt;&gt; sampler = RealTensors(shape=[3, 2, 4], norm=[5, 10])
-&gt;&gt;&gt; # Sample 2x2x2x2 complex tensors with unit norm
-&gt;&gt;&gt; sampler = ComplexTensors(shape=[2, 2, 2, 2], norm=[1, 1])
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample 3x2x4 real tensors with norm between 5 and 10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">RealTensors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample 2x2x2x2 complex tensors with unit norm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">ComplexTensors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</code></pre></div>
 
 <h3 id="identitymatrixmultiples">IdentityMatrixMultiples<a class="headerlink" href="#identitymatrixmultiples" title="Permanent link"> # </a></h3>
 <p>Sample square matrices of a given dimension consisting of the identity matrix multiplied by a scalar. The <code>sampler</code> parameter can be any scalar sampling set listed above. This sampling set is useful when you want a variable that will commute with other matrices, but can also be added to them.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3x3 matrices consisting of a random number between 1 and 3 multiplying the identity
-&gt;&gt;&gt; sampler = IdentityMatrixMultiples(dimension=3, sampler=[1, 3])
-&gt;&gt;&gt; # The default is dimension=2 and sampler=[1, 5]
-&gt;&gt;&gt; IdentityMatrixMultiples() == IdentityMatrixMultiples(dimension=2, sampler=[1, 5])
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample 3x3 matrices consisting of a random number between 1 and 3 multiplying the identity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">IdentityMatrixMultiples</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is dimension=2 and sampler=[1, 5]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IdentityMatrixMultiples</span><span class="p">()</span> <span class="o">==</span> <span class="n">IdentityMatrixMultiples</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h3 id="squarematrices">SquareMatrices<a class="headerlink" href="#squarematrices" title="Permanent link"> # </a></h3>
 <p>This is a general sampling set for square matrices. A large number of options for specifying properties of square matrices are included:</p>
@@ -396,29 +397,29 @@ True
 <p>Note that some combinations of options do not exist (e.g., odd-dimension, unit-determinant antisymmetric matrix). If you select such a combination, an error message will result.</p>
 <p>Other types of square matrices can be sampled using <code>RealMatrices</code>, <code>ComplexMatrices</code>, <code>IdentityMatrixMultiples</code>, <code>OrthogonalMatrices</code> and <code>UnitaryMatrices</code>.</p>
 <p>Here are a handful of examples:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # By default, we generate real 2x2 matrices with no restrictions:
-&gt;&gt;&gt; SquareMatrices() == SquareMatrices(dimension=2, complex=False, traceless=False, determinant=None, symmetry=None, norm=[1,5])
-True
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># By default, we generate real 2x2 matrices with no restrictions:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SquareMatrices</span><span class="p">()</span> <span class="o">==</span> <span class="n">SquareMatrices</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">traceless</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">determinant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symmetry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+<span class="go">True</span>
 
-&gt;&gt;&gt; # Diagonal, complex, traceless and unit determinant
-&gt;&gt;&gt; matrices = SquareMatrices(symmetry='diagonal', complex=True, traceless=True,
-...                           determinant=1)
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Diagonal, complex, traceless and unit determinant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span> <span class="o">=</span> <span class="n">SquareMatrices</span><span class="p">(</span><span class="n">symmetry</span><span class="o">=</span><span class="s1">&#39;diagonal&#39;</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">traceless</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">determinant</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-&gt;&gt;&gt; # Symmetric, real, zero determinant
-&gt;&gt;&gt; matrices = SquareMatrices(symmetry='symmetric', determinant=0)
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Symmetric, real, zero determinant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span> <span class="o">=</span> <span class="n">SquareMatrices</span><span class="p">(</span><span class="n">symmetry</span><span class="o">=</span><span class="s1">&#39;symmetric&#39;</span><span class="p">,</span> <span class="n">determinant</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-&gt;&gt;&gt; # Hermitian (enforces complex)
-&gt;&gt;&gt; matrices = SquareMatrices(symmetry='hermitian')
-</code></pre>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Hermitian (enforces complex)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span> <span class="o">=</span> <span class="n">SquareMatrices</span><span class="p">(</span><span class="n">symmetry</span><span class="o">=</span><span class="s1">&#39;hermitian&#39;</span><span class="p">)</span>
+</code></pre></div>
 
 <h3 id="orthogonalmatrices">OrthogonalMatrices<a class="headerlink" href="#orthogonalmatrices" title="Permanent link"> # </a></h3>
 <p>Sample from orthogonal matrices of a given dimension. To sample special orthogonal matrices (unit determinant), use the <code>unitdet=True</code> option.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3x3 orthogonal matrices with unit determinant
-&gt;&gt;&gt; sampler = OrthogonalMatrices(dimension=3, unitdet=True)
-&gt;&gt;&gt; # The default is dimension=2 and unitdet=False
-&gt;&gt;&gt; OrthogonalMatrices() == OrthogonalMatrices(dimension=2, unitdet=False)
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample 3x3 orthogonal matrices with unit determinant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">OrthogonalMatrices</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">unitdet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is dimension=2 and unitdet=False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">OrthogonalMatrices</span><span class="p">()</span> <span class="o">==</span> <span class="n">OrthogonalMatrices</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">unitdet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -428,12 +429,12 @@ True
 </div>
 <h3 id="unitarymatrices">UnitaryMatrices<a class="headerlink" href="#unitarymatrices" title="Permanent link"> # </a></h3>
 <p>Sample from unitary matrices of a given dimension. To sample special unitary matrices (unit determinant), use the <code>unitdet=True</code> option.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Sample 3x3 unitary matrices with unit determinant
-&gt;&gt;&gt; sampler = UnitaryMatrices(dimension=3, unitdet=True)
-&gt;&gt;&gt; # The default is dimension=2 and unitdet=False
-&gt;&gt;&gt; UnitaryMatrices() == UnitaryMatrices(dimension=2, unitdet=False)
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample 3x3 unitary matrices with unit determinant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">UnitaryMatrices</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">unitdet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is dimension=2 and unitdet=False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">UnitaryMatrices</span><span class="p">()</span> <span class="o">==</span> <span class="n">UnitaryMatrices</span><span class="p">(</span><span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">unitdet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -444,25 +445,25 @@ True
 <h2 id="variable-sampling-generic">Variable Sampling: Generic<a class="headerlink" href="#variable-sampling-generic" title="Permanent link"> # </a></h2>
 <h3 id="discreteset">DiscreteSet<a class="headerlink" href="#discreteset" title="Permanent link"> # </a></h3>
 <p>Sample from any discrete set of values that are specified in a tuple. A single value may also be provided, but this case should usually be specified as a constant instead of as a sampling set.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Select random numbers from (1, 3, 5, 7, 9)
-&gt;&gt;&gt; sampler = DiscreteSet((1, 3, 5, 7, 9))
-&gt;&gt;&gt; # Always select 3.5
-&gt;&gt;&gt; sampler = DiscreteSet(3.5)
-&gt;&gt;&gt; # This is equivalent to the above:
-&gt;&gt;&gt; sampler = 3.5
-&gt;&gt;&gt; # A tuple can also be used to specify a discrete set
-&gt;&gt;&gt; sampler = (1, 3, 5, 7, 9)
-&gt;&gt;&gt; # Select randomly between two matrices
-&gt;&gt;&gt; sampler = DiscreteSet((MathArray([[1, 0], [0, 1]]), MathArray([[0, 1], [1, 0]])))
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Select random numbers from (1, 3, 5, 7, 9)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">DiscreteSet</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Always select 3.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">DiscreteSet</span><span class="p">(</span><span class="mf">3.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># This is equivalent to the above:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="mf">3.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># A tuple can also be used to specify a discrete set</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Select randomly between two matrices</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">DiscreteSet</span><span class="p">((</span><span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]),</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])))</span>
+</code></pre></div>
 
 <h3 id="dependentsampler">DependentSampler<a class="headerlink" href="#dependentsampler" title="Permanent link"> # </a></h3>
 <p>Compute a value for a variable based on the values of other constants/variables. The sampler is simply initialized with the desired formula, which can use any base or user-defined functions (except for randomly sampled functions, see below). <code>DependentSampler</code>s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that <code>DependentSampler</code> can depend on vector/matrix quantities as well as scalars. You can even use sibling variables in a <code>DependentSampler</code> (but if you do so, we strongly recommend making such variables instructor variables!).</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Set radius based on the random values of x, y and z
-&gt;&gt;&gt; sampler = DependentSampler(formula=&quot;sqrt(x^2+y^2+z^2)&quot;)
-&gt;&gt;&gt; # Construct a matrix that depends on a variable
-&gt;&gt;&gt; sampler = DependentSampler(formula=&quot;[[x,0],[0,-x^2]]&quot;)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Set radius based on the random values of x, y and z</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;sqrt(x^2+y^2+z^2)&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Construct a matrix that depends on a variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;[[x,0],[0,-x^2]]&quot;</span><span class="p">)</span>
+</code></pre></div>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -474,35 +475,35 @@ True
 <p>We have two methods for selecting a random function.</p>
 <h3 id="specificfunctions">SpecificFunctions<a class="headerlink" href="#specificfunctions" title="Permanent link"> # </a></h3>
 <p>Samples functions from a specific list of functions. You can also specify just a single function, but usually this shouldn't be done as a sampling set.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Select either sin or cos randomly
-&gt;&gt;&gt; functionsampler = SpecificFunctions([np.cos, np.sin])
-&gt;&gt;&gt; # Equivalent sampling set specified as a list
-&gt;&gt;&gt; functionsampler = [np.cos, np.sin]
-&gt;&gt;&gt; # Always select a single lambda function
-&gt;&gt;&gt; functionsampler = SpecificFunctions(lambda x: x*x)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Select either sin or cos randomly</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functionsampler</span> <span class="o">=</span> <span class="n">SpecificFunctions</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Equivalent sampling set specified as a list</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functionsampler</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Always select a single lambda function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functionsampler</span> <span class="o">=</span> <span class="n">SpecificFunctions</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div>
 
 <h3 id="randomfunction">RandomFunction<a class="headerlink" href="#randomfunction" title="Permanent link"> # </a></h3>
 <p>Generate a random well-behaved function. The function is constructed from the sum of sinusoids with random amplitudes, frequencies and phases. It oscillates about a specified center value with up to a specified amplitude.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Generate a random function
-&gt;&gt;&gt; functionsampler = RandomFunction(center=1, amplitude=2)
-&gt;&gt;&gt; # The default is center=0, amplitude=10
-&gt;&gt;&gt; functionsampler = RandomFunction()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate a random function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functionsampler</span> <span class="o">=</span> <span class="n">RandomFunction</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is center=0, amplitude=10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functionsampler</span> <span class="o">=</span> <span class="n">RandomFunction</span><span class="p">()</span>
+</code></pre></div>
 
 <p>You can control how many random sinusoids are added together by specifying <code>num_terms</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Generate a random sinusoid
-&gt;&gt;&gt; functionsampler = RandomFunction(num_terms=1)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate a random sinusoid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functionsampler</span> <span class="o">=</span> <span class="n">RandomFunction</span><span class="p">(</span><span class="n">num_terms</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
 
 <p>You can also generate a non-unary function by specifying the input dimension, and generate vector output by specifying the output dimension.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Generate a function that takes in two scalar values and outputs a 3D vector
-&gt;&gt;&gt; functionsampler = RandomFunction(input_dim=2, output_dim=3)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate a function that takes in two scalar values and outputs a 3D vector</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functionsampler</span> <span class="o">=</span> <span class="n">RandomFunction</span><span class="p">(</span><span class="n">input_dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">output_dim</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div>
 
 <p>Finally, if you want to generate a complex random function, set <code>complex=True</code>. In this situation, the randomly generated function works as previously, but the sinusoid coefficients are complex numbers.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; functionsampler = RandomFunction(complex=True)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">functionsampler</span> <span class="o">=</span> <span class="n">RandomFunction</span><span class="p">(</span><span class="nb">complex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -511,53 +512,103 @@ True
 </ul>
 </div></div>
         
+        
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '../..';
-    </script>
-    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-    <script src="../../js/base.js"></script>
-    <script src="../../search/require.js"></script>
-    <script src="../../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../.."</script>
+    
+    <script src="../../js/base.js"></script>
+    <script src="../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

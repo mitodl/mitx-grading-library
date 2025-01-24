@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../img/favicon.ico">
 
+    
     <title>edX Syntax - MITxGraders</title>
+    
 
-    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../css/base.css" rel="stylesheet">
-    <link href="../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/highlight.css">
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../css/base.min.css" rel="stylesheet">
+    <link href="../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../css/extra.css" rel="stylesheet">
-
-
     <link href="../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="..">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="..">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../graders/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../graders/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -269,152 +270,202 @@
 
 <h1 id="edx-syntax">edX Syntax<a class="headerlink" href="#edx-syntax" title="Permanent link"> # </a></h1>
 <p>To create an edX problem using the MITx Grading Library, you need to create a "Blank Advanced Problem", which allows you to construct the problem description via XML. The library is used in <code>customresponse</code> problems, which means that there are two parts to setting up the problem: defining the input that the student sees, and defining the grader that will grade the result. Here is an example.</p>
-<pre class="codehilite"><code class="language-XML">&lt;problem&gt;
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
 
-&lt;!-- Define the grader --&gt;
-&lt;script type=&quot;text/python&quot;&gt;
-from mitxgraders import *
-grader = FormulaGrader(variables=[&quot;x&quot;])
-&lt;/script&gt;
+<span class="cm">&lt;!-- Define the grader --&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
+grader<span class="w"> </span>=<span class="w"> </span>FormulaGrader(variables=[&quot;x&quot;])
+<span class="nt">&lt;/script&gt;</span>
 
-  &lt;!-- Ask the question --&gt;
-  &lt;p&gt;Enter the derivative of \(x^2\).&lt;/p&gt;
+<span class="w">  </span><span class="cm">&lt;!-- Ask the question --&gt;</span>
+<span class="w">  </span><span class="nt">&lt;p&gt;</span>Enter<span class="w"> </span>the<span class="w"> </span>derivative<span class="w"> </span>of<span class="w"> </span>\(x^2\).<span class="nt">&lt;/p&gt;</span>
 
-  &lt;!-- Define the problem --&gt;
-  &lt;customresponse cfn=&quot;grader&quot; answer=&quot;2*x&quot;&gt;
-    &lt;textline math=&quot;true&quot; /&gt;
-  &lt;/customresponse&gt;
+<span class="w">  </span><span class="cm">&lt;!-- Define the problem --&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="w"> </span><span class="na">answer=</span><span class="s">&quot;2*x&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
-  &lt;!-- Ask another question --&gt;
-  &lt;p&gt;Enter the derivative of \(5x^2\).&lt;/p&gt;
+<span class="w">  </span><span class="cm">&lt;!-- Ask another question --&gt;</span>
+<span class="w">  </span><span class="nt">&lt;p&gt;</span>Enter<span class="w"> </span>the<span class="w"> </span>derivative<span class="w"> </span>of<span class="w"> </span>\(5x^2\).<span class="nt">&lt;/p&gt;</span>
 
-  &lt;!-- Define the problem. Note that the grader is reused --&gt;
-  &lt;customresponse cfn=&quot;grader&quot; answer=&quot;10*x&quot;&gt;
-    &lt;textline math=&quot;true&quot; /&gt;
-  &lt;/customresponse&gt;
+<span class="w">  </span><span class="cm">&lt;!-- Define the problem. Note that the grader is reused --&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="w"> </span><span class="na">answer=</span><span class="s">&quot;10*x&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
-&lt;/problem&gt;
-</code></pre>
+<span class="nt">&lt;/problem&gt;</span>
+</code></pre></div>
 
 <p>Note that the <code>customresponse</code> tag contains the answer that is passed to the grader. You can also use <code>expect="2*x"</code> instead of <code>answer="2*x"</code>; edX treats these parameters indistinguishably (although we strongly suggest not using both!). Also note that a grader can be used multiple times if desired.</p>
 <h2 id="using-an-answers-key-to-a-grader">Using an answers key to a grader<a class="headerlink" href="#using-an-answers-key-to-a-grader" title="Permanent link"> # </a></h2>
 <p>If you provide an <code>answers</code> key to the grader, it will ignore whatever is specified in the <code>customresponse</code> tag. Here is an example.</p>
-<pre class="codehilite"><code class="language-XML">&lt;problem&gt;
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
 
-&lt;script type=&quot;text/python&quot;&gt;
-from mitxgraders import *
-mygrader = FormulaGrader(
-    answers={'expect': '2*x', 'msg': 'Good job!'},
-    variables=['x']
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
+mygrader<span class="w"> </span>=<span class="w"> </span>FormulaGrader(
+<span class="w">    </span>answers={&#39;expect&#39;:<span class="w"> </span>&#39;2*x&#39;,<span class="w"> </span>&#39;msg&#39;:<span class="w"> </span>&#39;Good<span class="w"> </span>job!&#39;},
+<span class="w">    </span>variables=[&#39;x&#39;]
 )
-&lt;/script&gt;
+<span class="nt">&lt;/script&gt;</span>
 
-  &lt;p&gt;Enter the derivative of \(x^2\).&lt;/p&gt;
+<span class="w">  </span><span class="nt">&lt;p&gt;</span>Enter<span class="w"> </span>the<span class="w"> </span>derivative<span class="w"> </span>of<span class="w"> </span>\(x^2\).<span class="nt">&lt;/p&gt;</span>
 
-  &lt;customresponse cfn=&quot;mygrader&quot; answer=&quot;2*x&quot;&gt;
-    &lt;textline math=&quot;true&quot; /&gt;
-  &lt;/customresponse&gt;
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;mygrader&quot;</span><span class="w"> </span><span class="na">answer=</span><span class="s">&quot;2*x&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
-&lt;/problem&gt;
-</code></pre>
+<span class="nt">&lt;/problem&gt;</span>
+</code></pre></div>
 
 <p>The <code>answers</code> key is provided to the grader explicitly, and so it ignores whatever is in the <code>customresponse</code> tag. However, the <code>answer</code> key in the <code>customresponse</code> tag is still important, because it is what the students see when they click on "Show Answer".</p>
 <p>Also worth noting is that the grader is stored in a python variable, which in this example, we've called <code>mygrader</code> (the previous example just called it <code>grader</code>). The <code>cfn</code> key in the <code>customresponse</code> tag needs to tell edX which variable stores the grader you want to use for that problem. If you have multiple <code>customresponse</code> tags, you can provide a different grader to each one.</p>
 <h2 id="using-correct_answer-for-multiple-inputs">Using <code>correct_answer</code> for multiple inputs<a class="headerlink" href="#using-correct_answer-for-multiple-inputs" title="Permanent link"> # </a></h2>
 <p>If you are using multiple inputs (such as when using a <code>ListGrader</code>), you must provide the <code>answers</code> key to the grader explicitly, as the <code>expect</code> or <code>answer</code> parameters in the <code>customresponse</code> tag are ignored by both edX and the grader. When using multiple inputs, it's recommended to provide a <code>correct_answer</code> parameter on the <code>textline</code> tags, which is what is used to show students the correct answer. Here is an example.</p>
-<pre class="codehilite"><code class="language-XML">&lt;problem&gt;
-&lt;script type=&quot;text/python&quot;&gt;
-from mitxgraders import *
-grader = ListGrader(
-    answers=['x-2', 'x+2'],
-    subgraders=FormulaGrader(variables=['x'])
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
+grader<span class="w"> </span>=<span class="w"> </span>ListGrader(
+<span class="w">    </span>answers=[&#39;x-2&#39;,<span class="w"> </span>&#39;x+2&#39;],
+<span class="w">    </span>subgraders=FormulaGrader(variables=[&#39;x&#39;])
 )
-&lt;/script&gt;
+<span class="nt">&lt;/script&gt;</span>
 
-  &lt;p&gt;What are the linear factors of \((x^2 - 4)\)? Enter your answers in any order.&lt;/p&gt;
+<span class="w">  </span><span class="nt">&lt;p&gt;</span>What<span class="w"> </span>are<span class="w"> </span>the<span class="w"> </span>linear<span class="w"> </span>factors<span class="w"> </span>of<span class="w"> </span>\((x^2<span class="w"> </span>-<span class="w"> </span>4)\)?<span class="w"> </span>Enter<span class="w"> </span>your<span class="w"> </span>answers<span class="w"> </span>in<span class="w"> </span>any<span class="w"> </span>order.<span class="nt">&lt;/p&gt;</span>
 
-  &lt;!-- Note there is no 'expect' or 'answer' parameter in the customresponse tag --&gt;
-  &lt;customresponse cfn=&quot;grader&quot;&gt;
-    &lt;!-- correct_answer is shown to student when they press [Show Answer].
-         Its value is not used for grading purposes --&gt;
-    &lt;textline math=&quot;true&quot; correct_answer=&quot;x - 2&quot; /&gt;
-    &lt;textline math=&quot;true&quot; correct_answer=&quot;x + 2&quot; /&gt;
-  &lt;/customresponse&gt;
+<span class="w">  </span><span class="cm">&lt;!-- Note there is no &#39;expect&#39; or &#39;answer&#39; parameter in the customresponse tag --&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- correct_answer is shown to student when they press [Show Answer].</span>
+<span class="cm">         Its value is not used for grading purposes --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;x - 2&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;x + 2&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
-&lt;/problem&gt;
-</code></pre>
+<span class="nt">&lt;/problem&gt;</span>
+</code></pre></div>
 
 <p>Note that the <code>correct_answer</code> parameters are never sent to the grader, which is why you must provide them independently.</p>
 <p>When using lists, such as with a <code>ListGrader</code> or a <code>SingleListGrader</code>, you only need to provide an <code>answers</code> key to the top-level grader (the one that is specified in the <code>cfn</code> key).</p>
 <h2 id="passing-a-grader-directly">Passing a grader directly<a class="headerlink" href="#passing-a-grader-directly" title="Permanent link"> # </a></h2>
 <p>Because the <code>cfn</code> parameter of the <code>customresponse</code> tag is executed as python code, it is possible to provide the definition of the grader in-line, as the following example shows.</p>
-<pre class="codehilite"><code class="language-XML">&lt;problem&gt;
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
 
-&lt;!-- Make sure to remember to import the library! --&gt;
-&lt;script type=&quot;text/python&quot;&gt;
-from mitxgraders import *
-&lt;/script&gt;
+<span class="cm">&lt;!-- Make sure to remember to import the library! --&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
+<span class="nt">&lt;/script&gt;</span>
 
-  &lt;p&gt;Enter the derivative of \(x^2\).&lt;/p&gt;
+<span class="w">  </span><span class="nt">&lt;p&gt;</span>Enter<span class="w"> </span>the<span class="w"> </span>derivative<span class="w"> </span>of<span class="w"> </span>\(x^2\).<span class="nt">&lt;/p&gt;</span>
 
-  &lt;customresponse cfn=&quot;FormulaGrader(variables=['x'])&quot; answer=&quot;2*x&quot;&gt;
-    &lt;textline math=&quot;true&quot; /&gt;
-  &lt;/customresponse&gt;
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;FormulaGrader(variables=[&#39;x&#39;])&quot;</span><span class="w"> </span><span class="na">answer=</span><span class="s">&quot;2*x&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
-&lt;/problem&gt;
-</code></pre>
+<span class="nt">&lt;/problem&gt;</span>
+</code></pre></div>
 
 <p>We want to stress the simplicity of this example compared to implementing the same problem using standard edX problem types! This method of defining a grader is very handy for simple grader constructions such as this one. For more complex graders, we recommend the previous style. One must be careful to make sure that quotation marks <code>'</code> and <code>"</code> do not conflict if using the in-line method.</p>
 <h2 id="note-on-python-version">Note on Python Version<a class="headerlink" href="#note-on-python-version" title="Permanent link"> # </a></h2>
-<p>Older versions of edX used python 2.7 in custom graders, while newer versions use python 3.5. The library works seamlessly with both versions, although some matrix math functionality requires python 3.5. The python version is automatically selected by the edX server. No changes to the XML code are required to work with either version of python.</p></div>
+<p>The Python version is automatically selected by the edX server. No changes to the XML code are required.</p></div>
+        
         
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '..';
-    </script>
-    <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
-    <script src="../js/base.js"></script>
-    <script src="../search/require.js"></script>
-    <script src="../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = ".."</script>
+    
+    <script src="../js/base.js"></script>
+    <script src="../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

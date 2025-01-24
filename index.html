@@ -4,48 +4,46 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <link rel="shortcut icon" href="./img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
+    <link rel="shortcut icon" href="img/favicon.ico">
 
+    
     <title>Overview - MITxGraders</title>
+    
 
-    <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="./css/base.css" rel="stylesheet">
-    <link href="./css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="./css/highlight.css">
+    <link href="css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="css/base.min.css" rel="stylesheet">
+    <link href="css/cinder.min.css" rel="stylesheet">
 
-
-    <link href="./css/extra.css" rel="stylesheet">
-
-
-    <link href="./css/cinder_tweaks.css" rel="stylesheet">
-
-
-    <link href="./css/readthedocs.css" rel="stylesheet">
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
+    <link href="css/extra.css" rel="stylesheet">
+    <link href="css/cinder_tweaks.css" rel="stylesheet">
+    <link href="css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
-<body class="homepage" >
+<body>
 
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href=".">MITxGraders</a>
+            
+              <a class="navbar-brand" href=".">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li class="disabled">
-                        <a rel="next" >
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" >
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="edx/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="edx/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -293,51 +294,51 @@
 <li>is reliable (extensively tested)</li>
 <li>is open source (BSD-3 license, <a href="https://github.com/mitodl/mitx-grading-library">our Github repo</a>)</li>
 <li>has an <a href="https://edge.edx.org/courses/course-v1:MITx+grading-library+examples/">excellent example edX course</a></li>
-<li>is ready for the future of edX by being compatible with python 2 and 3</li>
+<li>is ready for the future of edX by being compatible with Python 3.8 and 3.11</li>
 <li>is actively maintained</li>
 </ul>
 <h2 id="two-typical-examples">Two Typical Examples<a class="headerlink" href="#two-typical-examples" title="Permanent link"> # </a></h2>
 <p>Typical usage in an edX course looks like:</p>
-<pre class="codehilite"><code class="language-XML">&lt;problem&gt;
-&lt;script type=&quot;text/python&quot;&gt;
-from mitxgraders import *
-grader = FormulaGrader(
-    variables=[&quot;x&quot;],
-    # allows students to use generic functions f and f' in their input
-    user_functions={&quot;f&quot;: RandomFunction(), &quot;f'&quot;: RandomFunction()}
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
+grader<span class="w"> </span>=<span class="w"> </span>FormulaGrader(
+<span class="w">    </span>variables=[&quot;x&quot;],
+<span class="w">    </span>#<span class="w"> </span>allows<span class="w"> </span>students<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>generic<span class="w"> </span>functions<span class="w"> </span>f<span class="w"> </span>and<span class="w"> </span>f&#39;<span class="w"> </span>in<span class="w"> </span>their<span class="w"> </span>input
+<span class="w">    </span>user_functions={&quot;f&quot;:<span class="w"> </span>RandomFunction(),<span class="w"> </span>&quot;f&#39;&quot;:<span class="w"> </span>RandomFunction()}
 )
-&lt;/script&gt;
+<span class="nt">&lt;/script&gt;</span>
 
-  &lt;p&gt;Enter the derivative of \(g(x) = e^{f(x^2)} \).&lt;/p&gt;
-  &lt;!-- answer is provided to the grader when using single inputs --&gt;
-  &lt;customresponse cfn=&quot;grader&quot; answer=&quot;e^(f(x)) * f'(x^2) * 2*x&quot;&gt;
-    &lt;textline math=&quot;true&quot; /&gt;
-  &lt;/customresponse&gt;
+<span class="w">  </span><span class="nt">&lt;p&gt;</span>Enter<span class="w"> </span>the<span class="w"> </span>derivative<span class="w"> </span>of<span class="w"> </span>\(g(x)<span class="w"> </span>=<span class="w"> </span>e^{f(x^2)}<span class="w"> </span>\).<span class="nt">&lt;/p&gt;</span>
+<span class="w">  </span><span class="cm">&lt;!-- answer is provided to the grader when using single inputs --&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="w"> </span><span class="na">answer=</span><span class="s">&quot;e^(f(x)) * f&#39;(x^2) * 2*x&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
-&lt;/problem&gt;
-</code></pre>
+<span class="nt">&lt;/problem&gt;</span>
+</code></pre></div>
 
 <p>The resulting problem would be similar to an edX <code>&lt;formularesponse /&gt;</code> problem, but allows students to use additional generic functions <code>f(x)</code> and <code>f'(x)</code> in their submissions.</p>
 <p>The next example grader would grade an unordered list of mathematical expressions.</p>
-<pre class="codehilite"><code class="language-XML">&lt;problem&gt;
-&lt;script type=&quot;text/python&quot;&gt;
-from mitxgraders import *
-grader = ListGrader(
-    answers=['x-2', 'x+2'],
-    subgraders=FormulaGrader(variables=['x'])
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
+grader<span class="w"> </span>=<span class="w"> </span>ListGrader(
+<span class="w">    </span>answers=[&#39;x-2&#39;,<span class="w"> </span>&#39;x+2&#39;],
+<span class="w">    </span>subgraders=FormulaGrader(variables=[&#39;x&#39;])
 )
-&lt;/script&gt;
+<span class="nt">&lt;/script&gt;</span>
 
-  &lt;p&gt;What are the linear factors of \((x^2 - 4)\)? Enter your answers in any order.&lt;/p&gt;
-  &lt;customresponse cfn=&quot;grader&quot;&gt;
-    &lt;!-- correct_answer is shown to student when they press [Show Answer].
-         Its value is not used for grading purposes --&gt;
-    &lt;textline math=&quot;true&quot; correct_answer=&quot;x - 2&quot; /&gt;
-    &lt;textline math=&quot;true&quot; correct_answer=&quot;x + 2&quot; /&gt;
-  &lt;/customresponse&gt;
+<span class="w">  </span><span class="nt">&lt;p&gt;</span>What<span class="w"> </span>are<span class="w"> </span>the<span class="w"> </span>linear<span class="w"> </span>factors<span class="w"> </span>of<span class="w"> </span>\((x^2<span class="w"> </span>-<span class="w"> </span>4)\)?<span class="w"> </span>Enter<span class="w"> </span>your<span class="w"> </span>answers<span class="w"> </span>in<span class="w"> </span>any<span class="w"> </span>order.<span class="nt">&lt;/p&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- correct_answer is shown to student when they press [Show Answer].</span>
+<span class="cm">         Its value is not used for grading purposes --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;x - 2&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;x + 2&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
-&lt;/problem&gt;
-</code></pre>
+<span class="nt">&lt;/problem&gt;</span>
+</code></pre></div>
 
 <h2 id="loading-in-edx">Loading in edX<a class="headerlink" href="#loading-in-edx" title="Permanent link"> # </a></h2>
 <p>Download <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a> and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip. If you want to use our AsciiMath renderer definitions (if you have math problems, you'll really want this!), place the <a href="https://raw.githubusercontent.com/mitodl/mitx-grading-library/master/MJxPrep.js">MJxPrep.js</a> file in your static folder (XML) or upload the file to your course assets (Studio).</p>
@@ -379,58 +380,103 @@ grader = ListGrader(
 </ul>
 <p>Enjoy!</p></div>
         
+        
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="./js/jquery-1.10.2.min.js"></script>
-    <script src="./js/bootstrap-3.0.3.min.js"></script>
-    <script src="./js/highlight.pack.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/bootstrap-3.0.3.min.js"></script>
+
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
     <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '.';
-    </script>
-    <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
-    <script src="./js/base.js"></script>
-    <script src="./search/require.js"></script>
-    <script src="./search/search.js"></script>
+    
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    <script>var base_url = "."</script>
+    
+    <script src="js/base.js"></script>
+    <script src="search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>
-
-<!--
-MkDocs version : 0.17.5
-Build Date UTC : 2022-12-08 18:54:21
--->

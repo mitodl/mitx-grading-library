@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
+    
     <title>FormulaGrader - MITxGraders</title>
+    
 
-    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../../css/base.css" rel="stylesheet">
-    <link href="../../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/base.min.css" rel="stylesheet">
+    <link href="../../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../../css/extra.css" rel="stylesheet">
-
-
     <link href="../../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="../..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="../..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../../string_grader/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../../string_grader/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../numerical_grader/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../numerical_grader/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -304,25 +305,25 @@
 <h2 id="variables-and-sampling">Variables and Sampling<a class="headerlink" href="#variables-and-sampling" title="Permanent link"> # </a></h2>
 <p><code>FormulaGrader</code> grades a formula by numerical sampling. That is, random values are assigned to each of the unknown variables and unknown functions, and the numerical value of the student's input expression and author's answer are calculated. The sampling process is repeated, and if the student answer and author answer compare within the desired tolerance enough times, the student input is graded as correct.</p>
 <p>Variables are configured by including a list of strings of each variable name as follows.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='1+x^2+y',
-...     variables=['x', 'y']
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;1+x^2+y&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>Note that the <code>answers</code> parameter follows all of the usual allowances from <code>ItemGrader</code>.</p>
 <p>The variables need to have numbers randomly assigned to them. Each is sampled from a <a href="../sampling/">sampling set</a>, which is <code>RealInterval()</code> by default (random numbers between 1 and 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the <code>sample_from</code> key.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='1+x^2+y+z/2',
-...     variables=['x', 'y', 'z'],
-...     sample_from={
-...         'x': ComplexRectangle(),
-...         'y': [2, 6],
-...         'z': (1, 3, 4, 8)
-...     }
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;1+x^2+y+z/2&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">ComplexRectangle</span><span class="p">(),</span>
+<span class="gp">... </span>        <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>The <code>sample_from</code> key must be a dictionary of <code>'variable_name': sampling_set</code> pairs. You can specify a sampling set, a real interval, or a discrete set of values to sample from. The above example shows each of these in order.</p>
 <h3 id="variable-names">Variable Names<a class="headerlink" href="#variable-names" title="Permanent link"> # </a></h3>
@@ -336,243 +337,243 @@
 <p>The AsciiMath renderer used in <code>&lt;textline&gt;</code> entries in edX has a number of special symbols that can help make variable names look like particular mathematical entries. A handful of these are <code>hatx</code>, <code>vecx</code>, <code>tildex</code>, <code>barx</code>, <code>dotx</code> and <code>ddotx</code>. There are also a handful of other reserved names in AsciiMath; we recommend testing your variables to ensure that they render as expected.</p>
 <h3 id="numbered-variables">Numbered Variables<a class="headerlink" href="#numbered-variables" title="Permanent link"> # </a></h3>
 <p>You can also specify special variables that are numbered. For example, if you specify that <code>a</code> is a numbered variable, students can include <code>a_{0}</code>, <code>a_{5}</code>, <code>a_{-2}</code>, etc, using any integer. All entries for a numbered variable will use the sampling set specified by the base name.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='a_{0} + a_{1}*x + 1/2*a_{2}*x^2',
-...     variables=['x'],
-...     numbered_vars=['a'],
-...     sample_from={
-...         'x': [-5, 5],
-...         'a': [-10, 10]
-...     }
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;a_</span><span class="si">{0}</span><span class="s1"> + a_</span><span class="si">{1}</span><span class="s1">*x + 1/2*a_</span><span class="si">{2}</span><span class="s1">*x^2&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">numbered_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>If you have a variable name that would clash with a numbered variable (say, you defined <code>a_{0}</code> and also a numbered variable <code>a</code>), then the specific variable has precedence.</p>
 <h2 id="samples-and-failable-evaluations">Samples and Failable Evaluations<a class="headerlink" href="#samples-and-failable-evaluations" title="Permanent link"> # </a></h2>
 <p>To control the number of samples that are checked to ensure correctness, you can modify the <code>samples</code> key.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='1+x^2',
-...     variables=['x'],
-...     samples=10
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;1+x^2&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">samples</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>The default for <code>samples</code> is 5.</p>
 <p>You may want to allow for a certain number of comparisons to fail before the student is marked incorrect. To do this, set <code>failable_evals</code>. This should be used very sparingly!</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='1+x^2',
-...     variables=['x'],
-...     samples=10,
-...     failable_evals=1
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;1+x^2&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">failable_evals</span><span class="o">=</span><span class="mi">1</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <h2 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link"> # </a></h2>
 <p>By default, four constants are defined: <code>e</code>, <code>pi</code>, and <code>i=j=sqrt(-1)</code>. You can define new constants by passing in a dictionary to <code>user_constants</code> as follows.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='1/sqrt(1-v^2/c^2)',
-...     variables=['v'],
-...     user_constants={
-...         'c': 3e8
-...     }
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;1/sqrt(1-v^2/c^2)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">user_constants</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mf">3e8</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>Constants are treated as variables that only ever have one value.</p>
 <p>If you want to remove a default constant, you can do so by setting it to <code>None</code>:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='sqrt(-1)',
-...     user_constants={
-...         'i': None,
-...         'j': None
-...     }
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;sqrt(-1)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">user_constants</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">&#39;j&#39;</span><span class="p">:</span> <span class="kc">None</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <h3 id="infinities">Infinities<a class="headerlink" href="#infinities" title="Permanent link"> # </a></h3>
 <p>When an expression results in an infinity, students are presented with an error message asking them to check for overflow. If you actually want infinity to be an acceptable answer, then you can specify <code>allow_inf=True</code>. This allows expressions to evaluate to infinity (or negative infinity), and also makes the constant <code>infty</code> available for students to use.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; # Without allow_inf turned on:
-&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='infty',
-...     user_constants={
-...         'infty': float('inf')
-...     }
-... )
-&gt;&gt;&gt; try:
-...     grader(None, 'infty')
-... except CalcError as error:
-...     print(error)
-Numerical overflow occurred. Does your expression generate very large numbers?
-&gt;&gt;&gt; # With allow_inf turned on:
-&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='infty',
-...     allow_inf=True
-... )
-&gt;&gt;&gt; grader(None, 'infty') == {'ok': True, 'msg': '', 'grade_decimal': 1}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Without allow_inf turned on:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;infty&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">user_constants</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;infty&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;infty&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">CalcError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">Numerical overflow occurred. Does your expression generate very large numbers?</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># With allow_inf turned on:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;infty&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">allow_inf</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;infty&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link"> # </a></h2>
 <p>By default, a large array of mathematical functions are available for use. See the full list <a href="../functions_and_constants/">here</a>. Note that all functions are capable of handling complex expressions unless otherwise stated. In the following example, <code>z*z</code> is recognized to be different from <code>abs(z)^2</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='abs(z)^2',
-...     variables=['z'],
-...     sample_from={
-...         'z': ComplexRectangle()
-...     }
-... )
-&gt;&gt;&gt; grader(None, 'z*z')['ok']
-False
-&gt;&gt;&gt; grader(None, 'z*conj(z)')['ok']
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;abs(z)^2&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="n">ComplexRectangle</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;z*z&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;z*conj(z)&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h3 id="user-functions">User Functions<a class="headerlink" href="#user-functions" title="Permanent link"> # </a></h3>
 <p>You can make user-defined functions available for students to use in their answers. To add user-defined functions, pass in a dictionary to the <code>user_functions</code> key as follows.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='x*x',
-...     variables=['x'],
-...     user_functions={'f': lambda x: x*x}
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;x*x&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>This defines a function <code>f(x) = x^2</code> that students may use. User-defined function names must start with a letter, and can use numbers and underscores, such as <code>my_func2</code>. They are also allowed to have apostrophes (primes) at the end of the name, such as to indicate derivatives. Eg, <code>f''</code>. Be careful about using quotation marks appropriately when using primes in function names, as in the following example.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers=&quot;f''(x)&quot;,
-...     variables=['x'],
-...     user_functions={&quot;f''&quot;: lambda x: x*x}
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s2">&quot;f&#39;&#39;(x)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;f&#39;&#39;&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <h3 id="choosing-a-function-randomly">Choosing a Function Randomly<a class="headerlink" href="#choosing-a-function-randomly" title="Permanent link"> # </a></h3>
 <p>You can also specify random functions by specifying a sampling set for a function. You can provide a list of functions to randomly choose from as follows.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; import numpy as np
-&gt;&gt;&gt; grader = FormulaGrader(
-...     answers=&quot;f(x)&quot;,
-...     variables=['x'],
-...     user_functions={&quot;f&quot;: [np.sin, np.cos]}
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s2">&quot;f(x)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">]}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>Each time this formula is checked, the function <code>f</code> will be sampled from the list of available functions.</p>
 <p>You can also specify a random well-behaved function by using the <code>RandomFunction()</code> sampling set.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers=&quot;f''(x) + omega^2*f(x)&quot;,
-...     variables=['x', 'omega'],
-...     user_functions={
-...         &quot;f&quot;: RandomFunction(),
-...         &quot;f''&quot;: RandomFunction()
-...     }
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s2">&quot;f&#39;&#39;(x) + omega^2*f(x)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;omega&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="n">RandomFunction</span><span class="p">(),</span>
+<span class="gp">... </span>        <span class="s2">&quot;f&#39;&#39;&quot;</span><span class="p">:</span> <span class="n">RandomFunction</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>This allows you to grade mathematical expressions that involve unknown functions, such as the differential equation described in this example. See <a href="../sampling/#randomfunction">Sampling</a> for further options associated with <code>RandomFunction</code>.</p>
 <h2 id="overriding-default-functions-and-constants">Overriding Default Functions and Constants<a class="headerlink" href="#overriding-default-functions-and-constants" title="Permanent link"> # </a></h2>
 <p>You can override default functions and constants if you really want, although this is discouraged and requires suppressing warnings with <code>suppress_warnings=True</code>. The following grader raises this warning when constructed:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; try:
-...     grader = FormulaGrader(
-...         answers='x^2',
-...         variables=['x'],
-...         user_functions={'sin': lambda x: x*x},
-...     )
-... except ConfigError as error:
-...     print(error)
-Warning: 'user_functions' contains entries 'sin' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;x^2&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;sin&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ConfigError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">Warning: &#39;user_functions&#39; contains entries &#39;sin&#39; which will override default values. If you intend to override defaults, you may suppress this warning by adding &#39;suppress_warnings=True&#39; to the grader configuration.</span>
+</code></pre></div>
 
 <p>The error can be suppressed by setting <code>suppress_warnings=True</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='x^2',
-...     variables=['x'],
-...     user_functions={'sin': lambda x: x*x},
-...     suppress_warnings=True
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;x^2&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;sin&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">suppress_warnings</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <h2 id="restricting-student-input">Restricting Student Input<a class="headerlink" href="#restricting-student-input" title="Permanent link"> # </a></h2>
 <p>For some questions, you will want to restrict the sorts of input that are marked correct. For example, if you want students to expand <code>sin(2*theta)</code>, then you don't want students to be able to just write <code>sin(2*theta)</code> and be graded correct.</p>
 <p><code>FormulaGrader</code> offers a number of ways to restrict what sort of answers will be marked correct.</p>
 <h3 id="instructor-variables">Instructor Variables<a class="headerlink" href="#instructor-variables" title="Permanent link"> # </a></h3>
 <p>In some situations, you need an extra variable to help define the problem in some way, particularly when using <code>DependentSampler</code>. Alternatively, you may want to remove a default constant such as <code>e</code>, <code>i</code>, <code>j</code> or <code>pi</code> from the problem. Both of these situations can be addressed by specifying particular variables to be instructor variables, as in the following.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='s/c',
-...     variables=['s', 'c', 'phi'],
-...     sample_from={
-...         's': DependentSampler(depends=['phi'], formula='sin(phi)'),
-...         'c': DependentSampler(depends=['phi'], formula='cos(phi)')
-...     },
-...     instructor_vars=['phi']
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;s/c&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;phi&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">depends</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">],</span> <span class="n">formula</span><span class="o">=</span><span class="s1">&#39;sin(phi)&#39;</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">depends</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">],</span> <span class="n">formula</span><span class="o">=</span><span class="s1">&#39;cos(phi)&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">},</span>
+<span class="gp">... </span>    <span class="n">instructor_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>Here, students can use <code>s</code> and <code>c</code>, but not <code>phi</code> in their answer. The <code>instructor_vars</code> key accepts a list of the variables/constants you wish to make unavailable to students.</p>
 <h3 id="forbidden-strings">Forbidden Strings<a class="headerlink" href="#forbidden-strings" title="Permanent link"> # </a></h3>
 <p>You can forbid students from entering certain strings using the <code>forbidden_strings</code> key:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='2*sin(theta)*cos(theta)',
-...     variables=['theta'],
-...     forbidden_strings=['*theta', 'theta*', 'theta/', '+theta', 'theta+', '-theta', 'theta-'],
-...     forbidden_message=&quot;Your answer should only use trigonometric functions acting on theta, not multiples of theta&quot;
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;2*sin(theta)*cos(theta)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">forbidden_strings</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*theta&#39;</span><span class="p">,</span> <span class="s1">&#39;theta*&#39;</span><span class="p">,</span> <span class="s1">&#39;theta/&#39;</span><span class="p">,</span> <span class="s1">&#39;+theta&#39;</span><span class="p">,</span> <span class="s1">&#39;theta+&#39;</span><span class="p">,</span> <span class="s1">&#39;-theta&#39;</span><span class="p">,</span> <span class="s1">&#39;theta-&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">forbidden_message</span><span class="o">=</span><span class="s2">&quot;Your answer should only use trigonometric functions acting on theta, not multiples of theta&quot;</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>If a student tries to use one of these strings, then they receive the <code>forbidden_message</code>, without giving away what the forbidden string is. We recommend using this sparingly, as students may find it confusing. The default <code>forbidden_message</code> is "Invalid Input: This particular answer is forbidden".</p>
 <p>Forbidden strings and student answers are stripped of whitespace before being compared. Thus, if <code>x + y</code> is forbidden, then answers containing <code>x+y</code> or <code>x   +   y</code> will be rejected.</p>
 <h3 id="blacklists-and-whitelists">Blacklists and Whitelists<a class="headerlink" href="#blacklists-and-whitelists" title="Permanent link"> # </a></h3>
 <p>You can disallow specific functions by adding them to the blacklist of functions as a list of disallowed function names. In the following example, <code>sin</code> is disallowed in correct answers.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='sqrt(1 - cos(x)^2)',
-...     variables=['x'],
-...     sample_from={'x': [0, np.pi]},
-...     blacklist=['sin']
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;sqrt(1 - cos(x)^2)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">]},</span>
+<span class="gp">... </span>    <span class="n">blacklist</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sin&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>If you want to exclude everything except for a specific set of functions, instead use a whitelist. In the following example, the only allowed functions in correct answers are <code>sin</code> and <code>cos</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='sin(x)/cos(x)',
-...     variables=['x'],
-...     whitelist=['sin', 'cos']
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;sin(x)/cos(x)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">whitelist</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sin&#39;</span><span class="p">,</span> <span class="s1">&#39;cos&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>If you want to exclude all functions, use <code>whitelist=[None]</code>:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='pi/2-x',
-...     variables=['x'],
-...     whitelist=[None]  # no functions are allowed
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;pi/2-x&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">whitelist</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>  <span class="c1"># no functions are allowed</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>You cannot use a whitelist and a blacklist at the same time.</p>
 <h3 id="required-functions">Required Functions<a class="headerlink" href="#required-functions" title="Permanent link"> # </a></h3>
 <p>You can specifically require certain functions to appear in the solution. Any solution that does not include all of these functions will generate an error message. To do this, specify a list of strings of function names that are required.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='2*sin(theta)*cos(theta)',
-...     variables=['theta'],
-...     required_functions=['sin', 'cos']
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;2*sin(theta)*cos(theta)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">required_functions</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sin&#39;</span><span class="p">,</span> <span class="s1">&#39;cos&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <h2 id="tolerance">Tolerance<a class="headerlink" href="#tolerance" title="Permanent link"> # </a></h2>
 <p>Student inputs are compared to answers with a numerical tolerance. You can set this as an absolute number (eg, <code>0.1</code>) or a percentage (eg, <code>'0.01%'</code>, which is the default tolerance). Tolerances must be nonnegative numbers or percentages.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='2*sin(theta)*cos(theta)',
-...     variables=['theta'],
-...     tolerance=0.00001
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;2*sin(theta)*cos(theta)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.00001</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>Tolerances are necessary because of numerical roundoff error that lead to small differences in evaluations of algebraically equivalent expressions. Zero tolerance should be used sparingly, perhaps only with integer sampling and answers.</p>
 <p>Note that if the answer is exactly <code>0</code> (or can be sampled to be exactly <code>0</code>, such as when using integer sampling), percentage tolerances don't work (as any percentage of zero is still zero). This means that the student-supplied answer must also evaluate to exactly zero to be graded correctly. Note that answers like <code>cos(pi/2)</code> evaluate to approximately <code>10^(-16)</code> due to numerical roundoff error. If you want such answers to be graded correctly, make sure to use an absolute tolerance instead of a relative tolerance on such questions.</p>
 <h2 id="suffixes">Suffixes<a class="headerlink" href="#suffixes" title="Permanent link"> # </a></h2>
 <p>Numbers with a <code>%</code> at the end will be treated as percentages, and converted to the appropriate decimals. If you desire, you can also enable the use of metric suffixes by setting the appropriate setting as follows.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = FormulaGrader(
-...     answers='2m*a',  # Equivalent to '0.002*a'
-...     variables=['a'],
-...     metric_suffixes=True
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;2m*a&#39;</span><span class="p">,</span>  <span class="c1"># Equivalent to &#39;0.002*a&#39;</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">metric_suffixes</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>The included suffixes are:</p>
 <ul>
@@ -589,33 +590,33 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 <h2 id="sibling-variables">Sibling Variables<a class="headerlink" href="#sibling-variables" title="Permanent link"> # </a></h2>
 <p>When a student submits several mathematical expressions as part of one problem, it is sometimes useful to grade these inputs in comparison to each other. This can be done using <em>sibling variables</em>, which are available when <code>FormulaGrader</code> is used as a subgrader in <strong>ordered</strong> <code>ListGrader</code> problems.</p>
 <p>For example:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = ListGrader(
-...     answers=[
-...         ('x', '2*x','3*x'),     # first input can be any of these 3 answers
-...         'sibling_1^2',          # second input must be first input squared
-...         'sibling_2^2'           # third input must be second input squared
-...     ],
-...     ordered=True,
-...     subgraders=FormulaGrader(variables=['x'])
-... )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">ListGrader</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;2*x&#39;</span><span class="p">,</span><span class="s1">&#39;3*x&#39;</span><span class="p">),</span>     <span class="c1"># first input can be any of these 3 answers</span>
+<span class="gp">... </span>        <span class="s1">&#39;sibling_1^2&#39;</span><span class="p">,</span>          <span class="c1"># second input must be first input squared</span>
+<span class="gp">... </span>        <span class="s1">&#39;sibling_2^2&#39;</span>           <span class="c1"># third input must be second input squared</span>
+<span class="gp">... </span>    <span class="p">],</span>
+<span class="gp">... </span>    <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">subgraders</span><span class="o">=</span><span class="n">FormulaGrader</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>Note that in this example, the sequence of inputs <code>['2*x', 4*x^2, 16*x^4]</code> is correct, and so is <code>['3*x', 9*x^2, 81*x^4]</code>, but <code>['3*x', 4*x^2, 16*x^4]</code> receives only two-thirds credit (from the first entry matching a given answer, and the last entry being the square of the second entry).</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; student_inputs = ['2*x','4*x^2', '16*x^4']
-&gt;&gt;&gt; result1, result2, result3 = grader(None, student_inputs)['input_list']
-&gt;&gt;&gt; result1['ok'], result2['ok'], result3['ok']
-(True, True, True)
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">student_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;2*x&#39;</span><span class="p">,</span><span class="s1">&#39;4*x^2&#39;</span><span class="p">,</span> <span class="s1">&#39;16*x^4&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">,</span> <span class="n">result3</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_inputs</span><span class="p">)[</span><span class="s1">&#39;input_list&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result2</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result3</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="go">(True, True, True)</span>
 
-&gt;&gt;&gt; student_inputs = ['3*x','9*x^2', '81*x^4']
-&gt;&gt;&gt; result1, result2, result3 = grader(None, student_inputs)['input_list']
-&gt;&gt;&gt; result1['ok'], result2['ok'], result3['ok']
-(True, True, True)
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;3*x&#39;</span><span class="p">,</span><span class="s1">&#39;9*x^2&#39;</span><span class="p">,</span> <span class="s1">&#39;81*x^4&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">,</span> <span class="n">result3</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_inputs</span><span class="p">)[</span><span class="s1">&#39;input_list&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result2</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result3</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="go">(True, True, True)</span>
 
-&gt;&gt;&gt; student_inputs = ['3*x','4*x^2', '16*x^4']
-&gt;&gt;&gt; result1, result2, result3 = grader(None, student_inputs)['input_list']
-&gt;&gt;&gt; result1['ok'], result2['ok'], result3['ok']
-(True, False, True)
-</code></pre>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;3*x&#39;</span><span class="p">,</span><span class="s1">&#39;4*x^2&#39;</span><span class="p">,</span> <span class="s1">&#39;16*x^4&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">,</span> <span class="n">result3</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_inputs</span><span class="p">)[</span><span class="s1">&#39;input_list&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result2</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result3</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="go">(True, False, True)</span>
+</code></pre></div>
 
 <p>Notes:</p>
 <ul>
@@ -640,72 +641,122 @@ Warning: 'user_functions' contains entries 'sin' which will override default val
 <p>Note that a few of these improvements have been merged into edX by the authors of this library.</p>
 <h2 id="options-listing">Options Listing<a class="headerlink" href="#options-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to a <code>FormulaGrader</code>.</p>
-<pre class="codehilite"><code class="language-python">grader = FormulaGrader(
-    variables=list,  # default []
-    numbered_vars=list,  # default []
-    sample_from=dict,  # default {}
-    samples=int,  # default 5
-    user_functions=dict,  # default {}
-    user_constants=dict,  # default {}
-    failable_evals=int,  # default 0
-    instructor_vars=list,  # default []
-    blacklist=list,  # default []
-    whitelist=list,  # default []
-    forbidden_strings=list,  # default []
-    forbidden_message=str,  # default 'Invalid Input: This particular answer is forbidden'
-    required_functions=list,  # default []
-    metric_suffixes=bool,  # default False
-    tolerance=(float | percentage),  # default '0.01%'
-)
-</code></pre></div>
+<div class="codehilite"><pre><span></span><code><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
+    <span class="n">variables</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">numbered_vars</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">sample_from</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>  <span class="c1"># default {}</span>
+    <span class="n">samples</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>  <span class="c1"># default 5</span>
+    <span class="n">user_functions</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>  <span class="c1"># default {}</span>
+    <span class="n">user_constants</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span>  <span class="c1"># default {}</span>
+    <span class="n">failable_evals</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>  <span class="c1"># default 0</span>
+    <span class="n">instructor_vars</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">blacklist</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">whitelist</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">forbidden_strings</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">forbidden_message</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &#39;Invalid Input: This particular answer is forbidden&#39;</span>
+    <span class="n">required_functions</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
+    <span class="n">metric_suffixes</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default False</span>
+    <span class="n">tolerance</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">percentage</span><span class="p">),</span>  <span class="c1"># default &#39;0.01%&#39;</span>
+<span class="p">)</span>
+</code></pre></div></div>
+        
         
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '../..';
-    </script>
-    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-    <script src="../../js/base.js"></script>
-    <script src="../../search/require.js"></script>
-    <script src="../../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../.."</script>
+    
+    <script src="../../js/base.js"></script>
+    <script src="../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

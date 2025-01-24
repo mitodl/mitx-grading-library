@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../img/favicon.ico">
 
+    
     <title>Introduction to Graders - MITxGraders</title>
+    
 
-    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../css/base.css" rel="stylesheet">
-    <link href="../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/highlight.css">
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../css/base.min.css" rel="stylesheet">
+    <link href="../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../css/extra.css" rel="stylesheet">
-
-
     <link href="../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../edx/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../edx/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../item_grader/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../item_grader/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -272,51 +273,51 @@
 
 <h1 id="introduction-to-graders">Introduction to Graders<a class="headerlink" href="#introduction-to-graders" title="Permanent link"> # </a></h1>
 <p>Graders are implemented as python classes. All grading classes are instantiated by calling them. Options can be provided using keyword arguments as</p>
-<pre class="codehilite"><code class="language-python">grader = FakeGradingClass(option_1=value_1, option_2=value2)
-# FakeGradingClass is not real! It's just a placeholder.
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">grader</span> <span class="o">=</span> <span class="n">FakeGradingClass</span><span class="p">(</span><span class="n">option_1</span><span class="o">=</span><span class="n">value_1</span><span class="p">,</span> <span class="n">option_2</span><span class="o">=</span><span class="n">value2</span><span class="p">)</span>
+<span class="c1"># FakeGradingClass is not real! It&#39;s just a placeholder.</span>
+</code></pre></div>
 
 <p>or with a configuration dictionary:</p>
-<pre class="codehilite"><code class="language-python">config = {'option_1': value_1, 'option_2': value_2}
-grader = FakeGradingClass(config)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;option_1&#39;</span><span class="p">:</span> <span class="n">value_1</span><span class="p">,</span> <span class="s1">&#39;option_2&#39;</span><span class="p">:</span> <span class="n">value_2</span><span class="p">}</span>
+<span class="n">grader</span> <span class="o">=</span> <span class="n">FakeGradingClass</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</code></pre></div>
 
 <p>Passing the configuration as a dictionary can be useful if you are using the same configuration for multiple problems. However, you cannot 'mix and match' these two options: if a configuration dictionary is supplied, any keyword arguments are ignored.</p>
 <p>Most configuration options are specific to their grading classes. For example, <code>FormulaGrader</code> has a <code>variables</code> configuration key, but <code>NumericalGrader</code> does not.</p>
 <p>A few configuration options are available to all grading classes.</p>
 <h2 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Permanent link"> # </a></h2>
 <p>Every grading class has a debug option. By default, <code>debug=False</code>. To receive debug information from a given grader, specify <code>debug=True</code>. Some graders will provide more debug information than others. Debug information can be used by authors to check to make sure that the graders are behaving as expected, but shouldn't be made available to students.</p>
-<pre class="codehilite"><code class="language-python">grader = FakeGradingClass(debug=True)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">grader</span> <span class="o">=</span> <span class="n">FakeGradingClass</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
 
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link"> # </a></h2>
 <p>Every grading class has a <code>suppress_warnings</code> key.</p>
 <p>The options passed to a grading class undergo extensive validation and graders will giver error messages if instantiated with invalid options.</p>
 <p>A few error messages serve only as warnings. For example, if you attempt to configure a <code>FormulaGrader</code> with <code>pi</code> as a variable, you will receive a warning:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; try:
-...     grader = FormulaGrader(variables=['pi'])
-... except ConfigError as error:
-...     print(error)
-Warning: 'variables' contains entries 'pi' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pi&#39;</span><span class="p">])</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ConfigError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">Warning: &#39;variables&#39; contains entries &#39;pi&#39; which will override default values. If you intend to override defaults, you may suppress this warning by adding &#39;suppress_warnings=True&#39; to the grader configuration.</span>
+</code></pre></div>
 
 <p>As the warning message says, if you really want to override the default value of <code>pi</code> (not recommended!) then you can suppress this warning by setting <code>suppress_warnings=True</code>.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; from mitxgraders import *
-&gt;&gt;&gt; grader = FormulaGrader(variables=['pi'], suppress_warnings=True)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pi&#39;</span><span class="p">],</span> <span class="n">suppress_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
 
 <h2 id="attempt-based-partial-credit">Attempt-Based Partial Credit<a class="headerlink" href="#attempt-based-partial-credit" title="Permanent link"> # </a></h2>
 <p>It is possible to pass a student's attempt number to a grader by explicitly requesting that edX do so in a <code>customresponse</code> tag as follows.</p>
-<pre class="codehilite"><code class="language-XML">&lt;customresponse cfn=&quot;grader&quot; expect=&quot;answer&quot; cfn_extra_args=&quot;attempt&quot;&gt;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="w"> </span><span class="na">expect=</span><span class="s">&quot;answer&quot;</span><span class="w"> </span><span class="na">cfn_extra_args=</span><span class="s">&quot;attempt&quot;</span><span class="nt">&gt;</span>
+</code></pre></div>
 
 <p>Once this is done, you can enable attempt-based partial credit for your graders. The syntax is as follows.</p>
-<pre class="codehilite"><code class="language-python">grader = FakeGradingClass(
-    attempt_based_credit=(None | function),  # default None
-    attempt_based_credit_msg=True  # default True
-)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">grader</span> <span class="o">=</span> <span class="n">FakeGradingClass</span><span class="p">(</span>
+    <span class="n">attempt_based_credit</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="o">|</span> <span class="n">function</span><span class="p">),</span>  <span class="c1"># default None</span>
+    <span class="n">attempt_based_credit_msg</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># default True</span>
+<span class="p">)</span>
+</code></pre></div>
 
 <p>Attempt-based partial credit is turned on by specifying a function to convert an attempt number into an amount of credit. We provide three functions to do this, but you can of course write your own.</p>
 <p>If a student's credit has been decreased from the maximum by attempt-based partial credit, the student can be provided with a message informing them of the maximum possible credit at that attempt number. This is controlled by the <code>attempt_based_credit_msg</code> setting. We recommend that this setting be left on, as it will likely lead to confusion otherwise.</p>
@@ -325,29 +326,29 @@ Warning: 'variables' contains entries 'pi' which will override default values. I
 <p>Attempt-based partial credit can be set on a course-wide basis through the use of <a href="../plugins/">plugins</a>.</p>
 <h3 id="reciprocalcredit">ReciprocalCredit<a class="headerlink" href="#reciprocalcredit" title="Permanent link"> # </a></h3>
 <p>This function simply awards credit based on the reciprocal of the attempt number. There are no options to set.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(attempt_based_credit=ReciprocalCredit())
-&gt;&gt;&gt; grader('cat', 'cat', attempt=1) == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=2) == {'grade_decimal': 0.5, 'msg': 'Maximum credit for attempt #2 is 50%.', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=3) == {'grade_decimal': 0.3333, 'msg': 'Maximum credit for attempt #3 is 33.3%.', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=4) == {'grade_decimal': 0.25, 'msg': 'Maximum credit for attempt #4 is 25%.', 'ok': 'partial'}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span><span class="n">attempt_based_credit</span><span class="o">=</span><span class="n">ReciprocalCredit</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #2 is 50%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.3333</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #3 is 33.3%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #4 is 25%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h3 id="geometriccredit">GeometricCredit<a class="headerlink" href="#geometriccredit" title="Permanent link"> # </a></h3>
 <p>This function decreases the possible credit by a factor for each attempt, forming a geometric progression. You may choose the factor, which defaults to 0.5.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; grader = StringGrader(attempt_based_credit=GeometricCredit(factor=0.5))
-&gt;&gt;&gt; grader('cat', 'cat', attempt=1) == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=2) == {'grade_decimal': 0.5, 'msg': 'Maximum credit for attempt #2 is 50%.', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=3) == {'grade_decimal': 0.25, 'msg': 'Maximum credit for attempt #3 is 25%.', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=4) == {'grade_decimal': 0.125, 'msg': 'Maximum credit for attempt #4 is 12.5%.', 'ok': 'partial'}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span><span class="n">attempt_based_credit</span><span class="o">=</span><span class="n">GeometricCredit</span><span class="p">(</span><span class="n">factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #2 is 50%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #3 is 25%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.125</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #4 is 12.5%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h3 id="linearcredit">LinearCredit<a class="headerlink" href="#linearcredit" title="Permanent link"> # </a></h3>
 <p>This function allows the first few attempts to have maximum credit, then linearly decreases credit until a minimum threshold is reached.</p>
@@ -363,85 +364,135 @@ True
 </li>
 </ul>
 <p>The following example demonstrates the default settings.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; creditor = LinearCredit(
-...     decrease_credit_after=1,  # First attempt receives full credit
-...     minimum_credit=0.2,       # Minimum credit
-...     decrease_credit_steps=4   # Number of attempts on the linear slope
-... )
-&gt;&gt;&gt; creditor == LinearCredit()
-True
-&gt;&gt;&gt; grader = StringGrader(attempt_based_credit=creditor)
-&gt;&gt;&gt; grader('cat', 'cat', attempt=1) == {'grade_decimal': 1, 'msg': '', 'ok': True}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=2) == {'grade_decimal': 0.8, 'msg': 'Maximum credit for attempt #2 is 80%.', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=3) == {'grade_decimal': 0.6, 'msg': 'Maximum credit for attempt #3 is 60%.', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=4) == {'grade_decimal': 0.4, 'msg': 'Maximum credit for attempt #4 is 40%.', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=5) == {'grade_decimal': 0.2, 'msg': 'Maximum credit for attempt #5 is 20%.', 'ok': 'partial'}
-True
-&gt;&gt;&gt; grader('cat', 'cat', attempt=6) == {'grade_decimal': 0.2, 'msg': 'Maximum credit for attempt #6 is 20%.', 'ok': 'partial'}
-True
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">creditor</span> <span class="o">=</span> <span class="n">LinearCredit</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">decrease_credit_after</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># First attempt receives full credit</span>
+<span class="gp">... </span>    <span class="n">minimum_credit</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>       <span class="c1"># Minimum credit</span>
+<span class="gp">... </span>    <span class="n">decrease_credit_steps</span><span class="o">=</span><span class="mi">4</span>   <span class="c1"># Number of attempts on the linear slope</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">creditor</span> <span class="o">==</span> <span class="n">LinearCredit</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">StringGrader</span><span class="p">(</span><span class="n">attempt_based_credit</span><span class="o">=</span><span class="n">creditor</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #2 is 80%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #3 is 60%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #4 is 40%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #5 is 20%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">attempt</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Maximum credit for attempt #6 is 20%.&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">}</span>
+<span class="go">True</span>
+</code></pre></div>
 
 <h2 id="option-listing">Option Listing<a class="headerlink" href="#option-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to all graders.</p>
-<pre class="codehilite"><code class="language-python">grader = AbstractGrader(
-    debug=bool,  # default False
-    wrong_msg=str,  # default ''
-    attempt_based_credit=(None | function),  # default None
-    attempt_based_credit_msg=bool,  # default True
-)
-</code></pre></div>
+<div class="codehilite"><pre><span></span><code><span class="n">grader</span> <span class="o">=</span> <span class="n">AbstractGrader</span><span class="p">(</span>
+    <span class="n">debug</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default False</span>
+    <span class="n">wrong_msg</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &#39;&#39;</span>
+    <span class="n">attempt_based_credit</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span> <span class="o">|</span> <span class="n">function</span><span class="p">),</span>  <span class="c1"># default None</span>
+    <span class="n">attempt_based_credit_msg</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default True</span>
+<span class="p">)</span>
+</code></pre></div></div>
+        
         
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '..';
-    </script>
-    <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
-    <script src="../js/base.js"></script>
-    <script src="../search/require.js"></script>
-    <script src="../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = ".."</script>
+    
+    <script src="../js/base.js"></script>
+    <script src="../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>

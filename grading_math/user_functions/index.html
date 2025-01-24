@@ -4,45 +4,43 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
+    
     <title>User-Defined Functions - MITxGraders</title>
+    
 
-    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../../css/base.css" rel="stylesheet">
-    <link href="../../css/cinder.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/base.min.css" rel="stylesheet">
+    <link href="../../css/cinder.min.css" rel="stylesheet">
 
-
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
     <link href="../../css/extra.css" rel="stylesheet">
-
-
     <link href="../../css/cinder_tweaks.css" rel="stylesheet">
-
-
     <link href="../../css/readthedocs.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
         <![endif]-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
     
+
+     
 </head>
 
 <body>
@@ -63,7 +61,9 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="../..">MITxGraders</a>
+            
+              <a class="navbar-brand" href="../..">MITxGraders</a>
+            
         </div>
 
         <!-- Expanded navigation -->
@@ -229,21 +229,21 @@
             <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fa fa-search"></i> Search
+                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../functions_and_constants/">
-                            <i class="fa fa-arrow-left"></i> Previous
+                        <a rel="prev" href="../functions_and_constants/">
+                            <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../comparer_functions/">
-                            Next <i class="fa fa-arrow-right"></i>
+                        <a rel="next" href="../comparer_functions/">
+                            Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fa fa-github"></i> GitHub</a>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
                     </li>
             </ul>
         </div>
@@ -251,6 +251,7 @@
 </div>
 
     <div class="container">
+        
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
@@ -269,90 +270,90 @@
 <p>It's possible to construct user-defined functions that take in scalar/vector/matrix arguments, and produce a scalar/vector/matrix appropriately.</p>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link"> # </a></h2>
 <p>Suppose we have a <code>MatrixGrader</code> problem in which we want to provide students with a function <code>rot(vector, axis, angle)</code> that rotates a vector about a given axis by a given angle. We can provide such a function with the <code>user_functions</code> configuration key.</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; import numpy as np
-&gt;&gt;&gt; from mitxgraders import *
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
-&gt;&gt;&gt; def rot(vec, axis, angle):
-...     &quot;&quot;&quot;
-...     Rotate vec by angle around axis. Implemented by Euler-Rodrigues formula:
-...     https://en.wikipedia.org/wiki/Euler-Rodrigues_formula
-...
-...     Arguments:
-...         vec: a 3-component MathArray to rotate
-...         axis: a 3-component MathArray to rotate around
-...         angle: a number
-...     &quot;&quot;&quot;
-...     vec = np.array(vec)
-...     unit_axis = np.array(axis)/np.linalg.norm(axis)
-...     a = np.cos(angle/2)
-...     omega = unit_axis * np.sin(angle/2)
-...     crossed = np.cross(omega, vec)
-...     result = vec + 2*a*crossed + 2*np.cross(omega, crossed)
-...     return MathArray(result)
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">rot</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+<span class="gp">... </span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="sd">    Rotate vec by angle around axis. Implemented by Euler-Rodrigues formula:</span>
+<span class="gp">... </span><span class="sd">    https://en.wikipedia.org/wiki/Euler-Rodrigues_formula</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="sd">    Arguments:</span>
+<span class="gp">... </span><span class="sd">        vec: a 3-component MathArray to rotate</span>
+<span class="gp">... </span><span class="sd">        axis: a 3-component MathArray to rotate around</span>
+<span class="gp">... </span><span class="sd">        angle: a number</span>
+<span class="gp">... </span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="gp">... </span>    <span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">unit_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">omega</span> <span class="o">=</span> <span class="n">unit_axis</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">crossed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">vec</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">result</span> <span class="o">=</span> <span class="n">vec</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="n">crossed</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">crossed</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">MathArray</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
-&gt;&gt;&gt; grader_1 = MatrixGrader(
-...    answers='rot(v, [0, 0, 1], theta)',
-...    variables=['v', 'theta'],
-...    sample_from={
-...        'v': RealVectors(shape=3),
-...    },
-...    user_functions={
-...        'rot': rot
-...    }
-... )
-</code></pre>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader_1</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;rot(v, [0, 0, 1], theta)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;theta&#39;</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>       <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="gp">... </span>   <span class="p">},</span>
+<span class="gp">... </span>   <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>       <span class="s1">&#39;rot&#39;</span><span class="p">:</span> <span class="n">rot</span>
+<span class="gp">... </span>   <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <h3 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link"> # </a></h3>
 <p>Our <code>rot(vec, axis, angle)</code> function works, but if students supply the function above with arguments of incorrect type, they receive unhelpful error messages:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; try:
-...     grader_1(None, 'rot(v, theta, [0, 0, 1])')
-... except StudentFacingError as error:
-...     print(error)
-There was an error evaluating rot(...). Its input does not seem to be in its domain.
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader_1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;rot(v, theta, [0, 0, 1])&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">There was an error evaluating rot(...). Its input does not seem to be in its domain.</span>
+</code></pre></div>
 
 <h3 id="the-solution">The Solution<a class="headerlink" href="#the-solution" title="Permanent link"> # </a></h3>
 <p>To provide students with more useful error messages, we can use <code>specify_domain</code>, a decorator function imported from <code>mitxgraders</code>. <a href="https://dbader.org/blog/python-decorators">Decorator Functions</a> are "higher-order functions" that take functions as input and produce functions as output, usually modifying the input function's behavior. In our case, <code>specify_domain</code> will modify the behavior of <code>rot</code> so as to provide more helpful <code>StudentFacingError</code>s.</p>
 <p>Here we go:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; @specify_domain(input_shapes=[[3], [3], [1]], display_name='rot')
-... def rot_with_error_messages(vec, axis, angle):
-...     # rot(vec, axis, angle) defined above
-...     return rot(vec, axis, angle)
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="nd">@specify_domain</span><span class="p">(</span><span class="n">input_shapes</span><span class="o">=</span><span class="p">[[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">display_name</span><span class="o">=</span><span class="s1">&#39;rot&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">rot_with_error_messages</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># rot(vec, axis, angle) defined above</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">rot</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">)</span>
 
-&gt;&gt;&gt; # Define new grader using rot_with_error_messages
-&gt;&gt;&gt; grader_2 = MatrixGrader(
-...    answers='rot(v, [0, 0, 1], theta)',
-...    variables=['v', 'theta'],
-...    sample_from={
-...        'v': RealVectors(shape=3),
-...    },
-...    user_functions={
-...        'rot': rot_with_error_messages
-...    }
-... )
-</code></pre>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define new grader using rot_with_error_messages</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader_2</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;rot(v, [0, 0, 1], theta)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;theta&#39;</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>       <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="gp">... </span>   <span class="p">},</span>
+<span class="gp">... </span>   <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>       <span class="s1">&#39;rot&#39;</span><span class="p">:</span> <span class="n">rot_with_error_messages</span>
+<span class="gp">... </span>   <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
 
 <p>Now if a student calls <code>rot</code> with incorrect inputs, they receive a more helpful message:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; try:
-...     grader_2(None, 'rot(v, theta, [0, 0, 1])')
-... except StudentFacingError as error:
-...     print(str(error).replace('&lt;br/&gt;', '\n'))
-There was an error evaluating function rot(...)
-1st input is ok: received a vector of length 3 as expected
-2nd input has an error: received a scalar, expected a vector of length 3
-3rd input has an error: received a vector of length 3, expected a scalar
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">grader_2</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;rot(v, theta, [0, 0, 1])&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;br/&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="go">There was an error evaluating function rot(...)</span>
+<span class="go">1st input is ok: received a vector of length 3 as expected</span>
+<span class="go">2nd input has an error: received a scalar, expected a vector of length 3</span>
+<span class="go">3rd input has an error: received a vector of length 3, expected a scalar</span>
+</code></pre></div>
 
 <h3 id="configuring-specify_domain">Configuring specify_domain<a class="headerlink" href="#configuring-specify_domain" title="Permanent link"> # </a></h3>
 <p>The decorator <code>specify_domain</code> accepts optional keyword arguments and should be called in either of two equivalent ways:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; @specify_domain(keyword_arguments)                # doctest: +SKIP
-... def target_function(x, y, z):
-...     pass # do whatever you want
-&gt;&gt;&gt; # or, equivalently:
-&gt;&gt;&gt; def target_function(x, y ,z):
-...     pass # do whatever you want
-&gt;&gt;&gt; decorated_function = specify_domain(keyword_arguments)(target_function) # doctest: +SKIP
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="nd">@specify_domain</span><span class="p">(</span><span class="n">keyword_arguments</span><span class="p">)</span>                <span class="c1"># doctest: +SKIP</span>
+<span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">target_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">pass</span> <span class="c1"># do whatever you want</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># or, equivalently:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">target_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">,</span><span class="n">z</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">pass</span> <span class="c1"># do whatever you want</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decorated_function</span> <span class="o">=</span> <span class="n">specify_domain</span><span class="p">(</span><span class="n">keyword_arguments</span><span class="p">)(</span><span class="n">target_function</span><span class="p">)</span> <span class="c1"># doctest: +SKIP</span>
+</code></pre></div>
 
 <p>The keyword arguments are:</p>
 <ul>
@@ -368,10 +369,10 @@ There was an error evaluating function rot(...)
     Defaults to <code>None</code>, meaning that the function's <code>__name__</code> attribute is used.</li>
 </ul>
 <p>So, for example,</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; @specify_domain(input_shapes=[1, [3, 2], 4], display_name='myfunc')
-... def some_function(x, A, v):
-...     pass
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="nd">@specify_domain</span><span class="p">(</span><span class="n">input_shapes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">4</span><span class="p">],</span> <span class="n">display_name</span><span class="o">=</span><span class="s1">&#39;myfunc&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">some_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+</code></pre></div>
 
 <p>specifies that the function <code>some_func</code> must be called with three arguments:</p>
 <ul>
@@ -381,77 +382,127 @@ There was an error evaluating function rot(...)
 </ul>
 <h3 id="arbitrary-same-shape-arguments">Arbitrary Same-Shape Arguments<a class="headerlink" href="#arbitrary-same-shape-arguments" title="Permanent link"> # </a></h3>
 <p>Some functions may allow an arbitrary number of arguments to be passed in. For example, consider a user-defined minimum function:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; def my_min(*args):
-...     return min(*args)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">my_min</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+</code></pre></div>
 
 <p>To inform <code>specify_domain</code> that a function should accept arbitrarily many arguments of a certain shape, supply a single shape to <code>input_shapes</code>, and also pass in a <code>min_length</code> parameter, to specify the minimum number of arguments required. (If you specify <code>min_length</code> and have more than one shape in <code>input_shapes</code>, a <code>ConfigError</code> will result.) So, our <code>my_min</code> function can be decorated as follows:</p>
-<pre class="codehilite"><code class="language-pycon">&gt;&gt;&gt; @specify_domain(input_shapes=[1], display_name='min', min_length=2)
-... def my_min(*args):
-...     return min(*args)
-&gt;&gt;&gt; my_min(1.5, 2.3, 4.6)
-1.5
-&gt;&gt;&gt; try:
-...     my_min(1)
-... except StudentFacingError as error:
-...     print(error)
-Wrong number of arguments passed to min(...): Expected at least 2 inputs, but received 1.
-&gt;&gt;&gt; try:
-...     my_min(MathArray([1, 2]), MathArray([3, 4]))
-... except StudentFacingError as error:
-...     print(error)
-There was an error evaluating function min(...)
-1st input has an error: received a vector of length 2, expected a scalar
-2nd input has an error: received a vector of length 2, expected a scalar
-</code></pre></div>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="nd">@specify_domain</span><span class="p">(</span><span class="n">input_shapes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">display_name</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">my_min</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_min</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">)</span>
+<span class="go">1.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">my_min</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">Wrong number of arguments passed to min(...): Expected at least 2 inputs, but received 1.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">my_min</span><span class="p">(</span><span class="n">MathArray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span> <span class="n">MathArray</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="go">There was an error evaluating function min(...)</span>
+<span class="go">1st input has an error: received a vector of length 2, expected a scalar</span>
+<span class="go">2nd input has an error: received a vector of length 2, expected a scalar</span>
+</code></pre></div></div>
+        
         
     </div>
 
-    <footer class="col-md-12 text-center">
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-    </footer>
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
 
-    <script src="../../js/jquery-1.10.2.min.js"></script>
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    var base_url = '../..';
-    </script>
-    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-    <script src="../../js/base.js"></script>
-    <script src="../../search/require.js"></script>
-    <script src="../../search/search.js"></script>
 
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        From here you can search these documents. Enter your search terms below.
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                        </div>
-                    </form>
-                    <div id="mkdocs-search-results"></div>
-                </div>
-                <div class="modal-footer">
-                </div>
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = "../.."</script>
+    
+    <script src="../../js/base.js"></script>
+    <script src="../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
-
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 
 </html>
