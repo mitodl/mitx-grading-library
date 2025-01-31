@@ -77,6 +77,59 @@ Download [python_lib.zip](https://github.com/mitodl/mitx-grading-library/raw/mas
 
 The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.
 
+### How to Zip Correctly
+
+EdX expects packages to be at the top level of the ZIP file. If you zip an entire folder named `python_lib`, the paths end up as `python_lib/mitxgraders/`, `python_lib/voluptuous/`, etc., and edX will fail to locate them.
+
+#### Option A (Command Line)
+
+1. Go *inside* your local `python_lib` folder that holds `mitxgraders/`, `voluptuous/`, etc.  
+2. Run:
+   ```bash
+   zip -r ../python_lib.zip *
+   ```
+   This ensures the zip file contains only the contents of `python_lib/` at the top level.
+
+#### Option B (Windows Explorer)
+
+1. Open the `python_lib` folder in File Explorer.  
+2. Select **all** its contents (e.g. `mitxgraders`, `voluptuous`, etc.).  
+3. **Right-click** → **Send to** → **Compressed (zipped) folder**.  
+4. Name the resulting zip file `python_lib.zip`.  
+   - Do **not** right-click on the `python_lib` folder itself; you want to zip just its **contents**.
+
+#### Option C (macOS Finder)
+
+1. Open the `python_lib` folder in Finder.  
+2. Select **all** its contents.  
+3. **Right-click** (or Control-click) → **Compress X Items** (where X is the number of selected items).  
+4. Rename the resulting `Archive.zip` file to `python_lib.zip`.  
+   - Again, ensure you’re zipping the *contents* rather than the entire `python_lib` folder.
+
+### Checking Your Zip File
+
+1. **Rename and Unzip**  
+   - Rename your `python_lib.zip` to `test.zip`.  
+   - Unzip `test.zip` into a folder named `test`.  
+   - If you see a folder `python_lib` inside `test`, you zipped incorrectly.  
+   - If you see folders like `mitxgraders/` or `voluptuous/` directly inside `test`, the zip is correct.
+
+2. **Using a Command (Optional)**  
+   - If you have a command line available, run:
+     ```bash
+     zipinfo python_lib.zip
+     ```
+     - **Incorrect** (extra directory):
+       ```
+       python_lib/
+       python_lib/mitxgraders/
+       python_lib/voluptuous/
+       ```
+     - **Correct** (no extra folder at the top):
+       ```
+       mitxgraders/
+       voluptuous/
+       ```
 
 ## Grading Classes
 
