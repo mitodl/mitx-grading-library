@@ -264,6 +264,8 @@
                 
             <li class="second-level"><a href="#loading-in-edx">Loading in edX</a></li>
                 
+                <li class="third-level"><a href="#how-to-zip-correctly">How to Zip Correctly</a></li>
+                <li class="third-level"><a href="#checking-your-zip-file">Checking Your Zip File</a></li>
             <li class="second-level"><a href="#grading-classes">Grading Classes</a></li>
                 
             <li class="second-level"><a href="#questions-bugs-issues-suggestions">Questions? Bugs? Issues? Suggestions?</a></li>
@@ -343,6 +345,57 @@ grader<span class="w"> </span>=<span class="w"> </span>ListGrader(
 <h2 id="loading-in-edx">Loading in edX<a class="headerlink" href="#loading-in-edx" title="Permanent link"> # </a></h2>
 <p>Download <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a> and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip. If you want to use our AsciiMath renderer definitions (if you have math problems, you'll really want this!), place the <a href="https://raw.githubusercontent.com/mitodl/mitx-grading-library/master/MJxPrep.js">MJxPrep.js</a> file in your static folder (XML) or upload the file to your course assets (Studio).</p>
 <p>The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.</p>
+<h3 id="how-to-zip-correctly">How to Zip Correctly<a class="headerlink" href="#how-to-zip-correctly" title="Permanent link"> # </a></h3>
+<p>EdX expects packages to be at the top level of the ZIP file. If you zip an entire folder named <code>python_lib</code>, the paths end up as <code>python_lib/mitxgraders/</code>, <code>python_lib/voluptuous/</code>, etc., and edX will fail to locate them.</p>
+<h4 id="option-a-command-line">Option A (Command Line)<a class="headerlink" href="#option-a-command-line" title="Permanent link"> # </a></h4>
+<ol>
+<li>Go <em>inside</em> your local <code>python_lib</code> folder that holds <code>mitxgraders/</code>, <code>voluptuous/</code>, etc.  </li>
+<li>Run:
+   <code>bash
+   zip -r ../python_lib.zip *</code>
+   This ensures the zip file contains only the contents of <code>python_lib/</code> at the top level.</li>
+</ol>
+<h4 id="option-b-windows-explorer">Option B (Windows Explorer)<a class="headerlink" href="#option-b-windows-explorer" title="Permanent link"> # </a></h4>
+<ol>
+<li>Open the <code>python_lib</code> folder in File Explorer.  </li>
+<li>Select <strong>all</strong> its contents (e.g. <code>mitxgraders</code>, <code>voluptuous</code>, etc.).  </li>
+<li><strong>Right-click</strong> → <strong>Send to</strong> → <strong>Compressed (zipped) folder</strong>.  </li>
+<li>Name the resulting zip file <code>python_lib.zip</code>.  </li>
+<li>Do <strong>not</strong> right-click on the <code>python_lib</code> folder itself; you want to zip just its <strong>contents</strong>.</li>
+</ol>
+<h4 id="option-c-macos-finder">Option C (macOS Finder)<a class="headerlink" href="#option-c-macos-finder" title="Permanent link"> # </a></h4>
+<ol>
+<li>Open the <code>python_lib</code> folder in Finder.  </li>
+<li>Select <strong>all</strong> its contents.  </li>
+<li><strong>Right-click</strong> (or Control-click) → <strong>Compress X Items</strong> (where X is the number of selected items).  </li>
+<li>Rename the resulting <code>Archive.zip</code> file to <code>python_lib.zip</code>.  </li>
+<li>Again, ensure you’re zipping the <em>contents</em> rather than the entire <code>python_lib</code> folder.</li>
+</ol>
+<h3 id="checking-your-zip-file">Checking Your Zip File<a class="headerlink" href="#checking-your-zip-file" title="Permanent link"> # </a></h3>
+<ol>
+<li><strong>Rename and Unzip</strong>  </li>
+<li>Rename your <code>python_lib.zip</code> to <code>test.zip</code>.  </li>
+<li>Unzip <code>test.zip</code> into a folder named <code>test</code>.  </li>
+<li>If you see a folder <code>python_lib</code> inside <code>test</code>, you zipped incorrectly.  </li>
+<li>
+<p>If you see folders like <code>mitxgraders/</code> or <code>voluptuous/</code> directly inside <code>test</code>, the zip is correct.</p>
+</li>
+<li>
+<p><strong>Using a Command (Optional)</strong>  </p>
+</li>
+<li>If you have a command line available, run:
+     <code>bash
+     zipinfo python_lib.zip</code><ul>
+<li><strong>Incorrect</strong> (extra directory):
+   <code>python_lib/
+   python_lib/mitxgraders/
+   python_lib/voluptuous/</code></li>
+<li><strong>Correct</strong> (no extra folder at the top):
+   <code>mitxgraders/
+   voluptuous/</code></li>
+</ul>
+</li>
+</ol>
 <h2 id="grading-classes">Grading Classes<a class="headerlink" href="#grading-classes" title="Permanent link"> # </a></h2>
 <p>Grading classes generally fall into two categories: single-input graders and multi-input graders.</p>
 <p><strong>Single-input graders</strong> grade a single input. All single-input graders are built on a framework we call an <code>ItemGrader</code>. We recommend understanding how <code>ItemGrader</code>s work before diving into more specifics.</p>
