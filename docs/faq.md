@@ -4,6 +4,6 @@
 
 Unfortunately, no. Those problem types cannot be used in a `customresponse` problem, so we can't grade them with a python grader.
 
-- Does the grader work with python 2 or python 3?
+- Does the grader work with Python 2 or Python 3?
 
-It works with both! Older versions of edX ran python graders in python 2.7; newer versions use python 3.8. The library works seamlessly with both. No changes to any code are required to switch between versions. Some functionality requires python 3.5 however.
+The library now only supports Python 3 (versions 3.8 and 3.11), as support for Python 2 was dropped in Version 3. For more information, see the [CHANGELOG](https://mitodl.github.io/mitx-grading-library/changelog/). If you need to use older versions of this package, you can download `python_lib.zip` from the Assets section of the [GitHub releases](https://github.com/mitodl/mitx-grading-library/releases).
