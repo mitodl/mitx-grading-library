@@ -8,6 +8,8 @@ on:
 jobs:
   edx-platform-integration-test:
     name: Integration with Tutor
+    permissions:
+      contents: read
     strategy:
       matrix:
         # Open edX Version: Sumac
