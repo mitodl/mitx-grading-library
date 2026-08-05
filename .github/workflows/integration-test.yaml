@@ -15,9 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           path: mitx-grading-library
+          persist-credentials: false
 
       - name: Adjust permissions to execute Tutor commands
         run: |
@@ -55,8 +56,11 @@ jobs:
 
       - name: Import MITx Demo Course
         run: |
-          tutor local do importdemocourse -r ${{ github.event.pull_request.head.repo.clone_url }} -d course -v ${{ github.event.pull_request.head.ref }}
+          tutor local do importdemocourse -r ${GITHUB_EVENT_PULL_REQUEST_HEAD_REPO_CLONE_URL} -d course -v ${GITHUB_EVENT_PULL_REQUEST_HEAD_REF}
         shell: bash
+        env:
+          GITHUB_EVENT_PULL_REQUEST_HEAD_REPO_CLONE_URL: ${{ github.event.pull_request.head.repo.clone_url }}
+          GITHUB_EVENT_PULL_REQUEST_HEAD_REF: ${{ github.event.pull_request.head.ref }}
 
       - name: Run integration tests
         run: |
