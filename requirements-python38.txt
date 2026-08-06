@@ -1,6 +1,6 @@
 # Used by the library
 # (taken from Redwood Open edX version)
-numpy==1.24.4
+numpy==1.26.4
 scipy==1.10.1
 pyparsing==3.1.2
 
