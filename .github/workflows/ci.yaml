@@ -61,3 +61,35 @@ jobs:
         run: |
           cd mitxgraders-js
           npm test
+
+  # Requiring `ci-gate` keeps the list of what must pass in the same file as the jobs it
+  # names. integration-test.yaml's edx-platform-integration-test job is schedule-only
+  # (monthly cron, no pull_request/push trigger) and must never be required, so it is
+  # deliberately left out here -- `needs` cannot cross workflows anyway.
+  ci-gate:
+    needs: [Python-3-Tests, NodeJS-Tests]
+    # Without this the gate is skipped when a dependency fails, and GitHub treats a
+    # skipped required job as successful, allowing the PR to merge despite the failure.
+    if: always()
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Evaluate CI result
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+          # Read from `needs` rather than naming each job again: adding a job to the list
+          # above is then the only edit, which is the entire point of this job. `skipped`
+          # passes so that a job legitimately gated behind an `if:` does not wedge the
+          # branch; `failure` and `cancelled` do not.
+          failed=$(echo "$NEEDS" | jq -r '
+            to_entries[]
+            | select(.value.result != "success" and .value.result != "skipped")
+            | .key')
+          if [ -n "$failed" ]; then
+            echo "::error::CI did not succeed: $(echo "$failed" | paste -sd, -)"
+            exit 1
+          fi
+          echo "All CI jobs succeeded."
