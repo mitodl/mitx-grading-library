@@ -209,11 +209,11 @@ if (window.MJxPrep) {
     var symbols = getCustom().symbols;
     if (!symbols) { return; }
     for (var i = 0; i < symbols.length; i++) {
-      var key = JSON.stringify(symbols[i]);
-      if (seenCustomSymbols[key]) { continue; }
-      seenCustomSymbols[key] = true;
       // One bad symbol shouldn't stop the rest, or break the preview
       try {
+        var key = JSON.stringify(symbols[i]);
+        if (seenCustomSymbols[key]) { continue; }
+        seenCustomSymbols[key] = true;
         AM.newsymbol(checkedSymbol(AM, symbols[i]));
       } catch (err) {
         console.error(logPrefix() + err.message);
@@ -756,6 +756,16 @@ if (window.MJxPrep) {
     applyCustomSymbols: applyCustomSymbols
   }
 
+  // Hooks already reported as broken; they run on every keystroke, so each
+  // is reported once
+  var reportedHooks = [];
+
+  function reportHook(hook, message) {
+    if (reportedHooks.indexOf(hook) >= 0) { return; }
+    reportedHooks.push(hook);
+    console.error(logPrefix() + message);
+  }
+
   // Run a course's MJxPrepCustom.pre or .post. A broken one is reported and
   // skipped, rather than leaving the student with a blank preview.
   function runCustomHook(name, eqn) {
@@ -765,11 +775,11 @@ if (window.MJxPrep) {
     try {
       result = hook(eqn, window.MJxPrepExports);
     } catch (err) {
-      console.error(logPrefix() + 'MJxPrepCustom.' + name + ' threw: ' + err.message);
+      reportHook(hook, 'MJxPrepCustom.' + name + ' threw: ' + err.message);
       return eqn;
     }
     if (typeof result !== 'string') {
-      console.error(logPrefix() + 'MJxPrepCustom.' + name + ' returned ' +
+      reportHook(hook, 'MJxPrepCustom.' + name + ' returned ' +
         typeof result + ' instead of a string');
       return eqn;
     }

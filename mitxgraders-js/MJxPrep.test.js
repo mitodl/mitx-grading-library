@@ -357,11 +357,14 @@ describe('course options and MJxPrepCustom', () => {
   it('logs bad symbols once and still adds the others', () => {
     const AM = fakeAM()
     const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const circular = { input: 'loop', tag: 'mo', output: 'l', ttype: 'CONST' }
+    circular.self = circular
     window.MJxPrepCustom = {
       symbols: [
         { input: 'bad', tag: 'mo', output: 'b', ttype: 'NOPE' },
         { input: 'proto', tag: 'mo', output: 'p', ttype: 'toString' },
         { inptu: 'typo', tag: 'mo', output: 't', ttype: 'CONST' },
+        circular,
         { input: 'good', tag: 'mo', output: 'g', ttype: 'CONST' }
       ]
     }
@@ -371,7 +374,10 @@ describe('course options and MJxPrepCustom', () => {
     expect(error.mock.calls.map((call) => call[0])).toEqual([
       expect.stringContaining('bad has unknown ttype NOPE'),
       expect.stringContaining('proto has unknown ttype toString'),
-      expect.stringContaining('needs string input and output')
+      expect.stringContaining('needs string input and output'),
+      // can't be told apart from a new symbol, so it's reported every time
+      expect.stringContaining('circular'),
+      expect.stringContaining('circular')
     ])
     error.mockRestore()
   } )
@@ -382,6 +388,7 @@ describe('course options and MJxPrepCustom', () => {
       pre: () => { throw Error('oops') },
       post: (eqn) => { eqn.replace(/x/g, 'y') }
     }
+    expect(preProcessEqn('fact(x)')).toBe('{:{:x:}!:}')
     expect(preProcessEqn('fact(x)')).toBe('{:{:x:}!:}')
     expect(error.mock.calls.map((call) => call[0])).toEqual([
       expect.stringContaining('MJxPrepCustom.pre threw: oops'),
