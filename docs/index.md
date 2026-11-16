@@ -73,7 +73,7 @@ grader = ListGrader(
 
 ## Loading in edX
 
-Download [python_lib.zip](https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip) and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip. If you want to use our AsciiMath renderer definitions (if you have math problems, you'll really want this!), place the [MJxPrep.js](https://raw.githubusercontent.com/mitodl/mitx-grading-library/master/MJxPrep.js) file in your static folder (XML) or upload the file to your course assets (Studio).
+Download [python_lib.zip](https://github.com/mitodl/mitx-grading-library/releases/latest/download/python_lib.zip) from the latest release and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip with your own modules in it, you'll need to merge ours with yours; [Upgrading a Course](upgrading.md) has a script that does this. If you want to use our AsciiMath renderer definitions (if you have math problems, you'll really want this!), place the [MJxPrep.js](https://github.com/mitodl/mitx-grading-library/releases/latest/download/MJxPrep.js) file in your static folder (XML) or upload the file to your course assets (Studio).
 
 The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.
 

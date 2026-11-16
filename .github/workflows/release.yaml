@@ -1,0 +1,100 @@
+name: Release
+
+# Push a tag matching mitxgraders/version.py (e.g. v3.1.0) to publish a GitHub
+# release with python_lib.zip and MJxPrep.js attached, then the docs site.
+# If only the docs job fails, use "Re-run failed jobs": re-running the release
+# job fails because the release already exists.
+on:
+  push:
+    tags: ["v*"]
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish the release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub release and upload its files
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Check the tag matches the library, MJxPrep.js and the changelog
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version="$(python -c 'import runpy; print(runpy.run_path("mitxgraders/version.py")["__version__"])')"
+          if [ "$TAG" != "v$version" ]; then
+            echo "::error::Tag $TAG doesn't match mitxgraders/version.py ($version)"
+            exit 1
+          fi
+          if ! grep -qF "var MJXPREP_VERSION = '$version';" MJxPrep.js; then
+            echo "::error::MJXPREP_VERSION in MJxPrep.js isn't $version"
+            exit 1
+          fi
+          if ! grep -qxF "### Version $version" docs/changelog.md; then
+            echo "::error::docs/changelog.md has no '### Version $version' section (drop '(unreleased)' before tagging)"
+            exit 1
+          fi
+
+      - name: Build release files
+        run: |
+          mkdir dist
+          python scripts/python_lib_zip.py build -o dist/python_lib.zip
+          cp MJxPrep.js scripts/python_lib_zip.py dist/
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: >-
+          gh release create "$TAG" dist/*
+          --repo "$GITHUB_REPOSITORY"
+          --verify-tag
+          --title "Version ${TAG#v}"
+          --generate-notes
+          --notes "See the [changelog](https://mitodl.github.io/mitx-grading-library/changelog/) and [Upgrading a Course](https://mitodl.github.io/mitx-grading-library/upgrading/)."
+
+  docs:
+    name: Publish the docs site
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push the built site to the gh-pages branch
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Install MkDocs
+        run: pip install mkdocs==1.6.1 mkdocs-cinder==1.2.0 pygments==2.21.0
+
+      - name: Deploy to the gh-pages branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          # The tag checkout doesn't include gh-pages; without it gh-deploy
+          # commits with no parent and the (non-force) push is rejected
+          git fetch --no-tags --depth=1 origin gh-pages:refs/remotes/origin/gh-pages
+          mkdocs gh-deploy
