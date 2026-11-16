@@ -1,7 +1,6 @@
 # For testing
 pytest
 pytest-cov
-codecov
 
 # For documentation
 mkdocs

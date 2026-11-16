@@ -47,9 +47,6 @@ jobs:
       - name: Run test cases
         run: pytest --cov=mitxgraders --cov-report=term-missing
 
-      - name: Run coverage
-        run: codecov
-
   NodeJS-Tests:
     runs-on: ubuntu-latest
     strategy:
