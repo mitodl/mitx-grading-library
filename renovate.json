@@ -9,6 +9,12 @@
       "matchManagers": ["pip_requirements", "pip-compile"],
       "matchPackageNames": ["numpy", "scipy", "pyparsing"],
       "enabled": false
+    },
+    {
+      "description": "The browser tests pin the MathJax versions Open edX serves (edx-platform common/templates/mathjax_include.html), so they move when edx-platform's do, not when MathJax releases.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["mathjax"],
+      "enabled": false
     }
   ]
 }

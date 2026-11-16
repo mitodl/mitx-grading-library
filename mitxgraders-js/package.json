@@ -4,7 +4,8 @@
   "description": "Javascript files to accompany mitxgraders Python library",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test:browser": "playwright test"
   },
   "repository": {
     "type": "git",
@@ -16,14 +17,21 @@
   },
   "homepage": "https://github.com/mitodl/mitx-grading-library#readme",
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "jest": "30.5.2",
-    "jest-environment-jsdom": "30.5.2"
+    "jest-environment-jsdom": "30.5.2",
+    "mathjax2": "npm:mathjax@2.7.5",
+    "mathjax4": "npm:mathjax@4.1.2"
   },
   "jest": {
     "verbose": true,
     "testEnvironment": "jsdom",
     "testEnvironmentOptions": {
       "url": "http://localhost/"
-    }
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/browser-tests/"
+    ]
   }
 }
