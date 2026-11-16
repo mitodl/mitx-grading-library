@@ -344,18 +344,49 @@ describe('course options and MJxPrepCustom', () => {
     )
   } )
 
-  it('logs a symbol with an unknown token type and still adds the others', () => {
+  it("doesn't add symbols again when the course's file runs again", () => {
+    const AM = fakeAM()
+    const config = () => ({ symbols: [{ input: 'Bi', tag: 'mi', output: 'Bi', ttype: 'CONST' }] })
+    window.MJxPrepCustom = config()
+    window.MJxPrepExports.applyCustomSymbols(AM)
+    window.MJxPrepCustom = config()
+    window.MJxPrepExports.applyCustomSymbols(AM)
+    expect(AM.newsymbol).toHaveBeenCalledTimes(1)
+  } )
+
+  it('logs bad symbols once and still adds the others', () => {
     const AM = fakeAM()
     const error = jest.spyOn(console, 'error').mockImplementation(() => {})
     window.MJxPrepCustom = {
       symbols: [
         { input: 'bad', tag: 'mo', output: 'b', ttype: 'NOPE' },
+        { input: 'proto', tag: 'mo', output: 'p', ttype: 'toString' },
+        { inptu: 'typo', tag: 'mo', output: 't', ttype: 'CONST' },
         { input: 'good', tag: 'mo', output: 'g', ttype: 'CONST' }
       ]
     }
     window.MJxPrepExports.applyCustomSymbols(AM)
-    expect(AM.newsymbol).toHaveBeenCalledTimes(1)
-    expect(error).toHaveBeenCalledWith(expect.stringContaining('bad has unknown ttype NOPE'))
+    window.MJxPrepExports.applyCustomSymbols(AM)
+    expect(AM.newsymbol.mock.calls).toEqual([[{ input: 'good', tag: 'mo', output: 'g', ttype: 0 }]])
+    expect(error.mock.calls.map((call) => call[0])).toEqual([
+      expect.stringContaining('bad has unknown ttype NOPE'),
+      expect.stringContaining('proto has unknown ttype toString'),
+      expect.stringContaining('needs string input and output')
+    ])
+    error.mockRestore()
+  } )
+
+  it('reports a pre or post that throws or returns a non-string, and skips it', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+    window.MJxPrepCustom = {
+      pre: () => { throw Error('oops') },
+      post: (eqn) => { eqn.replace(/x/g, 'y') }
+    }
+    expect(preProcessEqn('fact(x)')).toBe('{:{:x:}!:}')
+    expect(error.mock.calls.map((call) => call[0])).toEqual([
+      expect.stringContaining('MJxPrepCustom.pre threw: oops'),
+      expect.stringContaining('MJxPrepCustom.post returned undefined instead of a string')
+    ])
     error.mockRestore()
   } )
 

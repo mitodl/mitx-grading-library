@@ -200,18 +200,21 @@ if (window.MJxPrep) {
     );
   }
 
-  // The window.MJxPrepCustom.symbols that have been added to AsciiMath, so a
-  // course's symbols are added once, or again if the course replaces them.
-  var appliedCustomSymbols = null;
+  // Custom symbols already added (or rejected), by content: CAPA runs a
+  // problem's scripts again each time it renders the problem, so the course's
+  // file may set an equal MJxPrepCustom many times.
+  var seenCustomSymbols = {};
 
   function applyCustomSymbols(AM) {
     var symbols = getCustom().symbols;
-    if (!symbols || symbols === appliedCustomSymbols) { return; }
-    appliedCustomSymbols = symbols;
+    if (!symbols) { return; }
     for (var i = 0; i < symbols.length; i++) {
+      var key = JSON.stringify(symbols[i]);
+      if (seenCustomSymbols[key]) { continue; }
+      seenCustomSymbols[key] = true;
       // One bad symbol shouldn't stop the rest, or break the preview
       try {
-        AM.newsymbol(withTokenType(AM, symbols[i]));
+        AM.newsymbol(checkedSymbol(AM, symbols[i]));
       } catch (err) {
         console.error(logPrefix() + err.message);
       }
@@ -220,9 +223,13 @@ if (window.MJxPrep) {
 
   // A course's config can't use AM.TOKEN.CONST etc. since AsciiMath may not
   // have loaded yet, so it names the token type ("CONST") instead.
-  function withTokenType(AM, symbol) {
+  function checkedSymbol(AM, symbol) {
+    if (typeof symbol.input !== 'string' || typeof symbol.output !== 'string') {
+      throw Error('MJxPrepCustom symbol ' + JSON.stringify(symbol) +
+        ' needs string input and output');
+    }
     if (typeof symbol.ttype !== 'string') { return symbol; }
-    if (!(symbol.ttype in AM.TOKEN)) {
+    if (!Object.prototype.hasOwnProperty.call(AM.TOKEN, symbol.ttype)) {
       throw Error('MJxPrepCustom symbol ' + symbol.input + ' has unknown ttype ' +
         symbol.ttype + '; expected one of ' + Object.keys(AM.TOKEN).join(', '));
     }
@@ -749,17 +756,35 @@ if (window.MJxPrep) {
     applyCustomSymbols: applyCustomSymbols
   }
 
+  // Run a course's MJxPrepCustom.pre or .post. A broken one is reported and
+  // skipped, rather than leaving the student with a blank preview.
+  function runCustomHook(name, eqn) {
+    var hook = getCustom()[name];
+    if (!hook) { return eqn; }
+    var result;
+    try {
+      result = hook(eqn, window.MJxPrepExports);
+    } catch (err) {
+      console.error(logPrefix() + 'MJxPrepCustom.' + name + ' threw: ' + err.message);
+      return eqn;
+    }
+    if (typeof result !== 'string') {
+      console.error(logPrefix() + 'MJxPrepCustom.' + name + ' returned ' +
+        typeof result + ' instead of a string');
+      return eqn;
+    }
+    return result;
+  }
+
   // MJxPrepCustom.pre runs before any standard changes (other than
   // whitespace stripping); prefer .post where it works.
   function customPreReplacements(eqn) {
-    var pre = getCustom().pre;
-    return pre ? pre(eqn, window.MJxPrepExports) : eqn;
+    return runCustomHook('pre', eqn);
   }
 
   // MJxPrepCustom.post runs after all other processing, e.g. for cosmetic
   // changes like eqn.replace(/A_p/g, 'A_{+}')
   function customPostReplacements(eqn) {
-    var post = getCustom().post;
-    return post ? post(eqn, window.MJxPrepExports) : eqn;
+    return runCustomHook('post', eqn);
   }
 }
