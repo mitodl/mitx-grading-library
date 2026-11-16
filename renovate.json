@@ -2,5 +2,13 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>mitodl/.github:renovate-config"
+  ],
+  "packageRules": [
+    {
+      "description": "numpy, scipy and pyparsing are pinned to the versions in the Open edX codejail sandbox, so they only move when we retarget an Open edX release.",
+      "matchManagers": ["pip_requirements", "pip-compile"],
+      "matchPackageNames": ["numpy", "scipy", "pyparsing"],
+      "enabled": false
+    }
   ]
 }

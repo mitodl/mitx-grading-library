@@ -1,0 +1,7 @@
+# Used by the library, pinned to the Open edX Ulmo codejail sandbox (Python 3.11)
+# https://github.com/openedx/edx-platform/blob/release/ulmo/requirements/edx-sandbox/base.txt
+numpy==1.26.4
+scipy==1.16.3
+pyparsing==3.2.5
+
+-r requirements-dev.txt

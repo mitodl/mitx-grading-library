@@ -16,10 +16,14 @@
   },
   "homepage": "https://github.com/mitodl/mitx-grading-library#readme",
   "devDependencies": {
-    "jest": "^24.3.0"
+    "jest": "30.5.2",
+    "jest-environment-jsdom": "30.5.2"
   },
   "jest": {
     "verbose": true,
-    "testURL": "http://localhost/"
+    "testEnvironment": "jsdom",
+    "testEnvironmentOptions": {
+      "url": "http://localhost/"
+    }
   }
 }
