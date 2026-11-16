@@ -8,6 +8,8 @@
 course/course.tar.gz
 course/config.py
 site/
+# Built by scripts/python_lib_zip.py and attached to GitHub releases
+python_lib.zip
 mitxgraders-js/node_modules
 mitxgraders-js/test-results
 mitxgraders-js/playwright-report

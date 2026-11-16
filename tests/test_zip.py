@@ -4,20 +4,37 @@ Tests that python_lib.zip loads correctly
 
 
 
-import os
+import importlib.util
+import sys
 from importlib import reload
+from pathlib import Path
+
 import pytest
 import mitxgraders
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+def load_python_lib_zip_script():
+    """Import scripts/python_lib_zip.py, which isn't in a package"""
+    spec = importlib.util.spec_from_file_location(
+        "python_lib_zip", REPO_ROOT / "scripts" / "python_lib_zip.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
 
 @pytest.fixture()
-def loadzip():
-    """pytest fixture to dynamically load the library from python_lib.zip"""
+def loadzip(tmp_path, monkeypatch):
+    """pytest fixture to dynamically load the library from a freshly built python_lib.zip"""
+    zip_path = tmp_path / "python_lib.zip"
+    load_python_lib_zip_script().build(zip_path, REPO_ROOT)
+    # mitxgraders reads its plugins from 'python_lib.zip' in the working
+    # directory, as it does on edX
+    monkeypatch.chdir(tmp_path)
     # Add python_lib.zip to the path for searching for modules
-    import sys
-    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    zip_path = os.path.join(parent_dir, 'python_lib.zip')
-    sys.path.insert(0, zip_path)
+    sys.path.insert(0, str(zip_path))
     # The 0 tells it to search this zip file before even the module directory
     # Hence,
     reload(mitxgraders)
