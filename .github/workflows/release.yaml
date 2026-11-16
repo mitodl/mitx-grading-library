@@ -2,6 +2,8 @@ name: Release
 
 # Push a tag matching mitxgraders/version.py (e.g. v3.1.0) to publish a GitHub
 # release with python_lib.zip and MJxPrep.js attached, then the docs site.
+# If only the docs job fails, use "Re-run failed jobs": re-running the release
+# job fails because the release already exists.
 on:
   push:
     tags: ["v*"]
@@ -83,7 +85,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install MkDocs
-        run: pip install mkdocs mkdocs-cinder pygments
+        run: pip install mkdocs==1.6.1 mkdocs-cinder==1.2.0 pygments==2.21.0
 
       - name: Deploy to the gh-pages branch
         env:
@@ -92,4 +94,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          mkdocs gh-deploy --message "Deploy docs for ${GITHUB_REF_NAME}"
+          # The tag checkout doesn't include gh-pages; without it gh-deploy
+          # commits with no parent and the (non-force) push is rejected
+          git fetch --no-tags --depth=1 origin gh-pages:refs/remotes/origin/gh-pages
+          mkdocs gh-deploy

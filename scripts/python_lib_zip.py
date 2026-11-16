@@ -20,6 +20,8 @@ import zipfile
 from pathlib import Path
 
 LIBRARY_PACKAGES = ("mitxgraders", "voluptuous")
+# Where course teams add their own plugins (docs/plugins.md)
+PLUGINS_DIR = "mitxgraders/plugins/"
 SKIPPED_NAMES = {"__pycache__", ".DS_Store"}
 SKIPPED_SUFFIXES = {".pyc"}
 # Fixed timestamp so building the same source twice gives the same bytes
@@ -74,15 +76,23 @@ def _library_version(archive):
     return match.group(1) if match else None
 
 
+def _is_macos_metadata(name):
+    # macOS Finder's Compress adds these resource-fork copies of every file
+    return name.startswith("__MACOSX/")
+
+
 def update(course_zip, release_zip, output):
     """Replace mitxgraders/ and voluptuous/ in a course's zip with a release's.
 
-    Everything else in the course's zip (its own modules) is kept as is.
+    Everything else in the course's zip (its own modules) is kept as is, and
+    so are the course's own plugins in mitxgraders/plugins/ (see plugins.md).
+    macOS __MACOSX/ metadata is dropped.
 
     :param course_zip: the course's current python_lib.zip
     :param release_zip: python_lib.zip from a mitx-grading-library release
     :param output: path of the updated zip to write
-    :returns: (old library version, new library version, kept top-level names)
+    :returns: (old library version, new library version, what was kept from
+        the course's zip: top-level names, then plugin file paths)
     :rtype: tuple[str | None, str | None, list[str]]
     :raises ValueError: if either zip has the library inside a folder instead
         of at the top level
@@ -91,7 +101,9 @@ def update(course_zip, release_zip, output):
         for label, archive in (("course", course), ("release", release)):
             nested = [
                 name for name in archive.namelist()
-                if "/mitxgraders/" in name and not name.startswith("mitxgraders/")
+                if "/mitxgraders/" in name
+                and not name.startswith("mitxgraders/")
+                and not _is_macos_metadata(name)
             ]
             if nested:
                 raise ValueError(
@@ -105,16 +117,27 @@ def update(course_zip, release_zip, output):
         if new_version is None:
             raise ValueError(f"{release_zip} has no mitxgraders/version.py; is it a release python_lib.zip?")
 
-        kept = [
-            info for info in course.infolist()
-            if _top_level(info.filename) not in LIBRARY_PACKAGES
-        ]
+        release_names = set(release.namelist())
+        course_modules = []
+        course_plugins = []
+        for info in course.infolist():
+            name = info.filename
+            if _is_macos_metadata(name) or info.is_dir():
+                continue
+            if _top_level(name) not in LIBRARY_PACKAGES:
+                course_modules.append(info)
+            elif name.startswith(PLUGINS_DIR) and name not in release_names:
+                course_plugins.append(info)
+
         with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as updated:
+            kept = course_modules + course_plugins
             for source, infos in ((course, kept), (release, release.infolist())):
                 for info in infos:
                     # writestr rewrites the ZipInfo's offsets for the new file
                     updated.writestr(copy.copy(info), source.read(info))
-        return old_version, new_version, sorted({_top_level(info.filename) for info in kept})
+        kept_names = sorted({_top_level(info.filename) for info in course_modules})
+        kept_names += sorted(info.filename for info in course_plugins)
+        return old_version, new_version, kept_names
 
 
 def main(argv=None):
