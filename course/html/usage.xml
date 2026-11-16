@@ -5,7 +5,7 @@
 <p>The library is straightforward to use. To set up, you need to do two things:</p>
 
 <ul>
-  <li>Download <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a></li>
+  <li>Download <a href="https://github.com/mitodl/mitx-grading-library/releases/latest/download/python_lib.zip">python_lib.zip</a></li>
   <li>Upload python_lib.zip as a static asset (Warning: if you are already using a custom python grading library, then you will need to combine the two!)</li>
 </ul>
 
@@ -28,7 +28,7 @@ grader = StringGrader()
 <p>Very similar to the Studio usage above. To set up:</p>
 
 <ul>
-  <li>Download <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a></li>
+  <li>Download <a href="https://github.com/mitodl/mitx-grading-library/releases/latest/download/python_lib.zip">python_lib.zip</a></li>
   <li>Put python_lib.zip in your static folder (Warning: if you are already using a custom python grading library, then you will need to combine the two!)</li>
 </ul>
 
