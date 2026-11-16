@@ -136,28 +136,52 @@ function formulaequationinput(id, value) {
     </div>`;
 }
 
-// CAPA's JavascriptLoader runs the preprocessor script and then binds the
+// A course's MJxPrepCustom.js, as docs/grading_math/renderer.md describes
+const COURSE_CONFIG = `
+  window.MJxPrepOptions = { conj_as_star: true };
+  window.MJxPrepCustom = {
+    symbols: [{ input: "ell", tag: "mo", output: "\\u2113", tex: null, ttype: "CONST" }],
+    post: function (eqn) { return eqn.replace(/nfact/g, "n!"); }
+  };`;
+const COURSE_CONFIG_ANSWERS = [
+  { value: "ell", mathml: /ℓ|&#x2113;/i },
+  { value: "conj(z)", mathml: /∗|&#x2217;/i },
+  { value: "nfact", mathml: /<mo[^>]*>!<\/mo>/ },
+];
+
+function textlineAnswers(config) {
+  return config ? [...TEXTLINE_ANSWERS, ...COURSE_CONFIG_ANSWERS] : TEXTLINE_ANSWERS;
+}
+
+// CAPA's JavascriptLoader runs the problem's scripts and then binds the
 // problem. "early" does that while MathJax is still loading, "late" once
-// MathJax has finished its first typeset.
-function unitPage(major, timing) {
+// MathJax has finished its first typeset. config puts the course's config
+// file before or after MJxPrep.js, or leaves it out.
+function unitPage(major, timing, config) {
   const mathjax = MATHJAX[major];
+  const scripts = { before: ["MJxPrepCustom.js", "MJxPrep.js"], after: ["MJxPrep.js", "MJxPrepCustom.js"] }[config] || ["MJxPrep.js"];
   const load =
     timing === "early"
-      ? `<script src="/static/MJxPrep.js"></script><script>bindProblem();</script>`
+      ? scripts.map((name) => `<script src="/static/${name}"></script>`).join("") +
+        `<script>bindProblem();</script>`
       : `<script>
+          function loadInOrder(names, done) {
+            if (names.length === 0) { return done(); }
+            var script = document.createElement("script");
+            script.src = "/static/" + names[0];
+            script.onload = function () { loadInOrder(names.slice(1), done); };
+            document.body.appendChild(script);
+          }
           window.addEventListener("load", function () {
             ${mathjax.started}.then(function () {
-              var script = document.createElement("script");
-              script.src = "/static/MJxPrep.js";
-              script.onload = bindProblem;
-              document.body.appendChild(script);
+              loadInOrder(${JSON.stringify(scripts)}, bindProblem);
             });
           });
         </script>`;
   return `<!DOCTYPE html>
     <html><head><meta charset="utf-8">${mathjax.head}</head>
     <body>
-      ${TEXTLINE_ANSWERS.map((answer, i) => textline(i + 1, answer.value)).join("\n")}
+      ${textlineAnswers(config).map((answer, i) => textline(i + 1, answer.value)).join("\n")}
       ${formulaequationinput(FORMULA_ANSWER.id, FORMULA_ANSWER.value)}
       <script>
         function preprocessorFor(element) {
@@ -179,7 +203,7 @@ const FONT_PACKAGE = ["mathjax4/node_modules/@mathjax/mathjax-newcm-font", "@mat
 
 // Map CDN requests onto the installed packages; anything else is recorded and
 // refused so the test can't silently depend on the network.
-async function serveLocally(page, major, timing, unrouted) {
+async function serveLocally(page, major, timing, config, unrouted) {
   const cdnPackages = [
     [/^\/npm\/mathjax@2\.7\.5\/(.*)$/, path.join(NODE_MODULES, "mathjax2")],
     [/^\/npm\/mathjax@4\.1\.2\/(.*)$/, path.join(NODE_MODULES, "mathjax4")],
@@ -189,10 +213,13 @@ async function serveLocally(page, major, timing, unrouted) {
     const url = new URL(route.request().url());
     if (url.origin === LMS) {
       if (url.pathname === "/unit") {
-        return route.fulfill({ contentType: "text/html", body: unitPage(major, timing) });
+        return route.fulfill({ contentType: "text/html", body: unitPage(major, timing, config) });
       }
       if (url.pathname === "/static/MJxPrep.js") {
         return route.fulfill({ path: MJXPREP_JS, contentType: "application/javascript" });
+      }
+      if (url.pathname === "/static/MJxPrepCustom.js") {
+        return route.fulfill({ body: COURSE_CONFIG, contentType: "application/javascript" });
       }
     }
     if (url.host === "cdn.jsdelivr.net") {
@@ -217,9 +244,14 @@ async function previewMathML(page, inputId) {
   }, inputId);
 }
 
+const LOAD_ORDERS = ["early", "late"].flatMap((timing) =>
+  [null, "before", "after"].map((config) => ({ timing, config })),
+);
+
 for (const major of [2, 4]) {
-  for (const timing of ["early", "late"]) {
-    test(`renders saved answers with MJxPrep definitions on MathJax ${MATHJAX[major].version}, MJxPrep loaded ${timing}`, async ({ page }) => {
+  for (const { timing, config } of LOAD_ORDERS) {
+    const configName = config ? `, course config loaded ${config} it` : "";
+    test(`renders saved answers with MJxPrep definitions on MathJax ${MATHJAX[major].version}, MJxPrep loaded ${timing}${configName}`, async ({ page }) => {
       const errors = [];
       const mjxprepLogs = [];
       const unrouted = [];
@@ -253,11 +285,11 @@ for (const major of [2, 4]) {
         };
         window.__mjxprepPolls = () => ({ started: polls.started, active: polls.active.size });
       });
-      await serveLocally(page, major, timing, unrouted);
+      await serveLocally(page, major, timing, config, unrouted);
 
       await page.goto(`${LMS}/unit`);
 
-      for (const [i, answer] of TEXTLINE_ANSWERS.entries()) {
+      for (const [i, answer] of textlineAnswers(config).entries()) {
         await expect
           .poll(() => page.inputValue(`#input_${i + 1}_dynamath`), {
             message: `preview MathML for saved answer ${answer.value}`,

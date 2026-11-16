@@ -10,6 +10,7 @@ This major release removes support for Python 2 and older versions of Python 3 a
 
 * MJxPrep.js works with MathJax 4, which Open edX loads after [openedx/edx-platform#33555](https://github.com/openedx/edx-platform/pull/33555), as well as MathJax 2.7. Courses need to replace their copy of MJxPrep.js for answer previews to work on MathJax 4.
 * MJxPrep.js stops looking for MathJax's AsciiMath renderer after a minute instead of polling forever, and logs its version to the browser console (also available as `window.MJxPrep.version`).
+* Courses customize MJxPrep.js through `window.MJxPrepOptions` and `window.MJxPrepCustom` (`symbols`, `pre`, `post`) set in a separate file, instead of editing MJxPrep.js. MJxPrep.js no longer overwrites `window.MJxPrepOptions`, and its built-in `customPreReplacements`/`customPostReplacements` placeholders are gone. See [Customizing for a Course](grading_math/renderer.md#customizing-for-a-course).
 
 ## Version 3.0
 
