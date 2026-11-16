@@ -84,6 +84,12 @@
                         
                             
 <li >
+    <a href="../upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../edx/">edX Syntax</a>
 </li>
 
@@ -266,9 +272,9 @@
 </ul>
 <p>Unfortunately, no. Those problem types cannot be used in a <code>customresponse</code> problem, so we can't grade them with a python grader.</p>
 <ul>
-<li>Does the grader work with python 2 or python 3?</li>
+<li>Does the grader work with Python 2 or Python 3?</li>
 </ul>
-<p>It works with both! Older versions of edX ran python graders in python 2.7; newer versions use python 3.8. The library works seamlessly with both. No changes to any code are required to switch between versions. Some functionality requires python 3.5 however.</p></div>
+<p>The library only supports Python 3, as support for Python 2 was dropped in Version 3. It is tested against the numpy, scipy and pyparsing versions in the Open edX Ulmo (Python 3.11) and Verawood (Python 3.12) codejail sandboxes and edx-platform master (Python 3.12), and against the latest releases of those packages on Python 3.13 through 3.15. For more information, see the <a href="https://mitodl.github.io/mitx-grading-library/changelog/">CHANGELOG</a>. If you need to use older versions of this package, you can download <code>python_lib.zip</code> from the Assets section of the <a href="https://github.com/mitodl/mitx-grading-library/releases">GitHub releases</a>.</p></div>
         
         
     </div>

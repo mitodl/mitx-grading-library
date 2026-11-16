@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+
+    
+    <title>Upgrading a Course - MITxGraders</title>
+    
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../css/base.min.css" rel="stylesheet">
+    <link href="../css/cinder.min.css" rel="stylesheet">
+
+    
+        
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/vs-min.min.css">
+        
+    
+    <link href="../css/extra.css" rel="stylesheet">
+    <link href="../css/cinder_tweaks.css" rel="stylesheet">
+    <link href="../css/readthedocs.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            
+              <a class="navbar-brand" href="..">MITxGraders</a>
+            
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="..">Overview</a>
+</li>
+
+                        
+                            
+<li class="active">
+    <a href="./">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../edx/">edX Syntax</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../graders/">Introduction to Graders</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../item_grader/">ItemGrader</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../string_grader/">StringGrader</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Math <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../grading_math/formula_grader/">FormulaGrader</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/numerical_grader/">NumericalGrader</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/matrix_grader/matrix_grader/">MatrixGrader</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/sampling/">Sampling Sets</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/functions_and_constants/">Functions and Constants List</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/user_functions/">User-Defined Functions</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/comparer_functions/">Comparer Functions</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/renderer/">AsciiMath Renderer Definitions</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/integral_grader/">IntegralGrader</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/sum_grader/">SumGrader</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_math/interval_grader/">IntervalGrader</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Grading Lists <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../grading_lists/single_list_grader/">SingleListGrader</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../grading_lists/list_grader/">ListGrader</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../plugins/">Plugins</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../faq/">FAQs</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../changelog/">Changelog</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="..">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../edx/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/mitodl/mitx-grading-library"><i class="fab fa-github"></i> GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#upgrading-a-course">Upgrading a Course</a></li>
+            <li class="second-level"><a href="#which-version-is-a-course-running">Which version is a course running?</a></li>
+                
+            <li class="second-level"><a href="#where-to-download">Where to download</a></li>
+                
+            <li class="second-level"><a href="#updating-mjxprepjs">Updating MJxPrep.js</a></li>
+                
+            <li class="second-level"><a href="#updating-python_libzip">Updating python_lib.zip</a></li>
+                
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<h1 id="upgrading-a-course">Upgrading a Course<a class="headerlink" href="#upgrading-a-course" title="Permanent link"> # </a></h1>
+<p>Each course run keeps its own copy of <code>python_lib.zip</code> and <code>MJxPrep.js</code> in its static assets (Files &amp; Uploads in Studio), so a new release only reaches learners once those copies are replaced, course run by course run. Copying or rerunning a course copies its assets too, so update the course you rerun from as well.</p>
+<h2 id="which-version-is-a-course-running">Which version is a course running?<a class="headerlink" href="#which-version-is-a-course-running" title="Permanent link"> # </a></h2>
+<p><code>MJxPrep.js</code> logs a line to the browser's developer console on any page with a problem that loads it:</p>
+<div class="codehilite"><pre><span></span><code>MITx Grading Library (MJxPrep.js 3.1.0): Updated AsciiMath renderer definitions (MathJax 4.1.2)
+</code></pre></div>
+
+<p>The version is also available in the console as <code>window.MJxPrep.version</code>. Copies from before version 3.1.0 log <code>MITx Grading Library: Updated AsciiMath renderer definitions</code> with no version; those copies stop answer previews from working on MathJax 4.</p>
+<p>For <code>python_lib.zip</code>, open the zip and read <code>mitxgraders/version.py</code>, or set <code>debug=True</code> on a grader and submit an answer: the debug output starts with <code>MITx Grading Library Version 3.1.0</code>.</p>
+<h2 id="where-to-download">Where to download<a class="headerlink" href="#where-to-download" title="Permanent link"> # </a></h2>
+<p>Each <a href="https://github.com/mitodl/mitx-grading-library/releases">GitHub release</a> has these files attached:</p>
+<ul>
+<li><code>python_lib.zip</code>: the grading library, with <code>mitxgraders/</code> and <code>voluptuous/</code> at the top level</li>
+<li><code>MJxPrep.js</code>: the AsciiMath renderer definitions and preprocessor</li>
+<li><code>python_lib_zip.py</code>: a script that updates the library inside a <code>python_lib.zip</code> that also holds a course's own modules (see below)</li>
+</ul>
+<p>The latest release's files are always at:</p>
+<ul>
+<li><a href="https://github.com/mitodl/mitx-grading-library/releases/latest/download/python_lib.zip">https://github.com/mitodl/mitx-grading-library/releases/latest/download/python_lib.zip</a></li>
+<li><a href="https://github.com/mitodl/mitx-grading-library/releases/latest/download/MJxPrep.js">https://github.com/mitodl/mitx-grading-library/releases/latest/download/MJxPrep.js</a></li>
+<li><a href="https://github.com/mitodl/mitx-grading-library/releases/latest/download/python_lib_zip.py">https://github.com/mitodl/mitx-grading-library/releases/latest/download/python_lib_zip.py</a></li>
+</ul>
+<h2 id="updating-mjxprepjs">Updating MJxPrep.js<a class="headerlink" href="#updating-mjxprepjs" title="Permanent link"> # </a></h2>
+<p>Upload the new <code>MJxPrep.js</code> to the course's static assets under the same name, replacing the old one.</p>
+<p>If your course's copy was edited (different options, extra symbols, or code in <code>customPreReplacements</code>/<code>customPostReplacements</code>), move those changes into a separate <code>MJxPrepCustom.js</code> first, as described in <a href="../grading_math/renderer/#customizing-for-a-course">Customizing for a Course</a>. Otherwise uploading the new file drops them.</p>
+<h2 id="updating-python_libzip">Updating python_lib.zip<a class="headerlink" href="#updating-python_libzip" title="Permanent link"> # </a></h2>
+<p>If your course's <code>python_lib.zip</code> only contains <code>mitxgraders/</code> and <code>voluptuous/</code>, upload the new <code>python_lib.zip</code> under the same name, replacing the old one.</p>
+<p>If it also holds your course's own modules, download <code>python_lib.zip</code> and <code>python_lib_zip.py</code> from the release into the same folder as your course's zip (renamed, e.g. to <code>course_python_lib.zip</code>), and run:</p>
+<div class="codehilite"><pre><span></span><code>python3 python_lib_zip.py update course_python_lib.zip --release python_lib.zip
+</code></pre></div>
+
+<p>This writes <code>python_lib.updated.zip</code>, with <code>mitxgraders/</code> and <code>voluptuous/</code> replaced by the release's and everything else from your course's zip kept as is, including any <a href="../plugins/">plugins</a> you added to <code>mitxgraders/plugins/</code>. It prints the old and new library versions and what it kept, and warns if your zip had edited one of the library's own plugin files (such as <code>defaults_sample.py</code>), since the release's copy replaces it; move those changes into a plugin file of your own. It needs Python 3 and nothing else. Rename <code>python_lib.updated.zip</code> to <code>python_lib.zip</code> and upload it. If your zip has the library inside a folder (e.g. <code>python_lib/mitxgraders/</code>), the script stops and points you at <a href="../#how-to-zip-correctly">How to Zip Correctly</a>.</p></div>
+        
+        
+    </div>
+
+    
+      <footer class="col-md-12 text-center">
+          
+          
+            <hr>
+            <p>
+            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
+            </p>
+          
+
+          
+          
+      </footer>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../js/bootstrap-3.0.3.min.js"></script>
+
+    
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+        
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    <script>var base_url = ".."</script>
+    
+    <script src="../js/base.js"></script>
+    <script src="../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>

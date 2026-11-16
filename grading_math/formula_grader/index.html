@@ -84,6 +84,12 @@
                         
                             
 <li >
+    <a href="../../upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../../edx/">edX Syntax</a>
 </li>
 
@@ -307,20 +313,20 @@
 <p>Variables are configured by including a list of strings of each variable name as follows.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;1+x^2+y&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'1+x^2+y'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 <p>Note that the <code>answers</code> parameter follows all of the usual allowances from <code>ItemGrader</code>.</p>
 <p>The variables need to have numbers randomly assigned to them. Each is sampled from a <a href="../sampling/">sampling set</a>, which is <code>RealInterval()</code> by default (random numbers between 1 and 5). A variety of different sampling sets are available, including random complex numbers. To specify the sampling set to use for a variable, use the <code>sample_from</code> key.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;1+x^2+y+z/2&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'1+x^2+y+z/2'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">ComplexRectangle</span><span class="p">(),</span>
-<span class="gp">... </span>        <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
-<span class="gp">... </span>        <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="s1">'x'</span><span class="p">:</span> <span class="n">ComplexRectangle</span><span class="p">(),</span>
+<span class="gp">... </span>        <span class="s1">'y'</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="s1">'z'</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -338,12 +344,12 @@
 <h3 id="numbered-variables">Numbered Variables<a class="headerlink" href="#numbered-variables" title="Permanent link"> # </a></h3>
 <p>You can also specify special variables that are numbered. For example, if you specify that <code>a</code> is a numbered variable, students can include <code>a_{0}</code>, <code>a_{5}</code>, <code>a_{-2}</code>, etc, using any integer. All entries for a numbered variable will use the sampling set specified by the base name.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;a_</span><span class="si">{0}</span><span class="s1"> + a_</span><span class="si">{1}</span><span class="s1">*x + 1/2*a_</span><span class="si">{2}</span><span class="s1">*x^2&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">numbered_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'a_</span><span class="si">{0}</span><span class="s1"> + a_</span><span class="si">{1}</span><span class="s1">*x + 1/2*a_</span><span class="si">{2}</span><span class="s1">*x^2'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">numbered_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">'a'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
-<span class="gp">... </span>        <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="gp">... </span>        <span class="s1">'x'</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="s1">'a'</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -352,8 +358,8 @@
 <h2 id="samples-and-failable-evaluations">Samples and Failable Evaluations<a class="headerlink" href="#samples-and-failable-evaluations" title="Permanent link"> # </a></h2>
 <p>To control the number of samples that are checked to ensure correctness, you can modify the <code>samples</code> key.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;1+x^2&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'1+x^2'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">samples</span><span class="o">=</span><span class="mi">10</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -361,8 +367,8 @@
 <p>The default for <code>samples</code> is 5.</p>
 <p>You may want to allow for a certain number of comparisons to fail before the student is marked incorrect. To do this, set <code>failable_evals</code>. This should be used very sparingly!</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;1+x^2&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'1+x^2'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">failable_evals</span><span class="o">=</span><span class="mi">1</span>
 <span class="gp">... </span><span class="p">)</span>
@@ -371,10 +377,10 @@
 <h2 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link"> # </a></h2>
 <p>By default, four constants are defined: <code>e</code>, <code>pi</code>, and <code>i=j=sqrt(-1)</code>. You can define new constants by passing in a dictionary to <code>user_constants</code> as follows.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;1/sqrt(1-v^2/c^2)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'1/sqrt(1-v^2/c^2)'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'v'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">user_constants</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mf">3e8</span>
+<span class="gp">... </span>        <span class="s1">'c'</span><span class="p">:</span> <span class="mf">3e8</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -382,10 +388,10 @@
 <p>Constants are treated as variables that only ever have one value.</p>
 <p>If you want to remove a default constant, you can do so by setting it to <code>None</code>:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;sqrt(-1)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'sqrt(-1)'</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">user_constants</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-<span class="gp">... </span>        <span class="s1">&#39;j&#39;</span><span class="p">:</span> <span class="kc">None</span>
+<span class="gp">... </span>        <span class="s1">'i'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">'j'</span><span class="p">:</span> <span class="kc">None</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -394,54 +400,54 @@
 <p>When an expression results in an infinity, students are presented with an error message asking them to check for overflow. If you actually want infinity to be an acceptable answer, then you can specify <code>allow_inf=True</code>. This allows expressions to evaluate to infinity (or negative infinity), and also makes the constant <code>infty</code> available for students to use.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Without allow_inf turned on:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;infty&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'infty'</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">user_constants</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s1">&#39;infty&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="s1">'infty'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s1">'inf'</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;infty&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'infty'</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">CalcError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
 <span class="go">Numerical overflow occurred. Does your expression generate very large numbers?</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># With allow_inf turned on:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;infty&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'infty'</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">allow_inf</span><span class="o">=</span><span class="kc">True</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;infty&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'infty'</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">'ok'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'msg'</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
 <span class="go">True</span>
 </code></pre></div>
 
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link"> # </a></h2>
 <p>By default, a large array of mathematical functions are available for use. See the full list <a href="../functions_and_constants/">here</a>. Note that all functions are capable of handling complex expressions unless otherwise stated. In the following example, <code>z*z</code> is recognized to be different from <code>abs(z)^2</code>.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;abs(z)^2&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'abs(z)^2'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'z'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="n">ComplexRectangle</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="s1">'z'</span><span class="p">:</span> <span class="n">ComplexRectangle</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;z*z&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'z*z'</span><span class="p">)[</span><span class="s1">'ok'</span><span class="p">]</span>
 <span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;z*conj(z)&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'z*conj(z)'</span><span class="p">)[</span><span class="s1">'ok'</span><span class="p">]</span>
 <span class="go">True</span>
 </code></pre></div>
 
 <h3 id="user-functions">User Functions<a class="headerlink" href="#user-functions" title="Permanent link"> # </a></h3>
 <p>You can make user-defined functions available for students to use in their answers. To add user-defined functions, pass in a dictionary to the <code>user_functions</code> key as follows.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;x*x&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">}</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'x*x'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s1">'f'</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 <p>This defines a function <code>f(x) = x^2</code> that students may use. User-defined function names must start with a letter, and can use numbers and underscores, such as <code>my_func2</code>. They are also allowed to have apostrophes (primes) at the end of the name, such as to indicate derivatives. Eg, <code>f''</code>. Be careful about using quotation marks appropriately when using primes in function names, as in the following example.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s2">&quot;f&#39;&#39;(x)&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;f&#39;&#39;&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">}</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s2">"f''(x)"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s2">"f''"</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
@@ -449,20 +455,20 @@
 <p>You can also specify random functions by specifying a sampling set for a function. You can provide a list of functions to randomly choose from as follows.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s2">&quot;f(x)&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">]}</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s2">"f(x)"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s2">"f"</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">]}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 <p>Each time this formula is checked, the function <code>f</code> will be sampled from the list of available functions.</p>
 <p>You can also specify a random well-behaved function by using the <code>RandomFunction()</code> sampling set.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s2">&quot;f&#39;&#39;(x) + omega^2*f(x)&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;omega&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s2">"f''(x) + omega^2*f(x)"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">,</span> <span class="s1">'omega'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="n">RandomFunction</span><span class="p">(),</span>
-<span class="gp">... </span>        <span class="s2">&quot;f&#39;&#39;&quot;</span><span class="p">:</span> <span class="n">RandomFunction</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="s2">"f"</span><span class="p">:</span> <span class="n">RandomFunction</span><span class="p">(),</span>
+<span class="gp">... </span>        <span class="s2">"f''"</span><span class="p">:</span> <span class="n">RandomFunction</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -472,20 +478,20 @@
 <p>You can override default functions and constants if you really want, although this is discouraged and requires suppressing warnings with <code>suppress_warnings=True</code>. The following grader raises this warning when constructed:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>        <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;x^2&#39;</span><span class="p">,</span>
-<span class="gp">... </span>        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
-<span class="gp">... </span>        <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;sin&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="n">answers</span><span class="o">=</span><span class="s1">'x^2'</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s1">'sin'</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">)</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">ConfigError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-<span class="go">Warning: &#39;user_functions&#39; contains entries &#39;sin&#39; which will override default values. If you intend to override defaults, you may suppress this warning by adding &#39;suppress_warnings=True&#39; to the grader configuration.</span>
+<span class="go">Warning: 'user_functions' contains entries 'sin' which will override default values. If you intend to override defaults, you may suppress this warning by adding 'suppress_warnings=True' to the grader configuration.</span>
 </code></pre></div>
 
 <p>The error can be suppressed by setting <code>suppress_warnings=True</code>.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;x^2&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;sin&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'x^2'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span><span class="s1">'sin'</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="n">suppress_warnings</span><span class="o">=</span><span class="kc">True</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -496,13 +502,13 @@
 <h3 id="instructor-variables">Instructor Variables<a class="headerlink" href="#instructor-variables" title="Permanent link"> # </a></h3>
 <p>In some situations, you need an extra variable to help define the problem in some way, particularly when using <code>DependentSampler</code>. Alternatively, you may want to remove a default constant such as <code>e</code>, <code>i</code>, <code>j</code> or <code>pi</code> from the problem. Both of these situations can be addressed by specifying particular variables to be instructor variables, as in the following.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;s/c&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;phi&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'s/c'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'s'</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">,</span> <span class="s1">'phi'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">depends</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">],</span> <span class="n">formula</span><span class="o">=</span><span class="s1">&#39;sin(phi)&#39;</span><span class="p">),</span>
-<span class="gp">... </span>        <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">depends</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">],</span> <span class="n">formula</span><span class="o">=</span><span class="s1">&#39;cos(phi)&#39;</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="s1">'s'</span><span class="p">:</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">depends</span><span class="o">=</span><span class="p">[</span><span class="s1">'phi'</span><span class="p">],</span> <span class="n">formula</span><span class="o">=</span><span class="s1">'sin(phi)'</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="s1">'c'</span><span class="p">:</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">depends</span><span class="o">=</span><span class="p">[</span><span class="s1">'phi'</span><span class="p">],</span> <span class="n">formula</span><span class="o">=</span><span class="s1">'cos(phi)'</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="p">},</span>
-<span class="gp">... </span>    <span class="n">instructor_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">instructor_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">'phi'</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
@@ -510,10 +516,10 @@
 <h3 id="forbidden-strings">Forbidden Strings<a class="headerlink" href="#forbidden-strings" title="Permanent link"> # </a></h3>
 <p>You can forbid students from entering certain strings using the <code>forbidden_strings</code> key:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;2*sin(theta)*cos(theta)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">forbidden_strings</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*theta&#39;</span><span class="p">,</span> <span class="s1">&#39;theta*&#39;</span><span class="p">,</span> <span class="s1">&#39;theta/&#39;</span><span class="p">,</span> <span class="s1">&#39;+theta&#39;</span><span class="p">,</span> <span class="s1">&#39;theta+&#39;</span><span class="p">,</span> <span class="s1">&#39;-theta&#39;</span><span class="p">,</span> <span class="s1">&#39;theta-&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">forbidden_message</span><span class="o">=</span><span class="s2">&quot;Your answer should only use trigonometric functions acting on theta, not multiples of theta&quot;</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'2*sin(theta)*cos(theta)'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'theta'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">forbidden_strings</span><span class="o">=</span><span class="p">[</span><span class="s1">'*theta'</span><span class="p">,</span> <span class="s1">'theta*'</span><span class="p">,</span> <span class="s1">'theta/'</span><span class="p">,</span> <span class="s1">'+theta'</span><span class="p">,</span> <span class="s1">'theta+'</span><span class="p">,</span> <span class="s1">'-theta'</span><span class="p">,</span> <span class="s1">'theta-'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">forbidden_message</span><span class="o">=</span><span class="s2">"Your answer should only use trigonometric functions acting on theta, not multiples of theta"</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
@@ -522,25 +528,25 @@
 <h3 id="blacklists-and-whitelists">Blacklists and Whitelists<a class="headerlink" href="#blacklists-and-whitelists" title="Permanent link"> # </a></h3>
 <p>You can disallow specific functions by adding them to the blacklist of functions as a list of disallowed function names. In the following example, <code>sin</code> is disallowed in correct answers.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;sqrt(1 - cos(x)^2)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">]},</span>
-<span class="gp">... </span>    <span class="n">blacklist</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sin&#39;</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'sqrt(1 - cos(x)^2)'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">]},</span>
+<span class="gp">... </span>    <span class="n">blacklist</span><span class="o">=</span><span class="p">[</span><span class="s1">'sin'</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 <p>If you want to exclude everything except for a specific set of functions, instead use a whitelist. In the following example, the only allowed functions in correct answers are <code>sin</code> and <code>cos</code>.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;sin(x)/cos(x)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">whitelist</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sin&#39;</span><span class="p">,</span> <span class="s1">&#39;cos&#39;</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'sin(x)/cos(x)'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">whitelist</span><span class="o">=</span><span class="p">[</span><span class="s1">'sin'</span><span class="p">,</span> <span class="s1">'cos'</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 <p>If you want to exclude all functions, use <code>whitelist=[None]</code>:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;pi/2-x&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'pi/2-x'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">whitelist</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>  <span class="c1"># no functions are allowed</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -549,17 +555,17 @@
 <h3 id="required-functions">Required Functions<a class="headerlink" href="#required-functions" title="Permanent link"> # </a></h3>
 <p>You can specifically require certain functions to appear in the solution. Any solution that does not include all of these functions will generate an error message. To do this, specify a list of strings of function names that are required.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;2*sin(theta)*cos(theta)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">required_functions</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sin&#39;</span><span class="p">,</span> <span class="s1">&#39;cos&#39;</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'2*sin(theta)*cos(theta)'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'theta'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">required_functions</span><span class="o">=</span><span class="p">[</span><span class="s1">'sin'</span><span class="p">,</span> <span class="s1">'cos'</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="tolerance">Tolerance<a class="headerlink" href="#tolerance" title="Permanent link"> # </a></h2>
 <p>Student inputs are compared to answers with a numerical tolerance. You can set this as an absolute number (eg, <code>0.1</code>) or a percentage (eg, <code>'0.01%'</code>, which is the default tolerance). Tolerances must be nonnegative numbers or percentages.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;2*sin(theta)*cos(theta)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'2*sin(theta)*cos(theta)'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'theta'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.00001</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -569,8 +575,8 @@
 <h2 id="suffixes">Suffixes<a class="headerlink" href="#suffixes" title="Permanent link"> # </a></h2>
 <p>Numbers with a <code>%</code> at the end will be treated as percentages, and converted to the appropriate decimals. If you desire, you can also enable the use of metric suffixes by setting the appropriate setting as follows.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">FormulaGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;2m*a&#39;</span><span class="p">,</span>  <span class="c1"># Equivalent to &#39;0.002*a&#39;</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'2m*a'</span><span class="p">,</span>  <span class="c1"># Equivalent to '0.002*a'</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'a'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">metric_suffixes</span><span class="o">=</span><span class="kc">True</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -592,29 +598,29 @@
 <p>For example:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">ListGrader</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span>
-<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;2*x&#39;</span><span class="p">,</span><span class="s1">&#39;3*x&#39;</span><span class="p">),</span>     <span class="c1"># first input can be any of these 3 answers</span>
-<span class="gp">... </span>        <span class="s1">&#39;sibling_1^2&#39;</span><span class="p">,</span>          <span class="c1"># second input must be first input squared</span>
-<span class="gp">... </span>        <span class="s1">&#39;sibling_2^2&#39;</span>           <span class="c1"># third input must be second input squared</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">'x'</span><span class="p">,</span> <span class="s1">'2*x'</span><span class="p">,</span><span class="s1">'3*x'</span><span class="p">),</span>     <span class="c1"># first input can be any of these 3 answers</span>
+<span class="gp">... </span>        <span class="s1">'sibling_1^2'</span><span class="p">,</span>          <span class="c1"># second input must be first input squared</span>
+<span class="gp">... </span>        <span class="s1">'sibling_2^2'</span>           <span class="c1"># third input must be second input squared</span>
 <span class="gp">... </span>    <span class="p">],</span>
 <span class="gp">... </span>    <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">subgraders</span><span class="o">=</span><span class="n">FormulaGrader</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">subgraders</span><span class="o">=</span><span class="n">FormulaGrader</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">])</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 <p>Note that in this example, the sequence of inputs <code>['2*x', 4*x^2, 16*x^4]</code> is correct, and so is <code>['3*x', 9*x^2, 81*x^4]</code>, but <code>['3*x', 4*x^2, 16*x^4]</code> receives only two-thirds credit (from the first entry matching a given answer, and the last entry being the square of the second entry).</p>
-<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">student_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;2*x&#39;</span><span class="p">,</span><span class="s1">&#39;4*x^2&#39;</span><span class="p">,</span> <span class="s1">&#39;16*x^4&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">,</span> <span class="n">result3</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_inputs</span><span class="p">)[</span><span class="s1">&#39;input_list&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result2</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result3</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">student_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'2*x'</span><span class="p">,</span><span class="s1">'4*x^2'</span><span class="p">,</span> <span class="s1">'16*x^4'</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">,</span> <span class="n">result3</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_inputs</span><span class="p">)[</span><span class="s1">'input_list'</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">[</span><span class="s1">'ok'</span><span class="p">],</span> <span class="n">result2</span><span class="p">[</span><span class="s1">'ok'</span><span class="p">],</span> <span class="n">result3</span><span class="p">[</span><span class="s1">'ok'</span><span class="p">]</span>
 <span class="go">(True, True, True)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">student_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;3*x&#39;</span><span class="p">,</span><span class="s1">&#39;9*x^2&#39;</span><span class="p">,</span> <span class="s1">&#39;81*x^4&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">,</span> <span class="n">result3</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_inputs</span><span class="p">)[</span><span class="s1">&#39;input_list&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result2</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result3</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'3*x'</span><span class="p">,</span><span class="s1">'9*x^2'</span><span class="p">,</span> <span class="s1">'81*x^4'</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">,</span> <span class="n">result3</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_inputs</span><span class="p">)[</span><span class="s1">'input_list'</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">[</span><span class="s1">'ok'</span><span class="p">],</span> <span class="n">result2</span><span class="p">[</span><span class="s1">'ok'</span><span class="p">],</span> <span class="n">result3</span><span class="p">[</span><span class="s1">'ok'</span><span class="p">]</span>
 <span class="go">(True, True, True)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">student_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;3*x&#39;</span><span class="p">,</span><span class="s1">&#39;4*x^2&#39;</span><span class="p">,</span> <span class="s1">&#39;16*x^4&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">,</span> <span class="n">result3</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_inputs</span><span class="p">)[</span><span class="s1">&#39;input_list&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result2</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">],</span> <span class="n">result3</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'3*x'</span><span class="p">,</span><span class="s1">'4*x^2'</span><span class="p">,</span> <span class="s1">'16*x^4'</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">,</span> <span class="n">result3</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_inputs</span><span class="p">)[</span><span class="s1">'input_list'</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result1</span><span class="p">[</span><span class="s1">'ok'</span><span class="p">],</span> <span class="n">result2</span><span class="p">[</span><span class="s1">'ok'</span><span class="p">],</span> <span class="n">result3</span><span class="p">[</span><span class="s1">'ok'</span><span class="p">]</span>
 <span class="go">(True, False, True)</span>
 </code></pre></div>
 
@@ -653,10 +659,10 @@
     <span class="n">blacklist</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
     <span class="n">whitelist</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
     <span class="n">forbidden_strings</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
-    <span class="n">forbidden_message</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &#39;Invalid Input: This particular answer is forbidden&#39;</span>
+    <span class="n">forbidden_message</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default 'Invalid Input: This particular answer is forbidden'</span>
     <span class="n">required_functions</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>  <span class="c1"># default []</span>
     <span class="n">metric_suffixes</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="c1"># default False</span>
-    <span class="n">tolerance</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">percentage</span><span class="p">),</span>  <span class="c1"># default &#39;0.01%&#39;</span>
+    <span class="n">tolerance</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">percentage</span><span class="p">),</span>  <span class="c1"># default '0.01%'</span>
 <span class="p">)</span>
 </code></pre></div></div>
         

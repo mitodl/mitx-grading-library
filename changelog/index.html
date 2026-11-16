@@ -84,6 +84,12 @@
                         
                             
 <li >
+    <a href="../upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../edx/">edX Syntax</a>
 </li>
 
@@ -257,6 +263,9 @@
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#change-log">Change Log</a></li>
         <li class="first-level "><a href="#version-3">Version 3</a></li>
+            <li class="second-level"><a href="#version-31">Version 3.1</a></li>
+                
+                <li class="third-level"><a href="#version-310">Version 3.1.0</a></li>
             <li class="second-level"><a href="#version-30">Version 3.0</a></li>
                 
                 <li class="third-level"><a href="#version-300">Version 3.0.0</a></li>
@@ -310,6 +319,14 @@
 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link"> # </a></h1>
 <h1 id="version-3">Version 3<a class="headerlink" href="#version-3" title="Permanent link"> # </a></h1>
 <p>This major release removes support for Python 2 and older versions of Python 3 and adds support for Python 3.8 and 3.11.</p>
+<h2 id="version-31">Version 3.1<a class="headerlink" href="#version-31" title="Permanent link"> # </a></h2>
+<h3 id="version-310">Version 3.1.0<a class="headerlink" href="#version-310" title="Permanent link"> # </a></h3>
+<ul>
+<li>MJxPrep.js works with MathJax 4, which Open edX loads after <a href="https://github.com/openedx/edx-platform/pull/33555">openedx/edx-platform#33555</a>, as well as MathJax 2.7. Courses need to replace their copy of MJxPrep.js for answer previews to work on MathJax 4.</li>
+<li>MJxPrep.js stops looking for MathJax's AsciiMath renderer after a minute instead of polling forever, and logs its version to the browser console (also available as <code>window.MJxPrep.version</code>).</li>
+<li>Courses customize MJxPrep.js through <code>window.MJxPrepOptions</code> and <code>window.MJxPrepCustom</code> (<code>symbols</code>, <code>pre</code>, <code>post</code>) set in a separate file, instead of editing MJxPrep.js. MJxPrep.js no longer overwrites <code>window.MJxPrepOptions</code>, and its built-in <code>customPreReplacements</code>/<code>customPostReplacements</code> placeholders are gone. See <a href="../grading_math/renderer/#customizing-for-a-course">Customizing for a Course</a>.</li>
+<li><code>python_lib.zip</code> and <code>MJxPrep.js</code> are now attached to each <a href="https://github.com/mitodl/mitx-grading-library/releases">GitHub release</a> instead of being committed to the repository. <code>python_lib.zip</code> is no longer on the master branch. See <a href="../upgrading/">Upgrading a Course</a>, which includes a script that updates the library inside a <code>python_lib.zip</code> that also holds a course's own modules.</li>
+</ul>
 <h2 id="version-30">Version 3.0<a class="headerlink" href="#version-30" title="Permanent link"> # </a></h2>
 <h3 id="version-300">Version 3.0.0<a class="headerlink" href="#version-300" title="Permanent link"> # </a></h3>
 <ul>

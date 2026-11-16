@@ -84,6 +84,12 @@
                         
                             
 <li >
+    <a href="../../upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../../edx/">edX Syntax</a>
 </li>
 
@@ -274,7 +280,7 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">rot</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
-<span class="gp">... </span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="w">    </span><span class="sd">"""</span>
 <span class="gp">... </span><span class="sd">    Rotate vec by angle around axis. Implemented by Euler-Rodrigues formula:</span>
 <span class="gp">... </span><span class="sd">    https://en.wikipedia.org/wiki/Euler-Rodrigues_formula</span>
 <span class="gp">...</span>
@@ -282,7 +288,7 @@
 <span class="gp">... </span><span class="sd">        vec: a 3-component MathArray to rotate</span>
 <span class="gp">... </span><span class="sd">        axis: a 3-component MathArray to rotate around</span>
 <span class="gp">... </span><span class="sd">        angle: a number</span>
-<span class="gp">... </span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="sd">    """</span>
 <span class="gp">... </span>    <span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">unit_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
@@ -292,13 +298,13 @@
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">MathArray</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grader_1</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
-<span class="gp">... </span>   <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;rot(v, [0, 0, 1], theta)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>   <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;theta&#39;</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="n">answers</span><span class="o">=</span><span class="s1">'rot(v, [0, 0, 1], theta)'</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'v'</span><span class="p">,</span> <span class="s1">'theta'</span><span class="p">],</span>
 <span class="gp">... </span>   <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>       <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="gp">... </span>       <span class="s1">'v'</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
 <span class="gp">... </span>   <span class="p">},</span>
 <span class="gp">... </span>   <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>       <span class="s1">&#39;rot&#39;</span><span class="p">:</span> <span class="n">rot</span>
+<span class="gp">... </span>       <span class="s1">'rot'</span><span class="p">:</span> <span class="n">rot</span>
 <span class="gp">... </span>   <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -306,7 +312,7 @@
 <h3 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link"> # </a></h3>
 <p>Our <code>rot(vec, axis, angle)</code> function works, but if students supply the function above with arguments of incorrect type, they receive unhelpful error messages:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">grader_1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;rot(v, theta, [0, 0, 1])&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">grader_1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'rot(v, theta, [0, 0, 1])'</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
 <span class="go">There was an error evaluating rot(...). Its input does not seem to be in its domain.</span>
@@ -315,29 +321,29 @@
 <h3 id="the-solution">The Solution<a class="headerlink" href="#the-solution" title="Permanent link"> # </a></h3>
 <p>To provide students with more useful error messages, we can use <code>specify_domain</code>, a decorator function imported from <code>mitxgraders</code>. <a href="https://dbader.org/blog/python-decorators">Decorator Functions</a> are "higher-order functions" that take functions as input and produce functions as output, usually modifying the input function's behavior. In our case, <code>specify_domain</code> will modify the behavior of <code>rot</code> so as to provide more helpful <code>StudentFacingError</code>s.</p>
 <p>Here we go:</p>
-<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="nd">@specify_domain</span><span class="p">(</span><span class="n">input_shapes</span><span class="o">=</span><span class="p">[[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">display_name</span><span class="o">=</span><span class="s1">&#39;rot&#39;</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="nd">@specify_domain</span><span class="p">(</span><span class="n">input_shapes</span><span class="o">=</span><span class="p">[[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">display_name</span><span class="o">=</span><span class="s1">'rot'</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">rot_with_error_messages</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="c1"># rot(vec, axis, angle) defined above</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">rot</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define new grader using rot_with_error_messages</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grader_2</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
-<span class="gp">... </span>   <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;rot(v, [0, 0, 1], theta)&#39;</span><span class="p">,</span>
-<span class="gp">... </span>   <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;theta&#39;</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="n">answers</span><span class="o">=</span><span class="s1">'rot(v, [0, 0, 1], theta)'</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'v'</span><span class="p">,</span> <span class="s1">'theta'</span><span class="p">],</span>
 <span class="gp">... </span>   <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>       <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="gp">... </span>       <span class="s1">'v'</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
 <span class="gp">... </span>   <span class="p">},</span>
 <span class="gp">... </span>   <span class="n">user_functions</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>       <span class="s1">&#39;rot&#39;</span><span class="p">:</span> <span class="n">rot_with_error_messages</span>
+<span class="gp">... </span>       <span class="s1">'rot'</span><span class="p">:</span> <span class="n">rot_with_error_messages</span>
 <span class="gp">... </span>   <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 <p>Now if a student calls <code>rot</code> with incorrect inputs, they receive a more helpful message:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">grader_2</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;rot(v, theta, [0, 0, 1])&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">grader_2</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'rot(v, theta, [0, 0, 1])'</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;br/&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'&lt;br/&gt;'</span><span class="p">,</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">))</span>
 <span class="go">There was an error evaluating function rot(...)</span>
 <span class="go">1st input is ok: received a vector of length 3 as expected</span>
 <span class="go">2nd input has an error: received a scalar, expected a vector of length 3</span>
@@ -369,7 +375,7 @@
     Defaults to <code>None</code>, meaning that the function's <code>__name__</code> attribute is used.</li>
 </ul>
 <p>So, for example,</p>
-<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="nd">@specify_domain</span><span class="p">(</span><span class="n">input_shapes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">4</span><span class="p">],</span> <span class="n">display_name</span><span class="o">=</span><span class="s1">&#39;myfunc&#39;</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="nd">@specify_domain</span><span class="p">(</span><span class="n">input_shapes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">4</span><span class="p">],</span> <span class="n">display_name</span><span class="o">=</span><span class="s1">'myfunc'</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">some_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">pass</span>
 </code></pre></div>
@@ -387,7 +393,7 @@
 </code></pre></div>
 
 <p>To inform <code>specify_domain</code> that a function should accept arbitrarily many arguments of a certain shape, supply a single shape to <code>input_shapes</code>, and also pass in a <code>min_length</code> parameter, to specify the minimum number of arguments required. (If you specify <code>min_length</code> and have more than one shape in <code>input_shapes</code>, a <code>ConfigError</code> will result.) So, our <code>my_min</code> function can be decorated as follows:</p>
-<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="nd">@specify_domain</span><span class="p">(</span><span class="n">input_shapes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">display_name</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="nd">@specify_domain</span><span class="p">(</span><span class="n">input_shapes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">display_name</span><span class="o">=</span><span class="s1">'min'</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">my_min</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">my_min</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">)</span>

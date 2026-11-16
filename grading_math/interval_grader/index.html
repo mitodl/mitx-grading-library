@@ -84,6 +84,12 @@
                         
                             
 <li >
+    <a href="../../upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../../edx/">edX Syntax</a>
 </li>
 
@@ -296,37 +302,37 @@ something else.</p>
 <h2 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link"> # </a></h2>
 <p>To use an <code>IntervalGrader</code>, you can simply call invoke it like a typical grader:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span><span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[0, 1]&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;[0, 1]&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span><span class="n">answers</span><span class="o">=</span><span class="s1">'[0, 1]'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'[0, 1]'</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">'ok'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'msg'</span><span class="p">:</span> <span class="s1">''</span><span class="p">}</span>
 <span class="go">True</span>
 </code></pre></div>
 
 <p>Answers may be specified by supplying the relevant answer as a string, as in the above example, either through the <code>answers</code> key or through the <code>expect</code> keyword of the <code>customresponse</code> tag. You can also break out the answer into four constituent parts in a list as follows:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span><span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;]&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;[0, 1]&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span><span class="n">answers</span><span class="o">=</span><span class="p">[</span><span class="s1">'['</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">,</span> <span class="s1">'1'</span><span class="p">,</span> <span class="s1">']'</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'[0, 1]'</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">'ok'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'msg'</span><span class="p">:</span> <span class="s1">''</span><span class="p">}</span>
 <span class="go">True</span>
 </code></pre></div>
 
 <p>Each individual answer component conforms to the <code>ItemGrader</code> answers specification, so you can do things like the following:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="p">[</span>
-<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your opening bracket is wrong.&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}),</span>
-<span class="gp">... </span>        <span class="s1">&#39;0&#39;</span><span class="p">,</span>
-<span class="gp">... </span>        <span class="s1">&#39;1&#39;</span><span class="p">,</span>
-<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;expect&#39;</span><span class="p">:</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your closing bracket is wrong.&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">'['</span><span class="p">,</span> <span class="p">{</span><span class="s1">'expect'</span><span class="p">:</span> <span class="s1">'('</span><span class="p">,</span> <span class="s1">'msg'</span><span class="p">:</span> <span class="s1">'Your opening bracket is wrong.'</span><span class="p">,</span> <span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}),</span>
+<span class="gp">... </span>        <span class="s1">'0'</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">'1'</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">']'</span><span class="p">,</span> <span class="p">{</span><span class="s1">'expect'</span><span class="p">:</span> <span class="s1">')'</span><span class="p">,</span> <span class="s1">'msg'</span><span class="p">:</span> <span class="s1">'Your closing bracket is wrong.'</span><span class="p">,</span> <span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}),</span>
 <span class="gp">... </span>    <span class="p">]</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;[0, 1)&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="s1">&#39;partial&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Your closing bracket is wrong.&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'[0, 1)'</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">'ok'</span><span class="p">:</span> <span class="s1">'partial'</span><span class="p">,</span> <span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">'msg'</span><span class="p">:</span> <span class="s1">'Your closing bracket is wrong.'</span><span class="p">}</span>
 <span class="go">True</span>
 </code></pre></div>
 
 <h2 id="brackets">Brackets<a class="headerlink" href="#brackets" title="Permanent link"> # </a></h2>
 <p>You can specify the opening and closing brackets that students may use. Specify each separately as a list of acceptable characters. Entries that do not use these brackets will receive an error message.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[0,1]&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">opening_brackets</span><span class="o">=</span><span class="s1">&#39;([{&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">closing_brackets</span><span class="o">=</span><span class="s1">&#39;)]}&#39;</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'[0,1]'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">opening_brackets</span><span class="o">=</span><span class="s1">'([{'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">closing_brackets</span><span class="o">=</span><span class="s1">')]}'</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
@@ -334,16 +340,16 @@ something else.</p>
 <h2 id="subgrader">Subgrader<a class="headerlink" href="#subgrader" title="Permanent link"> # </a></h2>
 <p>Grading of the two math expressions is performed by a subgrader. The default subgrader is <code>NumericalGrader(tolerance=1e-13, allow_inf=True)</code>, which allows <code>infty</code> as an entry, and otherwise sets a tight absolute tolerance on the answers. If this default doesn't suit your requirements, you may specify your own <code>FormulaGrader</code> or <code>NumericalGrader</code> as the subgrader for the expressions. This is particularly useful if you want variables to be allowed to appear in the expressions.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[a,b^2]&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">FormulaGrader</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'[a,b^2]'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">subgrader</span><span class="o">=</span><span class="n">FormulaGrader</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">])</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="delimiter">Delimiter<a class="headerlink" href="#delimiter" title="Permanent link"> # </a></h2>
 <p>The default delimiter is a comma. However, due to the way expressions are parsed, if your expressions include commas in any location, the answer will not parse correctly. We suggest changing the delimiter to another character, as follows.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[0:1]&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;:&#39;</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'[0:1]'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">delimiter</span><span class="o">=</span><span class="s1">':'</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
@@ -354,9 +360,9 @@ something else.</p>
 <h2 id="options-listing">Options Listing<a class="headerlink" href="#options-listing" title="Permanent link"> # </a></h2>
 <p>Here is the full list of options specific to an <code>IntervalGrader</code>.</p>
 <div class="codehilite"><pre><span></span><code><span class="n">grader</span> <span class="o">=</span> <span class="n">IntervalGrader</span><span class="p">(</span>
-    <span class="n">opening_brackets</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># defaykt &#39;[(&#39;</span>
-    <span class="n">closing_brackets</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &#39;])&#39;</span>
-    <span class="n">delimiter</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default &#39;,&#39;, must be one character</span>
+    <span class="n">opening_brackets</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># defaykt '[('</span>
+    <span class="n">closing_brackets</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default '])'</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>  <span class="c1"># default ',', must be one character</span>
     <span class="n">partial_credit</span><span class="o">=</span><span class="nb">bool</span>  <span class="c1"># default True</span>
 <span class="p">)</span>
 </code></pre></div></div>

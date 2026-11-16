@@ -84,6 +84,12 @@
                         
                             
 <li >
+    <a href="../../upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../../edx/">edX Syntax</a>
 </li>
 
@@ -258,10 +264,10 @@
         <li class="first-level active"><a href="#asciimath-renderer-definitions">AsciiMath Renderer Definitions</a></li>
             <li class="second-level"><a href="#how-it-works">How it Works</a></li>
                 
-            <li class="second-level"><a href="#options">Options</a></li>
+            <li class="second-level"><a href="#customizing-for-a-course">Customizing for a Course</a></li>
                 
-            <li class="second-level"><a href="#extending-definitions">Extending Definitions</a></li>
-                
+                <li class="third-level"><a href="#options">Options</a></li>
+                <li class="third-level"><a href="#extending-definitions">Extending definitions</a></li>
             <li class="second-level"><a href="#notes">Notes</a></li>
                 
     </ul>
@@ -272,52 +278,68 @@
 <p>When math input is expected from students, edX offers a math preview that attempts to show their expression in normal mathematical notation. There are two ways to provide this preview:</p>
 <div class="codehilite"><pre><span></span><code><span class="nt">&lt;formulaequationinput/&gt;</span>
 or
-<span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
 </code></pre></div>
 
 <p>The <code>formulaequationinput</code> tag uses server-side parsing and rendering to display the preview to the student. By and large, the preview from <code>formulaequationinput</code> is better than that of <code>textline</code>, as it treats functions correctly, and displays a number of LaTeX symbols natively. The downsides to <code>formulaequationinput</code> are that it doesn't recognize vectors such as <code>vecx</code> or <code>hatx</code>, the factorial and conjugation functions just apply as <code>fact(x)</code> and <code>conj(x)</code>, and because the processing is done server-side, we are unable to enhance the display at all.</p>
+<p>Open edX versions that load MathJax 4 (after <a href="https://github.com/openedx/edx-platform/pull/33555">openedx/edx-platform#33555</a>) render the <code>formulaequationinput</code> preview in the browser through AsciiMath instead, the same way as <code>textline</code>. There, the symbol definitions in <code>MJxPrep.js</code> (such as <code>arctanh</code> and <code>hbar</code>) apply to <code>formulaequationinput</code> previews too, as long as <code>MJxPrep.js</code> is loaded on the page (e.g. by the <code>&lt;script&gt;</code> tag described below). The preprocessor doesn't, since <code>formulaequationinput</code> has no <code>preprocessorClassName</code>.</p>
 <p>The <code>textline</code> tag treats the student input as AsciiMath for the purpose of generating a preview, using MathJax to render it. While the preview does a reasonably good job, there are many situations where it falls down, even for standard edX functions (for example, try typing in <code>1/arctanh(x)</code> in a textline box!). Because this is done client-side through javascript, it's possible to supplement the AsciiMath definitions to handle new situations. We have constructed a series of renderer definitions to supplement the standard AsciiMath definitions in order to provide better previews.</p>
 <p>This article describes how to use our new AsciiMath renderer definitions with a <code>&lt;textline&gt;</code> tag.</p>
 <h2 id="how-it-works">How it Works<a class="headerlink" href="#how-it-works" title="Permanent link"> # </a></h2>
 <p>The renderer definitions are located in a javascript file, <code>MJxPrep.js</code>, which should be uploaded to the static assets folder for your course. This javascript file has two components: symbol definitions and a preprocessor.</p>
 <p>The symbol definitions are used to teach AsciiMath how to display various functions properly, such as <code>re</code>, <code>im</code>, <code>arctanh</code> etc. To load the symbol definitions in a problem, place the following HTML code somewhere in the problem.</p>
-<div class="codehilite"><pre><span></span><code><span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;/static/MJxPrep.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="w"> </span><span class="na">src=</span><span class="s">"/static/MJxPrep.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
 </code></pre></div>
 
 <p>Some functions are too complex for a symbol definition, and need the student's input to be preprocessed into AsciiMath before rendering. These functions include <code>log10</code>, <code>log2</code>, <code>fact</code>/<code>factorial</code>, <code>trans</code>, <code>adj</code>/<code>ctrans</code> and <code>cross</code>.</p>
 <p>It is quite common to have a variable name begin with <code>delta</code> or <code>Delta</code>, such as <code>Deltax</code>. Unfortunately, AsciiMath treats such variables as two separate entries, and can sometimes split them inopportunely, such as for the expression <code>1/Deltax</code>. The preprocessor detects such variable names and ensures that AsciiMath displays them correctly.</p>
 <p>To use these features, you need to add <code>preprocessorClassName</code> and <code>preprocessorSrc</code> properties to any <code>&lt;textline/&gt;</code> tags that use the preprocessor, such as in the following example.</p>
-<div class="codehilite"><pre><span></span><code><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;1/fact(5)&quot;</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">preprocessorClassName=</span><span class="s">&quot;MJxPrep&quot;</span><span class="w"> </span><span class="na">preprocessorSrc=</span><span class="s">&quot;/static/MJxPrep.js&quot;</span><span class="nt">/&gt;</span>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">"grader"</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">"1/fact(5)"</span><span class="w"> </span><span class="na">math=</span><span class="s">"1"</span><span class="w"> </span><span class="na">preprocessorClassName=</span><span class="s">"MJxPrep"</span><span class="w"> </span><span class="na">preprocessorSrc=</span><span class="s">"/static/MJxPrep.js"</span><span class="nt">/&gt;</span>
 <span class="nt">&lt;/customresponse&gt;</span>
 </code></pre></div>
 
 <p>If you use the preprocessor in your problem, you get the symbol definitions as well (you don't need to load them separately using a script tag).</p>
-<h2 id="options">Options<a class="headerlink" href="#options" title="Permanent link"> # </a></h2>
-<p>There are a few configurable options for the preprocessor in <code>MJxPrep.js</code>.</p>
-<p>By default, <code>conj()</code> displays as a bar over the argument to the function. However, you may wish for complex conjugates to be displayed as a superscript star. If so, you can set <code>conj_as_star: true</code> at the start of the file.</p>
-<p>By default, vectors <code>[1, 2, 3]</code> display as a column vector when the preprocessor is loaded (without the preprocessor, it will display as a row). If you would instead like them to display as a row vector, you can set the option <code>vectors_as_columns: false</code> at the start of the file.</p>
-<h2 id="extending-definitions">Extending Definitions<a class="headerlink" href="#extending-definitions" title="Permanent link"> # </a></h2>
-<p>If you're building a course that uses math extensively, it's likely that you want to use some sort of symbol that can't be written in the form of an edX variable. In this situation, we have provided two functions to extend the preprocessor. At the bottom of <code>MJxPrep.js</code>, you will find the functions <code>customPreReplacements</code> and <code>customPostReplacements</code>, which are called before and after our preprocessing functions occur, respectively. You can perform whatever manipulations you desire in these functions. As an example of a pre-replacement, consider the following line which implements the double factorial:</p>
-<div class="codehilite"><pre><span></span><code><span class="nx">working</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">replaceFunctionCalls</span><span class="p">(</span><span class="nx">working</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ffact&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">funcToPostfix</span><span class="p">(</span><span class="s1">&#39;!!&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">)</span>
+<h2 id="customizing-for-a-course">Customizing for a Course<a class="headerlink" href="#customizing-for-a-course" title="Permanent link"> # </a></h2>
+<p>Don't edit <code>MJxPrep.js</code> itself. Put your course's options and extensions in a separate file, e.g. <code>MJxPrepCustom.js</code>, and upload it to your static assets alongside <code>MJxPrep.js</code>. That way you can replace <code>MJxPrep.js</code> with a new release as is, and keep your changes.</p>
+<p>Load your file in each problem that uses the preprocessor, next to the <code>&lt;textline&gt;</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="w"> </span><span class="na">src=</span><span class="s">"/static/MJxPrepCustom.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
 </code></pre></div>
 
-<p>This leverages our <code>replaceFunctionCalls</code> and <code>funcToPostfix</code> functions which detect function calls and perform replacements, respectively (a number of other useful functions are included in the javascript file).</p>
-<p>As an example of a post-replacement, the following line simply replaces a variable name with something that actually looks like a derivative:</p>
-<div class="codehilite"><pre><span></span><code><span class="nx">working</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">working</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/dphidx/g</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{:(partial phi)/(partial x):}&#39;</span><span class="p">);</span>
+<p><code>MJxPrep.js</code> reads your settings each time it needs them, so the two files can load in either order.</p>
+<h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link"> # </a></h3>
+<p>Set <code>window.MJxPrepOptions</code> to change how the preprocessor displays some functions. Any option you leave out keeps its default.</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">window</span><span class="p">.</span><span class="nx">MJxPrepOptions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">conj_as_star</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">vectors_as_columns</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">};</span>
 </code></pre></div>
 
-<p>This is a trivial example of using regex to make a replacement; of course, more complicated replacements are also possible.</p>
-<p>Finally, if you want to introduce new symbols to AsciiMath using unicode, it's simple to do so. Here's an example of how we introduce hbar to the system:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1">// This is hbar, often used in physics</span>
-<span class="nx">AM</span><span class="p">.</span><span class="nx">newsymbol</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">input</span><span class="o">:</span><span class="s2">&quot;hbar&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">tag</span><span class="o">:</span><span class="s2">&quot;mo&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">output</span><span class="o">:</span><span class="s2">&quot;\u210F&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">tex</span><span class="o">:</span><span class="kc">null</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">ttype</span><span class="o">:</span><span class="nx">AM</span><span class="p">.</span><span class="nx">TOKEN</span><span class="p">.</span><span class="nx">CONST</span><span class="p">});</span>
+<p>By default, <code>conj()</code> displays as a bar over the argument to the function. Set <code>conj_as_star: true</code> to display complex conjugates as a superscript star instead.</p>
+<p>By default, vectors <code>[1, 2, 3]</code> display as a column vector when the preprocessor is loaded (without the preprocessor, it will display as a row). Set <code>vectors_as_columns: false</code> to display them as a row vector instead.</p>
+<h3 id="extending-definitions">Extending definitions<a class="headerlink" href="#extending-definitions" title="Permanent link"> # </a></h3>
+<p>If you're building a course that uses math extensively, you probably want some symbols that can't be written as an edX variable. Set <code>window.MJxPrepCustom</code> to extend the preprocessor and the AsciiMath symbols:</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">window</span><span class="p">.</span><span class="nx">MJxPrepCustom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Called before our preprocessing (after spaces are stripped)</span>
+<span class="w">  </span><span class="nx">pre</span><span class="o">:</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">eqn</span><span class="p">,</span><span class="w"> </span><span class="nx">mjx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Double factorial: ffact(n) -&gt; n!!</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">mjx</span><span class="p">.</span><span class="nx">replaceFunctionCalls</span><span class="p">(</span><span class="nx">eqn</span><span class="p">,</span><span class="w"> </span><span class="s1">'ffact'</span><span class="p">,</span><span class="w"> </span><span class="nx">mjx</span><span class="p">.</span><span class="nx">funcToPostfix</span><span class="p">(</span><span class="s1">'!!'</span><span class="p">));</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="c1">// Called after our preprocessing</span>
+<span class="w">  </span><span class="nx">post</span><span class="o">:</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">eqn</span><span class="p">,</span><span class="w"> </span><span class="nx">mjx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Variables are already wrapped in {: :} by this point</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">eqn</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/dphidx/g</span><span class="p">,</span><span class="w"> </span><span class="s1">'{:(partial phi)/(partial x):}'</span><span class="p">);</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="c1">// New AsciiMath symbols</span>
+<span class="w">  </span><span class="nx">symbols</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="nx">input</span><span class="o">:</span><span class="w"> </span><span class="s2">"ell"</span><span class="p">,</span><span class="w"> </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="s2">"mo"</span><span class="p">,</span><span class="w"> </span><span class="nx">output</span><span class="o">:</span><span class="w"> </span><span class="s2">"\u2113"</span><span class="p">,</span><span class="w"> </span><span class="nx">tex</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nx">ttype</span><span class="o">:</span><span class="w"> </span><span class="s2">"CONST"</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="nx">input</span><span class="o">:</span><span class="w"> </span><span class="s2">"erf"</span><span class="p">,</span><span class="w"> </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="s2">"mo"</span><span class="p">,</span><span class="w"> </span><span class="nx">output</span><span class="o">:</span><span class="w"> </span><span class="s2">"erf"</span><span class="p">,</span><span class="w"> </span><span class="nx">tex</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nx">ttype</span><span class="o">:</span><span class="w"> </span><span class="s2">"UNARY"</span><span class="p">,</span><span class="w"> </span><span class="nx">func</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">};</span>
 </code></pre></div>
 
+<p><code>pre</code> and <code>post</code> take the student's input as a string and return the replacement. We suggest trying <code>post</code> first, and using <code>pre</code> only if necessary. The second argument holds helper functions from <code>MJxPrep.js</code>, such as <code>replaceFunctionCalls</code>, <code>funcToPostfix</code> and <code>funcToSelf</code>, which detect function calls and perform replacements.</p>
+<p>Each entry in <code>symbols</code> is passed to AsciiMath's <code>AM.newsymbol</code>, with <code>ttype</code> given as the name of the token type (<code>"CONST"</code>, <code>"UNARY"</code>, <code>"BINARY"</code>, <code>"LEFTBRACKET"</code>, <code>"RIGHTBRACKET"</code> etc.) rather than <code>AM.TOKEN.CONST</code>, since AsciiMath may not have loaded when your file runs. See <a href="https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js">ASCIIMathML.js</a> for the symbol format and examples.</p>
 <h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link"> # </a></h2>
 <ul>
 <li>

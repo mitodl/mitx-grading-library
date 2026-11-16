@@ -83,6 +83,12 @@
 
                         
                             
+<li >
+    <a href="../upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
 <li class="active">
     <a href="./">edX Syntax</a>
 </li>
@@ -233,7 +239,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="..">
+                        <a rel="prev" href="../upgrading/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
@@ -273,25 +279,25 @@
 <div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
 
 <span class="cm">&lt;!-- Define the grader --&gt;</span>
-<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">"text/python"</span><span class="nt">&gt;</span>
 from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
-grader<span class="w"> </span>=<span class="w"> </span>FormulaGrader(variables=[&quot;x&quot;])
+grader<span class="w"> </span>=<span class="w"> </span>FormulaGrader(variables=["x"])
 <span class="nt">&lt;/script&gt;</span>
 
 <span class="w">  </span><span class="cm">&lt;!-- Ask the question --&gt;</span>
 <span class="w">  </span><span class="nt">&lt;p&gt;</span>Enter<span class="w"> </span>the<span class="w"> </span>derivative<span class="w"> </span>of<span class="w"> </span>\(x^2\).<span class="nt">&lt;/p&gt;</span>
 
 <span class="w">  </span><span class="cm">&lt;!-- Define the problem --&gt;</span>
-<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="w"> </span><span class="na">answer=</span><span class="s">&quot;2*x&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">"grader"</span><span class="w"> </span><span class="na">answer=</span><span class="s">"2*x"</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">"true"</span><span class="w"> </span><span class="nt">/&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
 <span class="w">  </span><span class="cm">&lt;!-- Ask another question --&gt;</span>
 <span class="w">  </span><span class="nt">&lt;p&gt;</span>Enter<span class="w"> </span>the<span class="w"> </span>derivative<span class="w"> </span>of<span class="w"> </span>\(5x^2\).<span class="nt">&lt;/p&gt;</span>
 
 <span class="w">  </span><span class="cm">&lt;!-- Define the problem. Note that the grader is reused --&gt;</span>
-<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="w"> </span><span class="na">answer=</span><span class="s">&quot;10*x&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">"grader"</span><span class="w"> </span><span class="na">answer=</span><span class="s">"10*x"</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">"true"</span><span class="w"> </span><span class="nt">/&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
 <span class="nt">&lt;/problem&gt;</span>
@@ -302,18 +308,18 @@ grader<span class="w"> </span>=<span class="w"> </span>FormulaGrader(variables=[
 <p>If you provide an <code>answers</code> key to the grader, it will ignore whatever is specified in the <code>customresponse</code> tag. Here is an example.</p>
 <div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
 
-<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">"text/python"</span><span class="nt">&gt;</span>
 from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
 mygrader<span class="w"> </span>=<span class="w"> </span>FormulaGrader(
-<span class="w">    </span>answers={&#39;expect&#39;:<span class="w"> </span>&#39;2*x&#39;,<span class="w"> </span>&#39;msg&#39;:<span class="w"> </span>&#39;Good<span class="w"> </span>job!&#39;},
-<span class="w">    </span>variables=[&#39;x&#39;]
+<span class="w">    </span>answers={'expect':<span class="w"> </span>'2*x',<span class="w"> </span>'msg':<span class="w"> </span>'Good<span class="w"> </span>job!'},
+<span class="w">    </span>variables=['x']
 )
 <span class="nt">&lt;/script&gt;</span>
 
 <span class="w">  </span><span class="nt">&lt;p&gt;</span>Enter<span class="w"> </span>the<span class="w"> </span>derivative<span class="w"> </span>of<span class="w"> </span>\(x^2\).<span class="nt">&lt;/p&gt;</span>
 
-<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;mygrader&quot;</span><span class="w"> </span><span class="na">answer=</span><span class="s">&quot;2*x&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">"mygrader"</span><span class="w"> </span><span class="na">answer=</span><span class="s">"2*x"</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">"true"</span><span class="w"> </span><span class="nt">/&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
 <span class="nt">&lt;/problem&gt;</span>
@@ -324,22 +330,22 @@ mygrader<span class="w"> </span>=<span class="w"> </span>FormulaGrader(
 <h2 id="using-correct_answer-for-multiple-inputs">Using <code>correct_answer</code> for multiple inputs<a class="headerlink" href="#using-correct_answer-for-multiple-inputs" title="Permanent link"> # </a></h2>
 <p>If you are using multiple inputs (such as when using a <code>ListGrader</code>), you must provide the <code>answers</code> key to the grader explicitly, as the <code>expect</code> or <code>answer</code> parameters in the <code>customresponse</code> tag are ignored by both edX and the grader. When using multiple inputs, it's recommended to provide a <code>correct_answer</code> parameter on the <code>textline</code> tags, which is what is used to show students the correct answer. Here is an example.</p>
 <div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
-<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">"text/python"</span><span class="nt">&gt;</span>
 from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
 grader<span class="w"> </span>=<span class="w"> </span>ListGrader(
-<span class="w">    </span>answers=[&#39;x-2&#39;,<span class="w"> </span>&#39;x+2&#39;],
-<span class="w">    </span>subgraders=FormulaGrader(variables=[&#39;x&#39;])
+<span class="w">    </span>answers=['x-2',<span class="w"> </span>'x+2'],
+<span class="w">    </span>subgraders=FormulaGrader(variables=['x'])
 )
 <span class="nt">&lt;/script&gt;</span>
 
 <span class="w">  </span><span class="nt">&lt;p&gt;</span>What<span class="w"> </span>are<span class="w"> </span>the<span class="w"> </span>linear<span class="w"> </span>factors<span class="w"> </span>of<span class="w"> </span>\((x^2<span class="w"> </span>-<span class="w"> </span>4)\)?<span class="w"> </span>Enter<span class="w"> </span>your<span class="w"> </span>answers<span class="w"> </span>in<span class="w"> </span>any<span class="w"> </span>order.<span class="nt">&lt;/p&gt;</span>
 
-<span class="w">  </span><span class="cm">&lt;!-- Note there is no &#39;expect&#39; or &#39;answer&#39; parameter in the customresponse tag --&gt;</span>
-<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="cm">&lt;!-- Note there is no 'expect' or 'answer' parameter in the customresponse tag --&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">"grader"</span><span class="nt">&gt;</span>
 <span class="w">    </span><span class="cm">&lt;!-- correct_answer is shown to student when they press [Show Answer].</span>
 <span class="cm">         Its value is not used for grading purposes --&gt;</span>
-<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;x - 2&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;x + 2&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">"true"</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">"x - 2"</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">"true"</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">"x + 2"</span><span class="w"> </span><span class="nt">/&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
 <span class="nt">&lt;/problem&gt;</span>
@@ -352,14 +358,14 @@ grader<span class="w"> </span>=<span class="w"> </span>ListGrader(
 <div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
 
 <span class="cm">&lt;!-- Make sure to remember to import the library! --&gt;</span>
-<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">"text/python"</span><span class="nt">&gt;</span>
 from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
 <span class="nt">&lt;/script&gt;</span>
 
 <span class="w">  </span><span class="nt">&lt;p&gt;</span>Enter<span class="w"> </span>the<span class="w"> </span>derivative<span class="w"> </span>of<span class="w"> </span>\(x^2\).<span class="nt">&lt;/p&gt;</span>
 
-<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;FormulaGrader(variables=[&#39;x&#39;])&quot;</span><span class="w"> </span><span class="na">answer=</span><span class="s">&quot;2*x&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">"FormulaGrader(variables=['x'])"</span><span class="w"> </span><span class="na">answer=</span><span class="s">"2*x"</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">"true"</span><span class="w"> </span><span class="nt">/&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
 <span class="nt">&lt;/problem&gt;</span>

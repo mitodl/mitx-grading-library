@@ -84,6 +84,12 @@
                         
                             
 <li >
+    <a href="../../../upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../../../edx/">edX Syntax</a>
 </li>
 
@@ -295,29 +301,29 @@
 <p>A typical use of <code>MatrixGrader</code> might look like</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">mitxgraders</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grader1</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
-<span class="gp">... </span>  <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;4*A*B^2*v&#39;</span><span class="p">,</span>
-<span class="gp">... </span>  <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">],</span>
-<span class="gp">... </span>  <span class="n">identity_dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># makes &#39;I&#39; available to students as the 2x2 identity matrix</span>
+<span class="gp">... </span>  <span class="n">answers</span><span class="o">=</span><span class="s1">'4*A*B^2*v'</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'A'</span><span class="p">,</span> <span class="s1">'B'</span><span class="p">,</span> <span class="s1">'v'</span><span class="p">],</span>
+<span class="gp">... </span>  <span class="n">identity_dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># makes 'I' available to students as the 2x2 identity matrix</span>
 <span class="gp">... </span>  <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>     <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">(),</span> <span class="c1"># samples from 2 by 2 matrices by default</span>
-<span class="gp">... </span>     <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">(),</span>
-<span class="gp">... </span>     <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="c1"># sample 2-component vectors</span>
+<span class="gp">... </span>     <span class="s1">'A'</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">(),</span> <span class="c1"># samples from 2 by 2 matrices by default</span>
+<span class="gp">... </span>     <span class="s1">'B'</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">(),</span>
+<span class="gp">... </span>     <span class="s1">'v'</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="c1"># sample 2-component vectors</span>
 <span class="gp">... </span>  <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 <p>The next few lines call the grader as a check function. The inputs <code>'4*A*B^2*v'</code> and <code>'4*A*B*B*v'</code> are correct:</p>
-<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;4*A*B^2*v&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'4*A*B^2*v'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'msg'</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="s1">'ok'</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;4*A*B*B*v&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'4*A*B*B*v'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'msg'</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="s1">'ok'</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 <span class="go">True</span>
 </code></pre></div>
 
 <p>while the input <code>'4*B*A*B*v'</code> is incorrect because the matrix-sampled variables are non-commutative:</p>
-<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;4*B*A*B*v&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader1</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'4*B*A*B*v'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">'msg'</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ok'</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 <span class="go">True</span>
 </code></pre></div>
 
@@ -366,13 +372,13 @@
 <p>Whether a matrix is input entry-by-entry or represented through variables, <code>MathArray</code>s are used to evaluate student expressions.</p>
 <p>For example, consider the grader below.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;2*A*[1, 2, 3] + v&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'2*A*[1, 2, 3] + v'</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">user_constants</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>      <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="gp">... </span>      <span class="s1">'A'</span><span class="p">:</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
 <span class="gp">... </span>    <span class="p">},</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'v'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>      <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># samples a random 2-component vector</span>
+<span class="gp">... </span>      <span class="s1">'v'</span><span class="p">:</span> <span class="n">RealVectors</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># samples a random 2-component vector</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -380,7 +386,7 @@
 <p>When a student inputs <code>v + A*2*[1, 2, 3]</code> to the grader above, a calculation similar to</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># Really, random samples would be chosen.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">MathArray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">+</span> <span class="n">A</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">MathArray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>  <span class="c1"># below is the result of evaluating student input, which would next be compared to author&#39;s answer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">+</span> <span class="n">A</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">MathArray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>  <span class="c1"># below is the result of evaluating student input, which would next be compared to author's answer</span>
 <span class="go">MathArray([30, 63])</span>
 </code></pre></div>
 
@@ -668,24 +674,24 @@ Cannot raise a non-square matrix to powers.
 <h3 id="parse-errors">Parse Errors:<a class="headerlink" href="#parse-errors" title="Permanent link"> # </a></h3>
 <p>For example, if a student enters <code>'[[1, 2],[3] ]'</code>, a matrix missing an entry in second row:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[[1, 2], [3, 4]]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'[[1, 2], [3, 4]]'</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">max_array_dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># allow students to enter matrices entry-by-entry</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;[[1, 2], [3]]&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">'[[1, 2], [3]]'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grade the input like edX would</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="c1"># students see this error message</span>
-<span class="go">Unable to parse vector/matrix. If you&#39;re trying to enter a matrix, this is most likely caused by an unequal number of elements in each row.</span>
+<span class="go">Unable to parse vector/matrix. If you're trying to enter a matrix, this is most likely caused by an unequal number of elements in each row.</span>
 </code></pre></div>
 
 <p>Such parse errors are <strong>always</strong> displayed to students.</p>
 <h3 id="shape-mismatch-errors-during-evaluation">Shape-Mismatch Errors During Evaluation<a class="headerlink" href="#shape-mismatch-errors-during-evaluation" title="Permanent link"> # </a></h3>
 <p>If a student submits an answer that will raise shape-mismatch errors then an error is raised with a helpful message. This avoids consuming one of the student's attempts. For example:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[11, 22, 33]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'[11, 22, 33]'</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;[10, 20, 30] + [1, 2]&#39;</span> <span class="c1"># Error! Adding vectors with different shapes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">'[10, 20, 30] + [1, 2]'</span> <span class="c1"># Error! Adding vectors with different shapes</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grade the input like edX would</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
@@ -697,21 +703,21 @@ Cannot raise a non-square matrix to powers.
 <h3 id="shape-mismatch-errors-during-comparison">Shape-Mismatch Errors During Comparison<a class="headerlink" href="#shape-mismatch-errors-during-comparison" title="Permanent link"> # </a></h3>
 <p>If the author's answer is a 3-component vector, and the student submits a different 3-component vector, then they will be marked incorrect. However, if the student submits a 2-component vector or a number, they will receive an error message:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[1, 2, 3]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'[1, 2, 3]'</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;[1, 2, -3]&#39;</span> <span class="c1"># wrong answer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">'[1, 2, -3]'</span> <span class="c1"># wrong answer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grade the input like edX would</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s1">'msg'</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ok'</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 <span class="go">True</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;[1, 2, 3, 4]&#39;</span> <span class="c1"># too many components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">'[1, 2, 3, 4]'</span> <span class="c1"># too many components</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grade the input like edX would</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="c1"># students see this error message</span>
 <span class="go">Expected answer to be a vector, but input is a vector of incorrect shape</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span> <span class="c1"># scalar; should be a vector</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">'0'</span> <span class="c1"># scalar; should be a vector</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grade the input like edX would</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">StudentFacingError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
@@ -731,18 +737,18 @@ Cannot raise a non-square matrix to powers.
 </ul>
 <p>we can use:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[1, 2, 3]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'[1, 2, 3]'</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">answer_shape_mismatch</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s1">&#39;is_raised&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-<span class="gp">... </span>        <span class="s1">&#39;msg_detail&#39;</span><span class="p">:</span> <span class="s1">&#39;shape&#39;</span> <span class="c1"># must be one of: None, &#39;type&#39;, &#39;shape&#39;</span>
+<span class="gp">... </span>        <span class="s1">'is_raised'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s1">'msg_detail'</span><span class="p">:</span> <span class="s1">'shape'</span> <span class="c1"># must be one of: None, 'type', 'shape'</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span> <span class="c1"># wrong shape</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">student_input</span> <span class="o">=</span> <span class="s1">'0'</span> <span class="c1"># wrong shape</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">student_input</span><span class="p">)</span> <span class="c1"># grades the input like edX would</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span>
-<span class="gp">... </span>  <span class="s1">&#39;grade_decimal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-<span class="gp">... </span>  <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;Expected answer to be a vector of length 3, but input is a scalar&#39;</span><span class="p">,</span>
-<span class="gp">... </span>  <span class="s1">&#39;ok&#39;</span><span class="p">:</span> <span class="kc">False</span>
+<span class="gp">... </span>  <span class="s1">'grade_decimal'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="s1">'msg'</span><span class="p">:</span> <span class="s1">'Expected answer to be a vector of length 3, but input is a scalar'</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="s1">'ok'</span><span class="p">:</span> <span class="kc">False</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="go">True</span>
 </code></pre></div>
@@ -750,20 +756,20 @@ Cannot raise a non-square matrix to powers.
 <h3 id="hiding-all-error-messages">Hiding All Error Messages<a class="headerlink" href="#hiding-all-error-messages" title="Permanent link"> # </a></h3>
 <p><code>MatrixGrader</code>s can be used to introduce non-commuting variables. In such a situation, students may not know that the variables they are using are matrices "under the hood", and so we want to suppress all matrix errors and messages. We can do this by setting <code>suppress_matrix_messages=True</code>, which overrides <code>answer_shape_mismatch={'is_raised'}</code> and <code>shape_errors</code>. In the following example, <code>A</code> and <code>B</code> are secretly matrices that don't commute, but students will never see a matrix error message from typing something like <code>1+A</code>.</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;A*B&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'A*B'</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'A'</span><span class="p">,</span> <span class="s1">'B'</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">sample_from</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">(),</span>
-<span class="gp">... </span>        <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="s1">'A'</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">(),</span>
+<span class="gp">... </span>        <span class="s1">'B'</span><span class="p">:</span> <span class="n">RealMatrices</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="n">max_array_dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">suppress_matrix_messages</span><span class="o">=</span><span class="kc">True</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;A*B&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'A*B'</span><span class="p">)[</span><span class="s1">'ok'</span><span class="p">]</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;B*A&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'B*A'</span><span class="p">)[</span><span class="s1">'ok'</span><span class="p">]</span>
 <span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;A+1&#39;</span><span class="p">)[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'A+1'</span><span class="p">)[</span><span class="s1">'ok'</span><span class="p">]</span>
 <span class="go">False</span>
 </code></pre></div>
 
@@ -775,10 +781,10 @@ Cannot raise a non-square matrix to powers.
 <p>To make an nxn identity matrix available to students, specify the configuration key <code>identity_dim=n</code>. That is, the grader <code>MatrixGrader(identity_dim=4, ...)</code> will automatically have a constant <code>I</code> whose value is the 4 by 4 identity matrix.</p>
 <p>If you want a different name (besides <code>I</code>) for the identity, or if you encounter situations where identity matrices of different sizes are required, you can use the <code>identity</code> function. For example:</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">grader</span> <span class="o">=</span> <span class="n">MatrixGrader</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">&#39;[1, 2, 3]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">answers</span><span class="o">=</span><span class="s1">'[1, 2, 3]'</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">user_constants</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>        <span class="s1">&#39;I_2&#39;</span><span class="p">:</span> <span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>  <span class="c1"># the 2 by 2 identity</span>
-<span class="gp">... </span>        <span class="s1">&#39;I_3&#39;</span><span class="p">:</span> <span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># the 3 by 3 identity</span>
+<span class="gp">... </span>        <span class="s1">'I_2'</span><span class="p">:</span> <span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>  <span class="c1"># the 2 by 2 identity</span>
+<span class="gp">... </span>        <span class="s1">'I_3'</span><span class="p">:</span> <span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># the 3 by 3 identity</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 </code></pre></div>

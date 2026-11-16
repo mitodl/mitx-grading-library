@@ -84,6 +84,12 @@
                         
                             
 <li >
+    <a href="../../upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../../edx/">edX Syntax</a>
 </li>
 
@@ -356,15 +362,15 @@
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample 3 by 2 real matrices with norm between 5 and 10</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">RealMatrices</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># The default is shape=[2, 2] and norm=[1, 5]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">RealMatrices</span><span class="p">()</span> <span class="o">==</span> <span class="n">RealMatrices</span><span class="p">({</span><span class="s1">&#39;norm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RealMatrices</span><span class="p">()</span> <span class="o">==</span> <span class="n">RealMatrices</span><span class="p">({</span><span class="s1">'norm'</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s1">'shape'</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)})</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Similarly for complex matrices</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ComplexMatrices</span><span class="p">()</span> <span class="o">==</span> <span class="n">ComplexMatrices</span><span class="p">({</span><span class="s1">&#39;norm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ComplexMatrices</span><span class="p">()</span> <span class="o">==</span> <span class="n">ComplexMatrices</span><span class="p">({</span><span class="s1">'norm'</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s1">'shape'</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)})</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample an upper triangular real 2x2 matrix.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">RealMatrices</span><span class="p">(</span><span class="n">triangular</span><span class="o">=</span><span class="s1">&#39;upper&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">RealMatrices</span><span class="p">(</span><span class="n">triangular</span><span class="o">=</span><span class="s1">'upper'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Sample a lower triangular complex 2x2 matrix.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">ComplexMatrices</span><span class="p">(</span><span class="n">triangular</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">ComplexMatrices</span><span class="p">(</span><span class="n">triangular</span><span class="o">=</span><span class="s1">'lower'</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="realtensors-and-complextensors">RealTensors and ComplexTensors<a class="headerlink" href="#realtensors-and-complextensors" title="Permanent link"> # </a></h3>
@@ -402,14 +408,14 @@
 <span class="go">True</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Diagonal, complex, traceless and unit determinant</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span> <span class="o">=</span> <span class="n">SquareMatrices</span><span class="p">(</span><span class="n">symmetry</span><span class="o">=</span><span class="s1">&#39;diagonal&#39;</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">traceless</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span> <span class="o">=</span> <span class="n">SquareMatrices</span><span class="p">(</span><span class="n">symmetry</span><span class="o">=</span><span class="s1">'diagonal'</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">traceless</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>                          <span class="n">determinant</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Symmetric, real, zero determinant</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span> <span class="o">=</span> <span class="n">SquareMatrices</span><span class="p">(</span><span class="n">symmetry</span><span class="o">=</span><span class="s1">&#39;symmetric&#39;</span><span class="p">,</span> <span class="n">determinant</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span> <span class="o">=</span> <span class="n">SquareMatrices</span><span class="p">(</span><span class="n">symmetry</span><span class="o">=</span><span class="s1">'symmetric'</span><span class="p">,</span> <span class="n">determinant</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Hermitian (enforces complex)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span> <span class="o">=</span> <span class="n">SquareMatrices</span><span class="p">(</span><span class="n">symmetry</span><span class="o">=</span><span class="s1">&#39;hermitian&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span> <span class="o">=</span> <span class="n">SquareMatrices</span><span class="p">(</span><span class="n">symmetry</span><span class="o">=</span><span class="s1">'hermitian'</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="orthogonalmatrices">OrthogonalMatrices<a class="headerlink" href="#orthogonalmatrices" title="Permanent link"> # </a></h3>
@@ -460,9 +466,9 @@
 <h3 id="dependentsampler">DependentSampler<a class="headerlink" href="#dependentsampler" title="Permanent link"> # </a></h3>
 <p>Compute a value for a variable based on the values of other constants/variables. The sampler is simply initialized with the desired formula, which can use any base or user-defined functions (except for randomly sampled functions, see below). <code>DependentSampler</code>s can depend on other dependent variables. If you construct a self-referential chain, an error will occur. Note that <code>DependentSampler</code> can depend on vector/matrix quantities as well as scalars. You can even use sibling variables in a <code>DependentSampler</code> (but if you do so, we strongly recommend making such variables instructor variables!).</p>
 <div class="codehilite"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Set radius based on the random values of x, y and z</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;sqrt(x^2+y^2+z^2)&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">"sqrt(x^2+y^2+z^2)"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Construct a matrix that depends on a variable</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;[[x,0],[0,-x^2]]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">DependentSampler</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">"[[x,0],[0,-x^2]]"</span><span class="p">)</span>
 </code></pre></div>
 
 <div class="admonition note">

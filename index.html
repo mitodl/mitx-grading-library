@@ -84,6 +84,12 @@
                         
                             
 <li >
+    <a href="upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
     <a href="edx/">edX Syntax</a>
 </li>
 
@@ -238,7 +244,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="edx/">
+                        <a rel="next" href="upgrading/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -296,25 +302,25 @@
 <li>is reliable (extensively tested)</li>
 <li>is open source (BSD-3 license, <a href="https://github.com/mitodl/mitx-grading-library">our Github repo</a>)</li>
 <li>has an <a href="https://edge.edx.org/courses/course-v1:MITx+grading-library+examples/">excellent example edX course</a></li>
-<li>is ready for the future of edX by being compatible with Python 3.8 and 3.11</li>
+<li>is ready for the future of edX by being tested against Python 3.11 through 3.15</li>
 <li>is actively maintained</li>
 </ul>
 <h2 id="two-typical-examples">Two Typical Examples<a class="headerlink" href="#two-typical-examples" title="Permanent link"> # </a></h2>
 <p>Typical usage in an edX course looks like:</p>
 <div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
-<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">"text/python"</span><span class="nt">&gt;</span>
 from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
 grader<span class="w"> </span>=<span class="w"> </span>FormulaGrader(
-<span class="w">    </span>variables=[&quot;x&quot;],
-<span class="w">    </span>#<span class="w"> </span>allows<span class="w"> </span>students<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>generic<span class="w"> </span>functions<span class="w"> </span>f<span class="w"> </span>and<span class="w"> </span>f&#39;<span class="w"> </span>in<span class="w"> </span>their<span class="w"> </span>input
-<span class="w">    </span>user_functions={&quot;f&quot;:<span class="w"> </span>RandomFunction(),<span class="w"> </span>&quot;f&#39;&quot;:<span class="w"> </span>RandomFunction()}
+<span class="w">    </span>variables=["x"],
+<span class="w">    </span>#<span class="w"> </span>allows<span class="w"> </span>students<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>generic<span class="w"> </span>functions<span class="w"> </span>f<span class="w"> </span>and<span class="w"> </span>f'<span class="w"> </span>in<span class="w"> </span>their<span class="w"> </span>input
+<span class="w">    </span>user_functions={"f":<span class="w"> </span>RandomFunction(),<span class="w"> </span>"f'":<span class="w"> </span>RandomFunction()}
 )
 <span class="nt">&lt;/script&gt;</span>
 
 <span class="w">  </span><span class="nt">&lt;p&gt;</span>Enter<span class="w"> </span>the<span class="w"> </span>derivative<span class="w"> </span>of<span class="w"> </span>\(g(x)<span class="w"> </span>=<span class="w"> </span>e^{f(x^2)}<span class="w"> </span>\).<span class="nt">&lt;/p&gt;</span>
 <span class="w">  </span><span class="cm">&lt;!-- answer is provided to the grader when using single inputs --&gt;</span>
-<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="w"> </span><span class="na">answer=</span><span class="s">&quot;e^(f(x)) * f&#39;(x^2) * 2*x&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">"grader"</span><span class="w"> </span><span class="na">answer=</span><span class="s">"e^(f(x)) * f'(x^2) * 2*x"</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">"true"</span><span class="w"> </span><span class="nt">/&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
 <span class="nt">&lt;/problem&gt;</span>
@@ -323,27 +329,27 @@ grader<span class="w"> </span>=<span class="w"> </span>FormulaGrader(
 <p>The resulting problem would be similar to an edX <code>&lt;formularesponse /&gt;</code> problem, but allows students to use additional generic functions <code>f(x)</code> and <code>f'(x)</code> in their submissions.</p>
 <p>The next example grader would grade an unordered list of mathematical expressions.</p>
 <div class="codehilite"><pre><span></span><code><span class="nt">&lt;problem&gt;</span>
-<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;text/python&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;script</span><span class="w"> </span><span class="na">type=</span><span class="s">"text/python"</span><span class="nt">&gt;</span>
 from<span class="w"> </span>mitxgraders<span class="w"> </span>import<span class="w"> </span>*
 grader<span class="w"> </span>=<span class="w"> </span>ListGrader(
-<span class="w">    </span>answers=[&#39;x-2&#39;,<span class="w"> </span>&#39;x+2&#39;],
-<span class="w">    </span>subgraders=FormulaGrader(variables=[&#39;x&#39;])
+<span class="w">    </span>answers=['x-2',<span class="w"> </span>'x+2'],
+<span class="w">    </span>subgraders=FormulaGrader(variables=['x'])
 )
 <span class="nt">&lt;/script&gt;</span>
 
 <span class="w">  </span><span class="nt">&lt;p&gt;</span>What<span class="w"> </span>are<span class="w"> </span>the<span class="w"> </span>linear<span class="w"> </span>factors<span class="w"> </span>of<span class="w"> </span>\((x^2<span class="w"> </span>-<span class="w"> </span>4)\)?<span class="w"> </span>Enter<span class="w"> </span>your<span class="w"> </span>answers<span class="w"> </span>in<span class="w"> </span>any<span class="w"> </span>order.<span class="nt">&lt;/p&gt;</span>
-<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">&quot;grader&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;customresponse</span><span class="w"> </span><span class="na">cfn=</span><span class="s">"grader"</span><span class="nt">&gt;</span>
 <span class="w">    </span><span class="cm">&lt;!-- correct_answer is shown to student when they press [Show Answer].</span>
 <span class="cm">         Its value is not used for grading purposes --&gt;</span>
-<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;x - 2&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">&quot;x + 2&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">"true"</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">"x - 2"</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;textline</span><span class="w"> </span><span class="na">math=</span><span class="s">"true"</span><span class="w"> </span><span class="na">correct_answer=</span><span class="s">"x + 2"</span><span class="w"> </span><span class="nt">/&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/customresponse&gt;</span>
 
 <span class="nt">&lt;/problem&gt;</span>
 </code></pre></div>
 
 <h2 id="loading-in-edx">Loading in edX<a class="headerlink" href="#loading-in-edx" title="Permanent link"> # </a></h2>
-<p>Download <a href="https://github.com/mitodl/mitx-grading-library/raw/master/python_lib.zip">python_lib.zip</a> and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip, you'll need to merge ours with yours and re-zip. If you want to use our AsciiMath renderer definitions (if you have math problems, you'll really want this!), place the <a href="https://raw.githubusercontent.com/mitodl/mitx-grading-library/master/MJxPrep.js">MJxPrep.js</a> file in your static folder (XML) or upload the file to your course assets (Studio).</p>
+<p>Download <a href="https://github.com/mitodl/mitx-grading-library/releases/latest/download/python_lib.zip">python_lib.zip</a> from the latest release and place it in your static folder (XML workflow) or upload it as a file asset (Studio workflow). If you already have a python_lib.zip with your own modules in it, you'll need to merge ours with yours; <a href="upgrading/">Upgrading a Course</a> has a script that does this. If you want to use our AsciiMath renderer definitions (if you have math problems, you'll really want this!), place the <a href="https://github.com/mitodl/mitx-grading-library/releases/latest/download/MJxPrep.js">MJxPrep.js</a> file in your static folder (XML) or upload the file to your course assets (Studio).</p>
 <p>The basic idea of this library is that it contains a number of classes that can be used as the check function for an edX custom response problem. Different classes of grader are used for different inputs. We begin by presenting a brief overview on how the grading classes are used in general.</p>
 <h3 id="how-to-zip-correctly">How to Zip Correctly<a class="headerlink" href="#how-to-zip-correctly" title="Permanent link"> # </a></h3>
 <p>EdX expects packages to be at the top level of the ZIP file. If you zip an entire folder named <code>python_lib</code>, the paths end up as <code>python_lib/mitxgraders/</code>, <code>python_lib/voluptuous/</code>, etc., and edX will fail to locate them.</p>

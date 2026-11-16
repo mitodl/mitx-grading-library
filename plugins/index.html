@@ -84,6 +84,12 @@
                         
                             
 <li >
+    <a href="../upgrading/">Upgrading a Course</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../edx/">edX Syntax</a>
 </li>
 
@@ -272,7 +278,7 @@
 <h2 id="overriding-library-defaults">Overriding Library Defaults<a class="headerlink" href="#overriding-library-defaults" title="Permanent link"> # </a></h2>
 <p>Library defaults for any grading class can be specified by constructing the desired dictionary of defaults, and calling <code>register_defaults(dict)</code> on the class. For example, to specify that all <code>StringGrader</code>s should be case-insensitive by default, you can do the following.</p>
 <div class="codehilite"><pre><span></span><code><span class="go">StringGrader.register_defaults({</span>
-<span class="go">    &#39;case_sensitive&#39;: False</span>
+<span class="go">    'case_sensitive': False</span>
 <span class="go">})</span>
 </code></pre></div>
 
