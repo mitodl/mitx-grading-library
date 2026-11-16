@@ -277,3 +277,140 @@ describe('callback returned by funcToPostfix', () => {
     expect(result).toBe('adj(x, y) + {:z^dagger:} + 5')
   } )
 } )
+
+describe('course options and MJxPrepCustom', () => {
+  const fakeAM = () => ({
+    TOKEN: { CONST: 0, UNARY: 1 },
+    newsymbol: jest.fn()
+  })
+
+  afterEach(() => {
+    window.MJxPrepOptions = {}
+    delete window.MJxPrepCustom
+    delete window.MathJax
+  })
+
+  it('falls back to the default for options a course leaves out or sets later', () => {
+    window.MJxPrepOptions = { conj_as_star: true }
+    expect(preProcessEqn('conj(x) + [1, 2]')).toBe('{:{:x:}^**:}+[[1], [2]]')
+    window.MJxPrepOptions = undefined
+    expect(preProcessEqn('conj(x)')).toBe('{:conj({:x:}):}')
+  } )
+
+  it('keeps options a course set before the file loaded', () => {
+    const loaded = window.MJxPrep
+    try {
+      delete window.MJxPrep
+      window.MJxPrepOptions = { vectors_as_columns: false }
+      jest.isolateModules(() => require('./MJxPrep.js'))
+      expect(window.MJxPrepOptions).toEqual({ vectors_as_columns: false })
+      expect(window.MJxPrepExports.preProcessEqn('[1, 2]')).toBe('[1,2]')
+    } finally {
+      window.MJxPrep = loaded
+    }
+  } )
+
+  it('runs pre before and post after the standard processing, with helpers', () => {
+    window.MJxPrepCustom = {
+      pre: (eqn, mjx) => mjx.replaceFunctionCalls(eqn, 'ffact', mjx.funcToPostfix('!!')),
+      post: (eqn) => eqn.replace(/dphidx/g, '{:(partial phi)/(partial x):}')
+    }
+    expect(preProcessEqn('ffact(n) + dphidx')).toBe(
+      // post sees variables already wrapped, so dphidx arrives as {:dphidx:}
+      '{:{:n:}!!:}+{:{:(partial phi)/(partial x):}:}'
+    )
+  } )
+
+  it('adds custom symbols once, resolving named token types', () => {
+    const AM = fakeAM()
+    const { applyCustomSymbols } = window.MJxPrepExports
+    window.MJxPrepCustom = {
+      symbols: [
+        { input: 'erf', tag: 'mo', output: 'erf', tex: null, ttype: 'UNARY', func: true },
+        { input: 'ell', tag: 'mo', output: 'ℓ', tex: null, ttype: 0 }
+      ]
+    }
+    applyCustomSymbols(AM)
+    applyCustomSymbols(AM)
+    expect(AM.newsymbol.mock.calls).toEqual([
+      [{ input: 'erf', tag: 'mo', output: 'erf', tex: null, ttype: 1, func: true }],
+      [{ input: 'ell', tag: 'mo', output: 'ℓ', tex: null, ttype: 0 }]
+    ])
+
+    window.MJxPrepCustom = { symbols: [{ input: 'scrP', tag: 'mo', output: '℘', ttype: 'CONST' }] }
+    applyCustomSymbols(AM)
+    expect(AM.newsymbol).toHaveBeenLastCalledWith(
+      { input: 'scrP', tag: 'mo', output: '℘', ttype: 0 }
+    )
+  } )
+
+  it("doesn't add symbols again when the course's file runs again", () => {
+    const AM = fakeAM()
+    const config = () => ({ symbols: [{ input: 'Bi', tag: 'mi', output: 'Bi', ttype: 'CONST' }] })
+    window.MJxPrepCustom = config()
+    window.MJxPrepExports.applyCustomSymbols(AM)
+    window.MJxPrepCustom = config()
+    window.MJxPrepExports.applyCustomSymbols(AM)
+    expect(AM.newsymbol).toHaveBeenCalledTimes(1)
+  } )
+
+  it('logs bad symbols once and still adds the others', () => {
+    const AM = fakeAM()
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const circular = { input: 'loop', tag: 'mo', output: 'l', ttype: 'CONST' }
+    circular.self = circular
+    window.MJxPrepCustom = {
+      symbols: [
+        { input: 'bad', tag: 'mo', output: 'b', ttype: 'NOPE' },
+        { input: 'proto', tag: 'mo', output: 'p', ttype: 'toString' },
+        { inptu: 'typo', tag: 'mo', output: 't', ttype: 'CONST' },
+        circular,
+        { input: 'good', tag: 'mo', output: 'g', ttype: 'CONST' }
+      ]
+    }
+    window.MJxPrepExports.applyCustomSymbols(AM)
+    window.MJxPrepExports.applyCustomSymbols(AM)
+    expect(AM.newsymbol.mock.calls).toEqual([[{ input: 'good', tag: 'mo', output: 'g', ttype: 0 }]])
+    expect(error.mock.calls.map((call) => call[0])).toEqual([
+      expect.stringContaining('bad has unknown ttype NOPE'),
+      expect.stringContaining('proto has unknown ttype toString'),
+      expect.stringContaining('needs string input and output'),
+      // can't be told apart from a new symbol, so it's reported every time
+      expect.stringContaining('circular'),
+      expect.stringContaining('circular')
+    ])
+    error.mockRestore()
+  } )
+
+  it('reports a pre or post that throws or returns a non-string once, and skips it', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+    // CAPA re-runs the course's file when it re-renders a problem, so each
+    // render brings new hook functions
+    const courseConfig = () => ({
+      pre: () => { throw null },
+      post: (eqn) => { eqn.replace(/x/g, 'y') }
+    })
+    window.MJxPrepCustom = courseConfig()
+    expect(preProcessEqn('fact(x)')).toBe('{:{:x:}!:}')
+    window.MJxPrepCustom = courseConfig()
+    expect(preProcessEqn('fact(x)')).toBe('{:{:x:}!:}')
+    expect(error.mock.calls.map((call) => call[0])).toEqual([
+      expect.stringContaining('MJxPrepCustom.pre threw: null'),
+      expect.stringContaining('MJxPrepCustom.post returned undefined instead of a string')
+    ])
+    error.mockRestore()
+  } )
+
+  it('adds symbols set after AsciiMath loaded when the preprocessor runs', () => {
+    const AM = fakeAM()
+    window.MathJax = { version: '4.1.2', InputJax: { AsciiMath: { AM } } }
+    window.MJxPrepCustom = {
+      symbols: [{ input: 'Diff', tag: 'mi', output: ' d', ttype: 'CONST', func: true }]
+    }
+    const preprocess = new window.MJxPrep().fn
+    expect(preprocess('Diff')).toBe('{:Diff:}')
+    expect(AM.newsymbol).toHaveBeenCalledWith(
+      { input: 'Diff', tag: 'mi', output: ' d', ttype: 0, func: true }
+    )
+  } )
+} )

@@ -9,8 +9,9 @@
  * Works with MathJax 2.7 (MathJax.Hub API) and MathJax 4.x (Open edX after
  * openedx/edx-platform#33555).
  *
- * Options can be specified at the top of the script
- * Custom replacements can be specified at the bottom of the script
+ * Don't edit this file to customize it for a course. Set window.MJxPrepOptions
+ * and window.MJxPrepCustom in a separate file instead, so this one can be
+ * replaced with a new release as is. See docs/grading_math/renderer.md.
  */
 
 // Make sure that this script only loads once
@@ -20,10 +21,23 @@ if (window.MJxPrep) {
   // is how to tell which release a course is running (see the console log).
   var MJXPREP_VERSION = '3.1.0';
 
-  // Specify options here!
-  window.MJxPrepOptions = {
+  // A course's options may have been set before this file loaded; options
+  // missing from it (or set later) fall back to these defaults when read.
+  var DEFAULT_OPTIONS = {
     conj_as_star: false,
     vectors_as_columns: true
+  };
+  window.MJxPrepOptions = window.MJxPrepOptions || {};
+
+  function getOption(name) {
+    var options = window.MJxPrepOptions;
+    return options && options[name] !== undefined ? options[name] : DEFAULT_OPTIONS[name];
+  }
+
+  // A course's window.MJxPrepCustom = {symbols, pre, post}, read each time
+  // it's needed so the course's file can load before or after this one.
+  function getCustom() {
+    return window.MJxPrepCustom || {};
   }
 
   // Define the preprocessor
@@ -33,6 +47,12 @@ if (window.MJxPrep) {
      *------------------------------------------------------
      */
     this.fn = function(eqn) {
+      // A course's symbols may have loaded after AsciiMath; CAPA calls this
+      // right before it renders a preview, so add them now.
+      var AM = findAsciiMath();
+      if (AM !== null) {
+        applyCustomSymbols(AM);
+      }
       try {
         return preProcessEqn(eqn)
       }
@@ -79,7 +99,7 @@ if (window.MJxPrep) {
 
     // Conjugate as star
     // Replace conj(...) -> {:(...)^*:}, with parentheses added as necessary
-    if (window.MJxPrepOptions.conj_as_star) {
+    if (getOption('conj_as_star')) {
       eqn = replaceFunctionCalls(eqn, 'conj', funcToPostfix('^**') )
     }
 
@@ -93,7 +113,7 @@ if (window.MJxPrep) {
     eqn = eqn.replace(/log2\(/g, "log_2(");
 
     // Display vectors as columns, if the option is turned on
-    if (window.MJxPrepOptions.vectors_as_columns) {
+    if (getOption('vectors_as_columns')) {
       eqn = columnizeVectors(eqn)
     }
 
@@ -172,11 +192,50 @@ if (window.MJxPrep) {
     // reported once instead of on every tick.
     clearInterval(checkExist);
     addAsciiMathSymbols(AM);
+    applyCustomSymbols(AM);
     rerenderPreviews();
     console.log(
       logPrefix() + "Updated AsciiMath renderer definitions (MathJax " +
       MathJax.version + ")"
     );
+  }
+
+  // Custom symbols already added (or rejected), by content: CAPA runs a
+  // problem's scripts again each time it renders the problem, so the course's
+  // file may set an equal MJxPrepCustom many times.
+  var seenCustomSymbols = {};
+
+  function applyCustomSymbols(AM) {
+    var symbols = getCustom().symbols;
+    if (!symbols) { return; }
+    for (var i = 0; i < symbols.length; i++) {
+      // One bad symbol shouldn't stop the rest, or break the preview
+      try {
+        var key = JSON.stringify(symbols[i]);
+        if (seenCustomSymbols[key]) { continue; }
+        seenCustomSymbols[key] = true;
+        AM.newsymbol(checkedSymbol(AM, symbols[i]));
+      } catch (err) {
+        console.error(logPrefix() + errorText(err));
+      }
+    }
+  }
+
+  // A course's config can't use AM.TOKEN.CONST etc. since AsciiMath may not
+  // have loaded yet, so it names the token type ("CONST") instead.
+  function checkedSymbol(AM, symbol) {
+    if (typeof symbol.input !== 'string' || typeof symbol.output !== 'string') {
+      throw Error('MJxPrepCustom symbol ' + JSON.stringify(symbol) +
+        ' needs string input and output');
+    }
+    if (typeof symbol.ttype !== 'string') { return symbol; }
+    if (!Object.prototype.hasOwnProperty.call(AM.TOKEN, symbol.ttype)) {
+      throw Error('MJxPrepCustom symbol ' + symbol.input + ' has unknown ttype ' +
+        symbol.ttype + '; expected one of ' + Object.keys(AM.TOKEN).join(', '));
+    }
+    var resolved = Object.assign({}, symbol);
+    resolved.ttype = AM.TOKEN[symbol.ttype];
+    return resolved;
   }
 
   function addAsciiMathSymbols(AM) {
@@ -681,7 +740,8 @@ if (window.MJxPrep) {
     }
   }
 
-  // Hacky exports for test file since we aren't transpiling
+  // Used by the tests (we aren't transpiling), and passed to a course's
+  // MJxPrepCustom.pre and .post functions as helpers
   window.MJxPrepExports = {
     findClosingBrace: findClosingBrace,
     replaceFunctionCalls: replaceFunctionCalls,
@@ -691,35 +751,56 @@ if (window.MJxPrep) {
     wrapVariables: wrapVariables,
     wrapFuncCalls: wrapFuncCalls,
     columnizeVectors: columnizeVectors,
-    funcToPostfix: funcToPostfix
+    funcToPostfix: funcToPostfix,
+    funcToSelf: funcToSelf,
+    applyCustomSymbols: applyCustomSymbols
   }
 
+  // Hooks already reported as broken, by name: they run on every keystroke,
+  // and CAPA re-runs the course's file (creating new functions) each time it
+  // re-renders a problem, so each is reported once per page
+  var reportedHooks = {};
+
+  function reportHook(name, message) {
+    if (reportedHooks[name]) { return; }
+    reportedHooks[name] = true;
+    console.error(logPrefix() + message);
+  }
+
+  // Course code can throw anything, including null
+  function errorText(err) {
+    return err instanceof Error ? err.message : String(err);
+  }
+
+  // Run a course's MJxPrepCustom.pre or .post. A broken one is reported and
+  // skipped, rather than leaving the student with a blank preview.
+  function runCustomHook(name, eqn) {
+    var hook = getCustom()[name];
+    if (!hook) { return eqn; }
+    var result;
+    try {
+      result = hook(eqn, window.MJxPrepExports);
+    } catch (err) {
+      reportHook(name, 'MJxPrepCustom.' + name + ' threw: ' + errorText(err));
+      return eqn;
+    }
+    if (typeof result !== 'string') {
+      reportHook(name, 'MJxPrepCustom.' + name + ' returned ' +
+        typeof result + ' instead of a string');
+      return eqn;
+    }
+    return result;
+  }
+
+  // MJxPrepCustom.pre runs before any standard changes (other than
+  // whitespace stripping); prefer .post where it works.
   function customPreReplacements(eqn) {
-    /*
-     * A function to allow for custom replacements.
-     * This function is called *before* any standard changes are
-     * made (other than whitespace cleaning).
-     * We suggest trying the Post replacements function (below) first,
-     * and resorting to the use of this function only if necessary.
-     */
-    var working = eqn;
-
-    // Manipulate working however you like here!
-
-    return working;
+    return runCustomHook('pre', eqn);
   }
 
+  // MJxPrepCustom.post runs after all other processing, e.g. for cosmetic
+  // changes like eqn.replace(/A_p/g, 'A_{+}')
   function customPostReplacements(eqn) {
-    /*
-     * A function to allow for custom replacements.
-     * This function is called *after* all other processing occurs,
-     * and is useful for providing cosmetic changes, for example:
-     * working = working.replace(/A_p/g, 'A_{+}');
-     */
-    var working = eqn;
-
-    // Manipulate working however you like here!
-
-    return working;
+    return runCustomHook('post', eqn);
   }
 }

@@ -42,44 +42,60 @@ To use these features, you need to add `preprocessorClassName` and `preprocessor
 If you use the preprocessor in your problem, you get the symbol definitions as well (you don't need to load them separately using a script tag).
 
 
-## Options
+## Customizing for a Course
 
-There are a few configurable options for the preprocessor in `MJxPrep.js`.
+Don't edit `MJxPrep.js` itself. Put your course's options and extensions in a separate file, e.g. `MJxPrepCustom.js`, and upload it to your static assets alongside `MJxPrep.js`. That way you can replace `MJxPrep.js` with a new release as is, and keep your changes.
 
-By default, `conj()` displays as a bar over the argument to the function. However, you may wish for complex conjugates to be displayed as a superscript star. If so, you can set `conj_as_star: true` at the start of the file.
+Load your file in each problem that uses the preprocessor, next to the `<textline>`:
 
-By default, vectors `[1, 2, 3]` display as a column vector when the preprocessor is loaded (without the preprocessor, it will display as a row). If you would instead like them to display as a row vector, you can set the option `vectors_as_columns: false` at the start of the file.
-
-
-## Extending Definitions
-
-If you're building a course that uses math extensively, it's likely that you want to use some sort of symbol that can't be written in the form of an edX variable. In this situation, we have provided two functions to extend the preprocessor. At the bottom of `MJxPrep.js`, you will find the functions `customPreReplacements` and `customPostReplacements`, which are called before and after our preprocessing functions occur, respectively. You can perform whatever manipulations you desire in these functions. As an example of a pre-replacement, consider the following line which implements the double factorial:
-
-```javascript
-working = replaceFunctionCalls(working, 'ffact', funcToPostfix('!!') )
+```XML
+<script type="text/javascript" src="/static/MJxPrepCustom.js"></script>
 ```
 
-This leverages our `replaceFunctionCalls` and `funcToPostfix` functions which detect function calls and perform replacements, respectively (a number of other useful functions are included in the javascript file).
+`MJxPrep.js` reads your settings each time it needs them, so the two files can load in either order.
 
-As an example of a post-replacement, the following line simply replaces a variable name with something that actually looks like a derivative:
+### Options
 
-```javascript
-working = working.replace(/dphidx/g, '{:(partial phi)/(partial x):}');
-```
-
-This is a trivial example of using regex to make a replacement; of course, more complicated replacements are also possible.
-
-Finally, if you want to introduce new symbols to AsciiMath using unicode, it's simple to do so. Here's an example of how we introduce hbar to the system:
+Set `window.MJxPrepOptions` to change how the preprocessor displays some functions. Any option you leave out keeps its default.
 
 ```javascript
-// This is hbar, often used in physics
-AM.newsymbol({
-  input:"hbar",
-  tag:"mo",
-  output:"\u210F",
-  tex:null,
-  ttype:AM.TOKEN.CONST});
+window.MJxPrepOptions = {
+  conj_as_star: true,
+  vectors_as_columns: false
+};
 ```
+
+By default, `conj()` displays as a bar over the argument to the function. Set `conj_as_star: true` to display complex conjugates as a superscript star instead.
+
+By default, vectors `[1, 2, 3]` display as a column vector when the preprocessor is loaded (without the preprocessor, it will display as a row). Set `vectors_as_columns: false` to display them as a row vector instead.
+
+### Extending definitions
+
+If you're building a course that uses math extensively, you probably want some symbols that can't be written as an edX variable. Set `window.MJxPrepCustom` to extend the preprocessor and the AsciiMath symbols:
+
+```javascript
+window.MJxPrepCustom = {
+  // Called before our preprocessing (after spaces are stripped)
+  pre: function(eqn, mjx) {
+    // Double factorial: ffact(n) -> n!!
+    return mjx.replaceFunctionCalls(eqn, 'ffact', mjx.funcToPostfix('!!'));
+  },
+  // Called after our preprocessing
+  post: function(eqn, mjx) {
+    // Variables are already wrapped in {: :} by this point
+    return eqn.replace(/dphidx/g, '{:(partial phi)/(partial x):}');
+  },
+  // New AsciiMath symbols
+  symbols: [
+    {input: "ell", tag: "mo", output: "\u2113", tex: null, ttype: "CONST"},
+    {input: "erf", tag: "mo", output: "erf", tex: null, ttype: "UNARY", func: true}
+  ]
+};
+```
+
+`pre` and `post` take the student's input as a string and return the replacement. We suggest trying `post` first, and using `pre` only if necessary. The second argument holds helper functions from `MJxPrep.js`, such as `replaceFunctionCalls`, `funcToPostfix` and `funcToSelf`, which detect function calls and perform replacements.
+
+Each entry in `symbols` is passed to AsciiMath's `AM.newsymbol`, with `ttype` given as the name of the token type (`"CONST"`, `"UNARY"`, `"BINARY"`, `"LEFTBRACKET"`, `"RIGHTBRACKET"` etc.) rather than `AM.TOKEN.CONST`, since AsciiMath may not have loaded when your file runs. See [ASCIIMathML.js](https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js) for the symbol format and examples.
 
 
 ## Notes
