@@ -347,6 +347,9 @@ if (window.MJxPrep) {
   var POLL_TIMEOUT_MS = 60000;
   var pollStartedAt = Date.now();
   var checkExist = setInterval(updateMathJax, POLL_INTERVAL_MS);
+  // If MathJax is already running (CAPA loads this script right before it
+  // renders saved answers), add the definitions before that first render.
+  updateMathJax();
 
   // FORBIDDEN_TO_WRAP includes things we've found problematic to wrap {:...:},
   // namely:
