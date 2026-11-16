@@ -382,16 +382,20 @@ describe('course options and MJxPrepCustom', () => {
     error.mockRestore()
   } )
 
-  it('reports a pre or post that throws or returns a non-string, and skips it', () => {
+  it('reports a pre or post that throws or returns a non-string once, and skips it', () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {})
-    window.MJxPrepCustom = {
-      pre: () => { throw Error('oops') },
+    // CAPA re-runs the course's file when it re-renders a problem, so each
+    // render brings new hook functions
+    const courseConfig = () => ({
+      pre: () => { throw null },
       post: (eqn) => { eqn.replace(/x/g, 'y') }
-    }
+    })
+    window.MJxPrepCustom = courseConfig()
     expect(preProcessEqn('fact(x)')).toBe('{:{:x:}!:}')
+    window.MJxPrepCustom = courseConfig()
     expect(preProcessEqn('fact(x)')).toBe('{:{:x:}!:}')
     expect(error.mock.calls.map((call) => call[0])).toEqual([
-      expect.stringContaining('MJxPrepCustom.pre threw: oops'),
+      expect.stringContaining('MJxPrepCustom.pre threw: null'),
       expect.stringContaining('MJxPrepCustom.post returned undefined instead of a string')
     ])
     error.mockRestore()

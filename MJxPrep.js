@@ -216,7 +216,7 @@ if (window.MJxPrep) {
         seenCustomSymbols[key] = true;
         AM.newsymbol(checkedSymbol(AM, symbols[i]));
       } catch (err) {
-        console.error(logPrefix() + err.message);
+        console.error(logPrefix() + errorText(err));
       }
     }
   }
@@ -756,14 +756,20 @@ if (window.MJxPrep) {
     applyCustomSymbols: applyCustomSymbols
   }
 
-  // Hooks already reported as broken; they run on every keystroke, so each
-  // is reported once
-  var reportedHooks = [];
+  // Hooks already reported as broken, by name: they run on every keystroke,
+  // and CAPA re-runs the course's file (creating new functions) each time it
+  // re-renders a problem, so each is reported once per page
+  var reportedHooks = {};
 
-  function reportHook(hook, message) {
-    if (reportedHooks.indexOf(hook) >= 0) { return; }
-    reportedHooks.push(hook);
+  function reportHook(name, message) {
+    if (reportedHooks[name]) { return; }
+    reportedHooks[name] = true;
     console.error(logPrefix() + message);
+  }
+
+  // Course code can throw anything, including null
+  function errorText(err) {
+    return err instanceof Error ? err.message : String(err);
   }
 
   // Run a course's MJxPrepCustom.pre or .post. A broken one is reported and
@@ -775,11 +781,11 @@ if (window.MJxPrep) {
     try {
       result = hook(eqn, window.MJxPrepExports);
     } catch (err) {
-      reportHook(hook, 'MJxPrepCustom.' + name + ' threw: ' + err.message);
+      reportHook(name, 'MJxPrepCustom.' + name + ' threw: ' + errorText(err));
       return eqn;
     }
     if (typeof result !== 'string') {
-      reportHook(hook, 'MJxPrepCustom.' + name + ' returned ' +
+      reportHook(name, 'MJxPrepCustom.' + name + ' returned ' +
         typeof result + ' instead of a string');
       return eqn;
     }
