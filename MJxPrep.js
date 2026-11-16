@@ -6,6 +6,8 @@
  *
  * Modifies MathJax AsciiMath renderer to accept a variety of new functions
  * Also defines a preprocessor for further beautification
+ * Works with MathJax 2.7 (MathJax.Hub API) and MathJax 4.x (Open edX after
+ * openedx/edx-platform#33555).
  *
  * Options can be specified at the top of the script
  * Custom replacements can be specified at the bottom of the script
@@ -14,6 +16,10 @@
 // Make sure that this script only loads once
 if (window.MJxPrep) {
 } else {
+  // Released version of this file. Course teams keep their own copy, so this
+  // is how to tell which release a course is running (see the console log).
+  var MJXPREP_VERSION = '3.1.0';
+
   // Specify options here!
   window.MJxPrepOptions = {
     conj_as_star: false,
@@ -35,6 +41,7 @@ if (window.MJxPrep) {
       }
     };
   };
+  window.MJxPrep.version = MJXPREP_VERSION;
 
   function preProcessEqn(eqn) {
     // Note that /pattern/flags is shorthand for a regex parser
@@ -105,12 +112,74 @@ if (window.MJxPrep) {
     return eqn;
   }
 
-  // Try to update AsciiMath
-  function updateMathJax() {
-    if (MathJax.InputJax.AsciiMath) {
-      // Grab the AsciiMath object
-      var AM = MathJax.InputJax.AsciiMath.AM;
+  function logPrefix() {
+    return "MITx Grading Library (MJxPrep.js " + MJXPREP_VERSION + "): ";
+  }
 
+  // Both MathJax 2.7 and MathJax 4 (whose input/asciimath component wraps the
+  // legacy v2 AsciiMath code) expose the AsciiMath parser here once it loads.
+  function findAsciiMath() {
+    if (typeof MathJax === "undefined" || MathJax === null) { return null; }
+    var jax = MathJax.InputJax && MathJax.InputJax.AsciiMath;
+    var AM = jax && jax.AM;
+    return AM && typeof AM.newsymbol === "function" ? AM : null;
+  }
+
+  // MathJax 4 also defines a legacy MathJax.Hub inside its AsciiMath
+  // component, but the v2 queue doesn't work there, so branch on the version
+  // instead of on whether MathJax.Hub exists.
+  function isMathJax2() {
+    return parseInt(String(MathJax.version), 10) < 3;
+  }
+
+  // Previews of saved answers may have rendered before our definitions were
+  // added, so ask MathJax to render them again.
+  function rerenderPreviews() {
+    if (isMathJax2()) {
+      MathJax.Hub.Queue([
+        "Reprocess",
+        MathJax.Hub,
+        "div.equation"
+      ]);
+      return;
+    }
+    // MathJax 4: CAPA renders previews in Problem.refreshMath, which it binds
+    // to keyup on these inputs, so replay a keyup once MathJax has started.
+    MathJax.startup.promise.then(function() {
+      var inputs = document.querySelectorAll(
+        "input.math, .formulaequationinput input"
+      );
+      for (var i = 0; i < inputs.length; i++) {
+        inputs[i].dispatchEvent(new Event("keyup", { bubbles: true }));
+      }
+    });
+  }
+
+  // Add our symbols to AsciiMath once it has loaded
+  function updateMathJax() {
+    var AM = findAsciiMath();
+    if (AM === null) {
+      if (Date.now() - pollStartedAt >= POLL_TIMEOUT_MS) {
+        clearInterval(checkExist);
+        console.warn(
+          logPrefix() + "AsciiMath did not load within " +
+          POLL_TIMEOUT_MS / 1000 + " s; custom renderer definitions not applied"
+        );
+      }
+      return;
+    }
+    // Stop polling before anything that can throw, so a failure below is
+    // reported once instead of on every tick.
+    clearInterval(checkExist);
+    addAsciiMathSymbols(AM);
+    rerenderPreviews();
+    console.log(
+      logPrefix() + "Updated AsciiMath renderer definitions (MathJax " +
+      MathJax.version + ")"
+    );
+  }
+
+  function addAsciiMathSymbols(AM) {
       // All of these new symbols are based on those appearing in the AsciiMath definitions
       // See https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js
       // Add functions, including some edX functions that don't exist in AsciiMath
@@ -270,26 +339,14 @@ if (window.MJxPrep) {
         ttype: AM.TOKEN.UNARY,
         acc: true
       });
-
-
-      // Ask MathJax to reprocess all input boxes, as saved answers may have rendered
-      // before these definitions went through
-      MathJax.Hub.Queue([
-        "Reprocess",
-        MathJax.Hub,
-        "div.equation"
-      ]);
-
-      // No need to update again
-      clearInterval(checkExist);
-      console.log(
-        "MITx Grading Library: Updated AsciiMath renderer definitions"
-      );
-    }
   }
 
-  // Check for the AsciiMath object every 200ms
-  var checkExist = setInterval(updateMathJax, 200);
+  // Check for the AsciiMath object every 200ms, giving up after a minute so a
+  // page without AsciiMath doesn't poll for as long as it stays open
+  var POLL_INTERVAL_MS = 200;
+  var POLL_TIMEOUT_MS = 60000;
+  var pollStartedAt = Date.now();
+  var checkExist = setInterval(updateMathJax, POLL_INTERVAL_MS);
 
   // FORBIDDEN_TO_WRAP includes things we've found problematic to wrap {:...:},
   // namely:
