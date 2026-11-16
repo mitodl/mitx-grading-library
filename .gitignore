@@ -9,3 +9,5 @@ course/course.tar.gz
 course/config.py
 site/
 mitxgraders-js/node_modules
+mitxgraders-js/test-results
+mitxgraders-js/playwright-report

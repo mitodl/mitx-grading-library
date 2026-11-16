@@ -4,6 +4,13 @@
 
 This major release removes support for Python 2 and older versions of Python 3 and adds support for Python 3.8 and 3.11.
 
+## Version 3.1
+
+### Version 3.1.0 (unreleased)
+
+* MJxPrep.js works with MathJax 4, which Open edX loads after [openedx/edx-platform#33555](https://github.com/openedx/edx-platform/pull/33555), as well as MathJax 2.7. Courses need to replace their copy of MJxPrep.js for answer previews to work on MathJax 4.
+* MJxPrep.js stops looking for MathJax's AsciiMath renderer after a minute instead of polling forever, and logs its version to the browser console (also available as `window.MJxPrep.version`).
+
 ## Version 3.0
 
 ### Version 3.0.0
