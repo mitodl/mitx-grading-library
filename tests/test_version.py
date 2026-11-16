@@ -16,6 +16,11 @@ def test_mjxprep_version_matches_the_library_version():
     assert re.search(r"var MJXPREP_VERSION = '([^']+)';", text).group(1) == __version__
 
 
+def test_readme_shows_this_version():
+    readme = (REPO_ROOT / "README.md").read_text()
+    assert re.search(rf"^Version {re.escape(__version__)} ", readme, re.MULTILINE)
+
+
 def test_changelog_has_a_section_for_this_version():
     changelog = (REPO_ROOT / "docs" / "changelog.md").read_text()
     assert re.search(rf"^### Version {re.escape(__version__)}\b", changelog, re.MULTILINE)

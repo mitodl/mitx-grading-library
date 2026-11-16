@@ -4,7 +4,7 @@
 
 A library of graders for edX Custom Response problems.
 
-Version 3.0.0 ([changelog](docs/changelog.md))
+Version 3.1.0 ([changelog](docs/changelog.md))
 
 Copyright 2017-2024 Jolyon Bloomfield and Chris Chudzicki
 
