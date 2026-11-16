@@ -1,0 +1,7 @@
+# Used by the library, pinned to the edx-platform master codejail sandbox (Python 3.12)
+# https://github.com/openedx/edx-platform/blob/master/requirements/edx-sandbox/base.txt
+numpy==1.26.4
+scipy==1.17.1
+pyparsing==3.3.3
+
+-r requirements-dev.txt

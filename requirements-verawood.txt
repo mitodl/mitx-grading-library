@@ -1,0 +1,7 @@
+# Used by the library, pinned to the Open edX Verawood codejail sandbox (Python 3.12)
+# https://github.com/openedx/edx-platform/blob/release/verawood/requirements/edx-sandbox/base.txt
+numpy==1.26.4
+scipy==1.17.1
+pyparsing==3.3.2
+
+-r requirements-dev.txt

@@ -1,0 +1,8 @@
+# Used by the library, unpinned to catch breakage from future numpy/scipy/pyparsing
+# releases before an Open edX release adopts them. numpy 1.26 (what every Open edX
+# sandbox ships) has no wheels for Python 3.13+, so newer Pythons test against these.
+numpy
+scipy
+pyparsing
+
+-r requirements-dev.txt

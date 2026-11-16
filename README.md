@@ -35,11 +35,11 @@ This is not required but can be useful for testing configurations in Python, rat
 
 To install:
 
-**Requirements:** An installation of Python 3.8 or 3.11 (current edX versions).
+**Requirements:** An installation of Python 3.11 (Open edX Ulmo) or 3.12 (Open edX Verawood and edx-platform master).
 
 0. (Optional) Create and activate a new Python Virtual Environment.
 1. Clone this repository and `cd` into it.
-2. Run `pip install -r requirements-python38.txt` or `pip install -r requirements-python311.txt` to install the requirements based on the Python version you want to test.
+2. Run `pip install -r requirements-<release>.txt` to install the numpy, scipy and pyparsing versions that ship in that Open edX release's codejail sandbox, where `<release>` is `ulmo` (Python 3.11), `verawood` (Python 3.12) or `master` (Python 3.12). For Python 3.13 and newer, use `requirements-latest.txt`, which installs the latest releases of those packages.
 3. Run `pytest` to check that tests are passing. (To invoke tests of just the documentation, you can run the following command: `python -m pytest --no-cov --disable-warnings docs/*`)
 
 
