@@ -42,24 +42,29 @@ def test_update_keeps_the_course_modules_and_replaces_the_library(tmp_path):
     course = make_zip(tmp_path / "course.zip", {
         "mitxgraders/version.py": '__version__ = "2.2.0"\n',
         "mitxgraders/removed_since.py": "",
-        "mitxgraders/plugins/template.py": "# old copy of a library plugin\n",
+        "mitxgraders/plugins/template.py": "# edited copy of a library plugin\n",
         "mitxgraders/plugins/defaults.py": "# the course's own plugin\n",
         "voluptuous/old.py": "",
         "sigfigs.py": "SIGFIGS = 3\n",
-        "grader_lib/": "",
         "grader_lib/__init__.py": "",
+        # A namespace package: on Python 3.11/3.12 zipimport needs the
+        # directory entry to find it
+        "nslib/": "",
+        "nslib/helpers.py": "",
         # macOS Finder's Compress adds these
         "__MACOSX/mitxgraders/._version.py": "",
     })
 
-    old, new, kept = python_lib_zip.update(course, release, tmp_path / "updated.zip")
+    old, new, kept, replaced = python_lib_zip.update(course, release, tmp_path / "updated.zip")
 
     assert (old, new) == ("2.2.0", __version__)
-    assert kept == ["grader_lib", "sigfigs.py", "mitxgraders/plugins/defaults.py"]
+    assert kept == ["grader_lib", "nslib", "sigfigs.py", "mitxgraders/plugins/defaults.py"]
+    assert replaced == ["mitxgraders/plugins/template.py"]
     with zipfile.ZipFile(tmp_path / "updated.zip") as updated, zipfile.ZipFile(release) as built:
         names = set(updated.namelist())
         assert names == set(built.namelist()) | {
-            "sigfigs.py", "grader_lib/__init__.py", "mitxgraders/plugins/defaults.py"
+            "sigfigs.py", "grader_lib/__init__.py", "nslib/", "nslib/helpers.py",
+            "mitxgraders/plugins/defaults.py",
         }
         assert updated.read("sigfigs.py") == b"SIGFIGS = 3\n"
         assert updated.read("mitxgraders/plugins/defaults.py") == b"# the course's own plugin\n"

@@ -92,8 +92,9 @@ def update(course_zip, release_zip, output):
     :param release_zip: python_lib.zip from a mitx-grading-library release
     :param output: path of the updated zip to write
     :returns: (old library version, new library version, what was kept from
-        the course's zip: top-level names, then plugin file paths)
-    :rtype: tuple[str | None, str | None, list[str]]
+        the course's zip: top-level names, then plugin file paths, and the
+        course's edited copies of release plugins that were replaced)
+    :rtype: tuple[str | None, str | None, list[str], list[str]]
     :raises ValueError: if either zip has the library inside a folder instead
         of at the top level
     """
@@ -120,14 +121,21 @@ def update(course_zip, release_zip, output):
         release_names = set(release.namelist())
         course_modules = []
         course_plugins = []
+        replaced_plugins = []
         for info in course.infolist():
             name = info.filename
-            if _is_macos_metadata(name) or info.is_dir():
+            if _is_macos_metadata(name):
                 continue
             if _top_level(name) not in LIBRARY_PACKAGES:
+                # Directory entries too: on Python 3.11/3.12, zipimport only
+                # finds a package without __init__.py through its directory entry
                 course_modules.append(info)
-            elif name.startswith(PLUGINS_DIR) and name not in release_names:
+            elif info.is_dir() or not name.startswith(PLUGINS_DIR):
+                continue
+            elif name not in release_names:
                 course_plugins.append(info)
+            elif course.read(info) != release.read(name):
+                replaced_plugins.append(name)
 
         with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as updated:
             kept = course_modules + course_plugins
@@ -137,7 +145,7 @@ def update(course_zip, release_zip, output):
                     updated.writestr(copy.copy(info), source.read(info))
         kept_names = sorted({_top_level(info.filename) for info in course_modules})
         kept_names += sorted(info.filename for info in course_plugins)
-        return old_version, new_version, kept_names
+        return old_version, new_version, kept_names, sorted(replaced_plugins)
 
 
 def main(argv=None):
@@ -169,12 +177,18 @@ def main(argv=None):
     if args.output.resolve() in (args.course_zip.resolve(), args.release.resolve()):
         parser.error("--output must be a new file, not one of the input zips")
     try:
-        old, new, kept = update(args.course_zip, args.release, args.output)
+        old, new, kept, replaced = update(args.course_zip, args.release, args.output)
     except ValueError as err:
         print(f"error: {err}", file=sys.stderr)
         return 1
     print(f"Wrote {args.output}: mitxgraders {old or 'not present'} -> {new}")
     print("Kept from the course's zip: " + (", ".join(kept) if kept else "nothing else"))
+    for name in replaced:
+        print(
+            f"warning: the course's {name} differed from the release's and was replaced. "
+            "Copy your changes into a plugin file of your own (see plugins.md).",
+            file=sys.stderr,
+        )
     print(f"Rename {args.output} to python_lib.zip and upload it to the course's Files & Uploads.")
     return 0
 
