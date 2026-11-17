@@ -8,15 +8,14 @@ import zipfile
 import pytest
 
 from mitxgraders.version import __version__
+from tests.helpers import zip_bytes
 from tests.test_zip import REPO_ROOT, load_python_lib_zip_script
 
 python_lib_zip = load_python_lib_zip_script()
 
 
 def make_zip(path, files):
-    with zipfile.ZipFile(path, "w") as archive:
-        for name, text in files.items():
-            archive.writestr(name, text)
+    path.write_bytes(zip_bytes(files))
     return path
 
 

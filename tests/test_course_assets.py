@@ -8,11 +8,11 @@ import importlib.util
 import io
 import subprocess
 import types
-import zipfile
 from pathlib import Path
 
 import pytest
 
+from tests.helpers import zip_bytes
 from tests.test_zip import REPO_ROOT
 
 spec = importlib.util.spec_from_file_location("course_assets", REPO_ROOT / "scripts" / "course_assets.py")
@@ -20,20 +20,34 @@ course_assets = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(course_assets)
 
 
-def zip_bytes(files):
-    buffer = io.BytesIO()
-    with zipfile.ZipFile(buffer, "w") as archive:
-        for name, text in files.items():
-            archive.writestr(name, text)
-    return buffer.getvalue()
+
+def test_classify_ignores_line_formatting():
+    known = {course_assets.normalized_sha256(b"function f() {\n  return 'a b';\n}\n"): "v3.0.0"}
+    for copy in (
+        b"function f() {\r\n  return 'a b';\r\n}\r\n",  # CRLF
+        b"\nfunction f() {  \n\treturn 'a b';\n\n}",  # indentation, trailing and blank lines
+    ):
+        assert course_assets.classify(copy, known) == ("stock", "v3.0.0")
+    assert course_assets.classify(b"function f() {\n  return 'a c';\n}\n", known) == ("customized", "")
+    assert course_assets.classify(b"x", {}) == ("present", "")
 
 
-def test_classify_ignores_whitespace():
-    known = {course_assets.normalized_sha256(b"var a = 1;\n"): "v3.0.0"}
-    assert course_assets.classify(b"var a = 1;\r\n", known) == ("stock", "v3.0.0")
-    assert course_assets.classify(b"  var  a =\t1;", known) == ("stock", "v3.0.0")
-    assert course_assets.classify(b"var a = 2;", known) == ("customized", "")
-    assert course_assets.classify(b"var a = 2;", {}) == ("present", "")
+def test_classify_keeps_whitespace_inside_a_line():
+    # e.g. the 18.02 fork's working.replace(/\[/g,'langle ') is a real customization
+    known = {course_assets.normalized_sha256(b"x = s.replace(/a/g, 'langle');\n"): "v3.0.0"}
+    assert course_assets.classify(b"x = s.replace(/a/g, 'langle ');\n", known) == ("customized", "")
+    assert course_assets.classify(b"x = s.replace(/a /g, 'langle');\n", known) == ("customized", "")
+
+
+@pytest.mark.parametrize("source, expected", [
+    (b"var a = 'x';\nvar b = 2;\n", False),
+    (b"var a = `x\n  y`;\n", True),
+    (b"var a = 'x \\\n  y';\n", True),
+    (b"var a = 'x \\\r\n  y';\n", True),
+    (b"var a = /\\\\/;\n", False),
+])
+def test_spans_lines(source, expected):
+    assert course_assets.spans_lines(source) == expected
 
 
 @pytest.mark.parametrize("files, expected", [

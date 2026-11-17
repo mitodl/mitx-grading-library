@@ -61,7 +61,7 @@ ZIP_NOISE = {"__MACOSX", "__pycache__", ".DS_Store"}
 # offsets and undecodable names)
 ZIP_READ_ERRORS = (zipfile.BadZipFile, zlib.error, RuntimeError, NotImplementedError, EOFError, ValueError)
 VERSION_PATTERN = re.compile(rb"""__version__\s*=\s*["']([^"']+)["']""")
-WHITESPACE = re.compile(rb"\s+")
+LINE_CONTINUATION = re.compile(rb"\\[ \t]*\r?$", re.MULTILINE)
 
 INVENTORY_FIELDS = (
     "course_key", "display_name", "start", "end", "scope", "template", "reruns",
@@ -75,8 +75,21 @@ def sha256(data):
 
 
 def normalized_sha256(data):
-    """Hash ignoring whitespace, so re-indented or re-saved copies still match."""
-    return sha256(WHITESPACE.sub(b"", data))
+    """Hash ignoring line endings, indentation, trailing spaces and blank lines.
+
+    Whitespace inside a line is kept, since in a string or regex literal it
+    changes what the code does. Whitespace at the ends of a line can't be inside
+    one, as long as no string spans lines (see :func:`spans_lines`).
+    """
+    lines = (line.strip() for line in data.splitlines())
+    return sha256(b"\n".join(line for line in lines if line))
+
+
+def spans_lines(data):
+    """Whether JavaScript source may have a string spanning lines, which
+    :func:`normalized_sha256` would change: a template literal, or a backslash
+    line continuation."""
+    return b"`" in data or LINE_CONTINUATION.search(data) is not None
 
 
 def classify(data, known):
@@ -235,6 +248,15 @@ def _git_file(repo_root, rev, path):
     return _git(repo_root, "cat-file", "blob", entry[2])
 
 
+def _known_hash(data, source):
+    if spans_lines(data):
+        raise ValueError(
+            f"{source} has a template literal or line continuation, so whitespace-normalized "
+            "hashes could match a copy that differs inside a string; classify by exact hash instead"
+        )
+    return normalized_sha256(data)
+
+
 def known_from_git(repo_root):
     """Collect every version of MJxPrep.js this repository has had.
 
@@ -253,14 +275,14 @@ def known_from_git(repo_root):
         for path in MJXPREP_PATHS:
             data = _git_file(repo_root, commit, path)
             if data is not None:
-                labels.setdefault(normalized_sha256(data), f"{commit[:7]} ({date})")
+                labels.setdefault(_known_hash(data, f"{commit[:7]}:{path}"), f"{commit[:7]} ({date})")
     # Oldest tag first, so a version is labelled with the first release that had it
     tagged = {}
     for tag in _git(repo_root, "tag", "--sort=creatordate").decode().split():
         for path in MJXPREP_PATHS:
             data = _git_file(repo_root, tag, path)
             if data is not None:
-                tagged.setdefault(normalized_sha256(data), tag)
+                tagged.setdefault(_known_hash(data, f"{tag}:{path}"), tag)
                 break
     labels.update(tagged)
     if not labels:
