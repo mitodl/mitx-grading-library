@@ -221,7 +221,7 @@ class FakeStore:
         if self.fail_writes:
             self.fail_writes -= 1
             # As MongoContentStore.save does, the old file is gone before the write fails
-            del self.assets[(course_key, filename)]
+            self.assets.pop((course_key, filename), None)
             raise OSError("write failed")
         self.assets[(course_key, filename)] = data
 
@@ -270,7 +270,8 @@ def test_run_replace_only_writes_allowlisted_copies(tmp_path):
     assert backup.read_bytes() == b"old"
     assert OLD[:16] in backup.name
     assert rows["course-v1:a+stock+1"]["old_sha256"] == OLD
-    assert store.cleared == ["course-v1:a+stock+1"]
+    # After the write, and again at the end of the run
+    assert store.cleared == ["course-v1:a+stock+1", "course-v1:a+stock+1"]
 
 
 def test_run_replace_dry_run_writes_nothing(tmp_path):
@@ -291,20 +292,50 @@ def test_run_replace_keeps_an_existing_backup(tmp_path):
     assert len(list((tmp_path / "backups").iterdir())) == 1
 
 
-def test_run_replace_restores_the_old_copy_when_a_write_fails(tmp_path):
-    store = FakeStore(ASSETS, fail_writes=1)
-    with pytest.raises(OSError):
-        run_replace(store, tmp_path, ["course-v1:a+stock+1", "course-v1:a+custom+1"], {OLD, "x"})
-    assert store.assets[("course-v1:a+stock+1", "MJxPrep.js")] == b"old"
+def report_rows(store, tmp_path, course_keys, allowed):
     out = io.StringIO()
     writer = csv.DictWriter(out, course_assets.REPORT_FIELDS)
-    store = FakeStore(ASSETS, fail_writes=1)
     with pytest.raises(OSError):
-        course_assets.run_replace(store, writer, "MJxPrep.js", b"new", ["course-v1:a+stock+1"], {OLD},
-                                  False, tmp_path / "b2")
-    assert "failed-restored" in out.getvalue()
-    # Stopped before the second course
+        course_assets.run_replace(store, writer, "MJxPrep.js", b"new", course_keys, allowed,
+                                  False, tmp_path / "backups")
+    return list(csv.DictReader(io.StringIO(out.getvalue()), course_assets.REPORT_FIELDS))
+
+
+def test_run_replace_restores_the_old_copy_when_a_write_fails(tmp_path):
+    assets = {**ASSETS, ("course-v1:a+stock+2", "MJxPrep.js"): b"old"}
+    store = FakeStore(assets, fail_writes=1)
+    rows = report_rows(store, tmp_path, ["course-v1:a+stock+1", "course-v1:a+stock+2"], {OLD})
+
+    assert store.assets[("course-v1:a+stock+1", "MJxPrep.js")] == b"old"
+    assert [row["action"] for row in rows] == ["failed", "restored"]
+    assert Path(rows[0]["backup"]).read_bytes() == b"old"
+    # Stopped before the second course, though it was allowed too
+    assert store.assets[("course-v1:a+stock+2", "MJxPrep.js")] == b"old"
     assert [key for key, __ in store.writes] == ["course-v1:a+stock+1", "course-v1:a+stock+1"]
+
+
+def test_run_replace_reports_a_failed_restore(tmp_path):
+    store = FakeStore(ASSETS, fail_writes=2)
+    rows = report_rows(store, tmp_path, ["course-v1:a+stock+1"], {OLD})
+    # The asset is gone, but the report says so and names the backup
+    assert [row["action"] for row in rows] == ["failed"]
+    assert Path(rows[0]["backup"]).read_bytes() == b"old"
+
+
+def test_run_replace_replaces_a_truncated_backup(tmp_path):
+    backup = course_assets.backup_path(tmp_path / "backups", "course-v1:a+stock+1", "MJxPrep.js", OLD)
+    backup.parent.mkdir()
+    backup.write_bytes(b"ol")
+    run_replace(FakeStore(ASSETS), tmp_path, ["course-v1:a+stock+1"], {OLD})
+    assert backup.read_bytes() == b"old"
+
+
+def test_inspect_zip_survives_damaged_zips():
+    data = zip_bytes({"mitxgraders/version.py": "__version__ = '3.0.0'\n", "voluptuous/__init__.py": ""})
+    for cut in range(len(data)):
+        course_assets.inspect_zip(data[:cut])
+    for i in range(len(data)):
+        course_assets.inspect_zip(data[:i] + bytes([data[i] ^ 0xFF]) + data[i + 1:])
 
 
 def test_run_replace_checks_every_key_before_writing(tmp_path):

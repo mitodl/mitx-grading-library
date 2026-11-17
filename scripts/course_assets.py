@@ -20,8 +20,13 @@ edxapp Python, e.g. after copying this file, known.json and the replacement in::
 Without ``--dry-run``, ``replace`` writes to the contentstore. It saves each
 copy it replaces in ``--backup-dir`` first (named with the copy's hash, never
 overwritten), so copy that directory and the report out of the container before
-it goes away. To roll a course back, run ``replace`` with its backup as
+it goes away. The report file must not exist yet, so each run keeps its own
+record. To roll a course back, run ``replace`` with its backup as
 ``--replacement`` and ``--allow`` set to the new hash.
+
+Only the asset with exactly this name is looked at, so a copy uploaded under
+another name (e.g. one imported from a subfolder, ``js_MJxPrep.js``) is
+reported as absent and left alone.
 
 The runs' git exports aren't touched; they pick up the new file on the run's
 next export. A run that is imported from git gets the old file back on its next
@@ -52,8 +57,9 @@ GIT_SYMLINK_MODE = "120000"
 LIBRARY_PACKAGES = {"mitxgraders", "voluptuous"}
 # Left by the tool that made the zip, not modules the course added
 ZIP_NOISE = {"__MACOSX", "__pycache__", ".DS_Store"}
-# What a damaged or unsupported zip member raises when read
-ZIP_READ_ERRORS = (zipfile.BadZipFile, zlib.error, RuntimeError, NotImplementedError, EOFError)
+# What a damaged or unsupported zip raises when read (ValueError covers bad
+# offsets and undecodable names)
+ZIP_READ_ERRORS = (zipfile.BadZipFile, zlib.error, RuntimeError, NotImplementedError, EOFError, ValueError)
 VERSION_PATTERN = re.compile(rb"""__version__\s*=\s*["']([^"']+)["']""")
 WHITESPACE = re.compile(rb"\s+")
 
@@ -121,9 +127,10 @@ def inspect_zip(data):
             version_file = nested[0]
             status = "nested"
         match = VERSION_PATTERN.search(archive.read(version_file))
+        version = match.group(1).decode() if match else ""
     except ZIP_READ_ERRORS:
         return "unreadable", "", []
-    return status, match.group(1).decode() if match else "", extras
+    return status, version, extras
 
 
 def inspect_file(filename, data, known):
@@ -293,8 +300,9 @@ def run_replace(store, writer, filename, replacement, course_keys, allowed, dry_
     """Replace ``filename`` in each course whose current copy's hash is allowed.
 
     The current copy is saved in ``backup_dir`` before it is overwritten, and
-    each write is read back. If a write fails, the old copy is written back
-    and the run stops.
+    each write is read back. If a write fails, the report gets a ``failed`` row
+    naming the backup, the old copy is written back and checked (a
+    ``restored`` row), and the run stops.
 
     :param store: a :class:`StudioStore`, or a stand-in for tests
     :param writer: csv.DictWriter with REPORT_FIELDS
@@ -302,8 +310,7 @@ def run_replace(store, writer, filename, replacement, course_keys, allowed, dry_
     :rtype: dict[str, int]
     """
     new_sha256 = sha256(replacement)
-    # Parse every key before writing anything, so a typo doesn't stop a run halfway
-    parsed = [(key, store.parse(key)) for key in course_keys]
+    parsed = parse_keys(store, course_keys)
     counts = defaultdict(int)
     replaced = []
     try:
@@ -320,19 +327,13 @@ def run_replace(store, writer, filename, replacement, course_keys, allowed, dry_
                 if row["action"] == "replace" and dry_run:
                     row["action"] = "would-replace"
                 elif row["action"] == "replace":
-                    backup = backup_path(backup_dir, key, filename, old_sha256)
-                    backup.parent.mkdir(parents=True, exist_ok=True)
-                    if not backup.exists():
-                        backup.write_bytes(old_data)
-                    row["backup"] = str(backup)
+                    row["backup"] = str(save_backup(backup_dir, key, filename, old_data))
                     try:
-                        store.write(course_key, filename, current, replacement)
-                        written = store.find(course_key, filename)
-                        if written is None or sha256(bytes(written.data)) != new_sha256:
-                            raise RuntimeError(f"{key}: {filename} didn't read back as {new_sha256}")
-                    except Exception:
-                        store.write(course_key, filename, current, old_data)
-                        writer.writerow({**row, "action": "failed-restored"})
+                        _write_and_check(store, course_key, filename, current, replacement)
+                    except BaseException:
+                        writer.writerow({**row, "action": "failed"})
+                        _write_and_check(store, course_key, filename, current, old_data)
+                        writer.writerow({**row, "action": "restored"})
                         raise
                     row["action"] = "replaced"
                     replaced.append(course_key)
@@ -344,6 +345,35 @@ def run_replace(store, writer, filename, replacement, course_keys, allowed, dry_
         for course_key in replaced:
             store.clear_cache(course_key, filename)
     return dict(counts)
+
+
+def parse_keys(store, course_keys):
+    """Parse every key up front, so a typo fails before anything is written."""
+    return [(key, store.parse(key)) for key in course_keys]
+
+
+def save_backup(backup_dir, course_key, filename, data):
+    """Save a course's copy under its hash, reusing an earlier backup only if it's intact.
+
+    :returns: the backup's path
+    :rtype: Path
+    """
+    path = backup_path(backup_dir, course_key, filename, sha256(data))
+    if path.exists() and sha256(path.read_bytes()) == sha256(data):
+        return path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    partial = path.with_name(path.name + ".partial")
+    partial.write_bytes(data)
+    partial.replace(path)
+    return path
+
+
+def _write_and_check(store, course_key, filename, current, data):
+    store.write(course_key, filename, current, data)
+    written = store.find(course_key, filename)
+    if written is None or sha256(bytes(written.data)) != sha256(data):
+        raise RuntimeError(f"{course_key}: {filename} didn't read back as {sha256(data)}")
+    store.clear_cache(course_key, filename)
 
 
 class StudioStore:
@@ -395,7 +425,6 @@ class StudioStore:
             thumbnail_location=current.thumbnail_location,
             import_path=current.import_path, locked=current.locked,
         ))
-        self.clear_cache(course_key, filename)
 
     def clear_cache(self, course_key, filename):
         from openedx.core.djangoapps.contentserver.caching import del_cached_content
@@ -504,6 +533,8 @@ def main(argv=None):
         print(f"Wrote {args.output} ({rows} rows) at {datetime.datetime.now(datetime.timezone.utc):%Y-%m-%dT%H:%MZ}")
         return 0
 
+    if "/" in args.filename or "\\" in args.filename:
+        parser.error("--filename is the asset's name, e.g. MJxPrep.js, not a path")
     replacement = args.replacement.read_bytes()
     if zipfile.is_zipfile(io.BytesIO(replacement)) != args.filename.endswith(".zip"):
         parser.error(f"--replacement {args.replacement} doesn't look like a {args.filename}")
@@ -523,7 +554,9 @@ def main(argv=None):
     if not allowed:
         parser.error("no allowed hashes; pass --allow, --allow-file or --inventory with --status")
     store = StudioStore()
-    with open(args.output, "w", newline="") as out:
+    parse_keys(store, course_keys)
+    # "x": never overwrite an earlier run's report, the record of what it replaced
+    with open(args.output, "x", newline="") as out:
         writer = csv.DictWriter(out, REPORT_FIELDS)
         writer.writeheader()
         counts = run_replace(store, writer, args.filename, replacement, course_keys, allowed,
