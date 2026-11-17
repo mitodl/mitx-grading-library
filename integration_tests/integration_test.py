@@ -10,8 +10,17 @@ import sys
 
 import django
 from opaque_keys.edx.keys import CourseKey
-from xmodule.capa.safe_exec import safe_exec
 from xmodule.contentstore.django import contentstore
+
+# capa moved out of edx-platform (openedx/edx-platform#38045): xmodule.capa
+# on Ulmo, xblocks-contrib on Verawood, xblocks-core on master
+try:
+    from xmodule.capa.safe_exec import safe_exec
+except ImportError:
+    try:
+        from xblocks_contrib.problem.capa.safe_exec import safe_exec
+    except ImportError:
+        from xblock_problem.capa.safe_exec import safe_exec
 from xmodule.util.sandboxing import SandboxService
 
 # Set up Django environment

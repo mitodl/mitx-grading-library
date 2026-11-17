@@ -5,6 +5,8 @@ on:
     paths:
       - "mitxgraders/**"
       - "voluptuous/**"
+      - "MJxPrep.js"
+      - "LICENSE"
       - "course/**"
       - "integration_tests/**"
       - "scripts/python_lib_zip.py"
@@ -16,6 +18,11 @@ on:
 
 permissions:
   contents: read
+
+# Each run launches Open edX three times, so drop runs for superseded commits
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   edx-platform-integration-test:
@@ -30,10 +37,13 @@ jobs:
           - openedx: verawood
             tutor: "tutor>=22,<23"
             codejail: "tutor-contrib-codejail>=22,<23"
-          # Tutor's main branch runs edx-platform master
+          # Tutor's main branch runs edx-platform master. No codejail plugin
+          # release allows Tutor main (23.x) yet, so install the Verawood one
+          # without its tutor~=22.0 requirement
           - openedx: master
             tutor: "tutor @ git+https://github.com/overhangio/tutor@main"
-            codejail: "tutor-contrib-codejail @ git+https://github.com/edunext/tutor-contrib-codejail@nightly"
+            codejail: "tutor-contrib-codejail>=22,<23"
+            codejail_pip_flags: "--no-deps"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -71,11 +81,15 @@ jobs:
         shell: bash
 
       - name: Install Tutor and the Codejail plugin
-        run: pip install "$TUTOR_SPEC" "$CODEJAIL_SPEC"
+        run: |
+          pip install "$TUTOR_SPEC"
+          # shellcheck disable=SC2086 # empty, or one flag
+          pip install $CODEJAIL_PIP_FLAGS "$CODEJAIL_SPEC"
         shell: bash
         env:
           TUTOR_SPEC: ${{ matrix.tutor }}
           CODEJAIL_SPEC: ${{ matrix.codejail }}
+          CODEJAIL_PIP_FLAGS: ${{ matrix.codejail_pip_flags }}
 
       - name: Enable and initialize the Codejail plugin
         run: |
