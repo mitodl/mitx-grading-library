@@ -45,3 +45,7 @@ python3 python_lib_zip.py update course_python_lib.zip --release python_lib.zip
 ```
 
 This writes `python_lib.updated.zip`, with `mitxgraders/` and `voluptuous/` replaced by the release's and everything else from your course's zip kept as is, including any [plugins](plugins.md) you added to `mitxgraders/plugins/`. It prints the old and new library versions and what it kept, and warns if your zip had edited one of the library's own plugin files (such as `defaults_sample.py`), since the release's copy replaces it; move those changes into a plugin file of your own. It needs Python 3 and nothing else. Rename `python_lib.updated.zip` to `python_lib.zip` and upload it. If your zip has the library inside a folder (e.g. `python_lib/mitxgraders/`), the script stops and points you at [How to Zip Correctly](index.md#how-to-zip-correctly).
+
+## Updating every course run on an Open edX instance
+
+Platform operators can update many course runs at once with [`scripts/course_assets.py`](https://github.com/mitodl/mitx-grading-library/blob/master/scripts/course_assets.py), which runs inside a Studio (CMS) container. `inventory` writes a CSV with each active, upcoming or template run's `MJxPrep.js` (stock release, customized, or absent) and `python_lib.zip` (library version and any extra modules). `replace` then swaps the file only in runs whose current copy has a hash you allow, e.g. every run the inventory lists as stock, saves each copy it replaces, and reports what it changed. Run it with `--dry-run` first. The script's docstring has the full steps.

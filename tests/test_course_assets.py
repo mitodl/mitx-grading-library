@@ -2,11 +2,14 @@
 Tests for the parts of scripts/course_assets.py that don't need Open edX
 """
 
+import csv
 import datetime
 import importlib.util
 import io
 import subprocess
+import types
 import zipfile
+from pathlib import Path
 
 import pytest
 
@@ -36,7 +39,7 @@ def test_classify_ignores_whitespace():
 @pytest.mark.parametrize("files, expected", [
     (
         {"mitxgraders/version.py": "__version__ = '3.0.0'\n", "voluptuous/__init__.py": ""},
-        ("stock", "3.0.0", []),
+        ("library-only", "3.0.0", []),
     ),
     (
         {
@@ -90,7 +93,7 @@ def test_latest_template_runs():
     runs = [
         ("course-v1:MITx+Template+2026_03_11", day.replace(month=3)),
         ("course-v1:MITx+Template+2026_03_18", day.replace(month=4)),
-        ("course-v1:MITx+Template+undated", None),
+        ("course-v1:MITx+Template+2025_01", day.replace(year=2025)),
         ("course-v1:MITx+Template.Mac+2025_01", day.replace(year=2025)),
         ("course-v1:MITxT+18.02.1x+3T2025", day.replace(month=9)),
     ]
@@ -138,7 +141,11 @@ def test_known_from_git_labels_versions_by_first_release(tmp_path):
     (tmp_path / "MJxPrep.js").write_text("two")
     git(tmp_path, "commit", "-q", "-am", "two")
     (tmp_path / "MJxPrep.js").write_text("three")
-    git(tmp_path, "commit", "-q", "-am", "three")
+    # The repository keeps symlinks to the root file in other folders
+    (tmp_path / "course" / "static").mkdir(parents=True)
+    (tmp_path / "course" / "static" / "MJxPrep.js").symlink_to("../../MJxPrep.js")
+    git(tmp_path, "add", ".")
+    git(tmp_path, "commit", "-q", "-m", "three")
     git(tmp_path, "tag", "-a", "v2", "-m", "v2")
 
     labels = course_assets.known_from_git(tmp_path)["MJxPrep.js"]
@@ -154,8 +161,18 @@ def test_known_from_git_needs_history(tmp_path):
     (tmp_path / "README").write_text("")
     git(tmp_path, "add", ".")
     git(tmp_path, "commit", "-q", "-m", "init")
-    with pytest.raises(ValueError, match="full clone"):
+    with pytest.raises(ValueError, match="No history"):
         course_assets.known_from_git(tmp_path)
+    shallow = tmp_path / "shallow"
+    subprocess.run(["git", "clone", "-q", "--depth", "1", f"file://{tmp_path}", str(shallow)],
+                   check=True, capture_output=True)
+    with pytest.raises(ValueError, match="shallow"):
+        course_assets.known_from_git(shallow)
+
+
+def test_read_hashes():
+    text = "ABC123  MJxPrep.js\n\ndef456\n"
+    assert course_assets.read_hashes(text) == {"abc123", "def456"}
 
 
 def test_main_replace_needs_courses_and_hashes(tmp_path):
@@ -167,3 +184,151 @@ def test_main_replace_needs_courses_and_hashes(tmp_path):
     with pytest.raises(SystemExit):
         course_assets.main(["replace", "--filename", "MJxPrep.js", "--replacement", str(replacement),
                             "--course", "course-v1:a+b+c"])
+
+
+def test_main_replace_refuses_a_mismatched_replacement(tmp_path):
+    replacement = tmp_path / "python_lib.zip"
+    replacement.write_bytes(zip_bytes({"mitxgraders/version.py": ""}))
+    with pytest.raises(SystemExit):
+        course_assets.main(["replace", "--filename", "MJxPrep.js", "--replacement", str(replacement),
+                            "--allow", "abc", "--course", "course-v1:a+b+c"])
+
+
+class FakeStore:
+    """Stands in for StudioStore: assets in a dict, courses in a set."""
+
+    def __init__(self, assets, courses=None, fail_writes=0):
+        self.assets = dict(assets)
+        self.courses = set(courses if courses is not None else (key for key, __ in assets))
+        self.fail_writes = fail_writes
+        self.writes = []
+        self.cleared = []
+
+    def parse(self, key):
+        if not key.startswith("course-v1:"):
+            raise ValueError(key)
+        return key
+
+    def has_course(self, course_key):
+        return course_key in self.courses
+
+    def find(self, course_key, filename):
+        data = self.assets.get((course_key, filename))
+        return None if data is None else types.SimpleNamespace(data=data, locked=False)
+
+    def write(self, course_key, filename, current, data):
+        self.writes.append((course_key, data))
+        if self.fail_writes:
+            self.fail_writes -= 1
+            # As MongoContentStore.save does, the old file is gone before the write fails
+            del self.assets[(course_key, filename)]
+            raise OSError("write failed")
+        self.assets[(course_key, filename)] = data
+
+    def clear_cache(self, course_key, filename):
+        self.cleared.append(course_key)
+
+
+def run_replace(store, tmp_path, course_keys, allowed, dry_run=False):
+    out = io.StringIO()
+    writer = csv.DictWriter(out, course_assets.REPORT_FIELDS)
+    writer.writeheader()
+    try:
+        counts = course_assets.run_replace(store, writer, "MJxPrep.js", b"new", course_keys, allowed,
+                                           dry_run, tmp_path / "backups")
+    finally:
+        rows = list(csv.DictReader(io.StringIO(out.getvalue())))
+    return counts, {row["course_key"]: row for row in rows}
+
+
+OLD = course_assets.sha256(b"old")
+NEW = course_assets.sha256(b"new")
+ASSETS = {
+    ("course-v1:a+stock+1", "MJxPrep.js"): b"old",
+    ("course-v1:a+custom+1", "MJxPrep.js"): b"custom",
+    ("course-v1:a+current+1", "MJxPrep.js"): b"new",
+}
+KEYS = ["course-v1:a+stock+1", "course-v1:a+custom+1", "course-v1:a+current+1",
+        "course-v1:a+empty+1", "course-v1:a+gone+1"]
+
+
+def test_run_replace_only_writes_allowlisted_copies(tmp_path):
+    store = FakeStore(ASSETS, courses=[*(key for key, __ in ASSETS), "course-v1:a+empty+1"])
+    counts, rows = run_replace(store, tmp_path, KEYS, {OLD})
+
+    assert store.writes == [("course-v1:a+stock+1", b"new")]
+    assert store.assets[("course-v1:a+custom+1", "MJxPrep.js")] == b"custom"
+    assert {key: row["action"] for key, row in rows.items()} == {
+        "course-v1:a+stock+1": "replaced",
+        "course-v1:a+custom+1": "not-allowlisted",
+        "course-v1:a+current+1": "already-current",
+        "course-v1:a+empty+1": "absent",
+        "course-v1:a+gone+1": "no-course",
+    }
+    assert counts["replaced"] == 1
+    backup = Path(rows["course-v1:a+stock+1"]["backup"])
+    assert backup.read_bytes() == b"old"
+    assert OLD[:16] in backup.name
+    assert rows["course-v1:a+stock+1"]["old_sha256"] == OLD
+    assert store.cleared == ["course-v1:a+stock+1"]
+
+
+def test_run_replace_dry_run_writes_nothing(tmp_path):
+    store = FakeStore(ASSETS)
+    counts, rows = run_replace(store, tmp_path, KEYS[:3], {OLD}, dry_run=True)
+    assert store.writes == []
+    assert rows["course-v1:a+stock+1"]["action"] == "would-replace"
+    assert not (tmp_path / "backups").exists()
+
+
+def test_run_replace_keeps_an_existing_backup(tmp_path):
+    store = FakeStore(ASSETS)
+    run_replace(store, tmp_path, ["course-v1:a+stock+1"], {OLD})
+    # Roll back, then replace again: the first backup must survive
+    store.assets[("course-v1:a+stock+1", "MJxPrep.js")] = b"old"
+    __, rows = run_replace(store, tmp_path, ["course-v1:a+stock+1"], {OLD})
+    assert Path(rows["course-v1:a+stock+1"]["backup"]).read_bytes() == b"old"
+    assert len(list((tmp_path / "backups").iterdir())) == 1
+
+
+def test_run_replace_restores_the_old_copy_when_a_write_fails(tmp_path):
+    store = FakeStore(ASSETS, fail_writes=1)
+    with pytest.raises(OSError):
+        run_replace(store, tmp_path, ["course-v1:a+stock+1", "course-v1:a+custom+1"], {OLD, "x"})
+    assert store.assets[("course-v1:a+stock+1", "MJxPrep.js")] == b"old"
+    out = io.StringIO()
+    writer = csv.DictWriter(out, course_assets.REPORT_FIELDS)
+    store = FakeStore(ASSETS, fail_writes=1)
+    with pytest.raises(OSError):
+        course_assets.run_replace(store, writer, "MJxPrep.js", b"new", ["course-v1:a+stock+1"], {OLD},
+                                  False, tmp_path / "b2")
+    assert "failed-restored" in out.getvalue()
+    # Stopped before the second course
+    assert [key for key, __ in store.writes] == ["course-v1:a+stock+1", "course-v1:a+stock+1"]
+
+
+def test_run_replace_checks_every_key_before_writing(tmp_path):
+    store = FakeStore(ASSETS)
+    with pytest.raises(ValueError):
+        run_replace(store, tmp_path, ["course-v1:a+stock+1", "typo"], {OLD})
+    assert store.writes == []
+
+
+def test_run_inventory_rows_feed_replace(tmp_path):
+    known = {"MJxPrep.js": {course_assets.normalized_sha256(b"old"): "v2.3.1"}}
+    store = FakeStore(ASSETS)
+    out = io.StringIO()
+    writer = csv.DictWriter(out, course_assets.INVENTORY_FIELDS)
+    writer.writeheader()
+    runs = [(key, {"scope": "active"}) for key in KEYS[:4]]
+    rows = course_assets.run_inventory(store, writer, runs, ["MJxPrep.js"], known,
+                                       {"course-v1:a+stock+1": 2})
+    assert rows == 4
+    inventory = list(csv.DictReader(io.StringIO(out.getvalue())))
+    assert [(row["status"], row["version"]) for row in inventory] == [
+        ("stock", "v2.3.1"), ("customized", ""), ("customized", ""), ("absent", ""),
+    ]
+    assert inventory[0]["reruns"] == "2"
+    assert course_assets.select_from_inventory(inventory, "MJxPrep.js", {"stock"}) == (
+        ["course-v1:a+stock+1"], {OLD},
+    )
