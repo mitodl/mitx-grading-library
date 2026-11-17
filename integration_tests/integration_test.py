@@ -12,8 +12,9 @@ import django
 from opaque_keys.edx.keys import CourseKey
 from xmodule.contentstore.django import contentstore
 
-# capa moved out of edx-platform (openedx/edx-platform#38045): xmodule.capa
-# on Ulmo, xblocks-contrib on Verawood, xblocks-core on master
+# capa moved out of edx-platform (openedx/edx-platform#38045): it's the
+# xmodule.capa module on Ulmo, xblocks_contrib from the xblocks-contrib package
+# on Verawood, and xblock_problem from the xblocks-core package on master
 try:
     from xmodule.capa.safe_exec import safe_exec
 except ImportError:
