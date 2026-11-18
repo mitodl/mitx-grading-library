@@ -20,7 +20,7 @@
     "@playwright/test": "1.64.1",
     "jest": "30.5.2",
     "jest-environment-jsdom": "30.5.2",
-    "mathjax2": "npm:mathjax@2.7.5",
+    "mathjax2": "npm:mathjax@3.0.0",
     "mathjax4": "npm:mathjax@4.1.2"
   },
   "overrides": {
