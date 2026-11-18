@@ -10,8 +10,18 @@ import sys
 
 import django
 from opaque_keys.edx.keys import CourseKey
-from xmodule.capa.safe_exec import safe_exec
 from xmodule.contentstore.django import contentstore
+
+# capa moved out of edx-platform (openedx/edx-platform#38045): it's the
+# xmodule.capa module on Ulmo, xblocks_contrib from the xblocks-contrib package
+# on Verawood, and xblock_problem from the xblocks-core package on master
+try:
+    from xmodule.capa.safe_exec import safe_exec
+except ImportError:
+    try:
+        from xblocks_contrib.problem.capa.safe_exec import safe_exec
+    except ImportError:
+        from xblock_problem.capa.safe_exec import safe_exec
 from xmodule.util.sandboxing import SandboxService
 
 # Set up Django environment
@@ -72,13 +82,11 @@ def execute_code(course_key_str):
         contentstore=contentstore
     )
     zip_lib = sandbox_service.get_python_lib_zip()
+    if zip_lib is None:
+        sys.exit(f"{course_key_str} has no python_lib.zip; was the course imported?")
 
-    extra_files = []
-    python_path = []
-
-    if zip_lib is not None:
-        extra_files.append(("python_lib.zip", zip_lib))
-        python_path.append("python_lib.zip")
+    extra_files = [("python_lib.zip", zip_lib)]
+    python_path = ["python_lib.zip"]
 
     safe_exec(
         code=GRADING_CLASSES_CODE,
