@@ -28,12 +28,35 @@ Only the asset with exactly this name is looked at, so a copy uploaded under
 another name (e.g. one imported from a subfolder, ``js_MJxPrep.js``) is
 reported as absent and left alone.
 
-The runs' git exports aren't touched; they pick up the new file on the run's
-next export. A run that is imported from git gets the old file back on its next
-import unless its repository is updated too.
+``replace`` doesn't touch git. A run exported to git (``git_repo`` in the
+inventory) picks up the new file on its next export. A run imported from git
+(``git_import``: the date, repository and branch of its latest import) gets the
+old file back on its next import, so update its repository as well with
+``git-replace``, on a workstation that can push to it::
+
+    python3 scripts/course_assets.py git-replace --filename MJxPrep.js \\
+        --replacement MJxPrep.js --inventory inventory.csv --status stock \\
+        --push-branch mjxprep-3.1.0 --open-pr --dry-run
+
+It fetches each repository's import branch into ``--work-dir``, replaces
+``static/<filename>`` where its hash is allowed (the inventory's hashes for
+those statuses, plus ``--allow``), and pushes one commit per repository to
+``--push-branch``. Pushing to the import branch itself, when that is
+edx-sysadmin's ``SYSADMIN_DEFAULT_BRANCH`` (``live`` on MIT's instances),
+re-imports the run straight away along with anything else on that branch,
+so a separate branch and a pull request for the course team is the default
+to reach for. Rerunning is safe: a push branch that already has the new file
+is reported ``already-pushed``, and ``--open-pr`` then opens its pull request
+if it has none. edx-sysadmin records only the repository's name, so a run
+imported from a repository other than its export repository needs
+``--remote NAME=URL`` or ``--remote-prefix`` (e.g. ``git@github.mit.edu:mitx/``)
+to be found; the report lists it as ``no-remote`` otherwise. A run whose
+team edits in git but uploads the course through Studio's import page leaves
+no record, so it shows up only as ``git_repo`` (or nothing).
 
 Only the standard library is used outside the edxapp environment, so ``known``
-runs with plain ``python3``.
+and ``git-replace`` run with plain ``python3`` (``git-replace`` also needs
+``git``, and ``gh`` for ``--open-pr``).
 """
 
 import argparse
@@ -54,6 +77,7 @@ DEFAULT_FILES = ("MJxPrep.js", "python_lib.zip")
 # Every path MJxPrep.js has had in this repository
 MJXPREP_PATHS = ("MJxPrep.js", "mitxgraders-js/MJxPrep.js", "course/static/MJxPrep.js")
 GIT_SYMLINK_MODE = "120000"
+GIT_FILE_MODES = ("100644", "100755")
 LIBRARY_PACKAGES = {"mitxgraders", "voluptuous"}
 # Left by the tool that made the zip, not modules the course added
 ZIP_NOISE = {"__MACOSX", "__pycache__", ".DS_Store"}
@@ -62,12 +86,22 @@ ZIP_NOISE = {"__MACOSX", "__pycache__", ".DS_Store"}
 ZIP_READ_ERRORS = (zipfile.BadZipFile, zlib.error, RuntimeError, NotImplementedError, EOFError, ValueError)
 VERSION_PATTERN = re.compile(rb"""__version__\s*=\s*["']([^"']+)["']""")
 LINE_CONTINUATION = re.compile(rb"\\[ \t]*\r?$", re.MULTILINE)
+# edx-sysadmin's CourseGitLog.git_log ends with the branch it imported
+GIT_IMPORT_BRANCH = re.compile(r"Branch: (\S+)")
 
 INVENTORY_FIELDS = (
     "course_key", "display_name", "start", "end", "scope", "template", "reruns",
+    "git_repo", "git_import",
     "filename", "status", "version", "sha256", "size", "locked", "extras",
 )
 REPORT_FIELDS = ("course_key", "filename", "action", "old_sha256", "new_sha256", "backup")
+GIT_REPORT_FIELDS = (
+    "course_key", "repo", "branch", "path", "action", "old_sha256", "new_sha256",
+    "commit", "pushed_to", "pull_request", "error",
+)
+# What git accepts as a remote here; anything else (e.g. a value starting
+# with "-") is refused rather than passed to git
+REMOTE_URL = re.compile(r"^(git@[^:\s]+:|ssh://|https://|file://)\S+$")
 
 
 def sha256(data):
@@ -398,6 +432,223 @@ def _write_and_check(store, course_key, filename, current, data):
     store.clear_cache(course_key, filename)
 
 
+def repo_name(url):
+    """:returns: a remote URL's repository name, e.g. ``MITx-6.00x-1T2026``"""
+    return url.rstrip("/").rsplit("/", 1)[-1].rsplit(":", 1)[-1].removesuffix(".git")
+
+
+def format_git_import(created, repo_dir, git_log):
+    """:returns: an inventory's ``git_import`` for one edx-sysadmin CourseGitLog row"""
+    branch = GIT_IMPORT_BRANCH.search(git_log or "")
+    date = f"{created:%Y-%m-%d}" if created else ""
+    return f"{date} {repo_dir}@{branch.group(1) if branch else ''}"
+
+
+def parse_git_import(value):
+    """:returns: (repo name, branch) from an inventory's ``git_import``, or ("", "")"""
+    if not value:
+        return "", ""
+    repo, __, branch = value.split(" ", 1)[-1].rpartition("@")
+    return repo, branch
+
+
+def git_targets(rows, filename, statuses, include_export_repos=False, remote_prefix="", remotes=None):
+    """Pick the repositories to update from an inventory's rows.
+
+    A run imported from git is updated on the branch it was imported from.
+    edx-sysadmin records only the repository's name, so its URL is taken
+    from ``remotes`` (name -> URL), else the run's export repository when that
+    has the same name, else ``remote_prefix`` + the name. A run that is only
+    exported to git is skipped unless ``include_export_repos``, since Studio
+    is its source and its next export brings the new file.
+
+    :param rows: rows of an ``inventory`` CSV
+    :param statuses: inventory statuses to update, e.g. {"stock"}
+    :returns: (course key, remote URL or "" when unknown, branch or "" for the default)
+    :rtype: list[tuple[str, str, str]]
+    """
+    remotes = remotes or {}
+    targets = []
+    for row in rows:
+        if row["filename"] != filename or row["status"] not in statuses:
+            continue
+        url = row.get("git_repo", "")
+        imported, branch = parse_git_import(row.get("git_import", ""))
+        if imported:
+            if imported in remotes:
+                url = remotes[imported]
+            elif repo_name(url) != imported:
+                url = f"{remote_prefix}{imported}.git" if remote_prefix else ""
+        elif not url or not include_export_repos:
+            continue
+        targets.append((row["course_key"], url, branch))
+    return targets
+
+
+class GitTargetError(Exception):
+    """A target repository that can't be updated, reported as ``failed``."""
+
+
+def work_tree_path(work_dir, url, branch):
+    """Where ``git-replace`` fetches a repository's branch.
+
+    The URL's hash is in the name, so two repositories with the same name
+    (edx-sysadmin knows them only by name) never share a work tree.
+    """
+    digest = sha256(url.encode())[:8]
+    return Path(work_dir) / f"{repo_name(url)}-{digest}@{branch.replace('/', '_')}"
+
+
+def _checkout(url, branch, work_dir):
+    """Fetch the tip of ``branch`` (or the remote's default branch) into a work tree.
+
+    :returns: (work tree path, branch name)
+    :rtype: tuple[Path, str]
+    :raises GitTargetError: when the remote has no default branch, or the work
+        tree's directory exists but isn't a repository (git would otherwise
+        work on whatever checkout encloses it)
+    """
+    if not branch:
+        head = _git(".", "ls-remote", "--symref", url, "HEAD").decode()
+        if "refs/heads/" not in head:
+            raise GitTargetError("remote has no default branch")
+        branch = head.split("refs/heads/", 1)[1].split()[0]
+    tree = work_tree_path(work_dir, url, branch)
+    if not tree.exists():
+        _git(".", "init", "--quiet", str(tree))
+        _git(tree, "remote", "add", "origin", url)
+    elif not (tree / ".git").is_dir():
+        raise GitTargetError(f"{tree} exists but isn't a git repository")
+    _git(tree, "remote", "set-url", "origin", url)
+    _git(tree, "fetch", "--quiet", "--depth", "1", "origin", f"refs/heads/{branch}")
+    _git(tree, "checkout", "--quiet", "--force", "-B", "course-assets", "FETCH_HEAD")
+    _git(tree, "clean", "--quiet", "-d", "--force")
+    return tree, branch
+
+
+def _push_branch_state(tree, push_branch, path, new_sha256):
+    """Check a push branch from an earlier run, so running again doesn't fail or duplicate it.
+
+    :returns: ``replace`` when the remote has no such branch,
+        ``already-pushed`` when it has the new file, else ``branch-exists``
+    :rtype: str
+    """
+    ref = f"refs/heads/{push_branch}"
+    if not _git(tree, "ls-remote", "origin", ref).strip():
+        return "replace"
+    _git(tree, "fetch", "--quiet", "--depth", "1", "origin", ref)
+    try:
+        pushed = _git(tree, "show", f"FETCH_HEAD:{path}")
+    except subprocess.CalledProcessError:
+        return "branch-exists"
+    return "already-pushed" if sha256(pushed) == new_sha256 else "branch-exists"
+
+
+def _last_line(error):
+    """:returns: the last line a failed command wrote to stderr"""
+    output = error.stderr if isinstance(error.stderr, str) else (error.stderr or b"").decode(errors="replace")
+    return output.strip().splitlines()[-1] if output.strip() else str(error)
+
+
+def _gh(*args):
+    return subprocess.run(["gh", *args], capture_output=True, check=True, text=True).stdout.strip()
+
+
+def _open_pull_request(url, base, head, title, body):
+    """Open a pull request with the ``gh`` CLI, or find the one already open.
+
+    :returns: its URL
+    """
+    host_path = re.sub(r"^(git@|ssh://git@|https://|ssh://)", "", url).replace(":", "/", 1)
+    repo = host_path.removesuffix(".git")
+    existing = _gh("pr", "list", "--repo", repo, "--base", base, "--head", head,
+                   "--state", "open", "--json", "url", "--jq", ".[0].url // empty")
+    return existing or _gh("pr", "create", "--repo", repo, "--base", base, "--head", head,
+                           "--title", title, "--body", body)
+
+
+def _tree_entry(tree, path):
+    """:returns: the git mode of ``path`` at HEAD, or None when it's absent"""
+    entry = _git(tree, "ls-tree", "HEAD", "--", path).decode().split()
+    return entry[0] if entry else None
+
+
+def run_git_replace(writer, filename, replacement, targets, allowed, work_dir, push_branch,
+                    message, dry_run=False, open_pr=False):
+    """Replace ``static/<filename>`` in each target repository whose copy's hash is allowed.
+
+    Each change is committed on its own and pushed to ``push_branch``. When
+    that is the branch the run is imported from and edx-sysadmin's
+    ``SYSADMIN_DEFAULT_BRANCH`` (``live`` on MIT's instances), its webhook
+    re-imports the run. Otherwise the change waits on that branch, and
+    ``open_pr`` opens a pull request for it (or finds the one already open,
+    so a rerun can add a missing one). A repository that fails is reported
+    and the run moves on, since nothing was pushed to it.
+
+    A symlinked ``static/<filename>`` (or ``static/``), which Studio's import
+    follows, and a ``static_import/<filename>``, which the import loads over
+    ``static/``, are reported and left for a person to sort out.
+
+    :param targets: (course key, remote URL, branch) from :func:`git_targets`
+    :param writer: csv.DictWriter with GIT_REPORT_FIELDS
+    :returns: count of each action taken
+    :rtype: dict[str, int]
+    """
+    new_sha256 = sha256(replacement)
+    path = f"static/{filename}"
+    counts = defaultdict(int)
+    seen = set()
+    for course_key, url, branch in targets:
+        row = {"course_key": course_key, "repo": url, "branch": branch, "path": path,
+               "new_sha256": new_sha256}
+        if not url:
+            row["action"] = "no-remote"
+        elif not REMOTE_URL.match(url):
+            row.update(action="failed", error="not a git remote URL")
+        elif (url, branch) in seen:
+            row["action"] = "duplicate-repo"
+        else:
+            seen.add((url, branch))
+            try:
+                tree, row["branch"] = _checkout(url, branch, work_dir)
+                current = tree / path
+                mode = _tree_entry(tree, path)
+                if GIT_SYMLINK_MODE in (_tree_entry(tree, "static"), mode):
+                    row["action"] = "symlink"
+                elif _tree_entry(tree, f"static_import/{filename}"):
+                    row["action"] = "static-import"
+                else:
+                    old_data = current.read_bytes() if mode in GIT_FILE_MODES else None
+                    row["old_sha256"] = sha256(old_data) if old_data is not None else None
+                    row["action"] = decide(row["old_sha256"], new_sha256, allowed)
+                if row["action"] == "replace" and push_branch and push_branch != row["branch"]:
+                    row["action"] = _push_branch_state(tree, push_branch, path, new_sha256)
+                if row["action"] == "replace" and dry_run:
+                    row["action"] = "would-replace"
+                elif row["action"] == "replace":
+                    current.write_bytes(replacement)
+                    _git(tree, "add", "--", path)
+                    _git(tree, "commit", "--quiet", "-m", message)
+                    row["commit"] = _git(tree, "rev-parse", "HEAD").decode().strip()
+                    _git(tree, "push", "--quiet", "origin", f"HEAD:refs/heads/{push_branch}")
+                    row.update(action="pushed", pushed_to=push_branch)
+            except subprocess.CalledProcessError as error:
+                row.update(action="failed", error=_last_line(error))
+            except GitTargetError as error:
+                row.update(action="failed", error=str(error))
+            if open_pr and row["action"] in ("pushed", "already-pushed") and push_branch != row["branch"]:
+                try:
+                    row["pull_request"] = _open_pull_request(
+                        url, row["branch"], push_branch, message,
+                        f"Replaces `{path}` (sha256 {row['old_sha256']}) with sha256 {new_sha256}.",
+                    )
+                except subprocess.CalledProcessError as error:
+                    row["error"] = f"pull request: {_last_line(error)}"
+        writer.writerow(row)
+        counts[row["action"]] += 1
+    return dict(counts)
+
+
 class StudioStore:
     """Course assets in the contentstore of the Studio this runs in."""
 
@@ -467,6 +718,7 @@ class StudioStore:
             if not str(overview.id).startswith("ccx-")
         ]
         latest_templates = latest_template_runs((overview.id, overview.created) for overview in overviews)
+        sources = StudioStore.git_sources()
         if course_keys:
             wanted = {CourseKey.from_string(key) for key in course_keys}
             overviews = [overview for overview in overviews if overview.id in wanted]
@@ -482,7 +734,34 @@ class StudioStore:
                     "end": overview.end.date().isoformat() if overview.end else "",
                     "scope": scope,
                     "template": template,
+                    **sources.get(str(overview.id), {}),
                 }
+
+    @staticmethod
+    def git_sources():
+        """Find the runs tied to a git repository.
+
+        ``git_repo`` is where ol-openedx-git-auto-export pushes the run on
+        each publish; ``git_import`` is the run's latest import from git by
+        edx-sysadmin (its GitHub webhook or ``git_add_course``), which
+        replaces what Studio has with the repository's branch.
+
+        :returns: course key -> {"git_repo": url, "git_import": "date repo@branch"}
+        :rtype: dict[str, dict[str, str]]
+        """
+        from django.apps import apps
+
+        sources = defaultdict(dict)
+        if apps.is_installed("ol_openedx_git_auto_export"):
+            repos = apps.get_model("ol_openedx_git_auto_export", "ContentGitRepository").objects
+            for key, url in repos.filter(is_export_enabled=True).values_list("content_key", "git_url"):
+                sources[str(key)]["git_repo"] = url
+        if apps.is_installed("edx_sysadmin"):
+            logs = apps.get_model("edx_sysadmin", "CourseGitLog").objects.exclude(course_id=None)
+            # Oldest first, so each run ends up with its latest import
+            for log in logs.order_by("created", "id"):
+                sources[str(log.course_id)]["git_import"] = format_git_import(log.created, log.repo_dir, log.git_log)
+        return sources
 
     @staticmethod
     def rerun_counts():
@@ -537,6 +816,42 @@ def main(argv=None):
     )
     replace_parser.add_argument("-o", "--output", type=Path, default=Path("report.csv"))
 
+    git_parser = commands.add_parser(
+        "git-replace", help="replace a file in the git repositories runs are imported from (on a workstation)",
+    )
+    git_parser.add_argument("--filename", required=True, help="asset filename, e.g. MJxPrep.js")
+    git_parser.add_argument("--replacement", type=Path, required=True, help="file to commit in its place")
+    git_parser.add_argument("--inventory", type=Path, required=True, help="inventory CSV from the inventory command")
+    git_parser.add_argument("--status", action="append", required=True,
+                            help="inventory status to replace, e.g. stock; repeat for more")
+    git_parser.add_argument("--course", dest="course_keys", action="append", default=[],
+                            help="only this course run; repeat for more")
+    git_parser.add_argument("--allow", action="append", default=[],
+                            help="sha256 of a repository's copy that may be replaced, beyond the inventory's")
+    git_parser.add_argument(
+        "--include-export-repos", action="store_true",
+        help="also update runs that are only exported to git (Studio's next export would anyway)",
+    )
+    git_parser.add_argument(
+        "--remote", dest="remotes", action="append", default=[], metavar="NAME=URL",
+        help="remote URL of an imported repository, by the name in git_import; repeat for more",
+    )
+    git_parser.add_argument(
+        "--remote-prefix", default="",
+        help="remote of any other imported repository, before its name, e.g. git@github.mit.edu:mitx/",
+    )
+    git_parser.add_argument(
+        "--push-branch",
+        help="branch to push each change to; the import branch itself (e.g. live) re-imports the run",
+    )
+    git_parser.add_argument("--open-pr", action="store_true",
+                            help="open a pull request from --push-branch to the import branch (needs gh)")
+    git_parser.add_argument("--message", help="commit message (default: names the file and its new hash)")
+    git_parser.add_argument("--dry-run", action="store_true", help="report what would change, push nothing")
+    git_parser.add_argument("--work-dir", type=Path, default=Path("course-repos"),
+                            help="where to fetch the repositories (default: %(default)s)")
+    git_parser.add_argument("-o", "--output", type=Path, default=Path("git-report.csv"))
+
     args = parser.parse_args(argv)
     if args.command == "known":
         known = known_from_git(Path(__file__).resolve().parent.parent)
@@ -560,6 +875,8 @@ def main(argv=None):
     replacement = args.replacement.read_bytes()
     if zipfile.is_zipfile(io.BytesIO(replacement)) != args.filename.endswith(".zip"):
         parser.error(f"--replacement {args.replacement} doesn't look like a {args.filename}")
+    if args.command == "git-replace":
+        return git_replace_main(parser, args, replacement)
     course_keys = list(args.course_keys)
     allowed = {value.lower() for value in args.allow}
     if args.allow_file:
@@ -583,6 +900,34 @@ def main(argv=None):
         writer.writeheader()
         counts = run_replace(store, writer, args.filename, replacement, course_keys, allowed,
                              args.dry_run, args.backup_dir)
+    summary = ", ".join(f"{action} {count}" for action, count in sorted(counts.items()))
+    print(f"{'Dry run: ' if args.dry_run else ''}{summary}. Report: {args.output}")
+    return 0
+
+
+def git_replace_main(parser, args, replacement):
+    if not args.dry_run and not args.push_branch:
+        parser.error("--push-branch is required unless --dry-run")
+    if any("=" not in value for value in args.remotes):
+        parser.error("--remote takes NAME=URL")
+    remotes = dict(value.split("=", 1) for value in args.remotes)
+    with args.inventory.open(newline="") as rows:
+        rows = list(csv.DictReader(rows))
+    if args.course_keys:
+        rows = [row for row in rows if row["course_key"] in args.course_keys]
+    __, allowed = select_from_inventory(rows, args.filename, set(args.status))
+    allowed |= {value.lower() for value in args.allow}
+    targets = git_targets(rows, args.filename, set(args.status), args.include_export_repos,
+                          args.remote_prefix, remotes)
+    if not targets:
+        parser.error("no runs selected that are imported from git (or, with --include-export-repos, exported)")
+    message = args.message or f"Replace static/{args.filename} (sha256 {sha256(replacement)[:12]})"
+    args.work_dir.mkdir(parents=True, exist_ok=True)
+    with open(args.output, "x", newline="") as out:
+        writer = csv.DictWriter(out, GIT_REPORT_FIELDS)
+        writer.writeheader()
+        counts = run_git_replace(writer, args.filename, replacement, targets, allowed, args.work_dir,
+                                 args.push_branch, message, args.dry_run, args.open_pr)
     summary = ", ".join(f"{action} {count}" for action, count in sorted(counts.items()))
     print(f"{'Dry run: ' if args.dry_run else ''}{summary}. Report: {args.output}")
     return 0

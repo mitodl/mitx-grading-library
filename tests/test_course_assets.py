@@ -377,3 +377,241 @@ def test_run_inventory_rows_feed_replace(tmp_path):
     assert course_assets.select_from_inventory(inventory, "MJxPrep.js", {"stock"}) == (
         ["course-v1:a+stock+1"], {OLD},
     )
+
+
+def test_repo_name():
+    assert course_assets.repo_name("git@github.mit.edu:mitxonline/MITx-6.00x-1T2026.git") == "MITx-6.00x-1T2026"
+    assert course_assets.repo_name("https://github.com/mitx/content-devops-0001") == "content-devops-0001"
+    assert course_assets.repo_name("git@host:repo.git") == "repo"
+
+
+def test_parse_git_import():
+    # The git_log edx-sysadmin's git_import.add_repo saves
+    git_log = "Cloning into 'content-devops-0001'...\nCommit ID: abc123\n   \nBranch: live\n"
+    value = course_assets.format_git_import(datetime.datetime(2021, 9, 1, 19, 56), "content-devops-0001", git_log)
+    assert value == "2021-09-01 content-devops-0001@live"
+    assert course_assets.parse_git_import(value) == ("content-devops-0001", "live")
+    assert course_assets.format_git_import(None, "repo", None) == " repo@"
+    assert course_assets.parse_git_import(" repo@") == ("repo", "")
+    assert course_assets.parse_git_import("") == ("", "")
+
+
+def inventory_row(course_key, status="stock", git_repo="", git_import=""):
+    return {"course_key": course_key, "filename": "MJxPrep.js", "status": status, "sha256": OLD,
+            "git_repo": git_repo, "git_import": git_import}
+
+
+def test_git_targets():
+    rows = [
+        # Imported from its own export repo
+        inventory_row("course-v1:a+same+1", git_repo="git@h:o/a-same-1.git", git_import="2026-01-01 a-same-1@live"),
+        # Imported from a repository elsewhere, which edx-sysadmin records only by name
+        inventory_row("course-v1:a+other+1", git_repo="git@h:o/a-other-1.git", git_import="2026-01-01 content@master"),
+        inventory_row("course-v1:a+export+1", git_repo="git@h:o/a-export-1.git"),
+        inventory_row("course-v1:a+studio+1"),
+        inventory_row("course-v1:a+custom+1", status="customized", git_import="2026-01-01 custom@live"),
+    ]
+    assert course_assets.git_targets(rows, "MJxPrep.js", {"stock"}) == [
+        ("course-v1:a+same+1", "git@h:o/a-same-1.git", "live"),
+        ("course-v1:a+other+1", "", "master"),
+    ]
+    assert course_assets.git_targets(rows, "MJxPrep.js", {"stock"}, include_export_repos=True,
+                                     remote_prefix="git@h:mitx/") == [
+        ("course-v1:a+same+1", "git@h:o/a-same-1.git", "live"),
+        ("course-v1:a+other+1", "git@h:mitx/content.git", "master"),
+        ("course-v1:a+export+1", "git@h:o/a-export-1.git", ""),
+    ]
+    assert course_assets.git_targets(rows, "python_lib.zip", {"stock"}) == []
+    # An explicit remote wins over both the export repository and the prefix
+    assert course_assets.git_targets(rows[:2], "MJxPrep.js", {"stock"}, remote_prefix="git@h:mitx/",
+                                     remotes={"content": "git@h:team/content.git",
+                                              "a-same-1": "git@h:team/a-same-1.git"}) == [
+        ("course-v1:a+same+1", "git@h:team/a-same-1.git", "live"),
+        ("course-v1:a+other+1", "git@h:team/content.git", "master"),
+    ]
+
+
+def make_remote(bare, setup=None):
+    """Make a bare course repository with static/MJxPrep.js on main and live.
+
+    :param setup: called with the source tree before it's committed, to change it
+    """
+    source = bare.with_name(bare.name + ".src")
+    (source / "static").mkdir(parents=True)
+    (source / "static" / "MJxPrep.js").write_bytes(b"old")
+    (source / "course.xml").write_text("<course/>")
+    if setup:
+        setup(source)
+    git(source, "init", "-q", "-b", "main")
+    git(source, "add", ".")
+    git(source, "commit", "-q", "-m", "Initial commit")
+    git(source, "branch", "live")
+    subprocess.run(["git", "clone", "-q", "--bare", str(source), str(bare)], check=True, capture_output=True)
+    return bare
+
+
+@pytest.fixture
+def remote(tmp_path, monkeypatch):
+    """A course repository from make_remote, and git configured to commit."""
+    config = tmp_path / "gitconfig"
+    config.write_text("[user]\n\tname = t\n\temail = t@example.com\n[commit]\n\tgpgsign = false\n")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(config))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    return make_remote(tmp_path / "course.git")
+
+
+def remote_file(bare, branch):
+    result = subprocess.run(["git", "-C", str(bare), "show", f"{branch}:static/MJxPrep.js"],
+                            capture_output=True, check=False)
+    return result.stdout if result.returncode == 0 else None
+
+
+def run_git_replace(tmp_path, targets, allowed, replacement=b"new", **kwargs):
+    out = io.StringIO()
+    writer = csv.DictWriter(out, course_assets.GIT_REPORT_FIELDS)
+    writer.writeheader()
+    counts = course_assets.run_git_replace(writer, "MJxPrep.js", replacement, targets, allowed,
+                                           tmp_path / "work", "mjxprep", "Update MJxPrep.js", **kwargs)
+    return counts, list(csv.DictReader(io.StringIO(out.getvalue())))
+
+
+def test_run_git_replace_pushes_a_branch_and_leaves_the_import_branch(tmp_path, remote):
+    url = f"file://{remote}"
+    counts, rows = run_git_replace(tmp_path, [("course-v1:a+b+1", url, "live")], {OLD})
+    assert counts == {"pushed": 1}
+    assert rows[0]["old_sha256"] == OLD
+    assert rows[0]["pushed_to"] == "mjxprep"
+    assert remote_file(remote, "mjxprep") == b"new"
+    assert remote_file(remote, "live") == b"old"
+    # Run again: the import branch still has the old copy, but the push branch
+    # has the new one, so nothing more is pushed
+    counts, rows = run_git_replace(tmp_path, [("course-v1:a+b+1", url, "live")], {OLD})
+    assert counts == {"already-pushed": 1}
+    # A push branch holding something else is left alone
+    counts, rows = run_git_replace(tmp_path, [("course-v1:a+b+1", url, "live")], {OLD},
+                                   replacement=b"newer")
+    assert counts == {"branch-exists": 1}
+    assert remote_file(remote, "mjxprep") == b"new"
+
+
+def test_run_git_replace_default_branch_and_dry_run(tmp_path, remote):
+    url = f"file://{remote}"
+    counts, rows = run_git_replace(tmp_path, [("course-v1:a+b+1", url, "")], {OLD}, dry_run=True)
+    assert counts == {"would-replace": 1}
+    assert rows[0]["action"] == "would-replace"
+    assert rows[0]["branch"] == "main"
+    assert remote_file(remote, "mjxprep") is None
+
+
+def test_run_git_replace_only_replaces_allowlisted_copies(tmp_path, remote):
+    url = f"file://{remote}"
+    targets = [
+        ("course-v1:a+b+1", url, "live"),
+        ("course-v1:a+b+2", url, "live"),
+        ("course-v1:a+c+1", "", "live"),
+        ("course-v1:a+d+1", "--upload-pack=touch /tmp/x", "live"),
+        ("course-v1:a+e+1", f"file://{tmp_path}/missing.git", "live"),
+    ]
+    counts, rows = run_git_replace(tmp_path, targets, {"0" * 64})
+    assert counts["failed"] == 2
+    assert [row["action"] for row in rows] == [
+        "not-allowlisted", "duplicate-repo", "no-remote", "failed", "failed",
+    ]
+    assert rows[3]["error"] == "not a git remote URL"
+    assert remote_file(remote, "mjxprep") is None
+
+
+def test_main_git_replace_reads_the_inventory(tmp_path, remote, monkeypatch):
+    inventory = tmp_path / "inventory.csv"
+    with inventory.open("w", newline="") as out:
+        writer = csv.DictWriter(out, course_assets.INVENTORY_FIELDS, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerow(inventory_row("course-v1:a+b+1", git_repo=f"file://{remote}",
+                                      git_import="2026-01-01 course@live"))
+        writer.writerow(inventory_row("course-v1:a+studio+1"))
+    replacement = tmp_path / "MJxPrep.js"
+    replacement.write_bytes(b"new")
+    monkeypatch.chdir(tmp_path)
+    args = ["git-replace", "--filename", "MJxPrep.js", "--replacement", str(replacement),
+            "--inventory", str(inventory), "--status", "stock"]
+    with pytest.raises(SystemExit):
+        course_assets.main(args)  # no --push-branch
+    assert course_assets.main([*args, "--push-branch", "live"]) == 0
+    assert remote_file(remote, "live") == b"new"
+    report = list(csv.DictReader((tmp_path / "git-report.csv").open()))
+    assert [(row["course_key"], row["action"]) for row in report] == [("course-v1:a+b+1", "pushed")]
+
+
+def test_run_git_replace_keeps_same_named_repositories_apart(tmp_path, remote):
+    # edx-sysadmin knows repositories only by name, so two orgs' "course" can both be targets
+    other = make_remote(tmp_path / "other" / "course.git")
+    targets = [("course-v1:a+b+1", f"file://{remote}", "live"), ("course-v1:a+b+2", f"file://{other}", "live")]
+    counts, __ = run_git_replace(tmp_path, targets, {OLD})
+    assert counts == {"pushed": 2}
+    assert remote_file(remote, "mjxprep") == remote_file(other, "mjxprep") == b"new"
+
+
+def test_run_git_replace_refuses_a_work_tree_that_isnt_a_repository(tmp_path, remote):
+    # The work dir sits in a checkout, which git must not fall through to
+    enclosing = tmp_path / "checkout"
+    enclosing.mkdir()
+    git(enclosing, "init", "-q", "-b", "main")
+    (enclosing / "kept").write_text("x")
+    git(enclosing, "add", ".")
+    git(enclosing, "commit", "-q", "-m", "init")
+    url = f"file://{remote}"
+    course_assets.work_tree_path(enclosing / "work", url, "live").mkdir(parents=True)
+    out = io.StringIO()
+    writer = csv.DictWriter(out, course_assets.GIT_REPORT_FIELDS)
+    counts = course_assets.run_git_replace(writer, "MJxPrep.js", b"new", [("course-v1:a+b+1", url, "live")],
+                                           {OLD}, enclosing / "work", "mjxprep", "Update")
+    assert counts == {"failed": 1}
+    assert "isn't a git repository" in out.getvalue()
+    head = subprocess.run(["git", "-C", str(enclosing), "branch", "--show-current"],
+                          capture_output=True, check=True, text=True).stdout.strip()
+    assert head == "main"
+    assert (enclosing / "kept").read_text() == "x"
+
+
+def test_run_git_replace_leaves_copies_studio_imports_differently(tmp_path, remote):
+    def symlinked(source):
+        (source / "MJxPrep.js").write_bytes(b"old")
+        (source / "static" / "MJxPrep.js").unlink()
+        (source / "static" / "MJxPrep.js").symlink_to("../MJxPrep.js")
+
+    def overridden(source):
+        (source / "static_import").mkdir()
+        (source / "static_import" / "MJxPrep.js").write_bytes(b"old")
+
+    symlink = make_remote(tmp_path / "symlink.git", symlinked)
+    static_import = make_remote(tmp_path / "static_import.git", overridden)
+    empty = tmp_path / "empty.git"
+    subprocess.run(["git", "init", "-q", "--bare", str(empty)], check=True, capture_output=True)
+    targets = [
+        ("course-v1:a+b+1", f"file://{symlink}", "live"),
+        ("course-v1:a+b+2", f"file://{static_import}", "live"),
+        ("course-v1:a+b+3", f"file://{empty}", ""),
+        ("course-v1:a+b+4", f"file://{remote}", "live"),
+    ]
+    counts, rows = run_git_replace(tmp_path, targets, {OLD})
+    assert [row["action"] for row in rows] == ["symlink", "static-import", "failed", "pushed"]
+    assert rows[2]["error"] == "remote has no default branch"
+    assert remote_file(symlink, "mjxprep") is None
+
+
+def test_run_git_replace_opens_a_missing_pull_request_on_a_rerun(tmp_path, remote, monkeypatch):
+    calls = []
+
+    def fail_then_open(url, base, head, title, body):
+        calls.append((url, base, head))
+        if len(calls) == 1:
+            raise subprocess.CalledProcessError(1, "gh", stderr="gh: not logged in")
+        return "https://example.com/pull/1"
+
+    monkeypatch.setattr(course_assets, "_open_pull_request", fail_then_open)
+    url = f"file://{remote}"
+    __, rows = run_git_replace(tmp_path, [("course-v1:a+b+1", url, "live")], {OLD}, open_pr=True)
+    assert (rows[0]["action"], rows[0]["error"]) == ("pushed", "pull request: gh: not logged in")
+    __, rows = run_git_replace(tmp_path, [("course-v1:a+b+1", url, "live")], {OLD}, open_pr=True)
+    assert (rows[0]["action"], rows[0]["pull_request"]) == ("already-pushed", "https://example.com/pull/1")
+    assert calls == [(url, "live", "mjxprep")] * 2
