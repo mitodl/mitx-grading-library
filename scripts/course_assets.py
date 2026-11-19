@@ -18,8 +18,8 @@ edxapp Python, e.g. after copying this file, known.json and the replacement in::
         --inventory inventory.csv --status stock --dry-run -o report.csv
 
 Without ``--dry-run``, ``replace`` writes to the contentstore. It saves each
-copy it replaces in ``--backup-dir`` first (named with the copy's hash, never
-overwritten), so copy that directory and the report out of the container before
+copy it replaces in ``--backup-dir`` first (named with the copy's hash, and
+reused when an intact one exists), so copy that directory and the report out of the container before
 it goes away. The report file must not exist yet, so each run keeps its own
 record. To roll a course back, run ``replace`` with its backup as
 ``--replacement`` and ``--allow`` set to the new hash.
