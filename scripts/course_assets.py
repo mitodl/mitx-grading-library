@@ -360,7 +360,8 @@ def run_replace(store, writer, filename, replacement, course_keys, allowed, dry_
     The current copy is saved in ``backup_dir`` before it is overwritten, and
     each write is read back. If a write fails, the report gets a ``failed`` row
     naming the backup, the old copy is written back and checked (a
-    ``restored`` row), and the run stops.
+    ``restored`` row), and the run stops. The cache of every file written is
+    cleared at the end, however the run ends.
 
     :param store: a :class:`StudioStore`, or a stand-in for tests
     :param writer: csv.DictWriter with REPORT_FIELDS
@@ -370,7 +371,7 @@ def run_replace(store, writer, filename, replacement, course_keys, allowed, dry_
     new_sha256 = sha256(replacement)
     parsed = parse_keys(store, course_keys)
     counts = defaultdict(int)
-    replaced = []
+    written = []
     try:
         for key, course_key in parsed:
             row = {"course_key": key, "filename": filename, "new_sha256": new_sha256}
@@ -386,6 +387,7 @@ def run_replace(store, writer, filename, replacement, course_keys, allowed, dry_
                     row["action"] = "would-replace"
                 elif row["action"] == "replace":
                     row["backup"] = str(save_backup(backup_dir, key, filename, old_data))
+                    written.append(course_key)
                     try:
                         _write_and_check(store, course_key, filename, current, replacement)
                     except BaseException:
@@ -394,13 +396,14 @@ def run_replace(store, writer, filename, replacement, course_keys, allowed, dry_
                         writer.writerow({**row, "action": "restored"})
                         raise
                     row["action"] = "replaced"
-                    replaced.append(course_key)
             writer.writerow(row)
             counts[row["action"]] += 1
     finally:
-        # The LMS can cache the old file again from a lagging read replica
-        # while the run is going, so clear each replaced file once more
-        for course_key in replaced:
+        # Cleared once the report is written, so a cache error (e.g. memcache
+        # down) can't roll back a good write or hide a restore. Clearing at the
+        # end also drops an old copy the LMS cached from a lagging read replica
+        # while the run was going.
+        for course_key in written:
             store.clear_cache(course_key, filename)
     return dict(counts)
 
@@ -431,7 +434,6 @@ def _write_and_check(store, course_key, filename, current, data):
     written = store.find(course_key, filename)
     if written is None or sha256(bytes(written.data)) != sha256(data):
         raise RuntimeError(f"{course_key}: {filename} didn't read back as {sha256(data)}")
-    store.clear_cache(course_key, filename)
 
 
 def repo_name(url):
@@ -907,6 +909,7 @@ def main(argv=None):
     if not allowed:
         parser.error("no allowed hashes; pass --allow, --allow-file or --inventory with --status")
     store = StudioStore()
+    # Before the report exists, so a typo doesn't leave an empty one that blocks the rerun
     parse_keys(store, course_keys)
     # "x": never overwrite an earlier run's report, the record of what it replaced
     with open(args.output, "x", newline="") as out:

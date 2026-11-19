@@ -284,8 +284,8 @@ def test_run_replace_only_writes_allowlisted_copies(tmp_path):
     assert backup.read_bytes() == b"old"
     assert OLD[:16] in backup.name
     assert rows["course-v1:a+stock+1"]["old_sha256"] == OLD
-    # After the write, and again at the end of the run
-    assert store.cleared == ["course-v1:a+stock+1", "course-v1:a+stock+1"]
+    # At the end of the run
+    assert store.cleared == ["course-v1:a+stock+1"]
 
 
 def test_run_replace_dry_run_writes_nothing(tmp_path):
@@ -665,3 +665,42 @@ def test_run_git_replace_adds_a_missing_origin(tmp_path, remote):
 def test_gh_repo(url):
     assert course_assets.gh_repo(url) == "github.mit.edu/mitx/repo"
 
+
+def test_run_replace_keeps_a_good_write_when_clearing_the_cache_fails(tmp_path):
+    class CacheDown(FakeStore):
+        def clear_cache(self, course_key, filename):
+            raise ConnectionError("memcache down")
+
+    store = CacheDown(ASSETS)
+    out = io.StringIO()
+    writer = csv.DictWriter(out, course_assets.REPORT_FIELDS)
+    with pytest.raises(ConnectionError):
+        course_assets.run_replace(store, writer, "MJxPrep.js", b"new", ["course-v1:a+stock+1"], {OLD},
+                                  False, tmp_path / "backups")
+    rows = list(csv.DictReader(io.StringIO(out.getvalue()), course_assets.REPORT_FIELDS))
+    assert store.assets[("course-v1:a+stock+1", "MJxPrep.js")] == b"new"
+    assert [row["action"] for row in rows] == ["replaced"]
+
+
+def test_main_replace_dry_run_writes_nothing(tmp_path, monkeypatch):
+    store = FakeStore(ASSETS)
+    monkeypatch.setattr(course_assets, "StudioStore", lambda: store)
+    monkeypatch.chdir(tmp_path)
+    replacement = tmp_path / "MJxPrep.js"
+    replacement.write_bytes(b"new")
+    assert course_assets.main(["replace", "--filename", "MJxPrep.js", "--replacement", str(replacement),
+                               "--course", "course-v1:a+stock+1", "--allow", OLD, "--dry-run"]) == 0
+    assert store.writes == []
+    report = list(csv.DictReader((tmp_path / "report.csv").open()))
+    assert [row["action"] for row in report] == ["would-replace"]
+
+
+def test_main_replace_checks_keys_before_creating_the_report(tmp_path, monkeypatch):
+    monkeypatch.setattr(course_assets, "StudioStore", lambda: FakeStore(ASSETS))
+    monkeypatch.chdir(tmp_path)
+    replacement = tmp_path / "MJxPrep.js"
+    replacement.write_bytes(b"new")
+    with pytest.raises(ValueError):
+        course_assets.main(["replace", "--filename", "MJxPrep.js", "--replacement", str(replacement),
+                            "--course", "typo", "--allow", OLD])
+    assert not (tmp_path / "report.csv").exists()
