@@ -1,7 +1,18 @@
 
 
+import io
 import re
+import zipfile
 from functools import wraps
+
+
+def zip_bytes(files):
+    """Return the bytes of a zip holding files, a {name: text} dict"""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        for name, text in files.items():
+            archive.writestr(name, text)
+    return buffer.getvalue()
 
 def log_results(results):
     """
