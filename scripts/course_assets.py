@@ -66,8 +66,10 @@ import hashlib
 import io
 import json
 import re
+import shutil
 import subprocess
 import sys
+import urllib.parse
 import zipfile
 import zlib
 from collections import defaultdict
@@ -516,10 +518,11 @@ def _checkout(url, branch, work_dir):
     tree = work_tree_path(work_dir, url, branch)
     if not tree.exists():
         _git(".", "init", "--quiet", str(tree))
-        _git(tree, "remote", "add", "origin", url)
     elif not (tree / ".git").is_dir():
         raise GitTargetError(f"{tree} exists but isn't a git repository")
-    _git(tree, "remote", "set-url", "origin", url)
+    # A run stopped right after `git init` leaves a work tree with no origin
+    has_origin = "origin" in _git(tree, "remote").decode().split()
+    _git(tree, "remote", "set-url" if has_origin else "add", "origin", url)
     _git(tree, "fetch", "--quiet", "--depth", "1", "origin", f"refs/heads/{branch}")
     _git(tree, "checkout", "--quiet", "--force", "-B", "course-assets", "FETCH_HEAD")
     _git(tree, "clean", "--quiet", "-d", "--force")
@@ -554,13 +557,23 @@ def _gh(*args):
     return subprocess.run(["gh", *args], capture_output=True, check=True, text=True).stdout.strip()
 
 
+def gh_repo(url):
+    """:returns: a remote URL as the HOST/OWNER/REPO that ``gh --repo`` takes"""
+    if "://" in url:
+        # ssh:// URLs can name a port, which gh's host doesn't include
+        parts = urllib.parse.urlsplit(url)
+        host_path = f"{parts.hostname}{parts.path}"
+    else:
+        host_path = url.split("@", 1)[-1].replace(":", "/", 1)
+    return host_path.rstrip("/").removesuffix(".git")
+
+
 def _open_pull_request(url, base, head, title, body):
     """Open a pull request with the ``gh`` CLI, or find the one already open.
 
     :returns: its URL
     """
-    host_path = re.sub(r"^(git@|ssh://git@|https://|ssh://)", "", url).replace(":", "/", 1)
-    repo = host_path.removesuffix(".git")
+    repo = gh_repo(url)
     existing = _gh("pr", "list", "--repo", repo, "--base", base, "--head", head,
                    "--state", "open", "--json", "url", "--jq", ".[0].url // empty")
     return existing or _gh("pr", "create", "--repo", repo, "--base", base, "--head", head,
@@ -636,7 +649,8 @@ def run_git_replace(writer, filename, replacement, targets, allowed, work_dir, p
                 row.update(action="failed", error=_last_line(error))
             except GitTargetError as error:
                 row.update(action="failed", error=str(error))
-            if open_pr and row["action"] in ("pushed", "already-pushed") and push_branch != row["branch"]:
+            if (open_pr and not dry_run and row["action"] in ("pushed", "already-pushed")
+                    and push_branch != row["branch"]):
                 try:
                     row["pull_request"] = _open_pull_request(
                         url, row["branch"], push_branch, message,
@@ -908,6 +922,9 @@ def main(argv=None):
 def git_replace_main(parser, args, replacement):
     if not args.dry_run and not args.push_branch:
         parser.error("--push-branch is required unless --dry-run")
+    # Checked up front: a missing gh would otherwise stop the run after a push
+    if args.open_pr and not shutil.which("gh"):
+        parser.error("--open-pr needs the gh CLI on PATH")
     if any("=" not in value for value in args.remotes):
         parser.error("--remote takes NAME=URL")
     remotes = dict(value.split("=", 1) for value in args.remotes)

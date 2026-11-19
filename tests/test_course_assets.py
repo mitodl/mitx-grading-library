@@ -615,3 +615,53 @@ def test_run_git_replace_opens_a_missing_pull_request_on_a_rerun(tmp_path, remot
     __, rows = run_git_replace(tmp_path, [("course-v1:a+b+1", url, "live")], {OLD}, open_pr=True)
     assert (rows[0]["action"], rows[0]["pull_request"]) == ("already-pushed", "https://example.com/pull/1")
     assert calls == [(url, "live", "mjxprep")] * 2
+
+
+def test_run_git_replace_dry_run_opens_no_pull_request(tmp_path, remote, monkeypatch):
+    url = f"file://{remote}"
+    run_git_replace(tmp_path, [("course-v1:a+b+1", url, "live")], {OLD})
+
+    def refuse(*args):
+        raise AssertionError("opened a pull request in a dry run")
+
+    monkeypatch.setattr(course_assets, "_open_pull_request", refuse)
+    counts, __ = run_git_replace(tmp_path, [("course-v1:a+b+1", url, "live")], {OLD}, dry_run=True, open_pr=True)
+    assert counts == {"already-pushed": 1}
+
+
+def test_main_git_replace_open_pr_needs_gh(tmp_path, monkeypatch):
+    inventory = tmp_path / "inventory.csv"
+    with inventory.open("w", newline="") as out:
+        writer = csv.DictWriter(out, course_assets.INVENTORY_FIELDS, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerow(inventory_row("course-v1:a+b+1", git_import="2026-01-01 course@live"))
+    replacement = tmp_path / "MJxPrep.js"
+    replacement.write_bytes(b"new")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(course_assets.shutil, "which", lambda name: None)
+    with pytest.raises(SystemExit):
+        course_assets.main(["git-replace", "--filename", "MJxPrep.js", "--replacement", str(replacement),
+                            "--inventory", str(inventory), "--status", "stock", "--remote-prefix",
+                            "git@example.com:mitx/", "--push-branch", "mjxprep", "--open-pr"])
+    assert not (tmp_path / "git-report.csv").exists()
+
+
+def test_run_git_replace_adds_a_missing_origin(tmp_path, remote):
+    # A run stopped between `git init` and `git remote add` leaves this behind
+    url = f"file://{remote}"
+    tree = course_assets.work_tree_path(tmp_path / "work", url, "live")
+    tree.mkdir(parents=True)
+    git(tree, "init", "-q")
+    counts, __ = run_git_replace(tmp_path, [("course-v1:a+b+1", url, "live")], {OLD})
+    assert counts == {"pushed": 1}
+
+
+@pytest.mark.parametrize("url", [
+    "git@github.mit.edu:mitx/repo.git",
+    "ssh://git@github.mit.edu/mitx/repo.git",
+    "ssh://git@github.mit.edu:2222/mitx/repo.git",
+    "https://github.mit.edu/mitx/repo",
+])
+def test_gh_repo(url):
+    assert course_assets.gh_repo(url) == "github.mit.edu/mitx/repo"
+
